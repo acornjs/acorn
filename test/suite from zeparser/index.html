@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Parser Test Suite Page (special build for Acorn)</title>
+    <style>
+      input+span:hover { border-bottom: 1px solid red; cursor: pointer; }
+      #cfg-menu { position: fixed; top:0; left: 0; background-color: white; }
+      div { font-size: 11px; font-family: monospace; }
+      .red { background-color: red; color: white; }
+      .green { background-color: green; color: white; }
+      hr { margin: 0; padding: 0; font-size: 1px; }
+    </style>
+  </head>
+  <body>
+    (c) qfox.nl<br/>
+    <a href="http://github.com/qfox/zeparser2">ZeParser</a> parser test suite<br/>
+    Testing <b><a href="http://github.com/marijnh/acorn/">Acorn</a></b> parser:<br/>
+    <script src="../../acorn.js"></script>
+
+    <script src="tests.js"></script>
+    <script>
+      new function(){
+        var out = document.createElement('pre');
+        document.body.appendChild(out);
+        var debug = function(){
+          var f = document.createElement('div');
+          f.innerHTML = Array.prototype.slice.call(arguments, 0).join(' ');
+          out.appendChild(f);
+        };
+
+        debug("Running test suite on parser...",good.length,"positive tests and",bad.length,"negative tests");
+        debug('<h1>These tests should succeed:</h1><br/>');
+        var start = Date.now();
+        var ok = 0;
+        var fail = 0;
+        for (var i=0; i<good.length; ++i) {
+          var test = good[i];
+          var input = test[0];
+          var outputLen = test[1].length ? test[1][1] : test[1];
+          var regexHints = test[3] ? test[2] : []; // if flags, then len=4
+          var desc = test[3] || test[2];
+
+          var crashed = false;
+          try {
+            var par = acorn.parse(input);
+          } catch (e) {
+            console.error('Crash for', input);
+            console.error(e);
+            crashed = e;
+          }
+
+          if (crashed) {
+            debug('<b class="red">Test crashed:</span>',desc,'(error message: '+crashed.toString()+')');
+            ++fail;
+          } else {//if (par.tok.tokenCount == outputLen) {
+            debug('<span class="green">Test '+i+' did not crash:</span>',desc);
+            ++ok;
+//          } else {
+//            debug('<b class="red">Test '+i+' failed:</span>',desc,'(found',par.tok&&par.tok.tokenCount,'expected',outputLen+')'),console.log(desc, par);
+//            ++fail;
+          }
+          debug('<b>'+input.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</b>');
+          debug('<br/>');
+        }
+
+        debug("<h1>These tests should fail:</h1><br/>");
+
+        for (var i=0; i<bad.length; ++i) {
+          var test = bad[i];
+          if (!test) console.warn("Probably missing a comma...");
+          var input = test[0];
+          var desc = test[1];
+
+          var crashed = false;
+          try {
+            var par = acorn.parse(input);
+          } catch (e) {
+            crashed = true;
+          }
+
+          if (crashed) {
+            debug('<span class="green">Test '+i+' should fail and did:</span>',desc);
+            ++ok;
+          } else {
+            debug('<b class="red">Test '+i+' did not fail but should:</span>',desc);
+            ++fail;
+          }
+          debug('<b>'+input.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</b>');
+          debug('<br/>');
+        }
+
+
+        debug("Parser test suite finished ("+(Date.now() - start)+' ms). ok:'+ok+', fail:'+fail);
+        console.log("Parser test suite finished ("+(Date.now() - start)+' ms). ok:'+ok+', fail:'+fail);
+      };
+    </script>
+  </body>
+</html>
