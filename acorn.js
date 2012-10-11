@@ -34,7 +34,7 @@
     for (var opt in defaultOptions) if (!options.hasOwnProperty(opt))
       options[opt] = defaultOptions[opt];
     sourceFile = options.sourceFile || null;
-    return parseTopLevel(opts.program);
+    return parseTopLevel(options.program);
   };
 
   // A second optional argument can be given to further configure
