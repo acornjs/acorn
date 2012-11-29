@@ -23,7 +23,7 @@
     factory(exports);
   } else if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
-    define(["exports"]);
+    define(["exports"], factory);
   } else {
     // Browser globals
     factory((root.acorn = {}));
