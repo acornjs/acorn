@@ -26,7 +26,51 @@
   //
   // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
 
-  var options, input, inputLen, sourceFile;
+  var options, input, inputLen, sourceFile, Syntax;
+  
+  // Node types
+  exports.Syntax = Syntax = {
+    AssignmentExpression: "AssignmentExpression",
+    ArrayExpression: "ArrayExpression",
+    BlockStatement: "BlockStatement",
+    BinaryExpression: "BinaryExpression",
+    BreakStatement: "BreakStatement",
+    CallExpression: "CallExpression",
+    CatchClause: "CatchClause",
+    ConditionalExpression: "ConditionalExpression",
+    ContinueStatement: "ContinueStatement",
+    DoWhileStatement: "DoWhileStatement",
+    DebuggerStatement: "DebuggerStatement",
+    EmptyStatement: "EmptyStatement",
+    ExpressionStatement: "ExpressionStatement",
+    ForStatement: "ForStatement",
+    ForInStatement: "ForInStatement",
+    FunctionDeclaration: "FunctionDeclaration",
+    FunctionExpression: "FunctionExpression",
+    Identifier: "Identifier",
+    IfStatement: "IfStatement",
+    Literal: "Literal",
+    LabeledStatement: "LabeledStatement",
+    LogicalExpression: "LogicalExpression",
+    MemberExpression: "MemberExpression",
+    NewExpression: "NewExpression",
+    ObjectExpression: "ObjectExpression",
+    Program: "Program",
+    Property: "Property",
+    ReturnStatement: "ReturnStatement",
+    SequenceExpression: "SequenceExpression",
+    SwitchStatement: "SwitchStatement",
+    SwitchCase: "SwitchCase",
+    ThisExpression: "ThisExpression",
+    ThrowStatement: "ThrowStatement",
+    TryStatement: "TryStatement",
+    UnaryExpression: "UnaryExpression",
+    UpdateExpression: "UpdateExpression",
+    VariableDeclaration: "VariableDeclaration",
+    VariableDeclarator: "VariableDeclarator",
+    WhileStatement: "WhileStatement",
+    WithStatement: "WithStatement"
+  };
 
   exports.parse = function(inpt, opts) {
     input = String(inpt); inputLen = input.length;
@@ -1020,7 +1064,7 @@
       if (first && isUseStrict(stmt)) setStrict(true);
       first = false;
     }
-    return finishNode(node, "Program");
+    return finishNode(node, Syntax.Program);
   };
 
   var loopLabel = {kind: "loop"}, switchLabel = {kind: "switch"};
@@ -1063,12 +1107,12 @@
         }
       }
       if (i === labels.length) raise(node.start, "Unsyntactic " + starttype.keyword);
-      return finishNode(node, isBreak ? "BreakStatement" : "ContinueStatement");
+      return finishNode(node, isBreak ? Syntax.BreakStatement : Syntax.ContinueStatement);
 
     case _debugger:
       next();
       semicolon();
-      return finishNode(node, "DebuggerStatement");
+      return finishNode(node, Syntax.DebuggerStatement);
 
     case _do:
       next();
@@ -1078,7 +1122,7 @@
       expect(_while);
       node.test = parseParenExpression();
       semicolon();
-      return finishNode(node, "DoWhileStatement");
+      return finishNode(node, Syntax.DoWhileStatement);
 
       // Disambiguating between a `for` and a `for`/`in` loop is
       // non-trivial. Basically, we have to parse the init `var`
@@ -1114,7 +1158,7 @@
       node.test = parseParenExpression();
       node.consequent = parseStatement();
       node.alternate = eat(_else) ? parseStatement() : null;
-      return finishNode(node, "IfStatement");
+      return finishNode(node, Syntax.IfStatement);
 
     case _return:
       if (!inFunction) raise(tokStart, "'return' outside of function");
@@ -1126,7 +1170,7 @@
       
       if (eat(_semi) || canInsertSemicolon()) node.argument = null;
       else { node.argument = parseExpression(); semicolon(); }
-      return finishNode(node, "ReturnStatement");
+      return finishNode(node, Syntax.ReturnStatement);
 
     case _switch:
       next();
@@ -1142,7 +1186,7 @@
       for (var cur, sawDefault; tokType != _braceR;) {
         if (tokType === _case || tokType === _default) {
           var isCase = tokType === _case;
-          if (cur) finishNode(cur, "SwitchCase");
+          if (cur) finishNode(cur, Syntax.SwitchCase);
           node.cases.push(cur = startNode());
           cur.consequent = [];
           next();
@@ -1157,10 +1201,10 @@
           cur.consequent.push(parseStatement());
         }
       }
-      if (cur) finishNode(cur, "SwitchCase");
+      if (cur) finishNode(cur, Syntax.SwitchCase);
       next(); // Closing brace
       labels.pop();
-      return finishNode(node, "SwitchStatement");
+      return finishNode(node, Syntax.SwitchStatement);
 
     case _throw:
       next();
@@ -1168,7 +1212,7 @@
         raise(lastEnd, "Illegal newline after throw");
       node.argument = parseExpression();
       semicolon();
-      return finishNode(node, "ThrowStatement");
+      return finishNode(node, Syntax.ThrowStatement);
 
     case _try:
       next();
@@ -1184,12 +1228,12 @@
         expect(_parenR);
         clause.guard = null;
         clause.body = parseBlock();
-        node.handlers.push(finishNode(clause, "CatchClause"));
+        node.handlers.push(finishNode(clause, Syntax.CatchClause));
       }
       node.finalizer = eat(_finally) ? parseBlock() : null;
       if (!node.handlers.length && !node.finalizer)
         raise(node.start, "Missing catch or finally clause");
-      return finishNode(node, "TryStatement");
+      return finishNode(node, Syntax.TryStatement);
 
     case _var:
       next();
@@ -1203,21 +1247,21 @@
       labels.push(loopLabel);
       node.body = parseStatement();
       labels.pop();
-      return finishNode(node, "WhileStatement");
+      return finishNode(node, Syntax.WhileStatement);
 
     case _with:
       if (strict) raise(tokStart, "'with' in strict mode");
       next();
       node.object = parseParenExpression();
       node.body = parseStatement();
-      return finishNode(node, "WithStatement");
+      return finishNode(node, Syntax.WithStatement);
 
     case _braceL:
       return parseBlock();
 
     case _semi:
       next();
-      return finishNode(node, "EmptyStatement");
+      return finishNode(node, Syntax.EmptyStatement);
 
       // If the statement does not start with a statement keyword or a
       // brace, it's an ExpressionStatement or LabeledStatement. We
@@ -1235,11 +1279,11 @@
         node.body = parseStatement();
         labels.pop();
         node.label = expr;
-        return finishNode(node, "LabeledStatement");
+        return finishNode(node, Syntax.LabeledStatement);
       } else {
         node.expression = expr;
         semicolon();
-        return finishNode(node, "ExpressionStatement");
+        return finishNode(node, Syntax.ExpressionStatement);
       }
     }
   }
@@ -1272,7 +1316,7 @@
       first = false
     }
     if (strict && !oldStrict) setStrict(false);
-    return finishNode(node, "BlockStatement");
+    return finishNode(node, Syntax.BlockStatement);
   }
 
   // Parse a regular `for` loop. The disambiguation code in
@@ -1288,7 +1332,7 @@
     expect(_parenR);
     node.body = parseStatement();
     labels.pop();
-    return finishNode(node, "ForStatement");
+    return finishNode(node, Syntax.ForStatement);
   }
 
   // Parse a `for`/`in` loop.
@@ -1299,7 +1343,7 @@
     expect(_parenR);
     node.body = parseStatement();
     labels.pop();
-    return finishNode(node, "ForInStatement");
+    return finishNode(node, Syntax.ForInStatement);
   }
 
   // Parse a list of variable declarations.
@@ -1313,10 +1357,10 @@
       if (strict && isStrictBadIdWord(decl.id.name))
         raise(decl.id.start, "Binding " + decl.id.name + " in strict mode");
       decl.init = eat(_eq) ? parseExpression(true, noIn) : null;
-      node.declarations.push(finishNode(decl, "VariableDeclarator"));
+      node.declarations.push(finishNode(decl, Syntax.VariableDeclarator));
       if (!eat(_comma)) break;
     }
-    return finishNode(node, "VariableDeclaration");
+    return finishNode(node, Syntax.VariableDeclaration);
   }
 
   // ### Expression parsing
@@ -1337,7 +1381,7 @@
       var node = startNodeFrom(expr);
       node.expressions = [expr];
       while (eat(_comma)) node.expressions.push(parseMaybeAssign(noIn));
-      return finishNode(node, "SequenceExpression");
+      return finishNode(node, Syntax.SequenceExpression);
     }
     return expr;
   }
@@ -1354,7 +1398,7 @@
       next();
       node.right = parseMaybeAssign(noIn);
       checkLVal(left);
-      return finishNode(node, "AssignmentExpression");
+      return finishNode(node, Syntax.AssignmentExpression);
     }
     return left;
   }
@@ -1369,7 +1413,7 @@
       node.consequent = parseExpression(true);
       expect(_colon);
       node.alternate = parseExpression(true, noIn);
-      return finishNode(node, "ConditionalExpression");
+      return finishNode(node, Syntax.ConditionalExpression);
     }
     return expr;
   }
@@ -1395,7 +1439,7 @@
         node.operator = tokVal;
         next();
         node.right = parseExprOp(parseMaybeUnary(noIn), prec, noIn);
-        var node = finishNode(node, /&&|\|\|/.test(node.operator) ? "LogicalExpression" : "BinaryExpression");
+        var node = finishNode(node, /&&|\|\|/.test(node.operator) ? Syntax.LogicalExpression : Syntax.BinaryExpression);
         return parseExprOp(node, minPrec, noIn);
       }
     }
@@ -1415,7 +1459,7 @@
       else if (strict && node.operator === "delete" &&
                node.argument.type === "Identifier")
         raise(node.start, "Deleting local variable in strict mode");
-      return finishNode(node, update ? "UpdateExpression" : "UnaryExpression");
+      return finishNode(node, update ? Syntax.UpdateExpression : Syntax.UnaryExpression);
     }
     var expr = parseExprSubscripts();
     while (tokType.postfix && !canInsertSemicolon()) {
@@ -1425,7 +1469,7 @@
       node.argument = expr;
       checkLVal(expr);
       next();
-      expr = finishNode(node, "UpdateExpression");
+      expr = finishNode(node, Syntax.UpdateExpression);
     }
     return expr;
   }
@@ -1442,19 +1486,19 @@
       node.object = base;
       node.property = parseIdent(true);
       node.computed = false;
-      return parseSubscripts(finishNode(node, "MemberExpression"), noCalls);
+      return parseSubscripts(finishNode(node, Syntax.MemberExpression), noCalls);
     } else if (eat(_bracketL)) {
       var node = startNodeFrom(base);
       node.object = base;
       node.property = parseExpression();
       node.computed = true;
       expect(_bracketR);
-      return parseSubscripts(finishNode(node, "MemberExpression"), noCalls);
+      return parseSubscripts(finishNode(node, Syntax.MemberExpression), noCalls);
     } else if (!noCalls && eat(_parenL)) {
       var node = startNodeFrom(base);
       node.callee = base;
       node.arguments = parseExprList(_parenR, false);
-      return parseSubscripts(finishNode(node, "CallExpression"), noCalls);
+      return parseSubscripts(finishNode(node, Syntax.CallExpression), noCalls);
     } else return base;
   }
 
@@ -1468,7 +1512,7 @@
     case _this:
       var node = startNode();
       next();
-      return finishNode(node, "ThisExpression");
+      return finishNode(node, Syntax.ThisExpression);
     case _name:
       return parseIdent();
     case _num: case _string: case _regexp:
@@ -1476,13 +1520,13 @@
       node.value = tokVal;
       node.raw = input.slice(tokStart, tokEnd);
       next();
-      return finishNode(node, "Literal");
+      return finishNode(node, Syntax.Literal);
 
     case _null: case _true: case _false:
       var node = startNode();
       node.value = tokType.atomValue;
       next();
-      return finishNode(node, "Literal");
+      return finishNode(node, Syntax.Literal);
 
     case _parenL:
       var tokStartLoc1 = tokStartLoc, tokStart1 = tokStart;
@@ -1503,7 +1547,7 @@
       var node = startNode();
       next();
       node.elements = parseExprList(_bracketR, true, true);
-      return finishNode(node, "ArrayExpression");
+      return finishNode(node, Syntax.ArrayExpression);
 
     case _braceL:
       return parseObj();
@@ -1531,7 +1575,7 @@
     node.callee = parseSubscripts(parseExprAtom(false), true);
     if (eat(_parenL)) node.arguments = parseExprList(_parenR, false);
     else node.arguments = [];
-    return finishNode(node, "NewExpression");
+    return finishNode(node, Syntax.NewExpression);
   }
 
   // Parse an object literal.
@@ -1576,7 +1620,7 @@
       }
       node.properties.push(prop);
     }
-    return finishNode(node, "ObjectExpression");
+    return finishNode(node, Syntax.ObjectExpression);
   }
 
   function parsePropertyName() {
@@ -1619,7 +1663,7 @@
       }
     }
 
-    return finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
+    return finishNode(node, isStatement ? Syntax.FunctionDeclaration : Syntax.FunctionExpression);
   }
 
   // Parses a comma-separated list of expressions, and returns them as
@@ -1650,7 +1694,7 @@
     var node = startNode();
     node.name = tokType === _name ? tokVal : (liberal && !options.forbidReserved && tokType.keyword) || unexpected();
     next();
-    return finishNode(node, "Identifier");
+    return finishNode(node, Syntax.Identifier);
   }
 
 })(typeof exports === "undefined" ? (window.acorn = {}) : exports);
