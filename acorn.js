@@ -212,7 +212,7 @@
   var _if = {keyword: "if"}, _return = {keyword: "return", beforeExpr: true}, _switch = {keyword: "switch"};
   var _throw = {keyword: "throw", beforeExpr: true}, _try = {keyword: "try"}, _var = {keyword: "var"};
   var _while = {keyword: "while", isLoop: true}, _with = {keyword: "with"}, _new = {keyword: "new", beforeExpr: true};
-  var _this = {keyword: "this"};
+  var _this = {keyword: "this"}, _const = {keyword: "const"};
 
   // The keywords that denote values.
 
@@ -236,7 +236,7 @@
                       "instanceof": {keyword: "instanceof", binop: 7}, "this": _this,
                       "typeof": {keyword: "typeof", prefix: true},
                       "void": {keyword: "void", prefix: true},
-                      "delete": {keyword: "delete", prefix: true}};
+                      "delete": {keyword: "delete", prefix: true}, "const": _const};
 
   // Punctuation token types. Again, the `type` property is purely for debugging.
 
@@ -336,7 +336,7 @@
 
   // And the keywords.
 
-  var isKeyword = makePredicate("break case catch continue debugger default do else finally for function if return switch throw try var while with null true false instanceof typeof void delete new in this");
+  var isKeyword = makePredicate("break case catch continue debugger default do else finally for function if return switch throw try var while with null true false instanceof typeof void delete new in this const");
 
   // ## Character categories
 
@@ -1197,6 +1197,12 @@
       semicolon();
       return node;
 
+    case _const:
+      next();
+      node = parseVar(node, false, "const");
+      semicolon();
+      return node;
+
     case _while:
       next();
       node.test = parseParenExpression();
@@ -1304,9 +1310,9 @@
 
   // Parse a list of variable declarations.
 
-  function parseVar(node, noIn) {
+  function parseVar(node, noIn, kind) {
     node.declarations = [];
-    node.kind = "var";
+    node.kind = kind || "var";
     for (;;) {
       var decl = startNode();
       decl.id = parseIdent();
