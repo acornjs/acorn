@@ -136,7 +136,7 @@
   // These are used to hold arrays of comments when
   // `options.trackComments` is true.
 
-  var tokCommentsBefore, tokCommentsAfter;
+  var tokCommentsBefore, tokCommentsAfter, lastTokCommentsAfter;
 
   // Interal state for the tokenizer. To distinguish between division
   // operators and regular expressions, it remembers whether the last
@@ -430,6 +430,7 @@
     tokType = type;
     skipSpace();
     tokVal = val;
+    lastTokCommentsAfter = tokCommentsAfter;
     tokCommentsAfter = tokComments;
     tokRegexpAllowed = type.beforeExpr;
   }
@@ -921,7 +922,7 @@
     node.start = other.start;
     if (other.commentsBefore) {
       node.commentsBefore = other.commentsBefore;
-      other.commentsBefore = null;
+      delete other.commentsBefore;
     }
     if (options.locations) {
       node.loc = new node_loc_t();
@@ -947,13 +948,13 @@
     node.type = type;
     node.end = lastEnd;
     if (options.trackComments) {
-      if (tokCommentsAfter) {
-        node.commentsAfter = tokCommentsAfter;
+      if (lastTokCommentsAfter) {
+        node.commentsAfter = lastTokCommentsAfter;
         tokCommentsAfter = null;
       } else if (lastFinishedNode && lastFinishedNode.end === lastEnd &&
                  lastFinishedNode.commentsAfter) {
         node.commentsAfter = lastFinishedNode.commentsAfter;
-        lastFinishedNode.commentsAfter = null;
+        delete lastFinishedNode.commentsAfter;
       }
       lastFinishedNode = node;
     }
