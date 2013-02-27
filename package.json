@@ -3,7 +3,7 @@
     "description": "ECMAScript parser",
     "homepage": "http://marijnhaverbeke.nl/acorn/",
     "main": "acorn.js",
-    "version": "0.1.01",
+    "version": "0.1.02",
     "engines": {"node": ">=0.4.0"},
     "maintainers": [{"name": "Marijn Haverbeke",
                      "email": "marijnh@gmail.com",
@@ -14,5 +14,6 @@
                       "url": "https://github.com/marijnh/acorn.git"}],
     "licenses": [{"type": "MIT",
                   "url": "http://marijnhaverbeke.nl/acorn/LICENSE"}],
-    "scripts": {"test": "node test/run.js"}
+    "scripts": {"test": "node test/run.js"},
+    "bin": {"acorn": "./bin/acorn"}
 }
