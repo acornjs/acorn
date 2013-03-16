@@ -55,10 +55,14 @@
 
   function next() {
     lastEnd = token.end;
+    if (options.locations)
+      lastEndLoc = token.endLoc;
+
     if (ahead.length)
       token = ahead.shift();
     else
       token = readToken();
+
     if (token.start >= nextLineStart) {
       while (token.start >= nextLineStart) {
         curLineStart = nextLineStart;
@@ -66,7 +70,6 @@
       }
       curIndent = indentationAfter(curLineStart);
     }
-    //lastEndLoc = token.loc.end;
   }
 
   function readToken() {
@@ -202,7 +205,7 @@
     node.type = type;
     node.end = lastEnd;
     if (options.locations)
-      node.loc.end = token.endLoc;
+      node.loc.end = lastEndLoc;
     return node;
   }
 
