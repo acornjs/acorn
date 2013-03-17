@@ -114,7 +114,7 @@
 
   function resetTo(pos) {
     var ch = input.charAt(pos - 1);
-    var reAllowed = !ch || /[\[\{\(,;:?\/*=+\-~!|&%^<>]/.test(ch) ||
+    var reAllowed = !ch || /[\[\{\(,;:?\/*=+\-~!|&%^<>]/.test(ch) ||    /**/
       /[enwfd]/.test(ch) && /\b(keywords|case|else|return|throw|new|in|(instance|type)of|delete|void)$/.test(input.slice(pos - 10, pos));
     fetchToken.jumpTo(pos, reAllowed);
   }
