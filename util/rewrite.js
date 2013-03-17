@@ -192,10 +192,6 @@
   })();
   
   exports.rewrite = function (ast, rewrite_rules) {
-    if (!acorn.walk) {
-      throw "Can't rewrite an acorn ast without acorn.walk";
-    }
-
     if (rewrite_rules) {
       for (var prop in exports.rewrite_rules) {
         if (!(prop in rewrite_rules)) {
