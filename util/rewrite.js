@@ -1,5 +1,7 @@
 (function (exports) {
   
+  exports.walk || (exports.walk = require("./walk.js"));
+
   var required_keys = [
     "BlockStatement", /*"Program",*/ "Statement", "EmptyStatement",
     "ExpressionStatement", "IfStatement", "LabeledStatement",
