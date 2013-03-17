@@ -1,6 +1,6 @@
 (function (exports) {
   
-  exports.walk || (exports.walk = require("./walk.js"));
+  var walk = exports.walk || require("./walk.js");
 
   var required_keys = [
     "BlockStatement", /*"Program",*/ "Statement", "EmptyStatement",
@@ -203,7 +203,7 @@
     }
 
     var jscode = new exports.JSCode();
-    acorn.walk.simple(ast, rewrite_rules, null, jscode);
+    walk.simple(ast, rewrite_rules, null, jscode);
 
     return jscode.toString();
   };
