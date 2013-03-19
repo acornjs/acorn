@@ -139,6 +139,7 @@
         var line = this[_l];
         if (!line) {
           line = this[_l] = [];
+          this.length = Math.max(this.length, _l + 1);
         }
 
         // Ensure we have enough columns to precede our input.
