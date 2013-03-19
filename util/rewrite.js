@@ -1,6 +1,6 @@
 (function (exports) {
   
-  var walk = exports.walk || require("./walk.js");
+  var walk = (typeof acorn !== "undefined" && acorn.walk) || require("./walk.js");
 
   var required_keys = [
     "BlockStatement", /*"Program",*/ "Statement", "EmptyStatement",
@@ -130,14 +130,15 @@
       var lines = text.split(/\r?\n/);
 
       // Ensure we have enough lines for the text we'll insert
-      var last_linno = linno + (lines.length - 1);
-      while (this.length <= last_linno) {
+      var llen = lines.length;
+      var real_llen = linno + lines.length;
+      while (this.length < real_llen) {
         this.push([]);
       }
 
       // Insert the text into the javascript respecting line and column
       // positions.
-      for (var l = 0, llen = lines.length; l < llen; l++) {
+      for (var l = 0; l < llen; l++) {
         var _l = l + linno;
         var line_update = lines[l];
         var clen = line_update.length;
