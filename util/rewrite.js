@@ -106,9 +106,10 @@
       this.usetabs = config.usetabs;
       this.tabwidth = config.tabwidth || 4;
       this.rn = config.rn;
+      this.lines = [];
     }
 
-    var proto = JSCode.prototype = [];
+    var proto = JSCode.prototype;
 
     function get_linno(linno) {
       return linno - 1;
@@ -123,10 +124,8 @@
     };
 
     proto.set = function (loc, text) {
-      var linno = loc.line;
+      var linno = get_linno(loc.line);
       var colno = loc.column;
-
-      linno = get_linno(linno);
       var lines = text.split(/\r?\n/);
 
       // Insert the text into the javascript respecting line and column
@@ -136,10 +135,9 @@
         var line_update = lines[l];
         var clen = line_update.length;
         
-        var line = this[_l];
+        var line = this.lines[_l];
         if (!line) {
-          line = this[_l] = [];
-          this.length = Math.max(this.length, _l + 1);
+          line = this.lines[_l] = [];
         }
 
         // Ensure we have enough columns to precede our input.
@@ -162,8 +160,8 @@
       var lines = [];
       var newline = this.rn ? "\r\n" : "\n";
 
-      for (var l = 0, llen = this.length; l < llen; l++) {
-        var line = this[l] || [];
+      for (var l = 0, llen = this.lines.length; l < llen; l++) {
+        var line = this.lines[l] || [];
 
         // Use tabs for indentation.
         if (this.usetabs) {
