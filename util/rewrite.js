@@ -129,22 +129,19 @@
       linno = get_linno(linno);
       var lines = text.split(/\r?\n/);
 
-      // Ensure we have enough lines for the text we'll insert
-      var llen = lines.length;
-      var real_llen = linno + lines.length;
-      while (this.length < real_llen) {
-        this.push([]);
-      }
-
       // Insert the text into the javascript respecting line and column
       // positions.
-      for (var l = 0; l < llen; l++) {
+      for (var l = 0, llen = lines.length; l < llen; l++) {
         var _l = l + linno;
         var line_update = lines[l];
         var clen = line_update.length;
         
-        // Ensure we have enough columns to precede our input.
         var line = this[_l];
+        if (!line) {
+          line = this[_l] = [];
+        }
+
+        // Ensure we have enough columns to precede our input.
         while (line.length < colno) {
           line.push(" ");
         }
@@ -165,7 +162,7 @@
       var newline = this.rn ? "\r\n" : "\n";
 
       for (var l = 0, llen = this.length; l < llen; l++) {
-        var line = this[l];
+        var line = this[l] || [];
 
         // Use tabs for indentation.
         if (this.usetabs) {
