@@ -86,7 +86,7 @@
 
   function def_error(key) {
     exports.rewrite_rules[key] = function (node, state) {
-      console.log(key, node, state);
+      console.error(key, node, state);
     };
   }
 
