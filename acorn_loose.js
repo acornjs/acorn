@@ -198,9 +198,15 @@
       node.loc = new node_loc_t();
     return node
   }
+
   function startNodeFrom(other) {
     return new node_t(other.start);
+    if (options.locations) {
+      node.loc = new node_loc_t();
+      node.loc.start = other.loc.start;
+    }
   }
+
   function finishNode(node, type) {
     node.type = type;
     node.end = lastEnd;

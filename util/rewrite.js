@@ -81,12 +81,17 @@
 
     Statement: function (node, jscode) {
       jscode.set(node.loc.end, ";");
+    },
+
+    ExpressionStatement: function (node, jscode) {
+      node.loc.end.column -= 1;
     }
   };
 
   function def_error(key) {
     exports.rewrite_rules[key] = function (node, state) {
       console.error(key, node, state);
+      throw '';
     };
   }
 
