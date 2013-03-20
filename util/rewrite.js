@@ -21,6 +21,42 @@
     rewrite_rules[node.type].apply(this, arguments);
   }
 
+  function loc_between(left, right, align, offset) {
+    if (!align) {
+      align = "left";
+    }
+
+    if (!offset) {
+      offset = 0;
+    }
+
+    var start = left.loc.end;
+    var end = right.loc.start;
+    var sameline = start.line === end.line;
+    align = sameline && align === "center" ? "left" : align;
+    var max_col = align === "left" ? start.column + offset : end.column - 1;
+    var min_col = align === "right" ? end.column - offset : start.column;
+    var line, column;
+
+    if (sameline) {
+      column = Math.floor((start.column + end.column) / 2);
+      column = Math.min(column, max_col);
+      column = Math.max(column, min_col);
+      line = start.line;
+    } else if (align === "left") {
+      column = max_col;
+      line = start.line;
+    } else if (align === "right") {
+      column = min_col;
+      line = end.line;
+    }
+
+    return {
+      column: column,
+      line: line
+    };
+  }
+
   var rewrite_rules = exports.rewrite_rules = {
     Literal: function (node, jscode) {
       jscode.set(node.loc.start, node.raw);
@@ -32,24 +68,16 @@
       var properties = node.properties;
       for (var i = 0, len = properties.length; i < len; i++) {
         var property = properties[i];
-        var is_last = i === (len - 1);
-        rewrite_rules.ObjectExpression_key.call(this, property.key, jscode, is_last);
-        rewrite_rules.ObjectExpression_value.call(this, property.value, jscode, is_last);
+        rewrite_node.call(this, property.key, jscode);
+        jscode.set(loc_between(property.key, property.value), ":");
+        rewrite_node.call(this, property.value, jscode);
+
+        if (i === (len - 1)) {
+          jscode.set(property.value.loc.end, ",")
+        }
       }
 
       jscode.set({ line: node.loc.end.line, column: node.loc.end.column - 1 }, "}");
-    },
-
-    ObjectExpression_key: function (node, jscode) {
-      rewrite_node.call(this, node, jscode);
-      jscode.set(node.loc.end, ":");
-    },
-
-    ObjectExpression_value: function (node, jscode, is_last) {
-      rewrite_node.call(this, node, jscode);
-      if (!is_last) {
-        jscode.set(node.loc.end, ",");
-      }
     },
 
     Identifier: function (node, jscode) {
@@ -66,13 +94,7 @@
 
     VariableDeclarator: function (node, jscode, is_last) {
       rewrite_node.call(this, node.id, jscode);
-
-      var idEnd = node.id.loc.end;
-      var initStart = node.init.loc.start;
-      jscode.set({
-        line: idEnd.line,
-        column: initStart.line === idEnd.line ? Math.floor((idEnd.column + initStart.column) / 2) : idEnd.column + 1
-      }, "=");
+      jscode.set(loc_between(node.id, node.init, null, 1), "=");
 
       if (!is_last) {
         jscode.set(node.loc.end, ",");
@@ -80,18 +102,30 @@
     },
 
     Statement: function (node, jscode) {
-      jscode.set(node.loc.end, ";");
+      if (!node.semicolon) {
+        jscode.set(node.loc.end, ";");
+        node.semicolon = true;
+      }
     },
 
     ExpressionStatement: function (node, jscode) {
-      node.loc.end.column -= 1;
+      if (!node.semicolon) {
+        jscode.set({ line: node.loc.end.line, column: node.loc.end.column - 1 }, ";");
+        node.semicolon = true;
+      }
+    },
+
+    BinaryExpression: function (node, jscode) {
+      rewrite_node.call(this, node.left, jscode);
+      rewrite_node.call(this, node.right, jscode);
+      jscode.set(loc_between(node.left, node.right, null, 1), node.operator);
     }
   };
 
   function def_error(key) {
     exports.rewrite_rules[key] = function (node, state) {
       console.error(key, node, state);
-      throw '';
+      throw "NotImplementedError: '" + key + "' is required";
     };
   }
 

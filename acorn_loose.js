@@ -204,11 +204,12 @@
   }
 
   function startNodeFrom(other) {
-    return new node_t(other.start);
+    var node = new node_t(other.start);
     if (options.locations) {
       node.loc = new node_loc_t();
       node.loc.start = other.loc.start;
     }
+    return node;
   }
 
   function finishNode(node, type) {
