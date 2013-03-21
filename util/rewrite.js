@@ -2,6 +2,18 @@
   
   var walk = (typeof acorn !== "undefined" && acorn.walk) || require("./walk.js");
 
+  function ErrorPrototype() {}
+  ErrorPrototype.prototype = Error.prototype;
+
+  function ParseError(node) {
+    this.node = node;
+    this.line = node.loc.start.line;
+    this.column = node.loc.start.column;
+    this.message = "" + node.type + " (" + this.line + ", " + this.column + ")";
+  }
+  ParseError.prototype = new ErrorPrototype();
+  ParseError.prototype.name = ParseError.name;
+
   var required_keys = [
     "BlockStatement", /*"Program",*/ "Statement", "EmptyStatement",
     "ExpressionStatement", "IfStatement", "LabeledStatement",
@@ -72,7 +84,7 @@
         jscode.set(loc_between(property.key, property.value), ":");
         rewrite_node.call(this, property.value, jscode);
 
-        if (i === (len - 1)) {
+        if (i !== (len - 1)) {
           jscode.set(property.value.loc.end, ",")
         }
       }
@@ -81,6 +93,9 @@
     },
 
     Identifier: function (node, jscode) {
+      if (node.name === "✖") {
+        throw new ParseError(node);
+      }
       jscode.set(node.loc.start, node.name);
     },
 

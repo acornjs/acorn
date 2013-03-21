@@ -110,7 +110,9 @@
           throw e;
         }
         resetTo(pos);
-        if (replace === true) replace = {start: pos, end: pos, type: tt.name, value: "✖"};
+        if (replace === true) {
+          replace = {start: pos, end: pos, type: tt.name, value: "✖", loc: getDummyLoc()};
+        }
         if (replace) return replace;
       }
     }
@@ -220,11 +222,23 @@
     return node;
   }
 
+  function getDummyLoc(dummy) {
+    if (options.locations) {
+      var loc = new node_loc_t();
+      loc.end = {
+        line: loc.start.line,
+        column: loc.start.column + 1
+      };
+      return loc;
+    }
+  };
+
   function dummyIdent() {
     var dummy = new node_t(0);
     dummy.type = "Identifier";
     dummy.end = 0;
     dummy.name = "✖";
+    dummy.loc = getDummyLoc();
     return dummy;
   }
   function isDummy(node) { return node.name == "✖"; }
