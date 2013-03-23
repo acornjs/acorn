@@ -249,12 +249,9 @@
       rewrite_rules = exports.rewrite_rules;
     }
 
-    var jscode_config = {};
-    if (code) {
-      
-    }
-
-    var jscode = new exports.JSCode(jscode_config);
+    var jscode = new exports.JSCode({
+      old_code: code
+    });
     walk.simple(ast, rewrite_rules, null, jscode);
 
     return jscode.toString();
