@@ -155,11 +155,14 @@
   // JSCode is a class that allows us to set the javascript code to particular lines and columns
   // We need this so that rewrite will (as much as possible) keep the same whitespace that was passed in.
   exports.JSCode = (function () {
+    var r_newline_rn = /\r\n/;
+    var r_line_indentation = /^\s*/;
+
     function JSCode(config) {
       config || (config = {});
-      this.usetabs = config.usetabs;
-      this.tabwidth = config.tabwidth || 4;
-      this.rn = config.rn;
+      var old_code = config.old_code || '';
+      this.newline = r_newline_rn.test(old_code) ? '\r\n' : '\n';
+      this.old_lines = old_code.split(this.newline);
       this.lines = [];
     }
 
@@ -212,37 +215,30 @@
 
     proto.toString = function () {
       var lines = [];
-      var newline = this.rn ? "\r\n" : "\n";
 
       for (var l = 0, llen = this.lines.length; l < llen; l++) {
-        var line = this.lines[l] || [];
-
-        // Use tabs for indentation.
-        if (this.usetabs) {
-          var spaces = 0;
-          for (var c = 0, clen = line.length; c < clen; c++) {
-            if (line[c] === " ") {
-              spaces += 1;
-              c -= 1;
-              line.shift();
-            }
-          }
-          var tabs = Math.floor(spaces / this.tabwidth);
-          var spaces = spaces % this.tabwidth;
-          line.unshift(Array(spaces + 1).join(' '));
-          line.unshift(Array(tabs + 1).join(' '));
+        var line = (this.lines[l] || []).join('');
+        var old_line = this.old_lines[l];
+        if (old_line) {
+          var indentation = old_line.match(r_line_indentation);
+          line = line.replace(r_line_indentation, indentation);
         }
-
-        lines.push(line.join(''));
+        lines.push(line);
       }
 
-      return lines.join(newline);
+      return lines.join(this.newline);
     };
 
     return JSCode;
   })();
   
-  exports.rewrite = function (ast, rewrite_rules) {
+  var rusetabs
+
+  // code is an optional argument. It is the code from which the ast is 
+  // generated. Passing code in allows us to get consistent indentation.
+  // rewrite_rules is also an optional argument, and allows you to customize
+  // the way the code is rewritten.
+  exports.rewrite = function (ast, code, rewrite_rules) {
     if (rewrite_rules) {
       for (var prop in exports.rewrite_rules) {
         if (!(prop in rewrite_rules)) {
@@ -253,7 +249,12 @@
       rewrite_rules = exports.rewrite_rules;
     }
 
-    var jscode = new exports.JSCode();
+    var jscode_config = {};
+    if (code) {
+      
+    }
+
+    var jscode = new exports.JSCode(jscode_config);
     walk.simple(ast, rewrite_rules, null, jscode);
 
     return jscode.toString();
