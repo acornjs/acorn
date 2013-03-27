@@ -110,9 +110,7 @@
           throw e;
         }
         resetTo(pos);
-        if (replace === true) {
-          replace = {start: pos, end: pos, type: tt.name, value: "✖", loc: getDummyLoc()};
-        }
+        if (replace === true) replace = {start: pos, end: pos, type: tt.name, value: "✖", loc: getDummyLoc()};
         if (replace) return replace;
       }
     }
@@ -120,7 +118,7 @@
 
   function resetTo(pos) {
     var ch = input.charAt(pos - 1);
-    var reAllowed = !ch || /[\[\{\(,;:?\/*=+\-~!|&%^<>]/.test(ch) ||    /**/
+    var reAllowed = !ch || /[\[\{\(,;:?\/*=+\-~!|&%^<>]/.test(ch) ||
       /[enwfd]/.test(ch) && /\b(keywords|case|else|return|throw|new|in|(instance|type)of|delete|void)$/.test(input.slice(pos - 10, pos));
     fetchToken.jumpTo(pos, reAllowed);
   }
@@ -221,17 +219,6 @@
       node.loc.end = lastEndLoc;
     return node;
   }
-
-  function getDummyLoc(dummy) {
-    if (options.locations) {
-      var loc = new node_loc_t();
-      loc.end = {
-        line: loc.start.line,
-        column: loc.start.column + 1
-      };
-      return loc;
-    }
-  };
 
   function dummyIdent() {
     var dummy = new node_t(0);
