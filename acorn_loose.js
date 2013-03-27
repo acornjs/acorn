@@ -220,6 +220,17 @@
     return node;
   }
 
+  function getDummyLoc(dummy) {
+    if (options.locations) {
+      var loc = new node_loc_t();
+      loc.end = {
+        line: loc.start.line,
+        column: loc.start.column + 1
+      };
+      return loc;
+    }
+  };
+
   function dummyIdent() {
     var dummy = new node_t(0);
     dummy.type = "Identifier";
