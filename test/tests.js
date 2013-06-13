@@ -21819,7 +21819,7 @@ test("try { } catch (e) { }", {
           }
         }
       },
-      handler: {
+      handlers: [{
           type: "CatchClause",
           param: {
             type: "Identifier",
@@ -21860,7 +21860,7 @@ test("try { } catch (e) { }", {
               column: 21
             }
           }
-        }
+        }]
       ,
       finalizer: null,
       loc: {
@@ -21906,7 +21906,7 @@ test("try { } catch (eval) { }", {
           }
         }
       },
-      handler:
+      handlers: [
         {
           type: "CatchClause",
           param: {
@@ -21949,7 +21949,7 @@ test("try { } catch (eval) { }", {
             }
           }
         }
-      ,
+      ],
       finalizer: null,
       loc: {
         start: {
@@ -21994,7 +21994,7 @@ test("try { } catch (arguments) { }", {
           }
         }
       },
-      handler:
+      handlers: [
         {
           type: "CatchClause",
           param: {
@@ -22037,7 +22037,7 @@ test("try { } catch (arguments) { }", {
             }
           }
         }
-      ,
+      ],
       finalizer: null,
       loc: {
         start: {
@@ -22082,7 +22082,7 @@ test("try { } catch (e) { say(e) }", {
           }
         }
       },
-      handler:
+      handlers: [
         {
           type: "CatchClause",
           param: {
@@ -22182,7 +22182,7 @@ test("try { } catch (e) { say(e) }", {
             }
           }
         }
-      ,
+      ],
       finalizer: null,
       loc: {
         start: {
@@ -22227,7 +22227,7 @@ test("try { } finally { cleanup(stuff) }", {
           }
         }
       },
-      handler: null,
+      handlers: [],
       finalizer: {
         type: "BlockStatement",
         body: [
@@ -22384,7 +22384,7 @@ test("try { doThat(); } catch (e) { say(e) }", {
           }
         }
       },
-      handler:
+      handlers: [
         {
           type: "CatchClause",
           param: {
@@ -22484,7 +22484,7 @@ test("try { doThat(); } catch (e) { say(e) }", {
             }
           }
         }
-      ,
+      ],
       finalizer: null,
       loc: {
         start: {
@@ -22571,7 +22571,7 @@ test("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }", {
           }
         }
       },
-      handler:
+      handlers: [
         {
           type: "CatchClause",
           param: {
@@ -22671,7 +22671,7 @@ test("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }", {
             }
           }
         }
-      ,
+      ],
       finalizer: {
         type: "BlockStatement",
         body: [

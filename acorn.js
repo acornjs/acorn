@@ -1235,7 +1235,7 @@
     case _try:
       next();
       node.block = parseBlock();
-      node.handler = null;
+      node.handlers = [];
       if (tokType === _catch) {
         var clause = startNode();
         next();
@@ -1246,10 +1246,10 @@
         expect(_parenR);
         clause.guard = null;
         clause.body = parseBlock();
-        node.handler = finishNode(clause, "CatchClause");
+        node.handlers = [finishNode(clause, "CatchClause")];
       }
       node.finalizer = eat(_finally) ? parseBlock() : null;
-      if (!node.handler && !node.finalizer)
+      if (!node.handlers.length && !node.finalizer)
         raise(node.start, "Missing catch or finally clause");
       return finishNode(node, "TryStatement");
 
