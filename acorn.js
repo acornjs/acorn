@@ -222,7 +222,7 @@
 
   function raise(pos, message) {
     var loc = getLineInfo(input, pos);
-    message += " (" + loc.line + ":" + loc.column + ")";
+    message += " (" + loc.line + ":" + (loc.column + 1) + ")";
     var err = new SyntaxError(message);
     err.pos = pos; err.loc = loc; err.raisedAt = tokPos;
     throw err;
