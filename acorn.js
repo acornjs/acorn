@@ -415,9 +415,15 @@
   var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
   var nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonASCIIidentifierChars + "]");
 
-  // Whether a single character denotes a newline.
+  // Whether a range of input contains a newline.
 
-  var newline = /[\n\r\u2028\u2029]/;
+  function hasInputNewLine(start, end) {
+    while(start < end) {
+      var ch = input.charCodeAt(start++);
+      if (ch === 13 || ch === 10 || ch === 8232 || ch === 8233) return true;
+    }
+    return false;
+  }
 
   // Matches a whole line break (where CRLF is considered a single
   // line break). Used to count lines.
@@ -738,9 +744,8 @@
   function readRegexp() {
     var content = "", escaped, inClass, start = tokPos;
     for (;;) {
-      if (tokPos >= inputLen) raise(start, "Unterminated regular expression");
       var ch = input.charAt(tokPos);
-      if (newline.test(ch)) raise(start, "Unterminated regular expression");
+      if (tokPos >= inputLen || ch === "\r" || ch === "\n" || ch === "\u2028" || ch === "\u2029") raise(start, "Unterminated regular expression");
       if (!escaped) {
         if (ch === "[") inClass = true;
         else if (ch === "]" && inClass) inClass = false;
@@ -1046,7 +1051,7 @@
 
   function canInsertSemicolon() {
     return !options.strictSemicolons &&
-      (tokType === _eof || tokType === _braceR || newline.test(input.slice(lastEnd, tokStart)));
+      (tokType === _eof || tokType === _braceR || hasInputNewLine(lastEnd, tokStart));
   }
 
   // Consume a semicolon, or, failing that, see if we are allowed to
@@ -1246,7 +1251,7 @@
 
     case _throw:
       next();
-      if (newline.test(input.slice(lastEnd, tokStart)))
+      if (hasInputNewLine(lastEnd, tokStart))
         raise(lastEnd, "Illegal newline after throw");
       node.argument = parseExpression();
       semicolon();
