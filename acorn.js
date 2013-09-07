@@ -471,7 +471,7 @@
 
   function finishToken(type, val) {
     tokEnd = tokPos;
-    if (options.locations) tokEndLoc = new line_loc_t;
+    if (options.locations === true) tokEndLoc = new line_loc_t;
     tokType = type;
     skipSpace();
     tokVal = val;
@@ -523,7 +523,7 @@
         if (next === 10) {
           ++tokPos;
         }
-        if (options.locations) {
+        if (options.locations === true) {
           ++tokCurLine;
           tokLineStart = tokPos;
         }
@@ -703,16 +703,16 @@
   }
 
   function readToken(forceRegexp) {
-    if (!forceRegexp) tokStart = tokPos;
+    if (forceRegexp !== true) tokStart = tokPos;
     else tokPos = tokStart + 1;
-    if (options.locations) tokStartLoc = new line_loc_t;
-    if (forceRegexp) return readRegexp();
+    if (options.locations === true) tokStartLoc = new line_loc_t;
+    if (forceRegexp === true) return readRegexp();
     if (tokPos >= inputLen) return finishToken(_eof);
 
     var code = input.charCodeAt(tokPos);
     // Identifier or keyword. '\uXXXX' sequences are allowed in
     // identifiers, so '\' also dispatches to that.
-    if (isIdentifierStart(code) || code === 92 /* '\' */) return readWord();
+    if (isIdentifierStart(code) === true || code === 92 /* '\' */) return readWord();
 
     var tok = getTokenFromCode(code);
 
@@ -807,8 +807,8 @@
     if (isIdentifierStart(input.charCodeAt(tokPos))) raise(tokPos, "Identifier directly after number");
 
     var str = input.slice(start, tokPos), val;
-    if (isFloat) val = parseFloat(str);
-    else if (!octal || str.length === 1) val = parseInt(str, 10);
+    if (isFloat === true) val = parseFloat(str);
+    else if (octal === false || str.length === 1) val = parseInt(str, 10);
     else if (/[89]/.test(str) || strict) raise(start, "Invalid number");
     else val = parseInt(str, 8);
     return finishToken(_num, val);
@@ -890,10 +890,10 @@
     for (;;) {
       var ch = input.charCodeAt(tokPos);
       if (isIdentifierChar(ch)) {
-        if (containsEsc) word += input.charAt(tokPos);
+        if (containsEsc === true) word += input.charAt(tokPos);
         ++tokPos;
       } else if (ch === 92) { // "\"
-        if (!containsEsc) word = input.slice(start, tokPos);
+        if (containsEsc === false) word = input.slice(start, tokPos);
         containsEsc = true;
         if (input.charCodeAt(++tokPos) != 117) // "u"
           raise(tokPos, "Expecting Unicode escape sequence \\uXXXX");
@@ -901,7 +901,7 @@
         var esc = readHexChar(4);
         var escStr = String.fromCharCode(esc);
         if (!escStr) raise(tokPos - 1, "Invalid Unicode escape");
-        if (!(first ? isIdentifierStart(esc) : isIdentifierChar(esc)))
+        if ((first === true ? isIdentifierStart(esc) !== true : isIdentifierChar(esc) !== true))
           raise(tokPos - 4, "Invalid Unicode escape");
         word += escStr;
       } else {
@@ -909,7 +909,7 @@
       }
       first = false;
     }
-    return containsEsc ? word : input.slice(start, tokPos);
+    return containsEsc === true ? word : input.slice(start, tokPos);
   }
 
   // Read an identifier or keyword token. Will check for reserved
@@ -918,11 +918,11 @@
   function readWord() {
     var word = readWord1();
     var type = _name;
-    if (!containsEsc) {
-      if (isKeyword(word)) type = keywordTypes[word];
-      else if (options.forbidReserved &&
-               (options.ecmaVersion === 3 ? isReservedWord3 : isReservedWord5)(word) ||
-               strict && isStrictReservedWord(word))
+    if (containsEsc === false) {
+      if (isKeyword(word) === true) type = keywordTypes[word];
+      else if (options.forbidReserved === true &&
+               (options.ecmaVersion === 3 ? isReservedWord3 : isReservedWord5)(word) === true ||
+               strict === true && isStrictReservedWord(word) === true)
         raise(tokStart, "The keyword '" + word + "' is reserved");
     }
     return finishToken(type, word);
@@ -989,9 +989,9 @@
 
   function startNode() {
     var node = new node_t();
-    if (options.locations)
+    if (options.locations === true)
       node.loc = new node_loc_t();
-    if (options.ranges)
+    if (options.ranges === true)
       node.range = [tokStart, 0];
     return node;
   }
@@ -1003,11 +1003,11 @@
   function startNodeFrom(other) {
     var node = new node_t();
     node.start = other.start;
-    if (options.locations) {
+    if (options.locations === true) {
       node.loc = new node_loc_t();
       node.loc.start = other.loc.start;
     }
-    if (options.ranges)
+    if (options.ranges === true)
       node.range = [other.range[0], 0];
 
     return node;
@@ -1018,9 +1018,9 @@
   function finishNode(node, type) {
     node.type = type;
     node.end = lastEnd;
-    if (options.locations)
+    if (options.locations === true)
       node.loc.end = lastEndLoc;
-    if (options.ranges)
+    if (options.ranges === true)
       node.range[1] = lastEnd;
     return node;
   }
@@ -1045,7 +1045,7 @@
   // Test whether a semicolon can be inserted at the current position.
 
   function canInsertSemicolon() {
-    return !options.strictSemicolons &&
+    return options.strictSemicolons !== true &&
       (tokType === _eof || tokType === _braceR || newline.test(input.slice(lastEnd, tokStart)));
   }
 
@@ -1099,8 +1099,10 @@
     while (tokType !== _eof) {
       var stmt = parseStatement();
       node.body.push(stmt);
-      if (first && isUseStrict(stmt)) setStrict(true);
-      first = false;
+      if (first === true) {
+        if (isUseStrict(stmt) === true) setStrict(true);
+        first = false;
+      }
     }
     return finishNode(node, "Program");
   }
@@ -1128,7 +1130,7 @@
     case _break: case _continue:
       next();
       var isBreak = starttype === _break;
-      if (eat(_semi) || canInsertSemicolon()) node.label = null;
+      if (eat(_semi) === true || canInsertSemicolon() === true) node.label = null;
       else if (tokType !== _name) unexpected();
       else {
         node.label = parseIdent();
@@ -1140,8 +1142,8 @@
       for (var i = 0; i < labels.length; ++i) {
         var lab = labels[i];
         if (node.label == null || lab.name === node.label.name) {
-          if (lab.kind != null && (isBreak || lab.kind === "loop")) break;
-          if (node.label && isBreak) break;
+          if (lab.kind != null && (isBreak === true || lab.kind === "loop")) break;
+          if (node.label && isBreak === true) break;
         }
       }
       if (i === labels.length) raise(node.start, "Unsyntactic " + starttype.keyword);
@@ -1179,12 +1181,12 @@
         var init = startNode();
         next();
         parseVar(init, true);
-        if (init.declarations.length === 1 && eat(_in))
+        if (init.declarations.length === 1 && eat(_in) === true)
           return parseForIn(node, init);
         return parseFor(node, init);
       }
       var init = parseExpression(false, true);
-      if (eat(_in)) {checkLVal(init); return parseForIn(node, init);}
+      if (eat(_in) === true) {checkLVal(init); return parseForIn(node, init);}
       return parseFor(node, init);
 
     case _function:
@@ -1206,7 +1208,7 @@
       // optional arguments, we eagerly look for a semicolon or the
       // possibility to insert one.
 
-      if (eat(_semi) || canInsertSemicolon()) node.argument = null;
+      if (eat(_semi) === true || canInsertSemicolon() === true) node.argument = null;
       else { node.argument = parseExpression(); semicolon(); }
       return finishNode(node, "ReturnStatement");
 
@@ -1345,14 +1347,16 @@
     var node = startNode(), first = true, strict = false, oldStrict;
     node.body = [];
     expect(_braceL);
-    while (!eat(_braceR)) {
+    while (eat(_braceR) !== true) {
       var stmt = parseStatement();
       node.body.push(stmt);
-      if (first && allowStrict && isUseStrict(stmt)) {
-        oldStrict = strict;
-        setStrict(strict = true);
+      if (first === true) {
+        if (allowStrict && isUseStrict(stmt)) {
+          oldStrict = strict;
+          setStrict(strict = true);
+        }
+        first = false;
       }
-      first = false;
     }
     if (strict && !oldStrict) setStrict(false);
     return finishNode(node, "BlockStatement");
@@ -1397,7 +1401,7 @@
         raise(decl.id.start, "Binding " + decl.id.name + " in strict mode");
       decl.init = eat(_eq) ? parseExpression(true, noIn) : null;
       node.declarations.push(finishNode(decl, "VariableDeclarator"));
-      if (!eat(_comma)) break;
+      if (eat(_comma) !== true) break;
     }
     return finishNode(node, "VariableDeclaration");
   }
@@ -1419,7 +1423,7 @@
     if (!noComma && tokType === _comma) {
       var node = startNodeFrom(expr);
       node.expressions = [expr];
-      while (eat(_comma)) node.expressions.push(parseMaybeAssign(noIn));
+      while (eat(_comma) === true) node.expressions.push(parseMaybeAssign(noIn));
       return finishNode(node, "SequenceExpression");
     }
     return expr;
@@ -1430,7 +1434,7 @@
 
   function parseMaybeAssign(noIn) {
     var left = parseMaybeConditional(noIn);
-    if (tokType.isAssign) {
+    if (tokType.isAssign === true) {
       var node = startNodeFrom(left);
       node.operator = tokVal;
       node.left = left;
@@ -1446,7 +1450,7 @@
 
   function parseMaybeConditional(noIn) {
     var expr = parseExprOps(noIn);
-    if (eat(_question)) {
+    if (eat(_question) === true) {
       var node = startNodeFrom(expr);
       node.test = expr;
       node.consequent = parseExpression(true);
@@ -1495,14 +1499,14 @@
       tokRegexpAllowed = true;
       next();
       node.argument = parseMaybeUnary();
-      if (update) checkLVal(node.argument);
+      if (update === true) checkLVal(node.argument);
       else if (strict && node.operator === "delete" &&
                node.argument.type === "Identifier")
         raise(node.start, "Deleting local variable in strict mode");
       return finishNode(node, update ? "UpdateExpression" : "UnaryExpression");
     }
     var expr = parseExprSubscripts();
-    while (tokType.postfix && !canInsertSemicolon()) {
+    while (tokType.postfix === true && !canInsertSemicolon() === true) {
       var node = startNodeFrom(expr);
       node.operator = tokVal;
       node.prefix = false;
@@ -1521,20 +1525,20 @@
   }
 
   function parseSubscripts(base, noCalls) {
-    if (eat(_dot)) {
+    if (eat(_dot) === true) {
       var node = startNodeFrom(base);
       node.object = base;
       node.property = parseIdent(true);
       node.computed = false;
       return parseSubscripts(finishNode(node, "MemberExpression"), noCalls);
-    } else if (eat(_bracketL)) {
+    } else if (eat(_bracketL) === true) {
       var node = startNodeFrom(base);
       node.object = base;
       node.property = parseExpression();
       node.computed = true;
       expect(_bracketR);
       return parseSubscripts(finishNode(node, "MemberExpression"), noCalls);
-    } else if (!noCalls && eat(_parenL)) {
+    } else if (noCalls !== true && eat(_parenL) === true) {
       var node = startNodeFrom(base);
       node.callee = base;
       node.arguments = parseExprList(_parenR, false);
@@ -1575,11 +1579,11 @@
       var val = parseExpression();
       val.start = tokStart1;
       val.end = tokEnd;
-      if (options.locations) {
+      if (options.locations === true) {
         val.loc.start = tokStartLoc1;
         val.loc.end = tokEndLoc;
       }
-      if (options.ranges)
+      if (options.ranges === true)
         val.range = [tokStart1, tokEnd];
       expect(_parenR);
       return val;
@@ -1614,7 +1618,7 @@
     var node = startNode();
     next();
     node.callee = parseSubscripts(parseExprAtom(), true);
-    if (eat(_parenL)) node.arguments = parseExprList(_parenR, false);
+    if (eat(_parenL) === true) node.arguments = parseExprList(_parenR, false);
     else node.arguments = empty;
     return finishNode(node, "NewExpression");
   }
@@ -1625,14 +1629,14 @@
     var node = startNode(), first = true, sawGetSet = false;
     node.properties = [];
     next();
-    while (!eat(_braceR)) {
-      if (!first) {
+    while (eat(_braceR) !== true) {
+      if (first === false) {
         expect(_comma);
-        if (options.allowTrailingCommas && eat(_braceR)) break;
+        if (options.allowTrailingCommas === true && eat(_braceR) === true) break;
       } else first = false;
 
       var prop = {key: parsePropertyName()}, isGetSet = false, kind;
-      if (eat(_colon)) {
+      if (eat(_colon) === true) {
         prop.value = parseExpression(true);
         kind = prop.kind = "init";
       } else if (options.ecmaVersion >= 5 && prop.key.type === "Identifier" &&
@@ -1654,8 +1658,8 @@
           if (other.key.name === prop.key.name) {
             var conflict = kind == other.kind || isGetSet && other.kind === "init" ||
               kind === "init" && (other.kind === "get" || other.kind === "set");
-            if (conflict && !strict && kind === "init" && other.kind === "init") conflict = false;
-            if (conflict) raise(prop.key.start, "Redefinition of property");
+            if (conflict === true && !strict && kind === "init" && other.kind === "init") conflict = false;
+            if (conflict === true) raise(prop.key.start, "Redefinition of property");
           }
         }
       }
@@ -1674,13 +1678,13 @@
 
   function parseFunction(node, isStatement) {
     if (tokType === _name) node.id = parseIdent();
-    else if (isStatement) unexpected();
+    else if (isStatement === true) unexpected();
     else node.id = null;
     node.params = [];
     var first = true;
     expect(_parenL);
-    while (!eat(_parenR)) {
-      if (!first) expect(_comma); else first = false;
+    while (eat(_parenR) !== true) {
+      if (first === false) expect(_comma); else first = false;
       node.params.push(parseIdent());
     }
 
@@ -1694,10 +1698,10 @@
     // If this is a strict mode function, verify that argument names
     // are not repeated, and it does not try to bind the words `eval`
     // or `arguments`.
-    if (strict || node.body.body.length && isUseStrict(node.body.body[0])) {
+    if (strict || node.body.body.length > 0 && isUseStrict(node.body.body[0])) {
       for (var i = node.id ? -1 : 0; i < node.params.length; ++i) {
         var id = i < 0 ? node.id : node.params[i];
-        if (isStrictReservedWord(id.name) || isStrictBadIdWord(id.name))
+        if (isStrictReservedWord(id.name) === true || isStrictBadIdWord(id.name) === true)
           raise(id.start, "Defining '" + id.name + "' in strict mode");
         if (i >= 0) for (var j = 0; j < i; ++j) if (id.name === node.params[j].name)
           raise(id.start, "Argument name clash in strict mode");
@@ -1715,13 +1719,13 @@
 
   function parseExprList(close, allowTrailingComma, allowEmpty) {
     var elts = [], first = true;
-    while (!eat(close)) {
-      if (!first) {
+    while (eat(close) !== true) {
+      if (first === false) {
         expect(_comma);
         if (allowTrailingComma && options.allowTrailingCommas && eat(close)) break;
       } else first = false;
 
-      if (allowEmpty && tokType === _comma) elts.push(null);
+      if (allowEmpty === true && tokType === _comma) elts.push(null);
       else elts.push(parseExpression(true));
     }
     return elts;
