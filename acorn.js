@@ -529,8 +529,10 @@
         }
       } else if (ch === 10 || ch === 8232 || ch === 8233) {
         ++tokPos;
-        ++tokCurLine;
-        tokLineStart = tokPos;
+        if (options.locations) {
+          ++tokCurLine;
+          tokLineStart = tokPos;
+        }
       } else if (ch > 8 && ch < 14) {
         ++tokPos;
       } else if (ch === 47) { // '/'
@@ -966,9 +968,11 @@
   function setStrict(strct) {
     strict = strct;
     tokPos = lastEnd;
-    while (tokPos < tokLineStart) {
-      tokLineStart = input.lastIndexOf("\n", tokLineStart - 2) + 1;
-      --tokCurLine;
+    if (options.locations) {
+      while (tokPos < tokLineStart) {
+        tokLineStart = input.lastIndexOf("\n", tokLineStart - 2) + 1;
+        --tokCurLine;
+      }
     }
     skipSpace();
     readToken();
