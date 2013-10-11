@@ -318,14 +318,14 @@
 
   var _slash = {binop: 10, beforeExpr: true}, _eq = {isAssign: true, beforeExpr: true};
   var _assign = {isAssign: true, beforeExpr: true};
-  var _incdec = {postfix: true, prefix: true, isUpdate: true}, _prefix = {prefix: true, beforeExpr: true};
+  var _incDec = {postfix: true, prefix: true, isUpdate: true}, _prefix = {prefix: true, beforeExpr: true};
   var _logicalOR = {binop: 1, beforeExpr: true};
   var _logicalAND = {binop: 2, beforeExpr: true};
   var _bitwiseOR = {binop: 3, beforeExpr: true};
   var _bitwiseXOR = {binop: 4, beforeExpr: true};
   var _bitwiseAND = {binop: 5, beforeExpr: true};
-  var _equalNotEqual = {binop: 6, beforeExpr: true};
-  var _gtLtEq = {binop: 7, beforeExpr: true};
+  var _equality = {binop: 6, beforeExpr: true};
+  var _relational = {binop: 7, beforeExpr: true};
   var _bitShift = {binop: 8, beforeExpr: true};
   var _plusMin = {binop: 9, prefix: true, beforeExpr: true};
   var _multiplyModulo = {binop: 10, beforeExpr: true};
@@ -613,7 +613,7 @@
         skipSpace();
         return readToken();
       }
-      return finishOp(_incdec, 2);
+      return finishOp(_incDec, 2);
     }
     if (next === 61) return finishOp(_assign, 2);
     return finishOp(_plusMin, 1);
@@ -637,12 +637,12 @@
     }
     if (next === 61)
       size = input.charCodeAt(tokPos + 2) === 61 ? 3 : 2;
-    return finishOp(_gtLtEq, size);
+    return finishOp(_relational, size);
   }
 
   function readToken_eq_excl(code) { // '=!'
     var next = input.charCodeAt(tokPos + 1);
-    if (next === 61) return finishOp(_equalNotEqual, input.charCodeAt(tokPos + 2) === 61 ? 3 : 2);
+    if (next === 61) return finishOp(_equality, input.charCodeAt(tokPos + 2) === 61 ? 3 : 2);
     return finishOp(code === 61 ? _eq : _prefix, 1);
   }
 
