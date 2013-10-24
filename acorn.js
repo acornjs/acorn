@@ -20,11 +20,11 @@
 // [dammit]: acorn_loose.js
 // [walk]: util/walk.js
 
-(function(root, mod) {
+(function(mod) {
   if (typeof exports == "object" && typeof module == "object") return mod(exports); // CommonJS
   if (typeof define == "function" && define.amd) return define(["exports"], mod); // AMD
-  mod(root.acorn || (root.acorn = {})); // Plain browser env
-})(this, function(exports) {
+  mod(this.acorn || (this.acorn = {})); // Plain browser env
+})(function(exports) {
   "use strict";
 
   exports.version = "0.4.1";
