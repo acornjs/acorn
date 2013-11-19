@@ -748,13 +748,15 @@
   // since a '/' inside a '[]' set does not end the expression.
 
   function readRegexp() {
-    var content = "", escaped, inClass, start = tokPos;
+    var content = "", escaped, inClass, start = tokPos, parenthesisDifference = 0;
     for (;;) {
       if (tokPos >= inputLen) raise(start, "Unterminated regular expression");
       var ch = input.charAt(tokPos);
       if (newline.test(ch)) raise(start, "Unterminated regular expression");
       if (!escaped) {
         if (ch === "[") inClass = true;
+        else if (ch === "(") ++parenthesisDifference;
+        else if (ch === ")") --parenthesisDifference;
         else if (ch === "]" && inClass) inClass = false;
         else if (ch === "/" && !inClass) break;
         escaped = ch === "\\";
@@ -767,6 +769,9 @@
     // here (don't ask).
     var mods = readWord1();
     if (mods && !/^[gmsiy]*$/.test(mods)) raise(start, "Invalid regexp flag");
+    // After mods pass, can do that check
+    if(parenthesisDifference > 0) raise(start, "Unterminated group in regular expression");
+    if(parenthesisDifference < 0) raise(start, "Unmached ')' in regular expression");
     return finishToken(_regexp, new RegExp(content, mods));
   }
 

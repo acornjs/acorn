@@ -85,7 +85,11 @@
 
         // Try to skip some text, based on the error message, and then continue
         var msg = e.message, pos = e.raisedAt, replace = true;
-        if (/unterminated/i.test(msg)) {
+        // Exception throwed not with 'raise'. Need explicit review
+        if (pos == undefined)
+          throw e;
+        
+        if (/unterminated/i.test(msg) && !/group/.test(msg)) {
           pos = lineEnd(e.pos);
           if (/string/.test(msg)) {
             replace = {start: e.pos, end: pos, type: tt.string, value: input.slice(e.pos + 1, pos)};
@@ -106,6 +110,8 @@
         } else if (/unexpected character/i.test(msg)) {
           pos++;
           replace = false;
+        } else if(/regular expression|RegExp/i.test(msg)) {
+          replace = true;
         } else {
           throw e;
         }

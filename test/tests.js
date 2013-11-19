@@ -26906,6 +26906,10 @@ testFail("var this = 10;", "Unexpected token (1:4)");
 
 testFail("throw\n10;", "Illegal newline after throw (1:5)");
 
+testFail("/erroneous (regex/", "Unterminated group in regular expression (1:1)");
+
+testFail("/erroneous )regex/", "Unmached ')' in regular expression (1:1)");
+
 // Assertion Tests
 (function() {
   var actualComments = [],
