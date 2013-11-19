@@ -765,6 +765,8 @@
     }
     var content = input.slice(start, tokPos);
     ++tokPos;
+    if(parenthesisDifference > 0) raise(start, "Unterminated group in regular expression");
+    if(parenthesisDifference < 0) raise(start, "Unmached ')' in regular expression");
     // Need to use `readWord1` because '\uXXXX' sequences are allowed
     // here (don't ask).
     var mods = readWord1();
