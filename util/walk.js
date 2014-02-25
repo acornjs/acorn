@@ -24,10 +24,10 @@
   // state.
   exports.simple = function(node, visitors, base, state) {
     if (!base) base = exports.base;
-    function c(node, st, override) {
+    function c(node, st, override, parent) {
       var type = override || node.type, found = visitors[type];
-      base[type](node, st, c);
-      if (found) found(node, st);
+      base[type](node, st, c, parent);
+      if (found) found(node, st, parent);
     }
     c(node, state);
   };
@@ -143,7 +143,7 @@
     return visitor;
   };
 
-  function skipThrough(node, st, c) { c(node, st); }
+  function skipThrough(node, st, c, parent) { c(node, st, null, parent); }
   function ignore(_node, _st, _c) {}
 
   // Node walkers.
@@ -151,83 +151,83 @@
   var base = exports.base = {};
   base.Program = base.BlockStatement = function(node, st, c) {
     for (var i = 0; i < node.body.length; ++i)
-      c(node.body[i], st, "Statement");
+      c(node.body[i], st, "Statement", node);
   };
   base.Statement = skipThrough;
   base.EmptyStatement = ignore;
   base.ExpressionStatement = function(node, st, c) {
-    c(node.expression, st, "Expression");
+    c(node.expression, st, "Expression", node);
   };
   base.IfStatement = function(node, st, c) {
-    c(node.test, st, "Expression");
-    c(node.consequent, st, "Statement");
-    if (node.alternate) c(node.alternate, st, "Statement");
+    c(node.test, st, "Expression", node);
+    c(node.consequent, st, "Statement", node);
+    if (node.alternate) c(node.alternate, st, "Statement", node);
   };
   base.LabeledStatement = function(node, st, c) {
-    c(node.body, st, "Statement");
+    c(node.body, st, "Statement", node);
   };
   base.BreakStatement = base.ContinueStatement = ignore;
   base.WithStatement = function(node, st, c) {
-    c(node.object, st, "Expression");
-    c(node.body, st, "Statement");
+    c(node.object, st, "Expression", node);
+    c(node.body, st, "Statement", node);
   };
   base.SwitchStatement = function(node, st, c) {
-    c(node.discriminant, st, "Expression");
+    c(node.discriminant, st, "Expression", node);
     for (var i = 0; i < node.cases.length; ++i) {
       var cs = node.cases[i];
-      if (cs.test) c(cs.test, st, "Expression");
+      if (cs.test) c(cs.test, st, "Expression", node);
       for (var j = 0; j < cs.consequent.length; ++j)
-        c(cs.consequent[j], st, "Statement");
+        c(cs.consequent[j], st, "Statement", node);
     }
   };
   base.ReturnStatement = function(node, st, c) {
-    if (node.argument) c(node.argument, st, "Expression");
+    if (node.argument) c(node.argument, st, "Expression", node);
   };
   base.ThrowStatement = function(node, st, c) {
-    c(node.argument, st, "Expression");
+    c(node.argument, st, "Expression", node);
   };
   base.TryStatement = function(node, st, c) {
-    c(node.block, st, "Statement");
-    if (node.handler) c(node.handler.body, st, "ScopeBody");
-    if (node.finalizer) c(node.finalizer, st, "Statement");
+    c(node.block, st, "Statement", node);
+    if (node.handler) c(node.handler.body, st, "ScopeBody", node);
+    if (node.finalizer) c(node.finalizer, st, "Statement", node);
   };
   base.WhileStatement = function(node, st, c) {
-    c(node.test, st, "Expression");
-    c(node.body, st, "Statement");
+    c(node.test, st, "Expression", node);
+    c(node.body, st, "Statement", node);
   };
   base.DoWhileStatement = base.WhileStatement;
   base.ForStatement = function(node, st, c) {
-    if (node.init) c(node.init, st, "ForInit");
-    if (node.test) c(node.test, st, "Expression");
-    if (node.update) c(node.update, st, "Expression");
-    c(node.body, st, "Statement");
+    if (node.init) c(node.init, st, "ForInit", node);
+    if (node.test) c(node.test, st, "Expression", node);
+    if (node.update) c(node.update, st, "Expression", node);
+    c(node.body, st, "Statement", node);
   };
   base.ForInStatement = function(node, st, c) {
-    c(node.left, st, "ForInit");
-    c(node.right, st, "Expression");
-    c(node.body, st, "Statement");
+    c(node.left, st, "ForInit", node);
+    c(node.right, st, "Expression", node);
+    c(node.body, st, "Statement", node);
   };
   base.ForInit = function(node, st, c) {
-    if (node.type == "VariableDeclaration") c(node, st);
-    else c(node, st, "Expression");
+    if (node.type == "VariableDeclaration") c(node, st, null, node);
+    else c(node, st, "Expression", node);
   };
   base.DebuggerStatement = ignore;
 
   base.FunctionDeclaration = function(node, st, c) {
-    c(node, st, "Function");
+    c(node, st, "Function", node);
   };
   base.VariableDeclaration = function(node, st, c) {
     for (var i = 0; i < node.declarations.length; ++i) {
       var decl = node.declarations[i];
-      if (decl.init) c(decl.init, st, "Expression");
+      if (decl.init) c(decl.init, st, "Expression", node);
     }
   };
 
   base.Function = function(node, st, c) {
-    c(node.body, st, "ScopeBody");
+    c(node.body, st, "ScopeBody", node);
   };
   base.ScopeBody = function(node, st, c) {
-    c(node, st, "Statement");
+    c(node, st, "Statement", node);
   };
 
   base.Expression = skipThrough;
@@ -235,38 +235,38 @@
   base.ArrayExpression = function(node, st, c) {
     for (var i = 0; i < node.elements.length; ++i) {
       var elt = node.elements[i];
-      if (elt) c(elt, st, "Expression");
+      if (elt) c(elt, st, "Expression", node);
     }
   };
   base.ObjectExpression = function(node, st, c) {
     for (var i = 0; i < node.properties.length; ++i)
-      c(node.properties[i].value, st, "Expression");
+      c(node.properties[i].value, st, "Expression", node);
   };
   base.FunctionExpression = base.FunctionDeclaration;
   base.SequenceExpression = function(node, st, c) {
     for (var i = 0; i < node.expressions.length; ++i)
-      c(node.expressions[i], st, "Expression");
+      c(node.expressions[i], st, "Expression", node);
   };
   base.UnaryExpression = base.UpdateExpression = function(node, st, c) {
-    c(node.argument, st, "Expression");
+    c(node.argument, st, "Expression", node);
   };
   base.BinaryExpression = base.AssignmentExpression = base.LogicalExpression = function(node, st, c) {
-    c(node.left, st, "Expression");
-    c(node.right, st, "Expression");
+    c(node.left, st, "Expression", node);
+    c(node.right, st, "Expression", node);
   };
   base.ConditionalExpression = function(node, st, c) {
-    c(node.test, st, "Expression");
-    c(node.consequent, st, "Expression");
-    c(node.alternate, st, "Expression");
+    c(node.test, st, "Expression", node);
+    c(node.consequent, st, "Expression", node);
+    c(node.alternate, st, "Expression", node);
   };
   base.NewExpression = base.CallExpression = function(node, st, c) {
-    c(node.callee, st, "Expression");
+    c(node.callee, st, "Expression", node);
     if (node.arguments) for (var i = 0; i < node.arguments.length; ++i)
-      c(node.arguments[i], st, "Expression");
+      c(node.arguments[i], st, "Expression", node);
   };
   base.MemberExpression = function(node, st, c) {
-    c(node.object, st, "Expression");
-    if (node.computed) c(node.property, st, "Expression");
+    c(node.object, st, "Expression", node);
+    if (node.computed) c(node.property, st, "Expression", node);
   };
   base.Identifier = base.Literal = ignore;
 
@@ -289,23 +289,23 @@
         (decl ? normalScope(scope) : inner).vars[node.id.name] =
           {type: decl ? "function" : "function name", node: node.id};
       }
-      c(node.body, inner, "ScopeBody");
+      c(node.body, inner, "ScopeBody", node);
     },
     TryStatement: function(node, scope, c) {
-      c(node.block, scope, "Statement");
+      c(node.block, scope, "Statement", node);
       if (node.handler) {
         var inner = makeScope(scope, true);
         inner.vars[node.handler.param.name] = {type: "catch clause", node: node.handler.param};
-        c(node.handler.body, inner, "ScopeBody");
+        c(node.handler.body, inner, "ScopeBody", node);
       }
-      if (node.finalizer) c(node.finalizer, scope, "Statement");
+      if (node.finalizer) c(node.finalizer, scope, "Statement", node);
     },
     VariableDeclaration: function(node, scope, c) {
       var target = normalScope(scope);
       for (var i = 0; i < node.declarations.length; ++i) {
         var decl = node.declarations[i];
         target.vars[decl.id.name] = {type: "var", node: decl.id};
-        if (decl.init) c(decl.init, scope, "Expression");
+        if (decl.init) c(decl.init, scope, "Expression", node);
       }
     }
   });
