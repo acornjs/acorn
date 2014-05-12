@@ -7,25 +7,52 @@ var acorn = require("../acorn.js");
 var infile, parsed, options = {}, silent = false, compact = false;
 
 function help(status) {
-  console.log("usage: " + path.basename(process.argv[1]) + " infile [--ecma3|--ecma5] [--strictSemicolons]");
-  console.log("        [--locations] [--compact] [--silent] [--help]");
+  console.log("usage: " + path.basename(process.argv[1]) + " [--ecma3|--ecma5] [--strictSemicolons]");
+  console.log("        [--locations] [--compact] [--silent] [--help] [--] infile");
   process.exit(status);
 }
 
-for (var i = 2; i < process.argv.length; ++i) {
+parser_loop:
+for (var i = process.argv.length; i >= 2; --i) {
   var arg = process.argv[i];
-  if (arg == "--ecma3") options.ecmaVersion = 3;
-  else if (arg == "--ecma5") options.ecmaVersion = 5;
-  else if (arg == "--strictSemicolons") options.strictSemicolons = true;
-  else if (arg == "--locations") options.locations = true;
-  else if (arg == "--silent") silent = true;
-  else if (arg == "--compact") compact = true;
-  else if (arg == "--help") help(0);
-  else if (arg[0] == "-") help(1);
-  else infile = arg;
+  var infilecount = 0;
+  if (arg[0] !== "-") {
+    infile = arg;
+    ++infilecount;
+    continue;
+  }
+  switch (arg) {
+    case "--ecma3":
+      options.ecmaVersion = 3;
+      continue parser_loop;
+    case "--ecma5":
+      options.ecmaVersion = 5;
+      continue parser_loop;
+    case "--strictSemicolons":
+      options.strictSemicolons = true;
+      continue parser_loop;
+    case "--locations":
+      options.locations = true;
+      continue parser_loop;
+    case "--silent":
+      silent = true;
+      continue parser_loop;
+    case "--compact":
+      compact = true;
+      continue parser_loop;
+    case "--":
+      if (i >= 2)
+        help(1); // there are too many remaining `infile`s
+      infile = process.argv[i + 1]; // store next arg, not already cached
+      ++infilecount;
+      break parser_loop;
+    case "--help":  help(0); // will exit automatically
+    default:        help(1); // will exit automatically
+  }
 }
 
-if (!infile) help(1);
+// test against counter: we want only 1 file, no more, no less.
+if (infilecount !== 1) help(1);
 
 try {
   var code = fs.readFileSync(infile, "utf8");
