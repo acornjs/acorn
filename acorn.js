@@ -26,6 +26,10 @@
   mod(root.acorn || (root.acorn = {})); // Plain browser env
 })(this, function(exports) {
   "use strict";
+  
+  function log(num) { // make debugging lines easier
+    console.log("At line " + num);
+  }
 
   exports.version = "0.5.1";
 
@@ -124,11 +128,10 @@
   var getLineInfo = exports.getLineInfo = function(input, offset) {
     for (var line = 1, cur = 0;;) {
       lineBreak.lastIndex = cur;
-      var match = lineBreak.exec(input);
-      if (match && match.index < offset) {
-        ++line;
-        cur = match.index + match[0].length;
-      } else break;
+      var match = lineBreak.exec(input), index = match.index;
+      if (!match || index >= offset) break; // break now instead of skipping to `else` first.
+      ++line;
+      cur = index + match[0].length;
     }
     return {line: line, column: offset - cur};
   };
@@ -159,10 +162,10 @@
       if (options.locations) {
         tokCurLine = 1;
         tokLineStart = lineBreak.lastIndex = 0;
-        var match;
-        while ((match = lineBreak.exec(input)) && match.index < pos) {
+        var match, index;
+        while ((match = lineBreak.exec(input)) && (index = match.index) < pos) {
           ++tokCurLine;
-          tokLineStart = match.index + match[0].length;
+          tokLineStart = index + match[0].length;
         }
       }
       tokRegexpAllowed = reAllowed;
@@ -361,16 +364,17 @@
   function makePredicate(words) {
     words = words.split(" ");
     var f = "", cats = [];
-    out: for (var i = 0; i < words.length; ++i) {
-      for (var j = 0; j < cats.length; ++j)
-        if (cats[j][0].length == words[i].length) {
-          cats[j].push(words[i]);
+    out: for (var i = words.length; i >= 0; ) {
+      // cache some variables used through the whole for loop, such as the current word
+      for (var word = words[--i], len = cats.length, j = len; j !== 0; )
+        if (cats[--j][0].length == len) {
+          cats[j].push(word);
           continue out;
         }
-      cats.push([words[i]]);
+      cats.push([word]);
     }
     function compareTo(arr) {
-      if (arr.length == 1) return f += "return str === " + JSON.stringify(arr[0]) + ";";
+      if (arr.length == 1) return f += "return str===" + JSON.stringify(arr[0]) + ";";
       f += "switch(str){";
       for (var i = 0; i < arr.length; ++i) f += "case " + JSON.stringify(arr[i]) + ":";
       f += "return true}return false;";
@@ -515,9 +519,12 @@
     var start = tokPos;
     var startLoc = options.onComment && options.locations && new Position;
     var ch = input.charCodeAt(tokPos+=2);
-    while (tokPos < inputLen && ch !== 10 && ch !== 13 && ch !== 8232 && ch !== 8233) {
-      ++tokPos;
-      ch = input.charCodeAt(tokPos);
+    while_loop:
+    while (tokPos < inputLen) {
+      switch (ch) {
+        case 10: case 13: case 8232: case 8233: break while_loop;
+        default: ++tokPos; ch = input.charCodeAt(tokPos);
+      }
     }
     if (options.onComment)
       options.onComment(false, input.slice(start + 2, tokPos), start, tokPos,
@@ -528,41 +535,50 @@
   // whitespace and comments, and.
 
   function skipSpace() {
+    while_loop:
     while (tokPos < inputLen) {
       var ch = input.charCodeAt(tokPos);
-      if (ch === 32) { // ' '
-        ++tokPos;
-      } else if (ch === 13) {
-        ++tokPos;
-        var next = input.charCodeAt(tokPos);
-        if (next === 10) {
+      // switch far faster here than a series of if-else statements.
+      // this makes it almost like a jump table in low-level programming.
+      switch (ch) {
+        case 32: // ' '
+        case 9: case 10: case 11: case 12: case 13: // 8 > ch > 14
+        case 160: // '\xa0'
           ++tokPos;
-        }
-        if (options.locations) {
-          ++tokCurLine;
-          tokLineStart = tokPos;
-        }
-      } else if (ch === 10 || ch === 8232 || ch === 8233) {
-        ++tokPos;
-        if (options.locations) {
-          ++tokCurLine;
-          tokLineStart = tokPos;
-        }
-      } else if (ch > 8 && ch < 14) {
-        ++tokPos;
-      } else if (ch === 47) { // '/'
-        var next = input.charCodeAt(tokPos + 1);
-        if (next === 42) { // '*'
-          skipBlockComment();
-        } else if (next === 47) { // '/'
-          skipLineComment();
-        } else break;
-      } else if (ch === 160) { // '\xa0'
-        ++tokPos;
-      } else if (ch >= 5760 && nonASCIIwhitespace.test(String.fromCharCode(ch))) {
-        ++tokPos;
-      } else {
-        break;
+          continue while_loop;
+          
+        case 13:
+          ++tokPos;
+          var next = input.charCodeAt(tokPos);
+          if (next === 10) {
+            ++tokPos;
+          }
+          if (options.locations) {
+            ++tokCurLine;
+            tokLineStart = tokPos;
+          }
+          continue while_loop;
+          
+        case 47: // '/'
+          var next = input.charCodeAt(tokPos + 1);
+          if (next === 42) { // '*'
+            skipBlockComment();
+          } else if (next === 47) { // '/'
+            skipLineComment();
+          } else break while_loop;
+          continue while_loop;
+          
+        case 10: case 8232: case 8233:
+          ++tokPos;
+          if (options.locations) {
+            ++tokCurLine;
+            tokLineStart = tokPos;
+          }
+          continue while_loop;
+          
+        default:
+          if (ch < 5760 || !nonASCIIwhitespace.test(String.fromCharCode(ch))) break while_loop;
+          ++tokPos;
       }
     }
   }
@@ -788,7 +804,16 @@
     }
     return finishToken(_regexp, value);
   }
-
+  
+  // more potential for the engine to optimize this
+  function readIntHelper(num) {
+    if (num < 48) return Infinity;
+    if (num < 58) return num - 48;
+    if (num < 65) return Infinity;
+    if (num < 97) return num - 65 + 10;
+    return Infinity;
+  }
+  
   // Read an integer in the given radix. Return null if zero digits
   // were read, the integer value otherwise. When `len` is given, this
   // will return `null` unless the integer has exactly `len` digits.
@@ -796,11 +821,7 @@
   function readInt(radix, len) {
     var start = tokPos, total = 0;
     for (var i = 0, e = len == null ? Infinity : len; i < e; ++i) {
-      var code = input.charCodeAt(tokPos), val;
-      if (code >= 97) val = code - 97 + 10; // a
-      else if (code >= 65) val = code - 65 + 10; // A
-      else if (code >= 48 && code <= 57) val = code - 48; // 0-9
-      else val = Infinity;
+      var val = readIntHelper(input.charCodeAt(tokPos));
       if (val >= radix) break;
       ++tokPos;
       total = total * radix + val;
@@ -844,6 +865,28 @@
     else val = parseInt(str, 8);
     return finishToken(_num, val);
   }
+  
+  // engine more able to preemptively optimize this out of the loop. Also, reduces general clutter.
+
+  function readStringHelper(num) {
+    switch (num) {
+      case 110: return "\n"; // 'n' -> '\n'
+      case 114: return "\r"; // 'r' -> '\r'
+      case 120: return String.fromCharCode(readHexChar(2)); // 'x'
+      case 117: return String.fromCharCode(readHexChar(4)); // 'u'
+      case 85: return String.fromCharCode(readHexChar(8)); // 'U'
+      case 116: return "\t"; // 't' -> '\t'
+      case 98: return "\b"; // 'b' -> '\b'
+      case 118: return "\u000b"; // 'v' -> '\u000b'
+      case 102: return "\f"; // 'f' -> '\f'
+      case 48: return "\0"; // 0 -> '\0'
+      case 13: if (input.charCodeAt(tokPos) === 10) ++tokPos; // '\r\n'
+      case 10: // ' \n'
+        if (options.locations) { tokLineStart = tokPos; ++tokCurLine; }
+        return ''; // append nothing
+      default: return String.fromCharCode(num);
+    }
+  }
 
   // Read a string value, interpreting backslash-escapes.
 
@@ -869,26 +912,12 @@
           out += String.fromCharCode(parseInt(octal, 8));
           tokPos += octal.length - 1;
         } else {
-          switch (ch) {
-          case 110: out += "\n"; break; // 'n' -> '\n'
-          case 114: out += "\r"; break; // 'r' -> '\r'
-          case 120: out += String.fromCharCode(readHexChar(2)); break; // 'x'
-          case 117: out += String.fromCharCode(readHexChar(4)); break; // 'u'
-          case 85: out += String.fromCharCode(readHexChar(8)); break; // 'U'
-          case 116: out += "\t"; break; // 't' -> '\t'
-          case 98: out += "\b"; break; // 'b' -> '\b'
-          case 118: out += "\u000b"; break; // 'v' -> '\u000b'
-          case 102: out += "\f"; break; // 'f' -> '\f'
-          case 48: out += "\0"; break; // 0 -> '\0'
-          case 13: if (input.charCodeAt(tokPos) === 10) ++tokPos; // '\r\n'
-          case 10: // ' \n'
-            if (options.locations) { tokLineStart = tokPos; ++tokCurLine; }
-            break;
-          default: out += String.fromCharCode(ch); break;
-          }
+          out += readStringHelper(ch);
         }
       } else {
-        if (ch === 13 || ch === 10 || ch === 8232 || ch === 8233) raise(tokStart, "Unterminated string constant");
+        switch (ch) { // anything else falls through. Quicker for the computer
+          case 13: case 10: case 8232: case 8233: raise(tokStart, "Unterminated string constant");
+        }
         out += String.fromCharCode(ch); // '\'
         ++tokPos;
       }
@@ -926,7 +955,7 @@
       } else if (ch === 92) { // "\"
         if (!containsEsc) word = input.slice(start, tokPos);
         containsEsc = true;
-        if (input.charCodeAt(++tokPos) != 117) // "u"
+        if (input.charCodeAt(++tokPos) !== 117) // "u"
           raise(tokPos, "Expecting Unicode escape sequence \\uXXXX");
         ++tokPos;
         var esc = readHexChar(4);
@@ -1150,7 +1179,7 @@
     if (tokType === _slash || tokType === _assign && tokVal == "/=")
       readToken(true);
 
-    var starttype = tokType, node = startNode();
+    var starttype = tokType, node = startNode(), label;
 
     // Most types of statements are recognized by the keyword they
     // start with. Many are trivial to parse, some require a bit of
@@ -1159,24 +1188,25 @@
     switch (starttype) {
     case _break: case _continue:
       next();
-      var isBreak = starttype === _break;
+      var isBreak = starttype === _break, len;
       if (eat(_semi) || canInsertSemicolon()) node.label = null;
       else if (tokType !== _name) unexpected();
       else {
-        node.label = parseIdent();
+        node.label = label = parseIdent();
         semicolon();
       }
+      len = labels.length; // cache length instead of getting it every time
 
       // Verify that there is an actual destination to break or
       // continue to.
-      for (var i = 0; i < labels.length; ++i) {
-        var lab = labels[i];
-        if (node.label == null || lab.name === node.label.name) {
-          if (lab.kind != null && (isBreak || lab.kind === "loop")) break;
-          if (node.label && isBreak) break;
-        }
+      for (var i = 0; i <= len; ++i) {
+        var lab = labels[i], label = node.label; // cache label for speed as well.
+        // short circuit the rest of the checks - more optimal
+        if (label != null && lab.name !== label.name) continue;
+        if (lab.kind != null && (isBreak || lab.kind === "loop")) break;
+        if (label && isBreak) break;
       }
-      if (i === labels.length) raise(node.start, "Unsyntactic " + starttype.keyword);
+      if (i === len) raise(node.start, "Unsyntactic " + starttype.keyword);
       return finishNode(node, isBreak ? "BreakStatement" : "ContinueStatement");
 
     case _debugger:
@@ -1255,7 +1285,7 @@
       // nodes. `cur` is used to keep the node that we are currently
       // adding statements to.
 
-      for (var cur, sawDefault; tokType != _braceR;) {
+      for (var cur, sawDefault; tokType !== _braceR;) {
         if (tokType === _case || tokType === _default) {
           var isCase = tokType === _case;
           if (cur) finishNode(cur, "SwitchCase");
@@ -1304,9 +1334,10 @@
       }
       node.guardedHandlers = empty;
       node.finalizer = eat(_finally) ? parseBlock() : null;
-      if (!node.handler && !node.finalizer)
-        raise(node.start, "Missing catch or finally clause");
-      return finishNode(node, "TryStatement");
+      // shortcut this return, simplify conditional
+      if (node.handler || node.finalizer) return finishNode(node, "TryStatement");
+      raise(node.start, "Missing catch or finally clause");
+      
 
     case _var:
       next();
@@ -1345,7 +1376,7 @@
     default:
       var maybeName = tokVal, expr = parseExpression();
       if (starttype === _name && expr.type === "Identifier" && eat(_colon)) {
-        for (var i = 0; i < labels.length; ++i)
+        for (var len = labels.length, i = 0; i <= len; ++i)
           if (labels[i].name === maybeName) raise(expr.start, "Label '" + maybeName + "' is already declared");
         var kind = tokType.isLoop ? "loop" : tokType === _switch ? "switch" : null;
         labels.push({name: maybeName, kind: kind});
@@ -1464,31 +1495,27 @@
 
   function parseMaybeAssign(noIn) {
     var left = parseMaybeConditional(noIn);
-    if (tokType.isAssign) {
-      var node = startNodeFrom(left);
-      node.operator = tokVal;
-      node.left = left;
-      next();
-      node.right = parseMaybeAssign(noIn);
-      checkLVal(left);
-      return finishNode(node, "AssignmentExpression");
-    }
-    return left;
+    if (!tokType.isAssign) return left;
+    var node = startNodeFrom(left);
+    node.operator = tokVal;
+    node.left = left;
+    next();
+    node.right = parseMaybeAssign(noIn);
+    checkLVal(left);
+    return finishNode(node, "AssignmentExpression");
   }
 
   // Parse a ternary conditional (`?:`) operator.
 
   function parseMaybeConditional(noIn) {
     var expr = parseExprOps(noIn);
-    if (eat(_question)) {
-      var node = startNodeFrom(expr);
-      node.test = expr;
-      node.consequent = parseExpression(true);
-      expect(_colon);
-      node.alternate = parseExpression(true, noIn);
-      return finishNode(node, "ConditionalExpression");
-    }
-    return expr;
+    if (!eat(_question)) return expr;
+    var node = startNodeFrom(expr);
+    node.test = expr;
+    node.consequent = parseExpression(true);
+    expect(_colon);
+    node.alternate = parseExpression(true, noIn);
+    return finishNode(node, "ConditionalExpression");
   }
 
   // Start the precedence parser.
@@ -1505,19 +1532,16 @@
 
   function parseExprOp(left, minPrec, noIn) {
     var prec = tokType.binop;
-    if (prec != null && (!noIn || tokType !== _in)) {
-      if (prec > minPrec) {
-        var node = startNodeFrom(left);
-        node.left = left;
-        node.operator = tokVal;
-        var op = tokType;
-        next();
-        node.right = parseExprOp(parseMaybeUnary(), prec, noIn);
-        var exprNode = finishNode(node, (op === _logicalOR || op === _logicalAND) ? "LogicalExpression" : "BinaryExpression");
-        return parseExprOp(exprNode, minPrec, noIn);
-      }
-    }
-    return left;
+    // invert & combine conditionals, using basic boolean algebra to optimize
+    if (prec == null || noIn && tokType === _in || prec <= minPrec) return left;
+    var node = startNodeFrom(left);
+    node.left = left;
+    node.operator = tokVal;
+    var op = tokType;
+    next();
+    node.right = parseExprOp(parseMaybeUnary(), prec, noIn);
+    var exprNode = finishNode(node, (op === _logicalOR || op === _logicalAND) ? "LogicalExpression" : "BinaryExpression");
+    return parseExprOp(exprNode, minPrec, noIn);
   }
 
   // Parse unary operators, both prefix and postfix.
@@ -1649,8 +1673,8 @@
     var node = startNode();
     next();
     node.callee = parseSubscripts(parseExprAtom(), true);
-    if (eat(_parenL)) node.arguments = parseExprList(_parenR, false);
-    else node.arguments = empty;
+    // convert if-else to ternary
+    node.arguments = eat(_parenL) ? parseExprList(_parenR, false) : empty;
     return finishNode(node, "NewExpression");
   }
 
@@ -1664,7 +1688,8 @@
       if (!first) {
         expect(_comma);
         if (options.allowTrailingCommas && eat(_braceR)) break;
-      } else first = false;
+      }
+      first = false; // either way, it ends up false
 
       var prop = {key: parsePropertyName()}, isGetSet = false, kind;
       if (eat(_colon)) {
@@ -1687,10 +1712,23 @@
         for (var i = 0; i < node.properties.length; ++i) {
           var other = node.properties[i];
           if (other.key.name === prop.key.name) {
-            var conflict = kind == other.kind || isGetSet && other.kind === "init" ||
-              kind === "init" && (other.kind === "get" || other.kind === "set");
-            if (conflict && !strict && kind === "init" && other.kind === "init") conflict = false;
-            if (conflict) raise(prop.key.start, "Redefinition of property");
+            // greatly speed up/simplify conditional evaluation (for computer) here
+            // now has a worst case of only 6 logical computations, fewer than the old variable
+            // optimization uses a switch hack (switch tests each case for equality with the given
+            // value in the switch conditional and jumps to the first case that is equal to that 
+            // 'condition'...I put 'true' as the switch conditional)
+            
+            // cache other.kind, if other is getter/setter
+            var otherKind = other.kind, otherIsGetSet = otherKind === "get" || otherKind === "set";
+            switch (true) { // small hack
+              case strict: // if strict
+                if (kind === otherKind === "init") raise(prop.key.start, "Redefinition of property");
+                // if other is getter/setter, break from switch
+                if (!otherIsGetSet) break;
+                // else, fall through...
+              case otherIsGetSet: // other is getter/setter
+                if (isGetSet || kind === "init") raise(prop.key.start, "Redefinition of property");
+            }
           }
         }
       }
@@ -1732,22 +1770,54 @@
 
     // Start a new scope with regard to labels and the `inFunction`
     // flag (restore them to their old value afterwards).
-    var oldInFunc = inFunction, oldLabels = labels;
+    var oldInFunc = inFunction, oldLabels = labels, body, params, id;
     inFunction = true; labels = [];
-    node.body = parseBlock(true);
+    // cache often-get properties instead of getting it each time
+    body = (node.body = parseBlock(true)).body; params = node.params;
     inFunction = oldInFunc; labels = oldLabels;
 
     // If this is a strict mode function, verify that argument names
     // are not repeated, and it does not try to bind the words `eval`
     // or `arguments`.
-    if (strict || node.body.body.length && isUseStrict(node.body.body[0])) {
-      for (var i = node.id ? -1 : 0; i < node.params.length; ++i) {
-        var id = i < 0 ? node.id : node.params[i];
+    if (strict || body.length && isUseStrict(body[0])) {
+      // I don't know if this is a bug, so I have given two possible options just in case.
+      
+      // Option 1
+      // unroll the first two cycles to eliminate redundant comparisons, specifically the following:
+      // i == -1: id = node.id, no for loop
+      // i ==  0: id = node.id, there is a for loop
+      /**/
+      id = node.id;
+      if (isStrictReservedWord(id.name) || isStrictBadIdWord(id.name))
+        raise(id.start, "Defining '" + id.name + "' in strict mode");
+      for (var j = 0; j < 0; ++j) if (id.name === params[0].name)
+        raise(id.start, "Argument name clash in strict mode");
+      // extra conditionals taken out of for loop
+      for (var len = params.length, i = 1; i < len; ++i) {
+        var id = params[i];
         if (isStrictReservedWord(id.name) || isStrictBadIdWord(id.name))
           raise(id.start, "Defining '" + id.name + "' in strict mode");
-        if (i >= 0) for (var j = 0; j < i; ++j) if (id.name === node.params[j].name)
+        for (var j = 0; j < i; ++j) if (id.name === params[j].name)
           raise(id.start, "Argument name clash in strict mode");
       }
+      /**/
+      // Option 2
+      // unroll the first cycle to eliminate redundant comparisons, specifically the following:
+      // i == -1: id = node.id, no for loop
+      // i ==  0: id = node.params[0], there is a for loop
+      /**
+      id = node.id;
+      if (isStrictReservedWord(id.name) || isStrictBadIdWord(id.name))
+        raise(id.start, "Defining '" + id.name + "' in strict mode");
+      // extra conditionals taken out of for loop
+      for (var len = params.length, i = 0; i < len; ++i) {
+        var id = params[i];
+        if (isStrictReservedWord(id.name) || isStrictBadIdWord(id.name))
+          raise(id.start, "Defining '" + id.name + "' in strict mode");
+        for (var j = 0; j < i; ++j) if (id.name === params[j].name)
+          raise(id.start, "Argument name clash in strict mode");
+      }
+      /**/
     }
 
     return finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
@@ -1765,10 +1835,11 @@
       if (!first) {
         expect(_comma);
         if (allowTrailingComma && options.allowTrailingCommas && eat(close)) break;
-      } else first = false;
+      }
+      first = false; // guaranteed to be false after if-statement either way
 
-      if (allowEmpty && tokType === _comma) elts.push(null);
-      else elts.push(parseExpression(true));
+      // replace if-else with ternary inside arguments
+      elts.push(allowEmpty && tokType === _comma ? null : parseExpression(true));
     }
     return elts;
   }
