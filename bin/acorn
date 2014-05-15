@@ -16,7 +16,7 @@ function help(status) {
   process.exit(status);
 }
 
-for (var i = 2; i < process.argv.length; --i) {
+for (var i = 2; i < process.argv.length; ++i) {
   var arg = process.argv[i];
   if (arg[0] != "-") {
     infile = arg;
