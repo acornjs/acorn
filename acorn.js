@@ -1182,8 +1182,8 @@
     default:
       var maybeName = tokVal, expr = parseExpression();
       if (starttype === _name && expr.type === "Identifier" && eat(_colon))
-        return parseLabeledStatement(node);
-      else return parseExpressionStatement(node);
+        return parseLabeledStatement(node, maybeName, expr);
+      else return parseExpressionStatement(node, expr);
     }
   }
   
@@ -1381,7 +1381,7 @@
     return finishNode(node, "EmptyStatement");
   }
   
-  function parseLabeledStatement(node) {
+  function parseLabeledStatement(node, maybeName, expr) {
     for (var i = 0; i < labels.length; ++i)
       if (labels[i].name === maybeName) raise(expr.start, "Label '" + maybeName + "' is already declared");
     var kind = tokType.isLoop ? "loop" : tokType === _switch ? "switch" : null;
@@ -1392,7 +1392,7 @@
     return finishNode(node, "LabeledStatement");
   }
   
-  function parseExpressionStatement(node) {
+  function parseExpressionStatement(node, expr) {
     node.expression = expr;
     semicolon();
     return finishNode(node, "ExpressionStatement");
