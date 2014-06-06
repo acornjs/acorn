@@ -1321,10 +1321,6 @@
 
     case _const:
     case _let:
-      if (options.ecmaVersion < 6) {
-        next();
-        unexpected();
-      }
     case _var:
       next();
       parseVar(node, false, starttype.keyword);
