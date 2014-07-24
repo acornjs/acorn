@@ -1739,6 +1739,9 @@
     case _new:
       return parseNew();
 
+    case _ellipsis:
+      return parseSpread();
+
     default:
       unexpected();
     }
@@ -1755,6 +1758,15 @@
     if (eat(_parenL)) node.arguments = parseExprList(_parenR, false);
     else node.arguments = empty;
     return finishNode(node, "NewExpression");
+  }
+
+  // Parse spread element '...expr'
+
+  function parseSpread() {
+    var node = startNode();
+    next();
+    node.argument = parseExpression(true);
+    return finishNode(node, "SpreadElement");
   }
 
   // Parse an object literal.
