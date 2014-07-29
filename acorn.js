@@ -32,8 +32,7 @@
   // The main exported interface (under `self.acorn` when in the
   // browser) is a `parse` function that takes a code string and
   // returns an abstract syntax tree as specified by [Mozilla parser
-  // API][api], with the caveat that the SpiderMonkey-specific syntax
-  // (`let`, `yield`, inline XML, etc) is not recognized.
+  // API][api], with the caveat that inline XML is not recognized.
   //
   // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
 
@@ -53,7 +52,7 @@
     // `ecmaVersion` indicates the ECMAScript version to parse. Must
     // be either 3, or 5, or 6. This influences support for strict
     // mode, the set of reserved words, support for getters and
-    // setters and other features. ES6 support is only partial.
+    // setters and other features.
     ecmaVersion: 5,
     // Turn on `strictSemicolons` to prevent the parser from doing
     // automatic semicolon insertion.
@@ -110,7 +109,7 @@
 
   function setOptions(opts) {
     options = opts || {};
-    for (var opt in defaultOptions) if (!Object.prototype.hasOwnProperty.call(options, opt))
+    for (var opt in defaultOptions) if (!has(options, opt))
       options[opt] = defaultOptions[opt];
     sourceFile = options.sourceFile || null;
 
@@ -199,7 +198,7 @@
 
   var tokType, tokVal;
 
-  // Interal state for the tokenizer. To distinguish between division
+  // Internal state for the tokenizer. To distinguish between division
   // operators and regular expressions, it remembers whether the last
   // token was one that is allowed to be followed by an expression.
   // (If it is, a slash is probably a regexp, if it isn't it's a
@@ -220,11 +219,23 @@
   var lastStart, lastEnd, lastEndLoc;
 
   // This is the parser's state. `inFunction` is used to reject
-  // `return` statements outside of functions, `labels` to verify that
-  // `break` and `continue` have somewhere to jump to, and `strict`
-  // indicates whether strict mode is on.
+  // `return` statements outside of functions, `inGenerator` to
+  // reject `yield`s outside of generators, `labels` to verify
+  // that `break` and `continue` have somewhere to jump to, and
+  // `strict` indicates whether strict mode is on.
 
-  var inFunction, labels, strict;
+  var inFunction, inGenerator, labels, strict;
+
+  // This counter is used for checking that arrow expressions did
+  // not contain nested parentheses in argument list.
+
+  var metParenL;
+
+  // This is used by parser for detecting if it's inside ES6
+  // Template String. If it is, it should treat '$' as prefix before
+  // '{expression}' and everything else as string literals.
+
+  var inTemplate = false;
 
   // This function is used to raise exceptions on parse errors. It
   // takes an offset integer (into the current `input`) to indicate
@@ -281,6 +292,9 @@
   var _let = {keyword: "let"}, _const = {keyword: "const"};
   var _while = {keyword: "while", isLoop: true}, _with = {keyword: "with"}, _new = {keyword: "new", beforeExpr: true};
   var _this = {keyword: "this"};
+  var _class = {keyword: "class"}, _extends = {keyword: "extends", beforeExpr: true};
+  var _export = {keyword: "export"}, _import = {keyword: "import"};
+  var _yield = {keyword: "yield", beforeExpr: true};
 
   // The keywords that denote values.
 
@@ -305,7 +319,9 @@
                       "instanceof": {keyword: "instanceof", binop: 7, beforeExpr: true}, "this": _this,
                       "typeof": {keyword: "typeof", prefix: true, beforeExpr: true},
                       "void": {keyword: "void", prefix: true, beforeExpr: true},
-                      "delete": {keyword: "delete", prefix: true, beforeExpr: true}};
+                      "delete": {keyword: "delete", prefix: true, beforeExpr: true},
+                      "class": _class, "extends": _extends,
+                      "export": _export, "import": _import, "yield": _yield};
 
   // Punctuation token types. Again, the `type` property is purely for debugging.
 
@@ -313,6 +329,7 @@
   var _braceR = {type: "}"}, _parenL = {type: "(", beforeExpr: true}, _parenR = {type: ")"};
   var _comma = {type: ",", beforeExpr: true}, _semi = {type: ";", beforeExpr: true};
   var _colon = {type: ":", beforeExpr: true}, _dot = {type: "."}, _ellipsis = {type: "..."}, _question = {type: "?", beforeExpr: true};
+  var _arrow = {type: "=>", beforeExpr: true}, _bquote = {type: "`"}, _dollarBraceL = {type: "${", beforeExpr: true};
 
   // Operators. These carry several kinds of properties to help the
   // parser use them properly (the presence of these properties is
@@ -342,7 +359,10 @@
   var _relational = {binop: 7, beforeExpr: true};
   var _bitShift = {binop: 8, beforeExpr: true};
   var _plusMin = {binop: 9, prefix: true, beforeExpr: true};
-  var _multiplyModulo = {binop: 10, beforeExpr: true};
+  var _modulo = {binop: 10, beforeExpr: true};
+
+  // '*' may be multiply or have special meaning in ES6
+  var _star = {binop: 10, beforeExpr: true};
 
   // Provide access to the token types for external users of the
   // tokenizer.
@@ -350,7 +370,8 @@
   exports.tokTypes = {bracketL: _bracketL, bracketR: _bracketR, braceL: _braceL, braceR: _braceR,
                       parenL: _parenL, parenR: _parenR, comma: _comma, semi: _semi, colon: _colon,
                       dot: _dot, ellipsis: _ellipsis, question: _question, slash: _slash, eq: _eq,
-                      name: _name, eof: _eof, num: _num, regexp: _regexp, string: _string};
+                      name: _name, eof: _eof, num: _num, regexp: _regexp, string: _string,
+                      arrow: _arrow, bquote: _bquote, dollarBraceL: _dollarBraceL};
   for (var kw in keywordTypes) exports.tokTypes["_" + kw] = keywordTypes[kw];
 
   // This is a trick taken from Esprima. It turns out that, on
@@ -423,7 +444,7 @@
 
   var isEcma5AndLessKeyword = makePredicate(ecma5AndLessKeywords);
 
-  var isEcma6Keyword = makePredicate(ecma5AndLessKeywords + " let const");
+  var isEcma6Keyword = makePredicate(ecma5AndLessKeywords + " let const class extends export import yield");
 
   var isKeyword = isEcma5AndLessKeyword;
 
@@ -488,6 +509,8 @@
     tokCurLine = 1;
     tokPos = tokLineStart = 0;
     tokRegexpAllowed = true;
+    metParenL = 0;
+    inTemplate = false;
     skipSpace();
   }
 
@@ -499,7 +522,7 @@
     tokEnd = tokPos;
     if (options.locations) tokEndLoc = new Position;
     tokType = type;
-    skipSpace();
+    if (type !== _bquote || inTemplate) skipSpace();
     tokVal = val;
     tokRegexpAllowed = type.beforeExpr;
   }
@@ -610,10 +633,10 @@
     return finishOp(_slash, 1);
   }
 
-  function readToken_mult_modulo() { // '%*'
+  function readToken_mult_modulo(code) { // '%*'
     var next = input.charCodeAt(tokPos + 1);
     if (next === 61) return finishOp(_assign, 2);
-    return finishOp(_multiplyModulo, 1);
+    return finishOp(code === 42 ? _star : _modulo, 1);
   }
 
   function readToken_pipe_amp(code) { // '|&'
@@ -667,20 +690,41 @@
     return finishOp(_relational, size);
   }
 
-  function readToken_eq_excl(code) { // '=!'
+  function readToken_eq_excl(code) { // '=!', '=>'
     var next = input.charCodeAt(tokPos + 1);
     if (next === 61) return finishOp(_equality, input.charCodeAt(tokPos + 2) === 61 ? 3 : 2);
+    if (code === 61 && next === 62 && options.ecmaVersion >= 6) { // '=>'
+      tokPos += 2;
+      return finishToken(_arrow);
+    }
     return finishOp(code === 61 ? _eq : _prefix, 1);
   }
 
   function getTokenFromCode(code) {
-    switch(code) {
-      // The interpretation of a dot depends on whether it is followed
-      // by a digit or another two dots.
+    // Special rules work inside ES6 template strings.
+    if (inTemplate) {
+      // '`' and '${' have special meanings, but they should follow string (can be empty)
+      if (tokType === _string) {
+        if (code === 96) { // '`'
+          ++tokPos;
+          return finishToken(_bquote);
+        }
+        if (code === 36 && input.charCodeAt(tokPos + 1) === 123) { // '${'
+          tokPos += 2;
+          return finishToken(_dollarBraceL);
+        }
+      }
+      // anything else is considered string literal
+      return readString();
+    }
+
+    switch (code) {
+    // The interpretation of a dot depends on whether it is followed
+    // by a digit or another two dots.
     case 46: // '.'
       return readToken_dot();
 
-      // Punctuation tokens.
+    // Punctuation tokens.
     case 40: ++tokPos; return finishToken(_parenL);
     case 41: ++tokPos; return finishToken(_parenR);
     case 59: ++tokPos; return finishToken(_semi);
@@ -691,17 +735,26 @@
     case 125: ++tokPos; return finishToken(_braceR);
     case 58: ++tokPos; return finishToken(_colon);
     case 63: ++tokPos; return finishToken(_question);
+    
+    case 96: // '`'
+      if (options.ecmaVersion >= 6) {
+        ++tokPos;
+        return finishToken(_bquote);
+      }
 
-      // '0x' is a hexadecimal number.
     case 48: // '0'
       var next = input.charCodeAt(tokPos + 1);
-      if (next === 120 || next === 88) return readHexNumber();
-      // Anything else beginning with a digit is an integer, octal
-      // number, or float.
+      if (next === 120 || next === 88) return readRadixNumber(16); // '0x', '0X' - hex number
+      if (options.ecmaVersion >= 6) {
+        if (next === 111 || next === 79) return readRadixNumber(8); // '0o', '0O' - octal number
+        if (next === 98 || next === 66) return readRadixNumber(2); // '0b', '0B' - binary number
+      }
+    // Anything else beginning with a digit is an integer, octal
+    // number, or float.
     case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: // 1-9
       return readNumber(false);
 
-      // Quotes produce strings.
+    // Quotes produce strings.
     case 34: case 39: // '"', "'"
       return readString(code);
 
@@ -714,7 +767,7 @@
       return readToken_slash();
 
     case 37: case 42: // '%*'
-      return readToken_mult_modulo();
+      return readToken_mult_modulo(code);
 
     case 124: case 38: // '|&'
       return readToken_pipe_amp(code);
@@ -748,7 +801,7 @@
     var code = input.charCodeAt(tokPos);
     // Identifier or keyword. '\uXXXX' sequences are allowed in
     // identifiers, so '\' also dispatches to that.
-    if (isIdentifierStart(code) || code === 92 /* '\' */) return readWord();
+    if (!inTemplate && (isIdentifierStart(code) || code === 92 /* '\' */)) return readWord();
 
     var tok = getTokenFromCode(code);
 
@@ -821,10 +874,10 @@
     return total;
   }
 
-  function readHexNumber() {
+  function readRadixNumber(radix) {
     tokPos += 2; // 0x
-    var val = readInt(16);
-    if (val == null) raise(tokStart + 2, "Expected hexadecimal number");
+    var val = readInt(radix);
+    if (val == null) raise(tokStart + 2, "Expected number in radix " + radix);
     if (isIdentifierStart(input.charCodeAt(tokPos))) raise(tokPos, "Identifier directly after number");
     return finishToken(_num, val);
   }
@@ -858,13 +911,38 @@
 
   // Read a string value, interpreting backslash-escapes.
 
+  function readCodePoint() {
+    var ch = input.charCodeAt(tokPos), code;
+    
+    if (ch === 123) {
+      if (options.ecmaVersion < 6) unexpected();
+      ++tokPos;
+      code = readHexChar(input.indexOf('}', tokPos) - tokPos);
+      ++tokPos;
+      if (code > 0x10FFFF) unexpected();
+    } else {
+      code = readHexChar(4);
+    }
+
+    // UTF-16 Encoding
+    if (code <= 0xFFFF) {
+      return String.fromCharCode(code);
+    }
+    var cu1 = ((code - 0x10000) >> 10) + 0xD800;
+    var cu2 = ((code - 0x10000) & 1023) + 0xDC00;
+    return String.fromCharCode(cu1, cu2);
+  }
+
   function readString(quote) {
-    tokPos++;
+    if (!inTemplate) tokPos++;
     var out = "";
     for (;;) {
       if (tokPos >= inputLen) raise(tokStart, "Unterminated string constant");
       var ch = input.charCodeAt(tokPos);
-      if (ch === quote) {
+      if (inTemplate) {
+        if (ch === 96 || ch === 36 && input.charCodeAt(tokPos + 1) === 123) // '`', '${'
+          return finishToken(_string, out);
+      } else if (ch === quote) {
         ++tokPos;
         return finishToken(_string, out);
       }
@@ -884,7 +962,7 @@
           case 110: out += "\n"; break; // 'n' -> '\n'
           case 114: out += "\r"; break; // 'r' -> '\r'
           case 120: out += String.fromCharCode(readHexChar(2)); break; // 'x'
-          case 117: out += String.fromCharCode(readHexChar(4)); break; // 'u'
+          case 117: out += readCodePoint(); break; // 'u'
           case 85: out += String.fromCharCode(readHexChar(8)); break; // 'U'
           case 116: out += "\t"; break; // 't' -> '\t'
           case 98: out += "\b"; break; // 'b' -> '\b'
@@ -899,9 +977,22 @@
           }
         }
       } else {
-        if (ch === 13 || ch === 10 || ch === 8232 || ch === 8233) raise(tokStart, "Unterminated string constant");
-        out += String.fromCharCode(ch); // '\'
         ++tokPos;
+        if (newline.test(String.fromCharCode(ch))) {
+          if (inTemplate) {
+            if (ch === 13 && input.charCodeAt(tokPos) === 10) {
+              ++tokPos;
+              ch = 10;
+            }
+            if (options.locations) {
+              ++tokCurLine;
+              tokLineStart = tokPos;
+            }
+          } else {
+            raise(tokStart, "Unterminated string constant");
+          }
+        }
+        out += String.fromCharCode(ch); // '\'
       }
     }
   }
@@ -1082,6 +1173,8 @@
     if (tokType === type) {
       next();
       return true;
+    } else {
+      return false;
     }
   }
 
@@ -1103,24 +1196,157 @@
   // raise an unexpected token error.
 
   function expect(type) {
-    if (tokType === type) next();
-    else unexpected();
+    eat(type) || unexpected();
   }
 
   // Raise an unexpected token error.
 
-  function unexpected() {
-    raise(tokStart, "Unexpected token");
+  function unexpected(pos) {
+    raise(pos != null ? pos : tokStart, "Unexpected token");
+  }
+
+  // Checks if hash object has a property.
+
+  function has(obj, propName) {
+    return Object.prototype.hasOwnProperty.call(obj, propName);
+  }
+  // Convert existing expression atom to assignable pattern
+  // if possible.
+
+  function toAssignable(node, allowSpread, checkType) {
+    if (options.ecmaVersion >= 6 && node) {
+      switch (node.type) {
+        case "Identifier":
+        case "MemberExpression":
+          break;          
+
+        case "ObjectExpression":
+          node.type = "ObjectPattern";
+          for (var i = 0; i < node.properties.length; i++) {
+            var prop = node.properties[i];
+            if (prop.kind !== "init") unexpected(prop.key.start);
+            toAssignable(prop.value, false, checkType);
+          }
+          break;
+
+        case "ArrayExpression":
+          node.type = "ArrayPattern";
+          for (var i = 0, lastI = node.elements.length - 1; i <= lastI; i++) {
+            toAssignable(node.elements[i], i === lastI, checkType);
+          }
+          break;
+
+        case "SpreadElement":
+          if (allowSpread) {
+            toAssignable(node.argument, false, checkType);
+            checkSpreadAssign(node.argument);
+          } else {
+            unexpected(node.start);
+          }
+          break;
+
+        default:
+          if (checkType) unexpected(node.start);
+      }
+    }
+    return node;
+  }
+
+  // Checks if node can be assignable spread argument.
+
+  function checkSpreadAssign(node) {
+    if (node.type !== "Identifier" && node.type !== "ArrayPattern")
+      unexpected(node.start);
+  }
+
+  // Verify that argument names are not repeated, and it does not
+  // try to bind the words `eval` or `arguments`.
+
+  function checkFunctionParam(param, nameHash) {
+    switch (param.type) {
+      case "Identifier":
+        if (isStrictReservedWord(param.name) || isStrictBadIdWord(param.name))
+          raise(param.start, "Defining '" + param.name + "' in strict mode");
+        if (has(nameHash, param.name))
+          raise(param.start, "Argument name clash in strict mode");
+        nameHash[param.name] = true;
+        break;
+
+      case "ObjectPattern":
+        for (var i = 0; i < param.properties.length; i++)
+          checkFunctionParam(param.properties[i].value, nameHash);
+        break;
+
+      case "ArrayPattern":
+        for (var i = 0; i < param.elements.length; i++)
+          checkFunctionParam(param.elements[i], nameHash);
+        break;
+    }
+  }
+
+  // Check if property name clashes with already added.
+  // Object/class getters and setters are not allowed to clash —
+  // either with each other or with an init property — and in
+  // strict mode, init properties are also not allowed to be repeated.
+
+  function checkPropClash(prop, propHash) {
+    if (prop.computed) return;
+    var key = prop.key, name;
+    switch (key.type) {
+      case "Identifier": name = key.name; break;
+      case "Literal": name = String(key.value); break;
+      default: return;
+    }
+    var kind = prop.kind || "init", other;
+    if (has(propHash, name)) {
+      other = propHash[name];
+      var isGetSet = kind !== "init";
+      if ((strict || isGetSet) && other[kind] || !(isGetSet ^ other.init))
+        raise(key.start, "Redefinition of property");
+    } else {
+      other = propHash[name] = {
+        init: false,
+        get: false,
+        set: false
+      };
+    }
+    other[kind] = true;
   }
 
   // Verify that a node is an lval — something that can be assigned
   // to.
 
-  function checkLVal(expr) {
-    if (expr.type !== "Identifier" && expr.type !== "MemberExpression")
-      raise(expr.start, "Assigning to rvalue");
-    if (strict && expr.type === "Identifier" && isStrictBadIdWord(expr.name))
-      raise(expr.start, "Assigning to " + expr.name + " in strict mode");
+  function checkLVal(expr, isBinding) {
+    switch (expr.type) {
+      case "Identifier":
+        if (strict && (isStrictBadIdWord(expr.name) || isStrictReservedWord(expr.name)))
+          raise(expr.start, isBinding
+            ? "Binding " + expr.name + " in strict mode"
+            : "Assigning to " + expr.name + " in strict mode"
+          );
+        break;
+      
+      case "MemberExpression":
+        if (!isBinding) break;
+
+      case "ObjectPattern":
+        for (var i = 0; i < expr.properties.length; i++)
+          checkLVal(expr.properties[i].value, isBinding);
+        break;
+
+      case "ArrayPattern":
+        for (var i = 0; i < expr.elements.length; i++) {
+          var elem = expr.elements[i];
+          if (elem) checkLVal(elem, isBinding);
+        }
+        break;
+
+      case "SpreadElement":
+        break;
+
+      default:
+        raise(expr.start, "Assigning to rvalue");
+    }
   }
 
   // ### Statement parsing
@@ -1133,7 +1359,7 @@
   function parseTopLevel(program) {
     lastStart = lastEnd = tokPos;
     if (options.locations) lastEndLoc = new Position;
-    inFunction = strict = null;
+    inFunction = inGenerator = strict = null;
     labels = [];
     readToken();
 
@@ -1173,6 +1399,7 @@
     case _do: return parseDoStatement(node);
     case _for: return parseForStatement(node);
     case _function: return parseFunctionStatement(node);
+    case _class: return parseClass(node, true);
     case _if: return parseIfStatement(node);
     case _return: return parseReturnStatement(node);
     case _switch: return parseSwitchStatement(node);
@@ -1183,6 +1410,8 @@
     case _with: return parseWithStatement(node);
     case _braceL: return parseBlock(); // no point creating a function for this
     case _semi: return parseEmptyStatement(node);
+    case _export: return parseExport(node);
+    case _import: return parseImport(node);
 
       // If the statement does not start with a statement keyword or a
       // brace, it's an ExpressionStatement or LabeledStatement. We
@@ -1237,13 +1466,13 @@
     return finishNode(node, "DoWhileStatement");
   }
   
-  // Disambiguating between a `for` and a `for`/`in` loop is
-  // non-trivial. Basically, we have to parse the init `var`
+  // Disambiguating between a `for` and a `for`/`in` or `for`/`of`
+  // loop is non-trivial. Basically, we have to parse the init `var`
   // statement or expression, disallowing the `in` operator (see
   // the second parameter to `parseExpression`), and then check
-  // whether the next token is `in`. When there is no init part
-  // (semicolon immediately after the opening parenthesis), it is
-  // a regular `for` loop.
+  // whether the next token is `in` or `of`. When there is no init
+  // part (semicolon immediately after the opening parenthesis), it
+  // is a regular `for` loop.
   
   function parseForStatement(node) {
     next();
@@ -1251,16 +1480,20 @@
     expect(_parenL);
     if (tokType === _semi) return parseFor(node, null);
     if (tokType === _var || tokType === _let) {
-      var init = startNode(), varKind = tokType.keyword;
+      var init = startNode(), varKind = tokType.keyword, isLet = tokType === _let;
       next();
       parseVar(init, true, varKind);
       finishNode(init, "VariableDeclaration");
-      if (init.declarations.length === 1 && eat(_in))
+      if ((tokType === _in || (tokType === _name && tokVal === "of")) && init.declarations.length === 1 &&
+          !(isLet && init.declarations[0].init))
         return parseForIn(node, init);
       return parseFor(node, init);
     }
     var init = parseExpression(false, true);
-    if (eat(_in)) {checkLVal(init); return parseForIn(node, init);}
+    if (tokType === _in || (tokType === _name && tokVal === "of")) {
+      checkLVal(init);
+      return parseForIn(node, init);
+    }
     return parseFor(node, init);
   }
   
@@ -1451,15 +1684,18 @@
     return finishNode(node, "ForStatement");
   }
 
-  // Parse a `for`/`in` loop.
+  // Parse a `for`/`in` and `for`/`of` loop, which are almost
+  // same from parser's perspective.
 
   function parseForIn(node, init) {
+    var type = tokType === _in ? "ForInStatement" : "ForOfStatement";
+    next();
     node.left = init;
     node.right = parseExpression();
     expect(_parenR);
     node.body = parseStatement();
     labels.pop();
-    return finishNode(node, "ForInStatement");
+    return finishNode(node, type);
   }
 
   // Parse a list of variable declarations.
@@ -1469,9 +1705,8 @@
     node.kind = kind;
     for (;;) {
       var decl = startNode();
-      decl.id = parseIdent();
-      if (strict && isStrictBadIdWord(decl.id.name))
-        raise(decl.id.start, "Binding " + decl.id.name + " in strict mode");
+      decl.id = options.ecmaVersion >= 6 ? toAssignable(parseExprAtom()) : parseIdent();
+      checkLVal(decl.id, true);
       decl.init = eat(_eq) ? parseExpression(true, noIn) : (kind === _const.keyword ? unexpected() : null);
       node.declarations.push(finishNode(decl, "VariableDeclarator"));
       if (!eat(_comma)) break;
@@ -1510,10 +1745,10 @@
     if (tokType.isAssign) {
       var node = startNodeFrom(left);
       node.operator = tokVal;
-      node.left = left;
+      node.left = tokType === _eq ? toAssignable(left) : left;
+      checkLVal(left);
       next();
       node.right = parseMaybeAssign(noIn);
-      checkLVal(left);
       return finishNode(node, "AssignmentExpression");
     }
     return left;
@@ -1617,7 +1852,12 @@
       node.callee = base;
       node.arguments = parseExprList(_parenR, false);
       return parseSubscripts(finishNode(node, "CallExpression"), noCalls);
-    } else return base;
+    } else if (tokType === _bquote) {
+      var node = startNodeFrom(base);
+      node.tag = base;
+      node.quasi = parseTemplate();
+      return parseSubscripts(finishNode(node, "TaggedTemplateExpression"), noCalls);
+    } return base;
   }
 
   // Parse an atomic expression — either a single token that is an
@@ -1631,8 +1871,17 @@
       var node = startNode();
       next();
       return finishNode(node, "ThisExpression");
+    
+    case _yield:
+      if (inGenerator) return parseYield();
+
     case _name:
-      return parseIdent();
+      var id = parseIdent(tokType !== _name);
+      if (eat(_arrow)) {
+        return parseArrowExpression(startNodeFrom(id), [id]);
+      }
+      return id;
+      
     case _num: case _string: case _regexp:
       var node = startNode();
       node.value = tokVal;
@@ -1648,23 +1897,52 @@
       return finishNode(node, "Literal");
 
     case _parenL:
-      var tokStartLoc1 = tokStartLoc, tokStart1 = tokStart;
+      var tokStartLoc1 = tokStartLoc, tokStart1 = tokStart, val, exprList;
       next();
-      var val = parseExpression();
+      // check whether this is generator comprehension or regular expression
+      if (options.ecmaVersion >= 6 && tokType === _for) {
+        val = parseComprehension(startNode(), true);
+      } else {
+        var oldParenL = ++metParenL;
+        if (tokType !== _parenR) {
+          val = parseExpression();
+          exprList = val.type === "SequenceExpression" ? val.expressions : [val];
+        } else {
+          exprList = [];
+        }
+        expect(_parenR);
+        // if '=>' follows '(...)', convert contents to arguments
+        if (metParenL === oldParenL && eat(_arrow)) {
+          val = parseArrowExpression(startNode(), exprList);
+        } else {
+          // forbid '()' before everything but '=>'
+          if (!val) unexpected(lastStart);
+          // forbid '...' in sequence expressions
+          if (options.ecmaVersion >= 6) {
+            for (var i = 0; i < exprList.length; i++) {
+              if (exprList[i].type === "SpreadElement") unexpected();
+            }
+          }
+        }
+      }
       val.start = tokStart1;
-      val.end = tokEnd;
+      val.end = lastEnd;
       if (options.locations) {
         val.loc.start = tokStartLoc1;
-        val.loc.end = tokEndLoc;
+        val.loc.end = lastEndLoc;
       }
-      if (options.ranges)
-        val.range = [tokStart1, tokEnd];
-      expect(_parenR);
+      if (options.ranges) {
+        val.range = [tokStart1, lastEnd];
+      }
       return val;
 
     case _bracketL:
       var node = startNode();
       next();
+      // check whether this is array comprehension or regular array
+      if (options.ecmaVersion >= 6 && tokType === _for) {
+        return parseComprehension(node, false);
+      }
       node.elements = parseExprList(_bracketR, true, true);
       return finishNode(node, "ArrayExpression");
 
@@ -1676,8 +1954,17 @@
       next();
       return parseFunction(node, false);
 
+    case _class:
+      return parseClass(startNode(), false);
+
     case _new:
       return parseNew();
+
+    case _ellipsis:
+      return parseSpread();
+
+    case _bquote:
+      return parseTemplate();
 
     default:
       unexpected();
@@ -1697,10 +1984,47 @@
     return finishNode(node, "NewExpression");
   }
 
+  // Parse spread element '...expr'
+
+  function parseSpread() {
+    var node = startNode();
+    next();
+    node.argument = parseExpression(true);
+    return finishNode(node, "SpreadElement");
+  }
+
+  // Parse template expression.
+
+  function parseTemplate() {
+    var node = startNode();
+    node.expressions = [];
+    node.quasis = [];
+    inTemplate = true;
+    next();
+    for (;;) {
+      var elem = startNode();
+      elem.value = {cooked: tokVal, raw: input.slice(tokStart, tokEnd)};
+      elem.tail = false;
+      next();
+      node.quasis.push(finishNode(elem, "TemplateElement"));
+      if (eat(_bquote)) { // '`', end of template
+        elem.tail = true;
+        break;
+      }
+      inTemplate = false;
+      expect(_dollarBraceL);
+      node.expressions.push(parseExpression());
+      inTemplate = true;
+      expect(_braceR);
+    }
+    inTemplate = false;
+    return finishNode(node, "TemplateLiteral");
+  }
+
   // Parse an object literal.
 
   function parseObj() {
-    var node = startNode(), first = true, sawGetSet = false;
+    var node = startNode(), first = true, propHash = {};
     node.properties = [];
     next();
     while (!eat(_braceR)) {
@@ -1709,63 +2033,150 @@
         if (options.allowTrailingCommas && eat(_braceR)) break;
       } else first = false;
 
-      var prop = {key: parsePropertyName()}, isGetSet = false, kind;
+      var prop = startNode(), kind, isGenerator;
+      if (options.ecmaVersion >= 6) {
+        prop.method = false;
+        prop.shorthand = false;
+        isGenerator = eat(_star);
+      }
+      parsePropertyName(prop);
       if (eat(_colon)) {
         prop.value = parseExpression(true);
         kind = prop.kind = "init";
-      } else if (options.ecmaVersion >= 5 && prop.key.type === "Identifier" &&
+      } else if (options.ecmaVersion >= 6 && tokType === _parenL) {
+        kind = prop.kind = "init";
+        prop.method = true;
+        prop.value = parseMethod(isGenerator);
+      } else if (options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
                  (prop.key.name === "get" || prop.key.name === "set")) {
-        isGetSet = sawGetSet = true;
+        if (isGenerator) unexpected();
         kind = prop.kind = prop.key.name;
-        prop.key = parsePropertyName();
-        if (tokType !== _parenL) unexpected();
-        prop.value = parseFunction(startNode(), false);
+        parsePropertyName(prop);
+        prop.value = parseMethod(false);
+      } else if (options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
+        kind = prop.kind = "init";
+        prop.value = prop.key;
+        prop.shorthand = true;
       } else unexpected();
 
-      // getters and setters are not allowed to clash — either with
-      // each other or with an init property — and in strict mode,
-      // init properties are also not allowed to be repeated.
-
-      if (prop.key.type === "Identifier" && (strict || sawGetSet)) {
-        for (var i = 0; i < node.properties.length; ++i) {
-          var other = node.properties[i];
-          if (other.key.name === prop.key.name) {
-            var conflict = kind == other.kind || isGetSet && other.kind === "init" ||
-              kind === "init" && (other.kind === "get" || other.kind === "set");
-            if (conflict && !strict && kind === "init" && other.kind === "init") conflict = false;
-            if (conflict) raise(prop.key.start, "Redefinition of property");
-          }
-        }
-      }
-      node.properties.push(prop);
+      checkPropClash(prop, propHash);
+      node.properties.push(finishNode(prop, "Property"));
     }
     return finishNode(node, "ObjectExpression");
   }
 
-  function parsePropertyName() {
-    if (tokType === _num || tokType === _string) return parseExprAtom();
-    return parseIdent(true);
+  function parsePropertyName(prop) {
+    if (options.ecmaVersion >= 6) {
+      if (eat(_bracketL)) {
+        prop.computed = true;
+        prop.key = parseExpression();
+        expect(_bracketR);
+        return;
+      } else {
+        prop.computed = false;
+      }
+    }
+    prop.key = (tokType === _num || tokType === _string) ? parseExprAtom() : parseIdent(true);
+  }
+
+  // Initialize empty function node.
+
+  function initFunction(node) {
+    node.id = null;
+    node.params = [];
+    if (options.ecmaVersion >= 6) {
+      node.defaults = [];
+      node.rest = null;
+      node.generator = false;
+    }
   }
 
   // Parse a function declaration or literal (depending on the
   // `isStatement` parameter).
 
-  function parseFunction(node, isStatement) {
-    if (tokType === _name) node.id = parseIdent();
-    else if (isStatement) unexpected();
-    else node.id = null;
-    node.params = [];
-    node.rest = null;
+  function parseFunction(node, isStatement, allowExpressionBody) {
+    initFunction(node);
+    if (options.ecmaVersion >= 6) {
+      node.generator = eat(_star);
+    }
+    if (isStatement || tokType === _name) {
+      node.id = parseIdent();
+    }
+    parseFunctionParams(node);
+    parseFunctionBody(node, allowExpressionBody);
+    return finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
+  }
+
+  // Parse object or class method.
+
+  function parseMethod(isGenerator) {
+    var node = startNode();
+    initFunction(node);
+    parseFunctionParams(node);
+    var allowExpressionBody;
+    if (options.ecmaVersion >= 6) {
+      node.generator = isGenerator;
+      allowExpressionBody = true;
+    } else {
+      allowExpressionBody = false;
+    }
+    parseFunctionBody(node, allowExpressionBody);
+    return finishNode(node, "FunctionExpression");
+  }
+
+  // Parse arrow function expression with given parameters.
+
+  function parseArrowExpression(node, params) {
+    initFunction(node);
+
+    var defaults = node.defaults, hasDefaults = false;
+    
+    for (var i = 0, lastI = params.length - 1; i <= lastI; i++) {
+      var param = params[i];
+
+      if (param.type === "AssignmentExpression" && param.operator === "=") {
+        hasDefaults = true;
+        params[i] = param.left;
+        defaults.push(param.right);
+      } else {
+        toAssignable(param, i === lastI, true);
+        defaults.push(null);
+        if (param.type === "SpreadElement") {
+          params.length--;
+          node.rest = param.argument;
+          break;
+        }
+      }
+    }
+
+    node.params = params;
+    if (!hasDefaults) node.defaults = [];
+
+    parseFunctionBody(node, true);
+    return finishNode(node, "ArrowFunctionExpression");
+  }
+
+  // Parse function parameters.
+
+  function parseFunctionParams(node) {
+    var defaults = [], hasDefaults = false;
+    
     expect(_parenL);
     for (;;) {
       if (eat(_parenR)) {
         break;
       } else if (options.ecmaVersion >= 6 && eat(_ellipsis)) {
-        node.rest = parseIdent();
+        node.rest = toAssignable(parseExprAtom(), false, true);
+        checkSpreadAssign(node.rest);
         expect(_parenR);
         break;
       } else {
-        node.params.push(parseIdent());
+        node.params.push(options.ecmaVersion >= 6 ? toAssignable(parseExprAtom(), false, true) : parseIdent());
+        if (options.ecmaVersion >= 6 && tokType === _eq) {
+          next();
+          hasDefaults = true;
+          defaults.push(parseExpression(true));
+        }
         if (!eat(_comma)) {
           expect(_parenR);
           break;
@@ -1773,36 +2184,76 @@
       }
     }
 
-    // Start a new scope with regard to labels and the `inFunction`
-    // flag (restore them to their old value afterwards).
-    var oldInFunc = inFunction, oldLabels = labels;
-    inFunction = true; labels = [];
-    node.body = parseBlock(true);
-    inFunction = oldInFunc; labels = oldLabels;
+    if (hasDefaults) node.defaults = defaults;
+  }
+
+  // Parse function body and check parameters.
+
+  function parseFunctionBody(node, allowExpression) {
+    var isExpression = allowExpression && tokType !== _braceL;
+    
+    if (isExpression) {
+      node.body = parseExpression(true);
+      node.expression = true;
+    } else {
+      // Start a new scope with regard to labels and the `inFunction`
+      // flag (restore them to their old value afterwards).
+      var oldInFunc = inFunction, oldInGen = inGenerator, oldLabels = labels;
+      inFunction = true; inGenerator = node.generator; labels = [];
+      node.body = parseBlock(true);
+      node.expression = false;
+      inFunction = oldInFunc; inGenerator = oldInGen; labels = oldLabels;
+    }
 
     // If this is a strict mode function, verify that argument names
     // are not repeated, and it does not try to bind the words `eval`
     // or `arguments`.
-    if (strict || node.body.body.length && isUseStrict(node.body.body[0])) {
-      // Negative indices are used to reuse loop body for node.rest and node.id
-      for (var i = -2, id; i < node.params.length; ++i) {
-        if (i >= 0) {
-          id = node.params[i];
-        } else if (i == -2) {
-          if (node.rest) id = node.rest;
-          else continue;
-        } else {
-          if (node.id) id = node.id;
-          else continue;
-        }
-        if (isStrictReservedWord(id.name) || isStrictBadIdWord(id.name))
-          raise(id.start, "Defining '" + id.name + "' in strict mode");
-        if (i >= 0) for (var j = 0; j < i; ++j) if (id.name === node.params[j].name)
-          raise(id.start, "Argument name clash in strict mode");
-      }
+    if (strict || !isExpression && node.body.body.length && isUseStrict(node.body.body[0])) {
+      var nameHash = {};
+      if (node.id)
+        checkFunctionParam(node.id, nameHash);
+      for (var i = 0; i < node.params.length; i++)
+        checkFunctionParam(node.params[i], nameHash);
+      if (node.rest)
+        checkFunctionParam(node.rest, nameHash);
     }
+  }
 
-    return finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
+  // Parse a class declaration or literal (depending on the
+  // `isStatement` parameter).
+  
+  function parseClass(node, isStatement) {
+    next();
+    node.id = tokType === _name ? parseIdent() : isStatement ? unexpected() : null;
+    node.superClass = eat(_extends) ? parseExpression() : null;
+    var classBody = startNode(), methodHash = {}, staticMethodHash = {};
+    classBody.body = [];
+    expect(_braceL);
+    while (!eat(_braceR)) {
+      var method = startNode();
+      if (tokType === _name && tokVal === "static") {
+        next();
+        method['static'] = true;
+      } else {
+        method['static'] = false;
+      }
+      var isGenerator = eat(_star);
+      parsePropertyName(method);
+      if (tokType === _name && !method.computed && method.key.type === "Identifier" &&
+          (method.key.name === "get" || method.key.name === "set")) {
+        if (isGenerator) unexpected();
+        method.kind = method.key.name;
+        parsePropertyName(method);
+      } else {
+        method.kind = "";
+      }
+      method.value = parseMethod(isGenerator);
+      checkPropClash(method, method['static'] ? staticMethodHash : methodHash);
+      classBody.body.push(finishNode(method, "MethodDefinition"));
+      eat(_semi);
+    }
+    node.body = finishNode(classBody, "ClassBody");
+    return finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression");
   }
 
   // Parses a comma-separated list of expressions, and returns them as
@@ -1848,6 +2299,182 @@
     tokRegexpAllowed = false;
     next();
     return finishNode(node, "Identifier");
+  }
+
+  // Parses module export declaration.
+
+  function parseExport(node) {
+    next();
+    // export var|const|let|function|class ...;
+    if (tokType === _var || tokType === _const || tokType === _let || tokType === _function || tokType === _class) {
+      node.declaration = parseStatement();
+      node['default'] = false;
+      node.specifiers = null;
+      node.source = null;
+    } else
+    // export default ...;
+    if (eat(_default)) {
+      node.declaration = parseExpression(true);
+      node['default'] = true;
+      node.specifiers = null;
+      node.source = null;
+      semicolon();
+    } else {
+      // export * from '...'
+      // export { x, y as z } [from '...']
+      var isBatch = tokType === _star;
+      node.declaration = null;
+      node['default'] = false;
+      node.specifiers = parseExportSpecifiers();
+      if (tokType === _name && tokVal === "from") {
+        next();
+        node.source = tokType === _string ? parseExprAtom() : unexpected();
+      } else {
+        if (isBatch) unexpected();
+        node.source = null;
+      }
+    }
+    return finishNode(node, "ExportDeclaration");
+  }
+
+  // Parses a comma-separated list of module exports.
+
+  function parseExportSpecifiers() {
+    var nodes = [], first = true;
+    if (tokType === _star) {
+      // export * from '...'
+      var node = startNode();
+      next();
+      nodes.push(finishNode(node, "ExportBatchSpecifier"));
+    } else {
+      // export { x, y as z } [from '...']
+      expect(_braceL);
+      while (!eat(_braceR)) {
+        if (!first) {
+          expect(_comma);
+          if (options.allowTrailingCommas && eat(_braceR)) break;
+        } else first = false;
+
+        var node = startNode();
+        node.id = parseIdent();
+        if (tokType === _name && tokVal === "as") {
+          next();
+          node.name = parseIdent(true);
+        } else {
+          node.name = null;
+        }
+        nodes.push(finishNode(node, "ExportSpecifier"));
+      }
+    }
+    return nodes;
+  }
+
+  // Parses import declaration.
+
+  function parseImport(node) {
+    next();
+    // import '...';
+    if (tokType === _string) {
+      node.specifiers = [];
+      node.source = parseExprAtom();
+      node.kind = "";
+    } else {
+      node.specifiers = parseImportSpecifiers();
+      if (tokType !== _name || tokVal !== "from") unexpected();
+      next();
+      node.source = tokType === _string ? parseExprAtom() : unexpected();
+      // only for backward compatibility with Esprima's AST
+      // (it doesn't support mixed default + named yet)
+      node.kind = node.specifiers[0]['default'] ? "default" : "named";
+    }
+    return finishNode(node, "ImportDeclaration");
+  }
+
+  // Parses a comma-separated list of module imports.
+
+  function parseImportSpecifiers() {
+    var nodes = [], first = true;
+    if (tokType === _star) {
+      var node = startNode();
+      next();
+      if (tokType !== _name || tokVal !== "as") unexpected();
+      next();
+      node.name = parseIdent();
+      checkLVal(node.name, true);
+      nodes.push(finishNode(node, "ImportBatchSpecifier"));
+      return nodes;
+    }
+    if (tokType === _name) {
+      // import defaultObj, { x, y as z } from '...'
+      var node = startNode();
+      node.id = parseIdent();
+      checkLVal(node.id, true);
+      node.name = null;
+      node['default'] = true;
+      nodes.push(finishNode(node, "ImportSpecifier"));
+      if (!eat(_comma)) return nodes;
+    }
+    expect(_braceL);
+    while (!eat(_braceR)) {
+      if (!first) {
+        expect(_comma);
+        if (options.allowTrailingCommas && eat(_braceR)) break;
+      } else first = false;
+
+      var node = startNode();
+      node.id = parseIdent(true);
+      if (tokType === _name && tokVal === "as") {
+        next();
+        node.name = parseIdent();
+      } else {
+        node.name = null;
+      }
+      checkLVal(node.name || node.id, true);
+      node['default'] = false;
+      nodes.push(finishNode(node, "ImportSpecifier"));
+    }
+    return nodes;
+  }
+
+  // Parses yield expression inside generator.
+
+  function parseYield() {
+    var node = startNode();
+    next();
+    if (eat(_semi) || canInsertSemicolon()) {
+      node.delegate = false;
+      node.argument = null;
+    } else {
+      node.delegate = eat(_star);
+      node.argument = parseExpression(true);
+    }
+    return finishNode(node, "YieldExpression");
+  }
+
+  // Parses array and generator comprehensions.
+
+  function parseComprehension(node, isGenerator) {
+    node.blocks = [];
+    while (tokType === _for) {
+      var block = startNode();
+      next();
+      expect(_parenL);
+      block.left = toAssignable(parseExprAtom());
+      checkLVal(block.left, true);
+      if (tokType !== _name || tokVal !== "of") unexpected();
+      next();
+      // `of` property is here for compatibility with Esprima's AST
+      // which also supports deprecated [for (... in ...) expr]
+      block.of = true;
+      block.right = parseExpression();
+      expect(_parenR);
+      node.blocks.push(finishNode(block, "ComprehensionBlock"));
+    }
+    node.filter = eat(_if) ? parseParenExpression() : null;
+    node.body = parseExpression();
+    expect(isGenerator ? _parenR : _bracketR);
+    node.generator = isGenerator;
+    return finishNode(node, "ComprehensionExpression");
   }
 
 });

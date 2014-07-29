@@ -1,5 +1,7 @@
 # Acorn
 
+[![Build Status](https://travis-ci.org/marijnh/acorn.svg?branch=master)](https://travis-ci.org/marijnh/acorn)
+
 A tiny, fast JavaScript parser, written completely in JavaScript.
 
 ## Installation
@@ -48,8 +50,7 @@ object referring to that same position.
 
 - **ecmaVersion**: Indicates the ECMAScript version to parse. Must be
   either 3, 5, or 6. This influences support for strict mode, the set
-  of reserved words, and support for getters and setter. Default is 5.
-  ES6 is only partially supported.
+  of reserved words, and support for new syntax features. Default is 5.
 
 - **strictSemicolons**: If `true`, prevents the parser from doing
   automatic semicolon insertion, and statements that do not end with
@@ -200,7 +201,7 @@ The `bin/acorn` utility can be used to parse a file from the command
 line. It accepts as arguments its input file and the following
 options:
 
-- `--ecma3|--ecma5`: Sets the ECMAScript version to parse. Default is
+- `--ecma3|--ecma5|--ecma6`: Sets the ECMAScript version to parse. Default is
   version 5.
 
 - `--strictSemicolons`: Prevents the parser from doing automatic

@@ -1459,6 +1459,7 @@ test("x = { answer: 42 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "answer",
@@ -1562,6 +1563,7 @@ test("x = { if: 42 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "if",
@@ -1665,6 +1667,7 @@ test("x = { true: 42 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "true",
@@ -1768,6 +1771,7 @@ test("x = { false: 42 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "false",
@@ -1871,6 +1875,7 @@ test("x = { null: 42 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "null",
@@ -1974,6 +1979,7 @@ test("x = { \"answer\": 42 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Literal",
                 value: "answer",
@@ -2077,6 +2083,7 @@ test("x = { x: 1, x: 2 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "x",
@@ -2108,6 +2115,7 @@ test("x = { x: 1, x: 2 }", {
               kind: "init"
             },
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "x",
@@ -2211,6 +2219,7 @@ test("x = { get width() { return m_width } }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "width",
@@ -2357,6 +2366,7 @@ test("x = { get undef() {} }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "undef",
@@ -2475,6 +2485,7 @@ test("x = { get if() {} }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "if",
@@ -2593,6 +2604,7 @@ test("x = { get true() {} }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "true",
@@ -2711,6 +2723,7 @@ test("x = { get false() {} }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "false",
@@ -2829,6 +2842,7 @@ test("x = { get null() {} }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "null",
@@ -2947,6 +2961,7 @@ test("x = { get \"undef\"() {} }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Literal",
                 value: "undef",
@@ -3065,6 +3080,7 @@ test("x = { get 10() {} }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Literal",
                 value: 10,
@@ -3183,6 +3199,7 @@ test("x = { set width(w) { m_width = w } }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "width",
@@ -3372,6 +3389,7 @@ test("x = { set if(w) { m_if = w } }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "if",
@@ -3561,6 +3579,7 @@ test("x = { set true(w) { m_true = w } }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "true",
@@ -3750,6 +3769,7 @@ test("x = { set false(w) { m_false = w } }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "false",
@@ -3939,6 +3959,7 @@ test("x = { set null(w) { m_null = w } }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "null",
@@ -4128,6 +4149,7 @@ test("x = { set \"null\"(w) { m_null = w } }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Literal",
                 value: "null",
@@ -4317,6 +4339,7 @@ test("x = { set 10(w) { m_null = w } }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Literal",
                 value: 10,
@@ -4506,6 +4529,7 @@ test("x = { get: 42 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "get",
@@ -4609,6 +4633,7 @@ test("x = { set: 43 }", {
           type: "ObjectExpression",
           properties: [
             {
+              type: "Property",
               key: {
                 type: "Identifier",
                 name: "set",
@@ -21734,6 +21759,7 @@ test("throw { message: \"Error\" }", {
         type: "ObjectExpression",
         properties: [
           {
+            type: "Property",
             key: {
               type: "Identifier",
               name: "message",
@@ -26723,7 +26749,7 @@ testFail("3x0",
          "Identifier directly after number (1:1)");
 
 testFail("0x",
-         "Expected hexadecimal number (1:2)");
+         "Expected number in radix 16 (1:2)");
 
 testFail("09",
          "Invalid number (1:0)");
@@ -28221,389 +28247,6 @@ test("for (let x in list) process(x);", {
   }
 }, {ecmaVersion: 6, locations: true});
 
-test("for (let x = 42 in list) process(x);", {
-  type: "Program",
-  body: [
-    {
-      type: "ForInStatement",
-      left: {
-        type: "VariableDeclaration",
-        declarations: [
-          {
-            type: "VariableDeclarator",
-            id: {
-              type: "Identifier",
-              name: "x",
-              loc: {
-                start: {
-                  line: 1,
-                  column: 9
-                },
-                end: {
-                  line: 1,
-                  column: 10
-                }
-              }
-            },
-            init: {
-              type: "Literal",
-              value: 42,
-              loc: {
-                start: {
-                  line: 1,
-                  column: 13
-                },
-                end: {
-                  line: 1,
-                  column: 15
-                }
-              }
-            },
-            loc: {
-              start: {
-                line: 1,
-                column: 9
-              },
-              end: {
-                line: 1,
-                column: 15
-              }
-            }
-          }
-        ],
-        kind: "let",
-        loc: {
-          start: {
-            line: 1,
-            column: 5
-          },
-          end: {
-            line: 1,
-            column: 15
-          }
-        }
-      },
-      right: {
-        type: "Identifier",
-        name: "list",
-        loc: {
-          start: {
-            line: 1,
-            column: 19
-          },
-          end: {
-            line: 1,
-            column: 23
-          }
-        }
-      },
-      body: {
-        type: "ExpressionStatement",
-        expression: {
-          type: "CallExpression",
-          callee: {
-            type: "Identifier",
-            name: "process",
-            loc: {
-              start: {
-                line: 1,
-                column: 25
-              },
-              end: {
-                line: 1,
-                column: 32
-              }
-            }
-          },
-          arguments: [
-            {
-              type: "Identifier",
-              name: "x",
-              loc: {
-                start: {
-                  line: 1,
-                  column: 33
-                },
-                end: {
-                  line: 1,
-                  column: 34
-                }
-              }
-            }
-          ],
-          loc: {
-            start: {
-              line: 1,
-              column: 25
-            },
-            end: {
-              line: 1,
-              column: 35
-            }
-          }
-        },
-        loc: {
-          start: {
-            line: 1,
-            column: 25
-          },
-          end: {
-            line: 1,
-            column: 36
-          }
-        }
-      },
-      loc: {
-        start: {
-          line: 1,
-          column: 0
-        },
-        end: {
-          line: 1,
-          column: 36
-        }
-      }
-    }
-  ],
-  loc: {
-    start: {
-      line: 1,
-      column: 0
-    },
-    end: {
-      line: 1,
-      column: 36
-    }
-  }
-}, {ecmaVersion: 6, locations: true});
-
-test("for (let i = function() { return 10 in [] } in list) process(x);", {
-  type: "Program",
-  body: [
-    {
-      type: "ForInStatement",
-      left: {
-        type: "VariableDeclaration",
-        declarations: [
-          {
-            type: "VariableDeclarator",
-            id: {
-              type: "Identifier",
-              name: "i",
-              loc: {
-                start: {
-                  line: 1,
-                  column: 9
-                },
-                end: {
-                  line: 1,
-                  column: 10
-                }
-              }
-            },
-            init: {
-              type: "FunctionExpression",
-              id: null,
-              params: [],
-              body: {
-                type: "BlockStatement",
-                body: [
-                  {
-                    type: "ReturnStatement",
-                    argument: {
-                      type: "BinaryExpression",
-                      left: {
-                        type: "Literal",
-                        value: 10,
-                        loc: {
-                          start: {
-                            line: 1,
-                            column: 33
-                          },
-                          end: {
-                            line: 1,
-                            column: 35
-                          }
-                        }
-                      },
-                      operator: "in",
-                      right: {
-                        type: "ArrayExpression",
-                        elements: [],
-                        loc: {
-                          start: {
-                            line: 1,
-                            column: 39
-                          },
-                          end: {
-                            line: 1,
-                            column: 41
-                          }
-                        }
-                      },
-                      loc: {
-                        start: {
-                          line: 1,
-                          column: 33
-                        },
-                        end: {
-                          line: 1,
-                          column: 41
-                        }
-                      }
-                    },
-                    loc: {
-                      start: {
-                        line: 1,
-                        column: 26
-                      },
-                      end: {
-                        line: 1,
-                        column: 41
-                      }
-                    }
-                  }
-                ],
-                loc: {
-                  start: {
-                    line: 1,
-                    column: 24
-                  },
-                  end: {
-                    line: 1,
-                    column: 43
-                  }
-                }
-              },
-              loc: {
-                start: {
-                  line: 1,
-                  column: 13
-                },
-                end: {
-                  line: 1,
-                  column: 43
-                }
-              }
-            },
-            loc: {
-              start: {
-                line: 1,
-                column: 9
-              },
-              end: {
-                line: 1,
-                column: 43
-              }
-            }
-          }
-        ],
-        kind: "let",
-        loc: {
-          start: {
-            line: 1,
-            column: 5
-          },
-          end: {
-            line: 1,
-            column: 43
-          }
-        }
-      },
-      right: {
-        type: "Identifier",
-        name: "list",
-        loc: {
-          start: {
-            line: 1,
-            column: 47
-          },
-          end: {
-            line: 1,
-            column: 51
-          }
-        }
-      },
-      body: {
-        type: "ExpressionStatement",
-        expression: {
-          type: "CallExpression",
-          callee: {
-            type: "Identifier",
-            name: "process",
-            loc: {
-              start: {
-                line: 1,
-                column: 53
-              },
-              end: {
-                line: 1,
-                column: 60
-              }
-            }
-          },
-          arguments: [
-            {
-              type: "Identifier",
-              name: "x",
-              loc: {
-                start: {
-                  line: 1,
-                  column: 61
-                },
-                end: {
-                  line: 1,
-                  column: 62
-                }
-              }
-            }
-          ],
-          loc: {
-            start: {
-              line: 1,
-              column: 53
-            },
-            end: {
-              line: 1,
-              column: 63
-            }
-          }
-        },
-        loc: {
-          start: {
-            line: 1,
-            column: 53
-          },
-          end: {
-            line: 1,
-            column: 64
-          }
-        }
-      },
-      loc: {
-        start: {
-          line: 1,
-          column: 0
-        },
-        end: {
-          line: 1,
-          column: 64
-        }
-      }
-    }
-  ],
-  loc: {
-    start: {
-      line: 1,
-      column: 0
-    },
-    end: {
-      line: 1,
-      column: 64
-    }
-  }
-}, {ecmaVersion: 6, locations: true});
-
 test("const x = 42", {
   type: "Program",
   body: [
@@ -28982,7 +28625,7 @@ testFail("for(const x = 0;;);", "Unexpected token (1:4)", {ecmaVersion: 6});
       Cat.prototype.roar = function(message) {
         return 'MEOOWW: ' + /*stuff*/ message;
       };
-    }.toString(),
+    }.toString().replace(/\r\n/g, '\n'),
     function assert(ast) {
       if (actualComments.length !== expectedComments.length) {
         return JSON.stringify(actualComments) + " !== " + JSON.stringify(expectedComments);
