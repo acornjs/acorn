@@ -139,8 +139,9 @@
           end: end
         };
         if (options.locations) {
-          comment.startLoc = startLoc;
-          comment.endLoc = endLoc;
+          comment.loc = new SourceLocation();
+          comment.loc.start = startLoc;
+          comment.loc.end = endLoc;
         }
         if (options.ranges)
           comment.range = [start, end];
