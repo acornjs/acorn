@@ -114,11 +114,39 @@
     directSourceFile: null
   };
 
+  var isArray = function (obj) {
+    return Object.prototype.toString.call(obj) === "[object Array]";
+  };
+
   function setOptions(opts) {
     options = opts || {};
     for (var opt in defaultOptions) if (!has(options, opt))
       options[opt] = defaultOptions[opt];
     sourceFile = options.sourceFile || null;
+    if (isArray(options.onToken)) {
+      var tokens = options.onToken;
+      options.onToken = function (token) {
+        tokens.push(token);
+      };
+    }
+    if (isArray(options.onComment)) {
+      var comments = options.onComment;
+      options.onComment = function (block, text, start, end, startLoc, endLoc) {
+        var comment = {
+          type: block ? 'Block' : 'Line',
+          value: text,
+          start: start,
+          end: end
+        };
+        if (options.locations) {
+          comment.startLoc = startLoc;
+          comment.endLoc = endLoc;
+        }
+        if (options.ranges)
+          comment.range = [start, end];
+        comments.push(comment);
+      };
+    }
     isKeyword = options.ecmaVersion >= 6 ? isEcma6Keyword : isEcma5AndLessKeyword;
   }
 
