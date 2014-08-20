@@ -143,8 +143,7 @@ that end up in the `type` properties of tokens.
 
 Escodegen supports generating comments from AST, attached in
 Esprima-specific format. In order to simulate same format in
-Acorn, consider following example (this may be simplified
-in future):
+Acorn, consider following example:
 
 ```javascript
 var comments = [], tokens = [];
