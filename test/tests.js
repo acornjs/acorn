@@ -28761,8 +28761,6 @@ testFail("for(const x = 0;;);", "Unexpected token (1:4)", {ecmaVersion: 6});
     }
   }, {
     locations: true,
-    onToken: function(token) {
-      actualTokens.push(token);
-    }
+    onToken: actualTokens
   });
 })();
