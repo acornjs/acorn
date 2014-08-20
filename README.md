@@ -155,9 +155,7 @@ var ast = acorn.parse('var x = 42; // answer', {
 	},
 	// collect token ranges
 	onToken: function (token) {
-		tokens.push({
-			range: [token.start, token.end]
-		});
+		tokens.push(token);
 	}
 });
 
