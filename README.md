@@ -96,7 +96,16 @@ object referring to that same position.
   parameters.
 
   If array is passed for this option, each found comment is pushed
-  to it as object in Esprima format.
+  to it as object in Esprima format:
+  
+  ```javascript
+  {
+    "type": "Line" | "Block",
+    "value": "comment text",
+    "range": ...,
+    "loc": ...
+  }
+  ```
 
   Note that you are not allowed to call the parser from the
   callback—that will corrupt its internal state.
