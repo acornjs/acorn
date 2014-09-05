@@ -28753,7 +28753,11 @@ testFail("for(const x = 0;;);", "Unexpected token (1:4)", {ecmaVersion: 6});
       return JSON.stringify(actualTokens) + " !== " + JSON.stringify(expectedTokens);
     } else {
       for (var i=0, n=actualTokens.length; i < n; i++) {
-        var actualToken = JSON.stringify(actualTokens[i]);
+        var actualToken = JSON.stringify(
+          actualTokens[i],
+          // just remove this when startLoc/endLoc support is dropped
+          function (key, value) { if (key !== 'startLoc' && key !== 'endLoc') return value; }
+        );
         var expectedToken = JSON.stringify(expectedTokens[i]);
         if (actualToken !== expectedToken)
           return actualToken + ' !== ' + expectedToken;

@@ -169,8 +169,6 @@
     return {line: line, column: offset - cur};
   };
 
-  var warn = !!Object.defineProperties && typeof console === 'object' && (console.warn || console.log);
-
   function Token() {
     this.type = tokType;
     this.value = tokVal;
@@ -179,40 +177,12 @@
     if (options.locations) {
       this.loc = new SourceLocation();
       this.loc.end = tokEndLoc;
-      if (!warn) {
-        // TODO: remove in next major release
-        this.startLoc = tokStartLoc;
-        this.endLoc = tokEndLoc;
-      }
+      // TODO: remove in next major release
+      this.startLoc = tokStartLoc;
+      this.endLoc = tokEndLoc;
     }
     if (options.ranges)
       this.range = [tokStart, tokEnd];
-  }
-
-  if (warn) {
-    // TODO: remove in next major release
-    Object.defineProperties(Token.prototype, {
-      startLoc: {
-        get: function () {
-          warn.call(console, 'startLoc is deprecated, use loc.start instead.');
-          return this.loc.start;
-        },
-        set: function (value) {
-          warn.call(console, 'startLoc is deprecated, use loc.start instead.');
-          this.loc.start = value;
-        }
-      },
-      endLoc: {
-        get: function () {
-          warn.call(console, 'endLoc is deprecated, use loc.end instead.');
-          return this.loc.end;
-        },
-        set: function (value) {
-          warn.call(console, 'endLoc is deprecated, use loc.end instead.');
-          this.loc.end = value;
-        }
-      }
-    });
   }
 
   exports.Token = Token;
