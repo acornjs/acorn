@@ -111,7 +111,10 @@
     sourceFile: null,
     // This value, if given, is stored in every node, whether
     // `locations` is on or off.
-    directSourceFile: null
+    directSourceFile: null,
+    // By default, source location line numbers are one-based.
+    // This can be configured with this option.
+    line: 1
   };
 
   function setOptions(opts) {
@@ -130,7 +133,7 @@
   // into.
 
   var getLineInfo = exports.getLineInfo = function(input, offset) {
-    for (var line = 1, cur = 0;;) {
+    for (var line = options.line, cur = 0;;) {
       lineBreak.lastIndex = cur;
       var match = lineBreak.exec(input);
       if (match && match.index < offset) {
@@ -175,7 +178,7 @@
     getToken.jumpTo = function(pos, reAllowed) {
       tokPos = pos;
       if (options.locations) {
-        tokCurLine = 1;
+        tokCurLine = options.line;
         tokLineStart = lineBreak.lastIndex = 0;
         var match;
         while ((match = lineBreak.exec(input)) && match.index < pos) {
@@ -523,7 +526,7 @@
   // Reset the token state. Used at the start of a parse.
 
   function initTokenState() {
-    tokCurLine = 1;
+    tokCurLine = options.line;
     tokPos = tokLineStart = 0;
     tokRegexpAllowed = true;
     metParenL = 0;
