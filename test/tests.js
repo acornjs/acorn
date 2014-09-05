@@ -28748,3 +28748,5 @@ testFail("for(const x = 0;;);", "Unexpected token (1:4)", {ecmaVersion: 6});
     }
   });
 })();
+
+test("function f(f) { 'use strict'; }", {});
