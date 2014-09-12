@@ -176,6 +176,14 @@ console.log(escodegen.generate(ast, {comment: true}));
 
 [escodegen]: https://github.com/Constellation/escodegen
 
+### acorn_csp.js ###
+
+Acorn parser uses optimization techniques that involve dynamic code generation and compilation through `new Function`.
+
+[Content Security Policy](http://www.html5rocks.com/en/tutorials/security/content-security-policy/#eval-too) disallows this by default for security purposes, so `acorn.js`  can't work in CSP-enabled environment (see [#90](https://github.com/marijnh/acorn/issues/90) and [#123](https://github.com/marijnh/acorn/issues/123)).
+
+For this cases, you should use `acorn_csp.js` which exposes same API as `acorn.js` but avoids usage of code generation in runtime.
+
 ### acorn_loose.js ###
 
 This file implements an error-tolerant parser. It exposes a single
