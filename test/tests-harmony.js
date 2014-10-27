@@ -13561,6 +13561,7 @@ test("yield* 10", {
   }
 }, {
   ecmaVersion: 6,
+  loose: false,
   ranges: true,
   locations: true
 });
@@ -13625,6 +13626,7 @@ test("e => yield* 10", {
   }
 }, {
   ecmaVersion: 6,
+  loose: false,
   ranges: true,
   locations: true
 });
@@ -13698,6 +13700,7 @@ test("(function () { yield* 10 })", {
   }
 }, {
   ecmaVersion: 6,
+  loose: false,
   ranges: true,
   locations: true
 });
