@@ -5064,6 +5064,65 @@ test("export { encrypt, decrypt as dec }", {
   locations: true
 });
 
+test("export { default } from \"other\"", {
+  type: "Program",
+  body: [{
+    type: "ExportDeclaration",
+    declaration: null,
+    specifiers: [
+      {
+        type: "ExportSpecifier",
+        id: {
+          type: "Identifier",
+          name: "default",
+          loc: {
+            start: {line: 1, column: 9},
+            end: {line: 1, column: 16}
+          }
+        },
+        name: null,
+        loc: {
+          start: {line: 1, column: 9},
+          end: {line: 1, column: 16}
+        }
+      }
+    ],
+    source: {
+      "type": "Literal",
+      "start": 24,
+      "end": 31,
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 24
+        },
+        "end": {
+          "line": 1,
+          "column": 31
+        }
+      },
+      "range": [
+        24,
+        31
+      ],
+      "value": "other",
+      "raw": "\"other\""
+    },
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 31}
+    }
+  }],
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 31}
+  }
+}, {
+  ecmaVersion: 6,
+  ranges: true,
+  locations: true
+});
+
 test("import \"jquery\"", {
   type: "Program",
   body: [{

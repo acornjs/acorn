@@ -2519,7 +2519,7 @@
         } else first = false;
 
         var node = startNode();
-        node.id = parseIdent();
+        node.id = parseIdent(true);
         if (tokType === _name && tokVal === "as") {
           next();
           node.name = parseIdent(true);
