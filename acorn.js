@@ -1605,7 +1605,11 @@
     labels.pop();
     expect(_while);
     node.test = parseParenExpression();
-    semicolon();
+    if (options.ecmaVersion >= 6) {
+      eat(_semi);
+    } else {
+      semicolon();
+    }
     return finishNode(node, "DoWhileStatement");
   }
 
