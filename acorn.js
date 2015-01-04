@@ -2393,6 +2393,8 @@
     classBody.body = [];
     expect(_braceL);
     while (!eat(_braceR)) {
+      while (eat(_semi));
+      if (tokType === _braceR) continue;
       var method = startNode();
       if (tokType === _name && tokVal === "static") {
         next();
@@ -2412,7 +2414,6 @@
       }
       method.value = parseMethod(isGenerator);
       classBody.body.push(finishNode(method, "MethodDefinition"));
-      eat(_semi);
     }
     node.body = finishNode(classBody, "ClassBody");
     return finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression");
