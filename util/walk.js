@@ -285,7 +285,23 @@
     c(node.object, st, "Expression");
     if (node.computed) c(node.property, st, "Expression");
   };
-  base.Identifier = base.Literal = base.ExportDeclaration = base.ImportDeclaration = ignore;
+  base.ExportDeclaration = function (node, st, c) {
+    c(node.declaration, st);
+  };
+  base.ImportDeclaration = function (node, st, c) {
+    c(node.source, st, 'Literal');
+    node.specifiers.forEach(function (specifier) {
+      c(specifier, st);
+    });
+  };
+  base.ImportSpecifier = function (node, st, c) {
+    c(node.id, st, 'Identifier');
+    if (node.name) c(node.name, st, 'Identifier');
+  };
+  base.ImportBatchSpecifier = function (node, st, c) {
+    c(node.name, st, 'Identifier');
+  };
+  base.Identifier = base.Literal = ignore;
 
   base.TaggedTemplateExpression = function(node, st, c) {
     c(node.tag, st, "Expression");
