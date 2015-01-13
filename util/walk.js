@@ -295,8 +295,8 @@
     });
   };
   base.ImportSpecifier = function (node, st, c) {
-    c(node.id, st, 'Identifier');
     if (node.name) c(node.name, st, 'Identifier');
+    else c(node.id, st, 'Identifier');
   };
   base.ImportBatchSpecifier = function (node, st, c) {
     c(node.name, st, 'Identifier');
