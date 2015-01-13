@@ -289,19 +289,11 @@
     c(node.declaration, st);
   };
   base.ImportDeclaration = function (node, st, c) {
-    c(node.source, st, 'Literal');
     node.specifiers.forEach(function (specifier) {
       c(specifier, st);
     });
   };
-  base.ImportSpecifier = function (node, st, c) {
-    if (node.name) c(node.name, st, 'Identifier');
-    else c(node.id, st, 'Identifier');
-  };
-  base.ImportBatchSpecifier = function (node, st, c) {
-    c(node.name, st, 'Identifier');
-  };
-  base.Identifier = base.Literal = ignore;
+  base.ImportSpecifier = base.ImportBatchSpecifier = base.Identifier = base.Literal = ignore;
 
   base.TaggedTemplateExpression = function(node, st, c) {
     c(node.tag, st, "Expression");
