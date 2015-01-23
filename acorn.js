@@ -2647,7 +2647,14 @@
     } else
     // export default ...;
     if (eat(_default)) {
-      node.declaration = parseExpression(true);
+      var stmt = node.declaration = parseStatement();
+      if (stmt.id) {
+        if (stmt.type === "FunctionExpression") {
+          stmt.type = "FunctionDeclaration";
+        } else if (stmt.type === "ClassExpression") {
+          stmt.type = "ClassDeclaration";
+        }
+      }
       node['default'] = true;
       node.specifiers = null;
       node.source = null;
