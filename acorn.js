@@ -2748,7 +2748,6 @@
     if (tokType === _string) {
       node.specifiers = [];
       node.source = parseExprAtom();
-      node.kind = "";
     } else {
       node.specifiers = parseImportSpecifiers();
       expectContextual("from");
@@ -2765,10 +2764,11 @@
     if (tokType === _name) {
       // import defaultObj, { x, y as z } from '...'
       var node = startNode();
-      node.id = parseIdent();
-      checkLVal(node.id, true);
-      node.name = null;
-      node['default'] = true;
+      node.id = startNode();
+      node.name = parseIdent();
+      checkLVal(node.name, true);
+      node.id.name = "default";
+      finishNode(node.id, "Identifier");
       nodes.push(finishNode(node, "ImportSpecifier"));
       if (!eat(_comma)) return nodes;
     }
