@@ -1,0 +1,9 @@
+/bin/update_authors.sh
+/bin/without_eval
+/test
+/tools
+/.editorconfig
+/.gitattributes
+/.tern-project
+/.travis.yml
+/docco.css
