@@ -5,6 +5,8 @@
     driver = require("./driver.js");
     require("./tests.js");
     require("./tests-harmony.js");
+    require("./tests-jsx.js");
+    require("../plugin/jsx.js");
   } else {
     driver = window;
   }
