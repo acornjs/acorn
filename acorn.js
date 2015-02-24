@@ -116,8 +116,11 @@
     directSourceFile: null,
     // When enabled, parenthesized expressions are represented by
     // (non-standard) ParenthesizedExpression nodes
-    preserveParens: false
+    preserveParens: false,
+    plugins: []
   };
+
+  exports.plugins = {};
 
   // This function tries to parse a single expression at a given
   // offset in a string. Useful for parsing mixed-language formats
@@ -272,7 +275,7 @@
   // to know when parsing a label, in order to allow or disallow
   // continue jumps to that label.
 
-  function TokenType(label, beforeExpr, binop, kind, keyword) {
+  var TokenType = exports.TokenType = function(label, beforeExpr, binop, kind, keyword) {
     this.label = label;
     this.keyword = keyword;
     this.beforeExpr = !!beforeExpr;
@@ -282,8 +285,7 @@
     this.postfix = kind && kind.indexOf("postfix") > -1;
     this.binop = binop || null;
     this.updateContext = null;
-  }
-
+  };
 
   function binop(name, prec) {
     return new TokenType(name, true, prec);
@@ -393,52 +395,6 @@
   kw("void", true, "prefix");
   kw("delete", true, "prefix");
 
-  // Update tokenizer context for a given token type
-
-  tt.parenR.updateContext = tt.braceR.updateContext = function() {
-    var out = this.context.pop();
-    if (out === b_stat && this.curTokContext() === f_expr) {
-      this.context.pop();
-      this.exprAllowed = false;
-    } else if (out !== b_tmpl) {
-      this.exprAllowed = !(out && out.isExpr);
-    }
-  };
-
-  tt.braceL.updateContext = function(prevType) {
-    this.context.push(this.braceIsBlock(prevType) ? b_stat : b_expr);
-    this.exprAllowed = true;
-  };
-
-  tt.dollarBraceL.updateContext = function() {
-    this.context.push(b_tmpl);
-    this.exprAllowed = true;
-  };
-
-  tt.parenL.updateContext = function(prevType) {
-    var statementParens = prevType === tt._if || prevType === tt._for || prevType === tt._with || prevType === tt._while;
-    this.context.push(statementParens ? p_stat : p_expr);
-    this.exprAllowed = true;
-  };
-
-  tt.incDec.updateContext = function() {
-    // tokExprAllowed stays unchanged
-  };
-
-  tt._function.updateContext = function() {
-    if (this.curTokContext() !== b_stat)
-      this.context.push(f_expr);
-    this.exprAllowed = false;
-  };
-
-  tt.backQuote.updateContext = function() {
-    if (this.curTokContext() === q_tmpl)
-      this.context.pop();
-    else
-      this.context.push(q_tmpl);
-    this.exprAllowed = false;
-  };
-
   // This is a trick taken from Esprima. It turns out that, on
   // non-Chrome browsers, to check whether a string is in a set, a
   // predicate containing a big ugly `switch` statement is faster than
@@ -529,9 +485,9 @@
 
   var newline = /[\n\r\u2028\u2029]/;
 
-  function isNewLine(code) {
+  var isNewLine = exports.isNewLine = function(code) {
     return code === 10 || code === 13 || code === 0x2028 || code == 0x2029;
-  }
+  };
 
   // Matches a whole line break (where CRLF is considered a single
   // line break). Used to count lines.
@@ -594,8 +550,9 @@
   //
   // [opp]: http://en.wikipedia.org/wiki/Operator-precedence_parser
 
-  function Parser(options, input, startPos) {
+  var Parser = exports.Parser = function(options, input, startPos) {
     this.options = parseOptions(options);
+    this.registerHooks(this.options.plugins);
     this.sourceFile = this.options.sourceFile || null;
     this.isKeyword = this.options.ecmaVersion >= 6 ? isEcma6Keyword : isEcma5AndLessKeyword;
     this.input = String(input);
@@ -630,7 +587,7 @@
     // The context stack is used to superficially track syntactic
     // context to predict whether a regular expression is allowed in a
     // given position.
-    this.context = [b_stat];
+    this.context = [tc.b_stat];
     this.exprAllowed = true;
 
     // Flags to track whether we are in strict mode, a function, a
@@ -642,11 +599,36 @@
     // If enabled, skip leading hashbang line.
     if (this.pos === 0 && this.options.allowHashBang && this.input.slice(0, 2) === '#!')
       this.skipLineComment(2);
-  }
+  };
 
   // Shorthand because we are going to be adding a _lot_ of methods to
   // this.
   var pp = Parser.prototype;
+
+  pp.registerHooks = function(plugins) {
+    var parseExprAtom = [], tokenize = [], updateContext = [];
+    for (var i = 0; i < plugins.length; i++) {
+      var ext = exports.plugins[plugins[i]];
+      if (!ext) throw new Error("Plugin '" + plugins[i] + "' not found");
+      if (ext.parseExprAtom) parseExprAtom.push(ext.parseExprAtom);
+      if (ext.tokenize) tokenize.push(ext.tokenize);
+      if (ext.updateContext) updateContext.push(ext.updateContext);
+    }
+    this.beforeParseExprAtom = combineHooks(parseExprAtom);
+    this.beforeTokenize = combineHooks(tokenize);
+    this.beforeUpdateContext = combineHooks(updateContext);
+  };
+
+  function combineHooks(hooks) {
+    if (!hooks.length) return null;
+    return function(arg) {
+      for (var i = 0; i < hooks.length; i++) {
+        var result = hooks[i].call(this, arg);
+        if (result !== false) return result;
+      }
+      return false;
+    };
+  }
 
   // Move to the next token
 
@@ -676,7 +658,7 @@
     this.readToken();
   };
 
-  pp.curTokContext = function() {
+  pp.curContext = function() {
     return this.context[this.context.length - 1];
   };
 
@@ -684,16 +666,19 @@
   // properties.
 
   pp.readToken = function() {
-    var inTemplate = this.curTokContext() === q_tmpl;
-    if (!inTemplate) this.skipSpace();
+    var curContext = this.curContext();
+    if (!curContext || !curContext.preserveSpace) this.skipSpace();
 
     this.start = this.pos;
     if (this.options.locations) this.startLoc = this.curPosition();
     if (this.pos >= this.input.length) return this.finishToken(tt.eof);
 
-    if (inTemplate) return this.readTmplToken();
+    if (curContext === tc.q_tmpl) return this.readTmplToken();
 
     var code = this.input.charCodeAt(this.pos);
+
+    if (this.beforeTokenize && this.beforeTokenize(code) !== false)
+      return;
 
     // Identifier or keyword. '\uXXXX' sequences are allowed in
     // identifiers, so '\' also dispatches to that.
@@ -790,20 +775,32 @@
   // given point in the program is loosely based on sweet.js' approach.
   // See https://github.com/mozilla/sweet.js/wiki/design
 
-  var b_stat = {token: "{", isExpr: false}, b_expr = {token: "{", isExpr: true}, b_tmpl = {token: "${", isExpr: true};
-  var p_stat = {token: "(", isExpr: false}, p_expr = {token: "(", isExpr: true};
-  var q_tmpl = {token: "`", isExpr: true}, f_expr = {token: "function", isExpr: true};
+  var TokContext = exports.TokContext = function(token, isExpr, preserveSpace) {
+    this.token = token;
+    this.isExpr = isExpr;
+    this.preserveSpace = preserveSpace;
+  };
+
+  var tc = exports.tokContexts = {
+    b_stat: new TokContext("{", false),
+    b_expr: new TokContext("{", true),
+    b_tmpl: new TokContext("${", true),
+    p_stat: new TokContext("(", false),
+    p_expr: new TokContext("(", true),
+    q_tmpl: new TokContext("`", true, true),
+    f_expr: new TokContext("function", true)
+  };
 
   pp.braceIsBlock = function(prevType) {
     var parent;
-    if (prevType === tt.colon && (parent = this.curTokContext()).token == "{")
+    if (prevType === tt.colon && (parent = this.curContext()).token == "{")
       return !parent.isExpr;
     if (prevType === tt._return)
       return newline.test(this.input.slice(this.lastTokEnd, this.start));
     if (prevType === tt._else || prevType === tt.semi || prevType === tt.eof)
       return true;
     if (prevType == tt.braceL)
-      return this.curTokContext() === b_stat;
+      return this.curContext() === tc.b_stat;
     return !this.exprAllowed;
   };
 
@@ -820,12 +817,62 @@
     this.value = val;
 
     var update;
-    if (type.keyword && prevType == tt.dot)
+    if (this.beforeUpdateContext && this.beforeUpdateContext(prevType) !== false)
+      ; // Handled
+    else if (type.keyword && prevType == tt.dot)
       this.exprAllowed = false;
     else if (update = type.updateContext)
       update.call(this, prevType);
     else
       this.exprAllowed = type.beforeExpr;
+  };
+
+  // Token-specific context update code
+
+  tt.parenR.updateContext = tt.braceR.updateContext = function() {
+    var out = this.context.pop();
+    if (out === tc.b_stat && this.curContext() === tc.f_expr) {
+      this.context.pop();
+      this.exprAllowed = false;
+    } else if (out === tc.b_tmpl) {
+      this.exprAllowed = true;
+    } else {
+      this.exprAllowed = !(out && out.isExpr);
+    }
+  };
+
+  tt.braceL.updateContext = function(prevType) {
+    this.context.push(this.braceIsBlock(prevType) ? tc.b_stat : tc.b_expr);
+    this.exprAllowed = true;
+  };
+
+  tt.dollarBraceL.updateContext = function() {
+    this.context.push(tc.b_tmpl);
+    this.exprAllowed = true;
+  };
+
+  tt.parenL.updateContext = function(prevType) {
+    var statementParens = prevType === tt._if || prevType === tt._for || prevType === tt._with || prevType === tt._while;
+    this.context.push(statementParens ? tc.p_stat : tc.p_expr);
+    this.exprAllowed = true;
+  };
+
+  tt.incDec.updateContext = function() {
+    // tokExprAllowed stays unchanged
+  };
+
+  tt._function.updateContext = function() {
+    if (this.curContext() !== tc.b_stat)
+      this.context.push(tc.f_expr);
+    this.exprAllowed = false;
+  };
+
+  tt.backQuote.updateContext = function() {
+    if (this.curContext() === tc.q_tmpl)
+      this.context.pop();
+    else
+      this.context.push(tc.q_tmpl);
+    this.exprAllowed = false;
   };
 
   // ### Token reading
@@ -2232,6 +2279,11 @@
   // or `{}`.
 
   pp.parseExprAtom = function(refShorthandDefaultPos) {
+    if (this.beforeParseExprAtom) {
+      var result = this.beforeParseExprAtom(refShorthandDefaultPos);
+      if (result !== false) return result;
+    }
+
     switch (this.type) {
     case tt._this:
       var node = this.startNode();
@@ -2250,19 +2302,13 @@
       return id;
 
     case tt.regexp:
-      var node = this.startNode();
-      node.regex = {pattern: this.value.pattern, flags: this.value.flags};
-      node.value = this.value.value;
-      node.raw = this.input.slice(this.start, this.end);
-      this.next();
-      return this.finishNode(node, "Literal");
+      var value = this.value;
+      var node = this.parseLiteral(value.value);
+      node.regex = {pattern: value.pattern, flags: value.flags};
+      return node;
 
     case tt.num: case tt.string:
-      var node = this.startNode();
-      node.value = this.value;
-      node.raw = this.input.slice(this.start, this.end);
-      this.next();
-      return this.finishNode(node, "Literal");
+      return this.parseLiteral(this.value);
 
     case tt._null: case tt._true: case tt._false:
       var node = this.startNode();
@@ -2304,6 +2350,14 @@
     default:
       this.unexpected();
     }
+  };
+
+  pp.parseLiteral = function(value) {
+    var node = this.startNode();
+    node.value = value;
+    node.raw = this.input.slice(this.start, this.end);
+    this.next();
+    return this.finishNode(node, "Literal");
   };
 
   pp.parseParenAndDistinguishExpression = function() {
