@@ -2514,7 +2514,7 @@
     if (options.ecmaVersion >= 6) {
       if (eat(_bracketL)) {
         prop.computed = true;
-        prop.key = parseExpression();
+        prop.key = parseMaybeAssign();
         expect(_bracketR);
         return;
       } else {
