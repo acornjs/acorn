@@ -15597,11 +15597,14 @@ test("new.target", {
 
 testFail("new.prop", "The only valid meta property for new is new.target (1:4)", {ecmaVersion: 6});
 
-test("export default function () {} false", {
+test("export default function foo() {} false", {
   body: [
     {
       declaration: {
-        id: null,
+        id: {
+          name: "foo",
+          type: "Identifier"
+        },
         generator: false,
         expression: false,
         params: [],
@@ -15609,7 +15612,7 @@ test("export default function () {} false", {
           body: [],
           type: "BlockStatement"
         },
-        type: "FunctionExpression"
+        type: "FunctionDeclaration"
       },
       type: "ExportDefaultDeclaration"
     },
