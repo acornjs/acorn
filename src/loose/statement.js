@@ -123,7 +123,7 @@ lp.parseStatement = function() {
       let clause = this.startNode()
       this.next()
       this.expect(tt.parenL)
-      clause.param = this.toAssignable(this.parseExprAtom())
+      clause.param = this.toAssignable(this.parseExprAtom(), true)
       this.expect(tt.parenR)
       clause.guard = null
       clause.body = this.parseBlock()
@@ -226,7 +226,7 @@ lp.parseVar = function(noIn) {
   node.declarations = []
   do {
     let decl = this.startNode()
-    decl.id = this.options.ecmaVersion >= 6 ? this.toAssignable(this.parseExprAtom()) : this.parseIdent()
+    decl.id = this.options.ecmaVersion >= 6 ? this.toAssignable(this.parseExprAtom(), true) : this.parseIdent()
     decl.init = this.eat(tt.eq) ? this.parseMaybeAssign(noIn) : null
     node.declarations.push(this.finishNode(decl, "VariableDeclarator"))
   } while (this.eat(tt.comma))

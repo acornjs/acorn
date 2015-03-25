@@ -4,16 +4,20 @@ import {tokTypes as tt} from ".."
 
 const lp = LooseParser.prototype
 
-lp.checkLVal = function(expr) {
+lp.checkLVal = function(expr, binding) {
   if (!expr) return expr
   switch (expr.type) {
   case "Identifier":
+    return expr
+
   case "MemberExpression":
+    return binding ? this.dummyIdent() : expr
+
   case "ObjectPattern":
   case "ArrayPattern":
   case "RestElement":
   case "AssignmentPattern":
-    return expr
+    if (this.options.ecmaVersion >= 6) return expr
 
   default:
     return this.dummyIdent()
@@ -419,24 +423,24 @@ lp.initFunction = function(node) {
 // Convert existing expression atom to assignable pattern
 // if possible.
 
-lp.toAssignable = function(node) {
+lp.toAssignable = function(node, binding) {
   if (this.options.ecmaVersion >= 6 && node) {
     switch (node.type) {
     case "ObjectExpression":
       node.type = "ObjectPattern"
       let props = node.properties
       for (let i = 0; i < props.length; i++)
-        this.toAssignable(props[i].value)
+        this.toAssignable(props[i].value, binding)
       break
 
     case "ArrayExpression":
       node.type = "ArrayPattern"
-      this.toAssignableList(node.elements)
+      this.toAssignableList(node.elements, binding)
       break
 
     case "SpreadElement":
       node.type = "RestElement"
-      node.argument = this.toAssignable(node.argument)
+      node.argument = this.toAssignable(node.argument, binding)
       break
 
     case "AssignmentExpression":
@@ -444,19 +448,19 @@ lp.toAssignable = function(node) {
       break
     }
   }
-  return this.checkLVal(node)
+  return this.checkLVal(node, binding)
 }
 
-lp.toAssignableList = function(exprList) {
+lp.toAssignableList = function(exprList, binding) {
   for (let i = 0; i < exprList.length; i++)
-    this.toAssignable(exprList[i])
+    exprList[i] = this.toAssignable(exprList[i], binding)
   return exprList
 }
 
 lp.parseFunctionParams = function(params) {
   this.pushCx()
   params = this.parseExprList(tt.parenR)
-  return this.toAssignableList(params)
+  return this.toAssignableList(params, true)
 }
 
 lp.parseMethod = function(isGenerator) {
@@ -471,7 +475,7 @@ lp.parseMethod = function(isGenerator) {
 
 lp.parseArrowExpression = function(node, params) {
   this.initFunction(node)
-  node.params = this.toAssignableList(params)
+  node.params = this.toAssignableList(params, true)
   node.expression = this.tok.type !== tt.braceL
   node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock()
   return this.finishNode(node, "ArrowFunctionExpression")
