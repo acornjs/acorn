@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/marijnh/acorn.svg?branch=master)](https://travis-ci.org/marijnh/acorn)
 [![NPM version](https://img.shields.io/npm/v/acorn.svg)](https://www.npmjs.org/package/acorn)  
-[Author funding status: ![maintainer happiness](https://marijnhaverbeke.nl/fund/status_s.png)](https://marijnhaverbeke.nl/fund/)
+[Author funding status: ![maintainer happiness](https://marijnhaverbeke.nl/fund/status_s.png?force)](https://marijnhaverbeke.nl/fund/)
 
 A tiny, fast JavaScript parser, written completely in JavaScript.
 
@@ -31,10 +31,10 @@ recent than IE5) without any kind of module management, a single
 global object `acorn` will be defined, and all the exported properties
 will be added to that.
 
-### acorn.js
+### Main parser
 
-This file contains the actual parser (and is what you get when you
-`require("acorn")` in node.js).
+This is implemented in `dist/acorn.js`, and is what you get when you
+`require("acorn")` in node.js.
 
 **parse**`(input, options)` is used to parse a JavaScript program.
 The `input` parameter is a string, `options` can be undefined or an
@@ -54,15 +54,20 @@ object referring to that same position.
   either 3, 5, or 6. This influences support for strict mode, the set
   of reserved words, and support for new syntax features. Default is 5.
 
-- **strictSemicolons**: If `true`, prevents the parser from doing
-  automatic semicolon insertion, and statements that do not end with
-  a semicolon will generate an error. Defaults to `false`.
+- **sourceType**: Indicate the mode the code should be parsed in. Can be
+  either `"script"` or `"module"`.
 
-- **allowTrailingCommas**: If `false`, the parser will not allow
-  trailing commas in array and object literals. Default is `true`.
+- **onInsertedSemicolon**: If given a callback, that callback will be
+  called whenever a missing semicolon is inserted by the parser. The
+  callback will be given the character offset of the point where the
+  semicolon is inserted as argument, and if `locations` is on, also a
+  `{line, column}` object representing this position.
 
-- **forbidReserved**: If `true`, using a reserved word will generate
-  an error. Defaults to `false`. When given the value `"everywhere"`,
+- **onTrailingComma**: Like `onInsertedSemicolon`, but for trailing
+  commas.
+
+- **allowReserved**: If `false`, using a reserved word will generate
+  an error. Defaults to `true`. When given the value `"never"`,
   reserved words and keywords can also not be used as property names
   (as in Internet Explorer's old parser).
   
@@ -156,15 +161,16 @@ there is more of the string left after the expression.
 **getLineInfo**`(input, offset)` can be used to get a `{line,
 column}` object for a given program string and character offset.
 
-**tokenize**`(input, options)` exports a primitive interface to
-Acorn's tokenizer. The function takes an input string and options
-similar to `parse` (though only some options are meaningful here), and
-returns a function that can be called repeatedly to read a single
-token, and returns a `{start, end, type, value}` object (with added
-`loc` property when the `locations` option is enabled and `range`
-property when the `ranges` option is enabled).
+**tokenizer**`(input, options)` returns an object with a `getToken`
+method that can be called repeatedly to get the next token, a `{start,
+end, type, value}` object (with added `loc` property when the
+`locations` option is enabled and `range` property when the `ranges`
+option is enabled). When the token's type is `tokTypes.eof`, you
+should stop calling the method, since it will keep returning that same
+token forever.
 
-In ES6 environment, returned result can be used as any other protocol-compliant iterable:
+In ES6 environment, returned result can be used as any other
+protocol-compliant iterable:
 
 ```javascript
 for (let token of acorn.tokenize(str)) {
@@ -216,12 +222,11 @@ in a context with such a
 (see [#90](https://github.com/marijnh/acorn/issues/90) and
 [#123](https://github.com/marijnh/acorn/issues/123)).
 
-The `bin/without_eval` script can be used to generate a version of
-`acorn.js` that has the generated code inlined, and can thus run
-without evaluating anything. In versions of this library downloaded
-from NPM, this script will be available as `acorn_csp.js`.
+The `dist/acorn_csp.js` file in the distribution (which is built
+by the `bin/without_eval` script) has the generated code inlined, and
+can thus run without evaluating anything.
 
-### acorn_loose.js ###
+### dist/acorn_loose.js ###
 
 This file implements an error-tolerant parser. It exposes a single
 function.
@@ -234,10 +239,10 @@ nodes with name `"✖"` as placeholders in places where it can't make
 sense of the input. Depends on `acorn.js`, because it uses the same
 tokenizer.
 
-### util/walk.js ###
+### dist/walk.js ###
 
 Implements an abstract syntax tree walker. Will store its interface in
-`acorn.walk` when used without a module system.
+`acorn.walk` when loaded without a module system.
 
 **simple**`(node, visitors, base, state)` does a 'simple' walk over
 a tree. `node` should be the AST node to walk, and `visitors` an
@@ -311,3 +316,64 @@ options:
 - `--help`: Print the usage information and quit.
 
 The utility spits out the syntax tree as JSON data.
+
+## Build system
+
+Acorn is written in ECMAScript 6, as a set of small modules, in the
+project's `src` directory, and compiled down to bigger ECMAScript 3
+files in `dist` using [Browserify](http://browserify.org) and
+[Babel](http://babeljs.io/). If you are already using Babel, you can
+consider including the modules directly.
+
+The command-line test runner (`npm test`) uses the ES6 modules. The
+browser-based test page (`test/index.html`) uses the compiled modules.
+The `bin/build-acorn.js` script builds the latter from the former.
+
+If you are working on Acorn, you'll probably want to try the code out
+directly, without an intermediate build step. In your scripts, you can
+register the Babel require shim like this:
+
+    require("babelify/node_modules/babel-core/register")
+
+That will allow you to directly `require` the ES6 modules.
+
+## Plugins
+
+Acorn is designed support allow plugins which, within reasonable
+bounds, redefine the way the parser works. Plugins can add new token
+types and new tokenizer contexts (if necessary), and extend methods in
+the parser object. This is not a clean, elegant API—using it requires
+an understanding of Acorn's internals, and plugins are likely to break
+whenever those internals are significantly changed. But still, it is
+_possible_, in this way, to create parsers for JavaScript dialects
+without forking all of Acorn. And in principle it is even possible to
+combine such plugins, so that if you have, for example, a plugin for
+parsing types and a plugin for parsing JSX-style XML literals, you
+could load them both and parse code with both JSX tags and types.
+
+A plugin should register itself by adding a property to
+`acorn.plugins`, which holds a function. Calling `acorn.parse`, a
+`plugin` option can be passed, holding an object mapping plugin names
+to configuration values (or just `true` for plugins that don't take
+options). After the parser object has been created, the initialization
+functions for the chosen plugins are called with `(parser,
+configValue)` arguments. They are expected to use the `parser.extend`
+method to extend parser methods. For example, the `readToken` method
+could be extended like this:
+
+```javascript
+parser.extend("readToken", function(nextMethod) {
+  return function(code) {
+    console.log("Reading a token!")
+    return nextMethod.call(this, code)
+  }
+})
+```
+
+The `nextMethod` argument passed to `extend`'s second argument is the
+previous value of this method, and should usually be called through to
+whenever the extended method does not handle the call itself.
+
+There is a proof-of-concept JSX plugin in the [`jsx`
+branch](https://github.com/marijnh/acorn/tree/jsx) branch of the
+Github repository.

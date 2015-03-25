@@ -4381,6 +4381,7 @@ test("let {a:b} = {}", {
 
 test("var {a:b} = {}", {
   type: "Program",
+  sourceType: "script",
   body: [{
     type: "VariableDeclaration",
     declarations: [{
@@ -4452,8 +4453,9 @@ test("var {a:b} = {}", {
 
 test("export var document", {
   type: "Program",
+  sourceType: "module",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: {
       type: "VariableDeclaration",
       declarations: [{
@@ -4478,8 +4480,7 @@ test("export var document", {
         end: {line: 1, column: 19}
       }
     },
-    default: false,
-    specifiers: null,
+    specifiers: [],
     source: null,
     loc: {
       start: {line: 1, column: 0},
@@ -4492,6 +4493,7 @@ test("export var document", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4499,7 +4501,7 @@ test("export var document", {
 test("export var document = { }", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: {
       type: "VariableDeclaration",
       declarations: [{
@@ -4531,8 +4533,7 @@ test("export var document = { }", {
         end: {line: 1, column: 25}
       }
     },
-    default: false,
-    specifiers: null,
+    specifiers: [],
     source: null,
     loc: {
       start: {line: 1, column: 0},
@@ -4545,6 +4546,7 @@ test("export var document = { }", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4552,7 +4554,7 @@ test("export var document = { }", {
 test("export let document", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: {
       type: "VariableDeclaration",
       declarations: [{
@@ -4577,8 +4579,7 @@ test("export let document", {
         end: {line: 1, column: 19}
       }
     },
-    default: false,
-    specifiers: null,
+    specifiers: [],
     source: null,
     loc: {
       start: {line: 1, column: 0},
@@ -4591,6 +4592,7 @@ test("export let document", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4598,7 +4600,7 @@ test("export let document", {
 test("export let document = { }", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: {
       type: "VariableDeclaration",
       declarations: [{
@@ -4630,8 +4632,7 @@ test("export let document = { }", {
         end: {line: 1, column: 25}
       }
     },
-    default: false,
-    specifiers: null,
+    specifiers: [],
     source: null,
     loc: {
       start: {line: 1, column: 0},
@@ -4644,6 +4645,7 @@ test("export let document = { }", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4651,7 +4653,7 @@ test("export let document = { }", {
 test("export const document = { }", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: {
       type: "VariableDeclaration",
       declarations: [{
@@ -4683,8 +4685,7 @@ test("export const document = { }", {
         end: {line: 1, column: 27}
       }
     },
-    default: false,
-    specifiers: null,
+    specifiers: [],
     source: null,
     loc: {
       start: {line: 1, column: 0},
@@ -4697,6 +4698,7 @@ test("export const document = { }", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4704,7 +4706,7 @@ test("export const document = { }", {
 test("export function parse() { }", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: {
       type: "FunctionDeclaration",
       id: {
@@ -4731,8 +4733,7 @@ test("export function parse() { }", {
         end: {line: 1, column: 27}
       }
     },
-    default: false,
-    specifiers: null,
+    specifiers: [],
     source: null,
     loc: {
       start: {line: 1, column: 0},
@@ -4745,6 +4746,7 @@ test("export function parse() { }", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4752,7 +4754,7 @@ test("export function parse() { }", {
 test("export class Class {}", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: {
       type: "ClassDeclaration",
       id: {
@@ -4777,8 +4779,7 @@ test("export class Class {}", {
         end: {line: 1, column: 21}
       }
     },
-    default: false,
-    specifiers: null,
+    specifiers: [],
     source: null,
     loc: {
       start: {line: 1, column: 0},
@@ -4791,6 +4792,7 @@ test("export class Class {}", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4798,7 +4800,7 @@ test("export class Class {}", {
 test("export default 42", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportDefaultDeclaration",
     declaration: {
       type: "Literal",
       value: 42,
@@ -4808,9 +4810,6 @@ test("export default 42", {
         end: {line: 1, column: 17}
       }
     },
-    default: true,
-    specifiers: null,
-    source: null,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 17}
@@ -4822,6 +4821,7 @@ test("export default 42", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4830,7 +4830,7 @@ test("export default function () {}", {
   type: "Program",
   range: [0, 29],
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportDefaultDeclaration",
     range: [0, 29],
     declaration: {
       type: "FunctionExpression",
@@ -4844,18 +4844,15 @@ test("export default function () {}", {
         range: [27, 29],
         body: []
       }
-    },
-    default: true,
-    specifiers: null,
-    source: null
+    }
   }]
-}, {ecmaVersion: 6, ranges: true});
+}, {ecmaVersion: 6, sourceType: "module", ranges: true});
 
 test("export default function f() {}", {
   type: "Program",
   range: [0, 30],
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportDefaultDeclaration",
     range: [0, 30],
     declaration: {
       type: "FunctionDeclaration",
@@ -4873,18 +4870,15 @@ test("export default function f() {}", {
         range: [28, 30],
         body: []
       }
-    },
-    default: true,
-    specifiers: null,
-    source: null
+    }
   }]
-}, {ecmaVersion: 6, ranges: true});
+}, {ecmaVersion: 6, sourceType: "module", ranges: true});
 
 test("export default class {}", {
   type: "Program",
   range: [0, 23],
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportDefaultDeclaration",
     range: [0, 23],
     declaration: {
       type: "ClassExpression",
@@ -4896,18 +4890,15 @@ test("export default class {}", {
         range: [21, 23],
         body: []
       }
-    },
-    default: true,
-    specifiers: null,
-    source: null
+    }
   }]
-}, {ecmaVersion: 6, ranges: true});
+}, {ecmaVersion: 6, sourceType: "module", ranges: true});
 
 test("export default class A {}", {
   type: "Program",
   range: [0, 25],
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportDefaultDeclaration",
     range: [0, 25],
     declaration: {
       type: "ClassDeclaration",
@@ -4923,27 +4914,16 @@ test("export default class A {}", {
         range: [23, 25],
         body: []
       }
-    },
-    default: true,
-    specifiers: null,
-    source: null
+    }
   }]
-}, {ecmaVersion: 6, ranges: true});
+}, {ecmaVersion: 6, sourceType: "module", ranges: true});
 
-testFail("export *", "Unexpected token (1:8)", {ecmaVersion: 6});
+testFail("export *", "Unexpected token (1:8)", {ecmaVersion: 6, sourceType: "module"});
 
 test("export * from \"crypto\"", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
-    declaration: null,
-    specifiers: [{
-      type: "ExportBatchSpecifier",
-      loc: {
-        start: {line: 1, column: 7},
-        end: {line: 1, column: 8}
-      }
-    }],
+    type: "ExportAllDeclaration",
     source: {
       type: "Literal",
       value: "crypto",
@@ -4964,6 +4944,7 @@ test("export * from \"crypto\"", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -4971,11 +4952,11 @@ test("export * from \"crypto\"", {
 test("export { encrypt }", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: null,
     specifiers: [{
       type: "ExportSpecifier",
-      id: {
+      exported: {
         type: "Identifier",
         name: "encrypt",
         loc: {
@@ -4983,7 +4964,14 @@ test("export { encrypt }", {
           end: {line: 1, column: 16}
         }
       },
-      name: null,
+      local: {
+        type: "Identifier",
+        name: "encrypt",
+        loc: {
+          start: {line: 1, column: 9},
+          end: {line: 1, column: 16}
+        }
+      },
       loc: {
         start: {line: 1, column: 9},
         end: {line: 1, column: 16}
@@ -5001,6 +4989,7 @@ test("export { encrypt }", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5008,12 +4997,12 @@ test("export { encrypt }", {
 test("export { encrypt, decrypt }", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: null,
     specifiers: [
       {
         type: "ExportSpecifier",
-        id: {
+        exported: {
           type: "Identifier",
           name: "encrypt",
           loc: {
@@ -5021,7 +5010,14 @@ test("export { encrypt, decrypt }", {
             end: {line: 1, column: 16}
           }
         },
-        name: null,
+        local: {
+          type: "Identifier",
+          name: "encrypt",
+          loc: {
+            start: {line: 1, column: 9},
+            end: {line: 1, column: 16}
+          }
+        },
         loc: {
           start: {line: 1, column: 9},
           end: {line: 1, column: 16}
@@ -5029,7 +5025,7 @@ test("export { encrypt, decrypt }", {
       },
       {
         type: "ExportSpecifier",
-        id: {
+        exported: {
           type: "Identifier",
           name: "decrypt",
           loc: {
@@ -5037,7 +5033,14 @@ test("export { encrypt, decrypt }", {
             end: {line: 1, column: 25}
           }
         },
-        name: null,
+        local: {
+          type: "Identifier",
+          name: "decrypt",
+          loc: {
+            start: {line: 1, column: 18},
+            end: {line: 1, column: 25}
+          }
+        },
         loc: {
           start: {line: 1, column: 18},
           end: {line: 1, column: 25}
@@ -5056,6 +5059,7 @@ test("export { encrypt, decrypt }", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5063,24 +5067,24 @@ test("export { encrypt, decrypt }", {
 test("export { encrypt as default }", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: null,
     specifiers: [{
       type: "ExportSpecifier",
-      id: {
-        type: "Identifier",
-        name: "encrypt",
-        loc: {
-          start: {line: 1, column: 9},
-          end: {line: 1, column: 16}
-        }
-      },
-      name: {
+      exported: {
         type: "Identifier",
         name: "default",
         loc: {
           start: {line: 1, column: 20},
           end: {line: 1, column: 27}
+        }
+      },
+      local: {
+        type: "Identifier",
+        name: "encrypt",
+        loc: {
+          start: {line: 1, column: 9},
+          end: {line: 1, column: 16}
         }
       },
       loc: {
@@ -5100,6 +5104,7 @@ test("export { encrypt as default }", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5107,12 +5112,12 @@ test("export { encrypt as default }", {
 test("export { encrypt, decrypt as dec }", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: null,
     specifiers: [
       {
         type: "ExportSpecifier",
-        id: {
+        exported: {
           type: "Identifier",
           name: "encrypt",
           loc: {
@@ -5120,7 +5125,14 @@ test("export { encrypt, decrypt as dec }", {
             end: {line: 1, column: 16}
           }
         },
-        name: null,
+        local: {
+          type: "Identifier",
+          name: "encrypt",
+          loc: {
+            start: {line: 1, column: 9},
+            end: {line: 1, column: 16}
+          }
+        },
         loc: {
           start: {line: 1, column: 9},
           end: {line: 1, column: 16}
@@ -5128,20 +5140,20 @@ test("export { encrypt, decrypt as dec }", {
       },
       {
         type: "ExportSpecifier",
-        id: {
-          type: "Identifier",
-          name: "decrypt",
-          loc: {
-            start: {line: 1, column: 18},
-            end: {line: 1, column: 25}
-          }
-        },
-        name: {
+        exported: {
           type: "Identifier",
           name: "dec",
           loc: {
             start: {line: 1, column: 29},
             end: {line: 1, column: 32}
+          }
+        },
+        local: {
+          type: "Identifier",
+          name: "decrypt",
+          loc: {
+            start: {line: 1, column: 18},
+            end: {line: 1, column: 25}
           }
         },
         loc: {
@@ -5162,6 +5174,7 @@ test("export { encrypt, decrypt as dec }", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5169,12 +5182,12 @@ test("export { encrypt, decrypt as dec }", {
 test("export { default } from \"other\"", {
   type: "Program",
   body: [{
-    type: "ExportDeclaration",
+    type: "ExportNamedDeclaration",
     declaration: null,
     specifiers: [
       {
         type: "ExportSpecifier",
-        id: {
+        exported: {
           type: "Identifier",
           name: "default",
           loc: {
@@ -5182,7 +5195,14 @@ test("export { default } from \"other\"", {
             end: {line: 1, column: 16}
           }
         },
-        name: null,
+        local: {
+          type: "Identifier",
+          name: "default",
+          loc: {
+            start: {line: 1, column: 9},
+            end: {line: 1, column: 16}
+          }
+        },
         loc: {
           start: {line: 1, column: 9},
           end: {line: 1, column: 16}
@@ -5215,6 +5235,7 @@ test("export { default } from \"other\"", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5244,6 +5265,7 @@ test("import \"jquery\"", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5253,8 +5275,8 @@ test("import $ from \"jquery\"", {
   body: [{
     type: "ImportDeclaration",
     specifiers: [{
-      type: "ImportSpecifier",
-      id: {
+      type: "ImportDefaultSpecifier",
+      local: {
         type: "Identifier",
         name: "$",
         loc: {
@@ -5262,7 +5284,6 @@ test("import $ from \"jquery\"", {
           end: {line: 1, column: 8}
         }
       },
-      name: null,
       loc: {
         start: {line: 1, column: 7},
         end: {line: 1, column: 8}
@@ -5288,6 +5309,7 @@ test("import $ from \"jquery\"", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5299,7 +5321,7 @@ test("import { encrypt, decrypt } from \"crypto\"", {
     specifiers: [
       {
         type: "ImportSpecifier",
-        id: {
+        imported: {
           type: "Identifier",
           name: "encrypt",
           loc: {
@@ -5307,7 +5329,14 @@ test("import { encrypt, decrypt } from \"crypto\"", {
             end: {line: 1, column: 16}
           }
         },
-        name: null,
+        local: {
+          type: "Identifier",
+          name: "encrypt",
+          loc: {
+            start: {line: 1, column: 9},
+            end: {line: 1, column: 16}
+          }
+        },
         loc: {
           start: {line: 1, column: 9},
           end: {line: 1, column: 16}
@@ -5315,7 +5344,7 @@ test("import { encrypt, decrypt } from \"crypto\"", {
       },
       {
         type: "ImportSpecifier",
-        id: {
+        imported: {
           type: "Identifier",
           name: "decrypt",
           loc: {
@@ -5323,7 +5352,14 @@ test("import { encrypt, decrypt } from \"crypto\"", {
             end: {line: 1, column: 25}
           }
         },
-        name: null,
+        local: {
+          type: "Identifier",
+          name: "decrypt",
+          loc: {
+            start: {line: 1, column: 18},
+            end: {line: 1, column: 25}
+          }
+        },
         loc: {
           start: {line: 1, column: 18},
           end: {line: 1, column: 25}
@@ -5350,6 +5386,7 @@ test("import { encrypt, decrypt } from \"crypto\"", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5360,7 +5397,7 @@ test("import { encrypt as enc } from \"crypto\"", {
     type: "ImportDeclaration",
     specifiers: [{
       type: "ImportSpecifier",
-      id: {
+      imported: {
         type: "Identifier",
         name: "encrypt",
         loc: {
@@ -5368,7 +5405,7 @@ test("import { encrypt as enc } from \"crypto\"", {
           end: {line: 1, column: 16}
         }
       },
-      name: {
+      local: {
         type: "Identifier",
         name: "enc",
         loc: {
@@ -5401,6 +5438,7 @@ test("import { encrypt as enc } from \"crypto\"", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5419,21 +5457,19 @@ test("import crypto, { decrypt, encrypt as enc } from \"crypto\"", {
     },
     specifiers: [
       {
-        type: "ImportSpecifier",
+        type: "ImportDefaultSpecifier",
         loc: {
           start: {line: 1, column: 7},
           end: {line: 1, column: 13}
         },
-        id: {
+        local: {
           type: "Identifier",
           loc: {
             start: {line: 1, column: 7},
             end: {line: 1, column: 13}
           },
           name: "crypto"
-        },
-        name: null,
-        default: true
+        }
       },
       {
         type: "ImportSpecifier",
@@ -5441,7 +5477,7 @@ test("import crypto, { decrypt, encrypt as enc } from \"crypto\"", {
           start: {line: 1, column: 17},
           end: {line: 1, column: 24}
         },
-        id: {
+        imported: {
           type: "Identifier",
           loc: {
             start: {line: 1, column: 17},
@@ -5449,8 +5485,14 @@ test("import crypto, { decrypt, encrypt as enc } from \"crypto\"", {
           },
           name: "decrypt"
         },
-        name: null,
-        default: false
+        local: {
+          type: "Identifier",
+          loc: {
+            start: {line: 1, column: 17},
+            end: {line: 1, column: 24}
+          },
+          name: "decrypt"
+        }
       },
       {
         type: "ImportSpecifier",
@@ -5458,7 +5500,7 @@ test("import crypto, { decrypt, encrypt as enc } from \"crypto\"", {
           start: {line: 1, column: 26},
           end: {line: 1, column: 40}
         },
-        id: {
+        imported: {
           type: "Identifier",
           loc: {
             start: {line: 1, column: 26},
@@ -5466,15 +5508,14 @@ test("import crypto, { decrypt, encrypt as enc } from \"crypto\"", {
           },
           name: "encrypt"
         },
-        name: {
+        local: {
           type: "Identifier",
           loc: {
             start: {line: 1, column: 37},
             end: {line: 1, column: 40}
           },
           name: "enc"
-        },
-        default: false
+        }
       }
     ],
     source: {
@@ -5489,11 +5530,12 @@ test("import crypto, { decrypt, encrypt as enc } from \"crypto\"", {
   }]
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
 
-testFail("import default from \"foo\"", "Unexpected token (1:7)", {ecmaVersion: 6});
+testFail("import default from \"foo\"", "Unexpected token (1:7)", {ecmaVersion: 6, sourceType: "module"});
 
 test("import { null as nil } from \"bar\"", {
   type: "Program",
@@ -5501,7 +5543,7 @@ test("import { null as nil } from \"bar\"", {
     type: "ImportDeclaration",
     specifiers: [{
       type: "ImportSpecifier",
-      id: {
+      imported: {
         type: "Identifier",
         name: "null",
         loc: {
@@ -5509,7 +5551,7 @@ test("import { null as nil } from \"bar\"", {
           end: {line: 1, column: 13}
         }
       },
-      name: {
+      local: {
         type: "Identifier",
         name: "nil",
         loc: {
@@ -5542,6 +5584,7 @@ test("import { null as nil } from \"bar\"", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5559,12 +5602,12 @@ test("import * as crypto from \"crypto\"", {
       end: {line: 1, column: 32}
     },
     specifiers: [{
-      type: "ImportBatchSpecifier",
+      type: "ImportNamespaceSpecifier",
       loc: {
         start: {line: 1, column: 7},
         end: {line: 1, column: 18}
       },
-      name: {
+      local: {
         type: "Identifier",
         loc: {
           start: {line: 1, column: 12},
@@ -5585,6 +5628,7 @@ test("import * as crypto from \"crypto\"", {
   }]
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5647,6 +5691,7 @@ test("(function* () { yield v })", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5717,6 +5762,7 @@ test("(function* () { yield\nv })", {
   }
 }, {
   ecmaVersion: 6,
+  sourceType: "module",
   ranges: true,
   locations: true
 });
@@ -5942,6 +5988,53 @@ test("var x = { *test () { yield *v } };", {
   ranges: true,
   locations: true
 });
+
+test("function* foo() { console.log(yield); }", {
+  body: [
+    {
+      id: {
+        name: "foo",
+        type: "Identifier",
+      },
+      generator: true,
+      expression: false,
+      params: [],
+      body: {
+        body: [
+          {
+            expression: {
+              callee: {
+                object: {
+                  name: "console",
+                  type: "Identifier",
+                },
+                property: {
+                  name: "log",
+                  type: "Identifier",
+                },
+                computed: false,
+                type: "MemberExpression",
+              },
+              arguments: [
+                {
+                  delegate: false,
+                  argument: null,
+                  type: "YieldExpression",
+                }
+              ],
+              type: "CallExpression",
+            },
+            type: "ExpressionStatement",
+          }
+        ],
+        type: "BlockStatement",
+      },
+      type: "FunctionDeclaration",
+    }
+  ],
+  sourceType: "script",
+  type: "Program"
+}, {ecmaVersion: 6})
 
 test("function* t() {}", {
   type: "Program",
@@ -6539,7 +6632,7 @@ test("class A {get() {}}", {
             end: {line: 1, column: 17}
           }
         },
-        kind: "",
+        kind: "method",
         static: false,
         loc: {
           start: {line: 1, column: 9},
@@ -6611,7 +6704,7 @@ test("class A { static get() {}}", {
             end: {line: 1, column: 25}
           }
         },
-        kind: "",
+        kind: "method",
         static: true,
         loc: {
           start: {line: 1, column: 10},
@@ -7006,7 +7099,7 @@ test("class A {set(v) {};}", {
             end: {line: 1, column: 18}
           }
         },
-        kind: "",
+        kind: "method",
         static: false,
         loc: {
           start: {line: 1, column: 9},
@@ -7085,7 +7178,7 @@ test("class A { static set(v) {};}", {
             end: {line: 1, column: 26}
           }
         },
-        kind: "",
+        kind: "method",
         static: true,
         loc: {
           start: {line: 1, column: 10},
@@ -7186,7 +7279,7 @@ test("class A {*gen(v) { yield v; }}", {
             end: {line: 1, column: 29}
           }
         },
-        kind: "",
+        kind: "method",
         static: false,
         loc: {
           start: {line: 1, column: 9},
@@ -7287,7 +7380,7 @@ test("class A { static *gen(v) { yield v; }}", {
             end: {line: 1, column: 37}
           }
         },
-        kind: "",
+        kind: "method",
         static: true,
         loc: {
           start: {line: 1, column: 10},
@@ -7370,8 +7463,7 @@ test("\"use strict\"; (class A {constructor() { super() }})", {
                   expression: {
                     type: "CallExpression",
                     callee: {
-                      type: "Identifier",
-                      name: "super",
+                      type: "Super",
                       loc: {
                         start: {line: 1, column: 40},
                         end: {line: 1, column: 45}
@@ -7400,7 +7492,7 @@ test("\"use strict\"; (class A {constructor() { super() }})", {
                 end: {line: 1, column: 49}
               }
             },
-            kind: "",
+            kind: "constructor",
             static: false,
             loc: {
               start: {line: 1, column: 24},
@@ -7432,6 +7524,36 @@ test("\"use strict\"; (class A {constructor() { super() }})", {
   ranges: true,
   locations: true
 });
+
+test("class A {'constructor'() {}}", {
+  type: "Program",
+  body: [{
+    type: "ClassDeclaration",
+    id: {type: "Identifier", name: "A"},
+    superClass: null,
+    body: {
+      type: "ClassBody",
+      body: [{
+        type: "MethodDefinition",
+        computed: false,
+        key: {type: "Literal", value: "constructor"},
+        static: false,
+        kind: "constructor",
+        value: {
+          type: "FunctionExpression",
+          id: null,
+          generator: false,
+          expression: false,
+          params: [],
+          body: {
+            type: "BlockStatement",
+            body: []
+          }
+        }
+      }]
+    }
+  }]
+}, {ecmaVersion: 6});
 
 test("class A {static foo() {}}", {
   type: "Program",
@@ -7478,7 +7600,7 @@ test("class A {static foo() {}}", {
             end: {line: 1, column: 24}
           }
         },
-        kind: "",
+        kind: "method",
         static: true,
         loc: {
           start: {line: 1, column: 9},
@@ -7551,7 +7673,7 @@ test("class A {foo() {} static bar() {}}", {
               end: {line: 1, column: 17}
             }
           },
-          kind: "",
+          kind: "method",
           static: false,
           loc: {
             start: {line: 1, column: 9},
@@ -7588,7 +7710,7 @@ test("class A {foo() {} static bar() {}}", {
               end: {line: 1, column: 33}
             }
           },
-          kind: "",
+          kind: "method",
           static: true,
           loc: {
             start: {line: 1, column: 18},
@@ -7672,8 +7794,7 @@ test("\"use strict\"; (class A { static constructor() { super() }})", {
                   expression: {
                     type: "CallExpression",
                     callee: {
-                      type: "Identifier",
-                      name: "super",
+                      type: "Super",
                       loc: {
                         start: {line: 1, column: 48},
                         end: {line: 1, column: 53}
@@ -7702,7 +7823,7 @@ test("\"use strict\"; (class A { static constructor() { super() }})", {
                 end: {line: 1, column: 57}
               }
             },
-            kind: "",
+            kind: "method",
             static: true,
             loc: {
               start: {line: 1, column: 25},
@@ -7781,7 +7902,7 @@ test("class A { foo() {} bar() {}}", {
               end: {line: 1, column: 18}
             }
           },
-          kind: "",
+          kind: "method",
           static: false,
           loc: {
             start: {line: 1, column: 10},
@@ -7818,7 +7939,7 @@ test("class A { foo() {} bar() {}}", {
               end: {line: 1, column: 27}
             }
           },
-          kind: "",
+          kind: "method",
           static: false,
           loc: {
             start: {line: 1, column: 19},
@@ -8429,7 +8550,7 @@ test("class A { static [foo]() {} }", {
           },
           name: "foo"
         },
-        kind: "",
+        kind: "method",
         value: {
           type: "FunctionExpression",
           loc: {
@@ -8696,7 +8817,7 @@ test("class A { foo() {} get foo() {} }",{
             },
             name: "foo"
           },
-          kind: "",
+          kind: "method",
           value: {
             type: "FunctionExpression",
             loc: {
@@ -9561,7 +9682,7 @@ test("class A {[x]() {}}", {
           },
           name: "x"
         },
-        kind: "",
+        kind: "method",
         value: {
           type: "FunctionExpression",
           loc: {
@@ -10303,7 +10424,7 @@ test("(class {f({x} = {x: 10}) {}})", {
               end: {line: 1, column: 27}
             }
           },
-          kind: "",
+          kind: "method",
           static: false,
           loc: {
             start: {line: 1, column: 8},
@@ -13740,6 +13861,34 @@ test("/[a-z]/u", {
   ecmaVersion: 6
 });
 
+test("/[\\uD834\\uDF06-\\uD834\\uDF08a-z]/u", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "Literal",
+        regex: {
+          pattern: "[\\uD834\\uDF06-\\uD834\\uDF08a-z]",
+          flags: "u"
+        },
+        loc: {
+          start: {
+            line: 1,
+            column: 0
+          },
+          end: {
+            line: 1,
+            column: 33
+          }
+        }
+      }
+    }
+  ]
+}, {
+  locations: true,
+  ecmaVersion: 6
+});
 
 test("do {} while (false) foo();", {
   type: "Program",
@@ -13846,11 +13995,11 @@ testFail("x \n isnt y", "Unexpected token (2:6)", {ecmaVersion: 6});
 
 testFail("function default() {}", "Unexpected token (1:9)", {ecmaVersion: 6});
 
-testFail("function hello() {'use strict'; ({ i: 10, s(eval) { } }); }", "Defining 'eval' in strict mode (1:44)", {ecmaVersion: 6});
+testFail("function hello() {'use strict'; ({ i: 10, s(eval) { } }); }", "Binding eval in strict mode (1:44)", {ecmaVersion: 6});
 
 testFail("function a() { \"use strict\"; ({ b(t, t) { } }); }", "Argument name clash in strict mode (1:37)", {ecmaVersion: 6});
 
-testFail("var super", "The keyword 'super' is reserved (1:4)", {ecmaVersion: 6, forbidReserved: true});
+testFail("var super", "Unexpected token (1:4)", {ecmaVersion: 6});
 
 testFail("var default", "Unexpected token (1:4)", {ecmaVersion: 6});
 
@@ -13866,11 +14015,11 @@ testFail("for (let x = 42 in list) process(x);", "Unexpected token (1:16)", {ecm
 
 testFail("for (let x = 42 of list) process(x);", "Unexpected token (1:16)", {ecmaVersion: 6});
 
-testFail("import foo", "Unexpected token (1:10)", {ecmaVersion: 6});
+testFail("import foo", "Unexpected token (1:10)", {ecmaVersion: 6, sourceType: "module"});
 
-testFail("import { foo, bar }", "Unexpected token (1:19)", {ecmaVersion: 6});
+testFail("import { foo, bar }", "Unexpected token (1:19)", {ecmaVersion: 6, sourceType: "module"});
 
-testFail("import foo from bar", "Unexpected token (1:16)", {ecmaVersion: 6});
+testFail("import foo from bar", "Unexpected token (1:16)", {ecmaVersion: 6, sourceType: "module"});
 
 testFail("((a)) => 42", "Unexpected token (1:1)", {ecmaVersion: 6});
 
@@ -13878,15 +14027,15 @@ testFail("(a, (b)) => 42", "Unexpected token (1:4)", {ecmaVersion: 6});
 
 testFail("\"use strict\"; (eval = 10) => 42", "Assigning to eval in strict mode (1:15)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; eval => 42", "Defining 'eval' in strict mode (1:14)", {ecmaVersion: 6});
+testFail("\"use strict\"; eval => 42", "Binding eval in strict mode (1:14)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; arguments => 42", "Defining 'arguments' in strict mode (1:14)", {ecmaVersion: 6});
+testFail("\"use strict\"; arguments => 42", "Binding arguments in strict mode (1:14)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; (eval, a) => 42", "Defining 'eval' in strict mode (1:15)", {ecmaVersion: 6});
+testFail("\"use strict\"; (eval, a) => 42", "Binding eval in strict mode (1:15)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; (arguments, a) => 42", "Defining 'arguments' in strict mode (1:15)", {ecmaVersion: 6});
+testFail("\"use strict\"; (arguments, a) => 42", "Binding arguments in strict mode (1:15)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; (eval, a = 10) => 42", "Defining 'eval' in strict mode (1:15)", {ecmaVersion: 6});
+testFail("\"use strict\"; (eval, a = 10) => 42", "Binding eval in strict mode (1:15)", {ecmaVersion: 6});
 
 testFail("\"use strict\"; (a, a) => 42", "Argument name clash in strict mode (1:18)", {ecmaVersion: 6});
 
@@ -14142,7 +14291,7 @@ testFail("[...{ a }] = b", "Unexpected token (1:4)", {ecmaVersion: 6});
 
 testFail("[...a, b] = c", "Assigning to rvalue (1:1)", {ecmaVersion: 6});
 
-testFail("({ t(eval) { \"use strict\"; } });", "Defining 'eval' in strict mode (1:5)", {ecmaVersion: 6});
+testFail("({ t(eval) { \"use strict\"; } });", "Binding eval in strict mode (1:5)", {ecmaVersion: 6});
 
 testFail("\"use strict\"; `${test}\\02`;", "Octal literal in strict mode (1:22)", {ecmaVersion: 6});
 
@@ -14211,9 +14360,9 @@ testFail("(b, ...a)", "Unexpected token (1:4)", {ecmaVersion: 6});
 
 testFail("switch (cond) { case 10: let a = 20; ", "Unexpected token (1:37)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; (eval) => 42", "Defining 'eval' in strict mode (1:15)", {ecmaVersion: 6});
+testFail("\"use strict\"; (eval) => 42", "Binding eval in strict mode (1:15)", {ecmaVersion: 6});
 
-testFail("(eval) => { \"use strict\"; 42 }", "Defining 'eval' in strict mode (1:1)", {ecmaVersion: 6});
+testFail("(eval) => { \"use strict\"; 42 }", "Binding eval in strict mode (1:1)", {ecmaVersion: 6});
 
 testFail("({ get test() { } }) => 42", "Object pattern can't contain getter or setter (1:7)", {ecmaVersion: 6});
 
@@ -14348,17 +14497,15 @@ test("import foo, * as bar from 'baz';", {
     type: "ImportDeclaration",
     specifiers: [
       {
-        type: "ImportSpecifier",
-        id: {
+        type: "ImportDefaultSpecifier",
+        local: {
           type: "Identifier",
           name: "foo"
-        },
-        name: null,
-        default: true
+        }
       },
       {
-        type: "ImportBatchSpecifier",
-        name: {
+        type: "ImportNamespaceSpecifier",
+        local: {
           type: "Identifier",
           name: "bar"
         }
@@ -14370,7 +14517,7 @@ test("import foo, * as bar from 'baz';", {
       raw: "'baz'"
     }
   }]
-}, {ecmaVersion: 6});
+}, {ecmaVersion: 6, sourceType: "module"});
 
 // https://github.com/marijnh/acorn/issues/173
 test("`{${x}}`, `}`", {
@@ -14930,7 +15077,7 @@ test("class A { static() {} }", {
           name: "static"
         },
         static: false,
-        kind: "",
+        kind: "method",
         value: {
           type: "FunctionExpression",
           range: [16, 21],
@@ -14952,6 +15099,55 @@ test("class A { static() {} }", {
   ranges: true,
   locations: true
 });
+
+// https://github.com/marijnh/acorn/issues/213
+
+test("for (const x of list) process(x);", {
+  type: "Program",
+  body: [{
+    type: "ForOfStatement",
+    left: {
+      type: "VariableDeclaration",
+      declarations: [{
+        type: "VariableDeclarator",
+        id: {
+          type: "Identifier",
+          name: "x",
+          range: [11, 12]
+        },
+        init: null,
+        range: [11, 12]
+      }],
+      kind: "const",
+      range: [5, 12]
+    },
+    right: {
+      type: "Identifier",
+      name: "list",
+      range: [16, 20]
+    },
+    body: {
+      type: "ExpressionStatement",
+      expression: {
+        type: "CallExpression",
+        callee: {
+          type: "Identifier",
+          name: "process",
+          range: [22, 29]
+        },
+        arguments: [{
+          type: "Identifier",
+          name: "x",
+          range: [30, 31]
+        }],
+        range: [22, 32]
+      },
+      range: [22, 33]
+    },
+    range: [0, 33]
+  }],
+  range: [0, 33]
+}, {ecmaVersion: 6, ranges: true});
 
 test("class A { *static() {} }", {
   type: "Program",
@@ -14978,7 +15174,7 @@ test("class A { *static() {} }", {
           name: "static"
         },
         static: false,
-        kind: "",
+        kind: "method",
         value: {
           type: "FunctionExpression",
           range: [17, 22],
@@ -15197,6 +15393,180 @@ test("var _\\u{104A6} = 10;", {
   ]
 }, {ecmaVersion: 6});
 
+test("let [x,] = [1]", {
+  "start": 0,
+  "body": [
+    {
+      "start": 0,
+      "declarations": [
+        {
+          "start": 4,
+          "id": {
+            "start": 4,
+            "elements": [
+              {
+                "start": 5,
+                "name": "x",
+                "type": "Identifier",
+                "end": 6
+              }
+            ],
+            "type": "ArrayPattern",
+            "end": 8
+          },
+          "init": {
+            "start": 11,
+            "elements": [
+              {
+                "start": 12,
+                "value": 1,
+                "raw": "1",
+                "type": "Literal",
+                "end": 13
+              }
+            ],
+            "type": "ArrayExpression",
+            "end": 14
+          },
+          "type": "VariableDeclarator",
+          "end": 14
+        }
+      ],
+      "kind": "let",
+      "type": "VariableDeclaration",
+      "end": 14
+    }
+  ],
+  "type": "Program",
+  "end": 14
+}, {ecmaVersion: 6});
+
+test("let {x} = y", {
+  "start": 0,
+  "body": [
+    {
+      "start": 0,
+      "declarations": [
+        {
+          "start": 4,
+          "id": {
+            "start": 4,
+            "properties": [
+              {
+                "start": 5,
+                "method": false,
+                "shorthand": true,
+                "computed": false,
+                "key": {
+                  "start": 5,
+                  "name": "x",
+                  "type": "Identifier",
+                  "end": 6
+                },
+                "kind": "init",
+                "value": {
+                  "start": 5,
+                  "name": "x",
+                  "type": "Identifier",
+                  "end": 6
+                },
+                "type": "Property",
+                "end": 6
+              }
+            ],
+            "type": "ObjectPattern",
+            "end": 7
+          },
+          "init": {
+            "start": 10,
+            "name": "y",
+            "type": "Identifier",
+            "end": 11
+          },
+          "type": "VariableDeclarator",
+          "end": 11
+        }
+      ],
+      "kind": "let",
+      "type": "VariableDeclaration",
+      "end": 11
+    }
+  ],
+  "type": "Program",
+  "end": 11
+}, {ecmaVersion: 6})
+
+test("[x,,] = 1", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "AssignmentExpression",
+        operator: "=",
+        left: {
+          type: "ArrayPattern",
+          elements: [
+            {
+              type: "Identifier",
+              name: "x"
+            },
+            null
+          ]
+        },
+        right: {
+          type: "Literal",
+          value: 1,
+          raw: "1"
+        }
+      }
+    }
+  ]
+}, {ecmaVersion: 6});
+
+test("for (var [name, value] in obj) {}", {
+  body: [
+    {
+      left: {
+        declarations: [
+          {
+            id: {
+              elements: [
+                {
+                  name: "name",
+                  type: "Identifier"
+                },
+                {
+                  name: "value",
+                  type: "Identifier"
+                }
+              ],
+              type: "ArrayPattern"
+            },
+            init: null,
+            type: "VariableDeclarator"
+          }
+        ],
+        kind: "var",
+        type: "VariableDeclaration"
+      },
+      right: {
+        name: "obj",
+        type: "Identifier"
+      },
+      body: {
+        body: [],
+        type: "BlockStatement"
+      },
+      type: "ForInStatement"
+    }
+  ],
+  sourceType: "script",
+  type: "Program"
+}, {ecmaVersion: 6})
+
+testFail("let [x]", "Complex binding patterns require an initialization value (1:7)", {ecmaVersion: 6})
+testFail("var [x]", "Complex binding patterns require an initialization value (1:7)", {ecmaVersion: 6})
 testFail("var _𖫵 = 11;", "Unexpected character '𖫵' (1:5)", {ecmaVersion: 6});
 testFail("var 𫠞_ = 12;", "Unexpected character '𫠞' (1:4)", {ecmaVersion: 6});
 testFail("var 𫠝_ = 10;", "Unexpected character '𫠝' (1:4)", {ecmaVersion: 5});
@@ -15207,3 +15577,54 @@ testFail("if (1) ; else class Cls {}", "Unexpected token (1:14)", {ecmaVersion: 
 
 testFail("'use strict'; [...eval] = arr", "Assigning to eval in strict mode (1:18)", {ecmaVersion: 6});
 testFail("'use strict'; ({eval = defValue} = obj)", "Assigning to eval in strict mode (1:16)", {ecmaVersion: 6});
+
+testFail("[...eval] = arr", "Assigning to eval in strict mode (1:4)", {ecmaVersion: 6, sourceType: "module"});
+
+testFail("function* y({yield}) {}", "Binding yield (1:13)", {ecmaVersion: 6});
+
+test("new.target", {
+  type: "Program",
+  body: [{
+    type: "ExpressionStatement",
+    expression: {
+      type: "MetaProperty",
+      meta: {type: "Identifier", name: "new"},
+      property: {type: "Identifier", name: "target"}
+    }
+  }],
+  sourceType: "script"
+}, {ecmaVersion: 6});
+
+testFail("new.prop", "The only valid meta property for new is new.target (1:4)", {ecmaVersion: 6});
+
+test("export default function foo() {} false", {
+  body: [
+    {
+      declaration: {
+        id: {
+          name: "foo",
+          type: "Identifier"
+        },
+        generator: false,
+        expression: false,
+        params: [],
+        body: {
+          body: [],
+          type: "BlockStatement"
+        },
+        type: "FunctionDeclaration"
+      },
+      type: "ExportDefaultDeclaration"
+    },
+    {
+      expression: {
+        value: false,
+        raw: "false",
+        type: "Literal"
+      },
+      type: "ExpressionStatement"
+    }
+  ],
+  sourceType: "module",
+  type: "Program"
+}, {ecmaVersion: 6, sourceType: "module"})

@@ -17,44 +17,17 @@
     for (var i = 0; i < tests.length; ++i) {
       var test = tests[i];
       if (config.filter && !config.filter(test)) continue;
+      var testOpts = test.options || {locations: true};
+      var expected = {};
+      if (expected.onComment = testOpts.onComment)
+        testOpts.onComment = []
+      if (expected.onToken = testOpts.onToken)
+        testOpts.onToken = [];
+
       try {
-        var testOpts = test.options || {locations: true};
-        var expected = {};
-        if (expected.onComment = testOpts.onComment) {
-          testOpts.onComment = []
-        }
-        if (expected.onToken = testOpts.onToken) {
-          testOpts.onToken = [];
-        }
         var ast = parse(test.code, testOpts);
-        if (test.error) {
-          if (config.loose) {
-            callback("ok", test.code);
-          } else {
-            callback("fail", test.code, "Expected error message: " + test.error + "\nBut parsing succeeded.");
-          }
-        }
-        else if (test.assert) {
-          var error = test.assert(ast);
-          if (error) callback("fail", test.code,
-                                 "\n  Assertion failed:\n " + error);
-          else callback("ok", test.code);
-        } else {
-          var mis = misMatch(test.ast, ast);
-          for (var name in expected) {
-            if (mis) break;
-            if (expected[name]) {
-              mis = misMatch(expected[name], testOpts[name]);
-              testOpts[name] = expected[name];
-            }
-          }
-          if (mis) callback("fail", test.code, mis);
-          else callback("ok", test.code);
-        }
       } catch(e) {
-        if (!(e instanceof SyntaxError)) {
-          throw e;
-        }
+        if (!(e instanceof SyntaxError)) { console.log(e.stack); throw e; }
         if (test.error) {
           if (e.message == test.error) callback("ok", test.code);
           else callback("fail", test.code,
@@ -62,6 +35,27 @@
         } else {
           callback("error", test.code, e.message || e.toString());
         }
+        continue
+      }
+
+      if (test.error) {
+        if (config.loose) callback("ok", test.code);
+        else callback("fail", test.code, "Expected error message: " + test.error + "\nBut parsing succeeded.");
+      } else if (test.assert) {
+        var error = test.assert(ast);
+        if (error) callback("fail", test.code, "\n  Assertion failed:\n " + error);
+        else callback("ok", test.code);
+      } else {
+        var mis = misMatch(test.ast, ast);
+        for (var name in expected) {
+          if (mis) break;
+          if (expected[name]) {
+            mis = misMatch(expected[name], testOpts[name]);
+            testOpts[name] = expected[name];
+          }
+        }
+        if (mis) callback("fail", test.code, mis);
+        else callback("ok", test.code);
       }
     }
   };
@@ -75,7 +69,8 @@
 
   var misMatch = exports.misMatch = function(exp, act) {
     if (!exp || !act || (typeof exp != "object") || (typeof act != "object")) {
-      if (exp !== act) return ppJSON(exp) + " !== " + ppJSON(act);
+      if (exp !== act && typeof exp != "function")
+        return ppJSON(exp) + " !== " + ppJSON(act);
     } else if (exp instanceof RegExp || act instanceof RegExp) {
       var left = ppJSON(exp), right = ppJSON(act);
       if (left !== right) return left + " !== " + right;

@@ -27261,55 +27261,55 @@ testFail("function hello() {'use strict'; arguments--; }",
          "Assigning to arguments in strict mode (1:32)");
 
 testFail("function hello() {'use strict'; function eval() { } }",
-         "Defining 'eval' in strict mode (1:41)");
+         "Binding eval in strict mode (1:41)");
 
 testFail("function hello() {'use strict'; function arguments() { } }",
-         "Defining 'arguments' in strict mode (1:41)");
+         "Binding arguments in strict mode (1:41)");
 
 testFail("function eval() {'use strict'; }",
-         "Defining 'eval' in strict mode (1:9)");
+         "Binding eval in strict mode (1:9)");
 
 testFail("function arguments() {'use strict'; }",
-         "Defining 'arguments' in strict mode (1:9)");
+         "Binding arguments in strict mode (1:9)");
 
 testFail("function hello() {'use strict'; (function eval() { }()) }",
-         "Defining 'eval' in strict mode (1:42)");
+         "Binding eval in strict mode (1:42)");
 
 testFail("function hello() {'use strict'; (function arguments() { }()) }",
-         "Defining 'arguments' in strict mode (1:42)");
+         "Binding arguments in strict mode (1:42)");
 
 testFail("(function eval() {'use strict'; })()",
-         "Defining 'eval' in strict mode (1:10)");
+         "Binding eval in strict mode (1:10)");
 
 testFail("(function arguments() {'use strict'; })()",
-         "Defining 'arguments' in strict mode (1:10)");
+         "Binding arguments in strict mode (1:10)");
 
 testFail("function hello() {'use strict'; ({ s: function eval() { } }); }",
-         "Defining 'eval' in strict mode (1:47)");
+         "Binding eval in strict mode (1:47)");
 
 testFail("(function package() {'use strict'; })()",
-         "Defining 'package' in strict mode (1:10)");
+         "Binding package in strict mode (1:10)");
 
 testFail("function hello() {'use strict'; ({ i: 10, set s(eval) { } }); }",
-         "Defining 'eval' in strict mode (1:48)");
+         "Binding eval in strict mode (1:48)");
 
 testFail("function hello() {'use strict'; ({ set s(eval) { } }); }",
-         "Defining 'eval' in strict mode (1:41)");
+         "Binding eval in strict mode (1:41)");
 
 testFail("function hello() {'use strict'; ({ s: function s(eval) { } }); }",
-         "Defining 'eval' in strict mode (1:49)");
+         "Binding eval in strict mode (1:49)");
 
 testFail("function hello(eval) {'use strict';}",
-         "Defining 'eval' in strict mode (1:15)");
+         "Binding eval in strict mode (1:15)");
 
 testFail("function hello(arguments) {'use strict';}",
-         "Defining 'arguments' in strict mode (1:15)");
+         "Binding arguments in strict mode (1:15)");
 
 testFail("function hello() { 'use strict'; function inner(eval) {} }",
-         "Defining 'eval' in strict mode (1:48)");
+         "Binding eval in strict mode (1:48)");
 
 testFail("function hello() { 'use strict'; function inner(arguments) {} }",
-         "Defining 'arguments' in strict mode (1:48)");
+         "Binding arguments in strict mode (1:48)");
 
 testFail("function hello() { 'use strict'; \"\\1\"; }",
          "Octal literal in strict mode (1:34)");
@@ -27348,10 +27348,10 @@ testFail("function hello() { \"use strict\"; var static; }",
          "The keyword 'static' is reserved (1:37)");
 
 testFail("function hello(static) { \"use strict\"; }",
-         "Defining 'static' in strict mode (1:15)");
+         "Binding static in strict mode (1:15)");
 
 testFail("function static() { \"use strict\"; }",
-         "Defining 'static' in strict mode (1:9)");
+         "Binding static in strict mode (1:9)");
 
 testFail("\"use strict\"; function static() { }",
          "The keyword 'static' is reserved (1:23)");
@@ -27360,10 +27360,10 @@ testFail("function a(t, t) { \"use strict\"; }",
          "Argument name clash in strict mode (1:14)");
 
 testFail("function a(eval) { \"use strict\"; }",
-         "Defining 'eval' in strict mode (1:11)");
+         "Binding eval in strict mode (1:11)");
 
 testFail("function a(package) { \"use strict\"; }",
-         "Defining 'package' in strict mode (1:11)");
+         "Binding package in strict mode (1:11)");
 
 testFail("function a() { \"use strict\"; function b(t, t) { }; }",
          "Argument name clash in strict mode (1:43)");
@@ -27375,10 +27375,10 @@ testFail("function a() { \"use strict\"; (function b(t, t) { }); }",
          "Argument name clash in strict mode (1:44)");
 
 testFail("(function a(eval) { \"use strict\"; })",
-         "Defining 'eval' in strict mode (1:12)");
+         "Binding eval in strict mode (1:12)");
 
 testFail("(function a(package) { \"use strict\"; })",
-         "Defining 'package' in strict mode (1:12)");
+         "Binding package in strict mode (1:12)");
 
 testFail("\"use strict\";function foo(){\"use strict\";}function bar(){var v = 015}",
          "Invalid number (1:65)");
@@ -28682,7 +28682,39 @@ test("const x = 14, y = 3, z = 1977", {
 
 testFail("const a;", "Unexpected token (1:7)", {ecmaVersion: 6});
 
-testFail("for(const x = 0;;);", "Unexpected token (1:4)", {ecmaVersion: 6});
+test("for(const x = 0;;);", {
+  type: "Program",
+  body: [{
+    type: "ForStatement",
+    init: {
+      type: "VariableDeclaration",
+      declarations: [{
+        type: "VariableDeclarator",
+        id: {
+          type: "Identifier",
+          name: "x",
+          range: [10, 11]
+        },
+        init: {
+          type: "Literal",
+          value: 0,
+          range: [14, 15]
+        },
+        range: [10, 15]
+      }],
+      kind: "const",
+      range: [4, 15]
+    },
+    test: null,
+    update: null,
+    body: {
+      type: "EmptyStatement",
+      range: [18, 19]
+    },
+    range: [0, 19]
+  }],
+  range: [0, 19]
+}, {ecmaVersion: 6, ranges: true});
 
 testFail("for(x of a);", "Unexpected token (1:6)");
 
@@ -28914,3 +28946,22 @@ test("function f() {} / 1 /", {
     }
   ]
 });
+
+var semicolons = []
+testAssert("var x\nreturn\n10", function() {
+  var result = semicolons.join(" ");
+  semicolons.length = 0;
+  if (result != "5 12 15")
+    return "Unexpected result for onInsertedSemicolon: " + result;
+}, {onInsertedSemicolon: function(pos) { semicolons.push(pos); },
+    allowReturnOutsideFunction: true,
+    loose: false})
+
+var trailingCommas = []
+testAssert("[1,2,] + {foo: 1,}", function() {
+  var result = trailingCommas.join(" ");
+  trailingCommas.length = 0;
+  if (result != "4 16")
+    return "Unexpected result for onTrailingComma: " + result;
+}, {onTrailingComma: function(pos) { trailingCommas.push(pos); },
+    loose: false})
