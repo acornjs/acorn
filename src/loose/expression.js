@@ -162,7 +162,6 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
       this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
     } else if (!noCalls && this.tok.type == tt.parenL) {
-      this.pushCx()
       let node = this.startNodeAt(start)
       node.callee = base
       node.arguments = this.parseExprList(tt.parenR)
@@ -233,7 +232,6 @@ lp.parseExprAtom = function() {
 
   case tt.bracketL:
     node = this.startNode()
-    this.pushCx()
     node.elements = this.parseExprList(tt.bracketR, true)
     return this.finishNode(node, "ArrayExpression")
 
@@ -282,7 +280,6 @@ lp.parseNew = function() {
   let start = this.storeCurrentPos()
   node.callee = this.parseSubscripts(this.parseExprAtom(), start, true, startIndent, line)
   if (this.tok.type == tt.parenL) {
-    this.pushCx()
     node.arguments = this.parseExprList(tt.parenR)
   } else {
     node.arguments = []
@@ -458,7 +455,6 @@ lp.toAssignableList = function(exprList, binding) {
 }
 
 lp.parseFunctionParams = function(params) {
-  this.pushCx()
   params = this.parseExprList(tt.parenR)
   return this.toAssignableList(params, true)
 }
@@ -482,6 +478,7 @@ lp.parseArrowExpression = function(node, params) {
 }
 
 lp.parseExprList = function(close, allowEmpty) {
+  this.pushCx()
   let indent = this.curIndent, line = this.curLineStart, elts = []
   this.next(); // Opening bracket
   while (!this.closes(close, indent + 1, line)) {
