@@ -264,12 +264,12 @@ base.MemberExpression = (node, st, c) => {
   c(node.object, st, "Expression")
   if (node.computed) c(node.property, st, "Expression")
 }
-base.ExportDeclaration = (node, st, c) => c(node.declaration, st)
+base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => c(node.declaration, st)
 base.ImportDeclaration = (node, st, c) => {
   for (let i = 0; i < node.specifiers.length; i++)
     c(node.specifiers[i], st)
 }
-base.ImportSpecifier = base.ImportBatchSpecifier = base.Identifier = base.Literal = ignore
+base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.Literal = ignore
 
 base.TaggedTemplateExpression = (node, st, c) => {
   c(node.tag, st, "Expression")
