@@ -1,5 +1,7 @@
 // AST walker module for Mozilla Parser API compatible trees
 
+import assert from 'assert';
+
 // A simple walk is one where you simply specify callbacks to be
 // called on specific nodes. The last two arguments are optional. A
 // simple use would be
@@ -20,6 +22,7 @@ export function simple(node, visitors, base, state) {
   if (!base) base = exports.base
   ;(function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
+    assert(base[type], type + ' did not have a handler')
     base[type](node, st, c)
     if (found) found(node, st)
   })(node, state)
@@ -36,6 +39,7 @@ export function ancestor(node, visitors, base, state) {
       st = st.slice()
       st.push(node)
     }
+    assert(base[type], type + ' did not have a handler')
     base[type](node, st, c)
     if (found) found(node, st)
   })(node, state)
@@ -49,6 +53,7 @@ export function ancestor(node, visitors, base, state) {
 export function recursive(node, state, funcs, base) {
   let visitor = funcs ? exports.make(funcs, base) : base
   ;(function c(node, st, override) {
+    assert(visitor[override || node.type], (override || node.type) + ' did not have a handler')
     visitor[override || node.type](node, st, c)
   })(node, state)
 }
