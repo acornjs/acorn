@@ -242,7 +242,7 @@ pp.parseExprAtom = function(refShorthandDefaultPos) {
     return this.finishNode(node, type)
 
   case tt._yield:
-    if (this.inGenerator) unexpected()
+    if (this.inGenerator) this.unexpected()
 
   case tt.name:
     let start = this.markPosition()
