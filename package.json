@@ -39,6 +39,7 @@
   "devDependencies": {
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
+    "derequire": "^2.0.0",
     "unicode-7.0.0": "~0.1.5"
   }
 }

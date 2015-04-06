@@ -3,14 +3,30 @@ var stream = require("stream")
 
 var browserify = require("browserify")
 var babelify = require("babelify")
+var derequire = require("derequire")
 
 process.chdir(path.resolve(__dirname, ".."))
+
+function derequireStream() {
+  var tr = new stream.Transform
+  var src = ''
+  tr._transform = function(chunk, _, callback) {
+    src += chunk
+    callback()
+  }
+  tr._flush = function(callback) {
+    this.push(derequire(src))
+    callback()
+  }
+  return tr
+}
 
 browserify({standalone: "acorn"})
   .transform(babelify)
   .require("./src/index.js", {entry: true})
   .bundle()
   .on("error", function (err) { console.log("Error: " + err.message) })
+  .pipe(derequireStream())
   .pipe(fs.createWriteStream("dist/acorn.js"))
 
 function acornShim(file) {
@@ -37,6 +53,7 @@ browserify({standalone: "acorn.loose"})
   .require("./src/loose/index.js", {entry: true})
   .bundle()
   .on("error", function (err) { console.log("Error: " + err.message) })
+  .pipe(derequireStream())
   .pipe(fs.createWriteStream("dist/acorn_loose.js"))
 
 browserify({standalone: "acorn.walk"})
@@ -45,4 +62,5 @@ browserify({standalone: "acorn.walk"})
   .require("./src/walk/index.js", {entry: true})
   .bundle()
   .on("error", function (err) { console.log("Error: " + err.message) })
+  .pipe(derequireStream())
   .pipe(fs.createWriteStream("dist/walk.js"))
