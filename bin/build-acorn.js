@@ -2,7 +2,7 @@ var fs = require("fs"), path = require("path")
 var stream = require("stream")
 
 var browserify = require("browserify")
-var babelify = require("babelify")
+var babelify = require("babelify").configure({loose: "all"})
 
 process.chdir(path.resolve(__dirname, ".."))
 
