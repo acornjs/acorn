@@ -21,7 +21,7 @@ function acornShim(file) {
     tr._transform = function(chunk, _, callback) {
       if (!sent) {
         sent = true
-        callback(null, "module.exports = typeof window != 'undefined' ? window.acorn : require(('suppress', './acorn'))")
+        callback(null, "module.exports = (typeof window != 'undefined' && window.acorn) || _dereq_(\"./acorn\")")
       } else {
         callback()
       }
