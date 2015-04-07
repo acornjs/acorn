@@ -7,6 +7,7 @@ var babelify = require("babelify")
 process.chdir(path.resolve(__dirname, ".."))
 
 browserify({standalone: "acorn"})
+  .plugin(require('browserify-derequire'))
   .transform(babelify)
   .require("./src/index.js", {entry: true})
   .bundle()
@@ -32,6 +33,7 @@ function acornShim(file) {
 }
 
 browserify({standalone: "acorn.loose"})
+  .plugin(require('browserify-derequire'))
   .transform(acornShim)
   .transform(babelify)
   .require("./src/loose/index.js", {entry: true})
@@ -40,6 +42,7 @@ browserify({standalone: "acorn.loose"})
   .pipe(fs.createWriteStream("dist/acorn_loose.js"))
 
 browserify({standalone: "acorn.walk"})
+  .plugin(require('browserify-derequire'))
   .transform(acornShim)
   .transform(babelify)
   .require("./src/walk/index.js", {entry: true})
