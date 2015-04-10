@@ -403,7 +403,30 @@ test("(1 + 2 ) * 3", {
   preserveParens: true
 });
 
-testFail("(x) = 23", "Assigning to rvalue (1:0)", { preserveParens: true });
+test("(x) = 23", {
+  body: [
+    {
+      expression: {
+        operator: "=",
+        left: {
+          expression: {
+            name: "x",
+            type: "Identifier",
+          },
+          type: "ParenthesizedExpression",
+        },
+        right: {
+          value: 23,
+          raw: "23",
+          type: "Literal",
+        },
+        type: "AssignmentExpression",
+      },
+      type: "ExpressionStatement",
+    }
+  ],
+  type: "Program",
+}, {preserveParens: true});
 
 test("x = []", {
   type: "Program",

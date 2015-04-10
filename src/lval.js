@@ -39,6 +39,10 @@ pp.toAssignable = function(node, isBinding) {
       }
       break
 
+    case "ParenthesizedExpression":
+      node.expression = this.toAssignable(node.expression, isBinding)
+      break
+
     case "MemberExpression":
       if (!isBinding) break
 
@@ -181,6 +185,10 @@ pp.checkLVal = function(expr, isBinding, checkClashes) {
 
   case "RestElement":
     this.checkLVal(expr.argument, isBinding, checkClashes)
+    break
+
+  case "ParenthesizedExpression":
+    this.checkLVal(expr.expression, isBinding, checkClashes)
     break
 
   default:

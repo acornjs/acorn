@@ -13,6 +13,11 @@ lp.checkLVal = function(expr, binding) {
   case "MemberExpression":
     return binding ? this.dummyIdent() : expr
 
+  case "ParenthesizedExpression":
+    expr.expression = this.checkLVal(expr.expression, binding)
+    return expr
+
+  // FIXME recursively check contents
   case "ObjectPattern":
   case "ArrayPattern":
   case "RestElement":
