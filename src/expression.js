@@ -93,12 +93,14 @@ pp.parseMaybeAssign = function(noIn, refShorthandDefaultPos) {
     failOnShorthandAssign = false
   }
   let start = this.markPosition()
+  if (this.type == tt.parenL || this.type == tt.name)
+    this.potentialArrowAt = this.start
   let left = this.parseMaybeConditional(noIn, refShorthandDefaultPos)
   if (this.type.isAssign) {
     let node = this.startNodeAt(start)
     node.operator = this.value
     node.left = this.type === tt.eq ? this.toAssignable(left) : left
-    refShorthandDefaultPos.start = 0; // reset because shorthand default was used correctly
+    refShorthandDefaultPos.start = 0 // reset because shorthand default was used correctly
     this.checkLVal(left)
     this.next()
     node.right = this.parseMaybeAssign(noIn)
@@ -232,7 +234,7 @@ pp.parseSubscripts = function(base, start, noCalls) {
 // or `{}`.
 
 pp.parseExprAtom = function(refShorthandDefaultPos) {
-  let node
+  let node, canBeArrow = this.potentialArrowAt == this.start
   switch (this.type) {
   case tt._this:
   case tt._super:
@@ -247,9 +249,8 @@ pp.parseExprAtom = function(refShorthandDefaultPos) {
   case tt.name:
     let start = this.markPosition()
     let id = this.parseIdent(this.type !== tt.name)
-    if (!this.canInsertSemicolon() && this.eat(tt.arrow)) {
+    if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow))
       return this.parseArrowExpression(this.startNodeAt(start), [id])
-    }
     return id
 
   case tt.regexp:
@@ -269,7 +270,7 @@ pp.parseExprAtom = function(refShorthandDefaultPos) {
     return this.finishNode(node, "Literal")
 
   case tt.parenL:
-    return this.parseParenAndDistinguishExpression()
+    return this.parseParenAndDistinguishExpression(canBeArrow)
 
   case tt.bracketL:
     node = this.startNode()
@@ -318,7 +319,7 @@ pp.parseParenExpression = function() {
   return val
 }
 
-pp.parseParenAndDistinguishExpression = function() {
+pp.parseParenAndDistinguishExpression = function(canBeArrow) {
   let start = this.markPosition(), val
   if (this.options.ecmaVersion >= 6) {
     this.next()
@@ -345,7 +346,7 @@ pp.parseParenAndDistinguishExpression = function() {
     let innerEnd = this.markPosition()
     this.expect(tt.parenR)
 
-    if (!this.canInsertSemicolon() && this.eat(tt.arrow)) {
+    if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
       if (innerParenStart) this.unexpected(innerParenStart)
       return this.parseArrowExpression(this.startNodeAt(start), exprList)
     }
