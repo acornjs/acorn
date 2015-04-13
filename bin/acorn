@@ -31,6 +31,7 @@ for (var i = 2; i < process.argv.length; ++i) {
 
 try {
   var code = fs.readFileSync(infile, "utf8");
+  code = code.replace(/^#!.*(\r\n?|\n)/,""); //remove shebang if present
 
   if (!tokenize)
     parsed = acorn.parse(code, options);
