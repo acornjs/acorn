@@ -70,7 +70,7 @@ object referring to that same position.
   an error. Defaults to `true`. When given the value `"never"`,
   reserved words and keywords can also not be used as property names
   (as in Internet Explorer's old parser).
-  
+
 - **allowReturnOutsideFunction**: By default, a return statement at
   the top level raises an error. Set this to `true` to accept such
   code.
@@ -112,7 +112,7 @@ object referring to that same position.
 
   If array is passed for this option, each found comment is pushed
   to it as object in Esprima format:
-  
+
   ```javascript
   {
     "type": "Line" | "Block",
@@ -304,6 +304,8 @@ options:
 - `--locations`: Attaches a "loc" object to each node with "start" and
   "end" subobjects, each of which contains the one-based line and
   zero-based column numbers in `{line, column}` form.
+
+- `--allow-hash-bang`: If the code starts with the characters #! (as in a shellscript), the first line will be treated as a comment.
 
 - `--compact`: No whitespace is used in the AST output.
 
