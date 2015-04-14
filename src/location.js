@@ -61,7 +61,3 @@ pp.raise = function(pos, message) {
 pp.curPosition = function() {
   return new Position(this.curLine, this.pos - this.lineStart)
 }
-
-pp.markPosition = function() {
-  return this.options.locations ? [this.start, this.startLoc] : this.start
-}

@@ -48,9 +48,9 @@ export const version = "1.0.4"
 
 export function parse(input, options) {
   let p = parser(options, input)
-  let startPos = p.options.locations ? [p.pos, p.curPosition()] : p.pos
+  let startPos = p.pos, startLoc = p.options.locations && p.curPosition()
   p.nextToken()
-  return p.parseTopLevel(p.options.program || p.startNodeAt(startPos))
+  return p.parseTopLevel(p.options.program || p.startNodeAt(startPos, startLoc))
 }
 
 // This function tries to parse a single expression at a given

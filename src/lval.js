@@ -129,7 +129,7 @@ pp.parseBindingList = function(close, allowEmpty, allowTrailingComma) {
       this.expect(close)
       break
     } else {
-      elts.push(this.parseMaybeDefault())
+      elts.push(this.parseMaybeDefault(this.start, this.startLoc))
     }
   }
   return elts
@@ -137,11 +137,10 @@ pp.parseBindingList = function(close, allowEmpty, allowTrailingComma) {
 
 // Parses assignment pattern around given atom if possible.
 
-pp.parseMaybeDefault = function(startPos, left) {
-  startPos = startPos || this.markPosition()
+pp.parseMaybeDefault = function(startPos, startLoc, left) {
   left = left || this.parseBindingAtom()
   if (!this.eat(tt.eq)) return left
-  let node = this.startNodeAt(startPos)
+  let node = this.startNodeAt(startPos, startLoc)
   node.operator = "="
   node.left = left
   node.right = this.parseMaybeAssign()
