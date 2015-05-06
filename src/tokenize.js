@@ -25,6 +25,9 @@ export class Token {
 
 const pp = Parser.prototype
 
+// Are we running under Rhino?
+const isRhino = typeof Packages !== "undefined"
+
 // Move to the next token
 
 pp.next = function() {
@@ -414,19 +417,21 @@ pp.readRegexp = function() {
     }
   }
   // Detect invalid regular expressions.
-  try {
-    new RegExp(tmp)
-  } catch (e) {
-    if (e instanceof SyntaxError) this.raise(start, "Error parsing regular expression: " + e.message)
-    this.raise(e)
-  }
-  // Get a regular expression object for this pattern-flag pair, or `null` in
-  // case the current environment doesn't support the flags it uses.
-  let value
-  try {
-    value = new RegExp(content, mods)
-  } catch (err) {
-    value = null
+  let value = null
+  // Rhino's regular expression parser is flaky and throws uncatchable exceptions,
+  // so don't do detection if we are running under Rhino
+  if (!isRhino) {
+    try {
+      new RegExp(tmp)
+    } catch (e) {
+      if (e instanceof SyntaxError) this.raise(start, "Error parsing regular expression: " + e.message)
+      this.raise(e)
+    }
+    // Get a regular expression object for this pattern-flag pair, or `null` in
+    // case the current environment doesn't support the flags it uses.
+    try {
+      value = new RegExp(content, mods)
+    } catch (err) {}
   }
   return this.finishToken(tt.regexp, {pattern: content, flags: mods, value: value})
 }
