@@ -3,11 +3,13 @@ import {types as tt, lineBreak} from "./tokentype"
 
 export function Parser(options, input, startPos) {
   this.options = options
-  this.loadPlugins(this.options.plugins)
   this.sourceFile = this.options.sourceFile || null
   this.isKeyword = keywords[this.options.ecmaVersion >= 6 ? 6 : 5]
   this.isReservedWord = reservedWords[this.options.ecmaVersion]
   this.input = input
+
+  // Load plugins
+  this.loadPlugins(this.options.plugins)
 
   // Set up token state
 
