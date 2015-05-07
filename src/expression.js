@@ -82,7 +82,7 @@ pp.parseExpression = function(noIn, refShorthandDefaultPos) {
 // Parse an assignment expression. This includes applications of
 // operators like `+=`.
 
-pp.parseMaybeAssign = function(noIn, refShorthandDefaultPos) {
+pp.parseMaybeAssign = function(noIn, refShorthandDefaultPos, afterLeftParse) {
   if (this.type == tt._yield && this.inGenerator) return this.parseYield()
 
   let failOnShorthandAssign
@@ -96,6 +96,7 @@ pp.parseMaybeAssign = function(noIn, refShorthandDefaultPos) {
   if (this.type == tt.parenL || this.type == tt.name)
     this.potentialArrowAt = this.start
   let left = this.parseMaybeConditional(noIn, refShorthandDefaultPos)
+  if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
@@ -339,13 +340,13 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
       first ? first = false : this.expect(tt.comma)
       if (this.type === tt.ellipsis) {
         spreadStart = this.start
-        exprList.push(this.parseRest())
+        exprList.push(this.parseParenItem(this.parseRest()))
         break
       } else {
         if (this.type === tt.parenL && !innerParenStart) {
           innerParenStart = this.start
         }
-        exprList.push(this.parseMaybeAssign(false, refShorthandDefaultPos))
+        exprList.push(this.parseMaybeAssign(false, refShorthandDefaultPos, this.parseParenItem))
       }
     }
     let innerEndPos = this.start, innerEndLoc = this.startLoc
@@ -353,7 +354,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
 
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
       if (innerParenStart) this.unexpected(innerParenStart)
-      return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList)
+        return this.parseParenArrowList(startPos, startLoc, exprList)
     }
 
     if (!exprList.length) this.unexpected(this.lastTokStart)
@@ -378,6 +379,14 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
   } else {
     return val
   }
+}
+
+pp.parseParenItem = function(item) {
+  return item
+}
+
+pp.parseParenArrowList = function(startPos, startLoc, exprList) {
+  return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList)
 }
 
 // New's precedence is slightly tricky. It must allow its argument
@@ -456,7 +465,15 @@ pp.parseObj = function(isPattern, refShorthandDefaultPos) {
         isGenerator = this.eat(tt.star)
     }
     this.parsePropertyName(prop)
-    if (this.eat(tt.colon)) {
+    this.parsePropertyValue(prop, isPattern, isGenerator, startPos, startLoc, refShorthandDefaultPos)
+    this.checkPropClash(prop, propHash)
+    node.properties.push(this.finishNode(prop, "Property"))
+  }
+  return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression")
+}
+
+pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLoc, refShorthandDefaultPos) {
+  if (this.eat(tt.colon)) {
       prop.value = isPattern ? this.parseMaybeDefault(this.start, this.startLoc) : this.parseMaybeAssign(false, refShorthandDefaultPos)
       prop.kind = "init"
     } else if (this.options.ecmaVersion >= 6 && this.type === tt.parenL) {
@@ -488,11 +505,6 @@ pp.parseObj = function(isPattern, refShorthandDefaultPos) {
       }
       prop.shorthand = true
     } else this.unexpected()
-
-    this.checkPropClash(prop, propHash)
-    node.properties.push(this.finishNode(prop, "Property"))
-  }
-  return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression")
 }
 
 pp.parsePropertyName = function(prop) {
