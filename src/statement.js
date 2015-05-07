@@ -369,8 +369,7 @@ pp.parseVar = function(node, isFor, kind) {
   node.kind = kind.keyword
   for (;;) {
     let decl = this.startNode()
-    decl.id = this.parseBindingAtom()
-    this.checkLVal(decl.id, true)
+    this.parseVarId(decl)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
     } else if (kind === tt._const && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
@@ -386,6 +385,11 @@ pp.parseVar = function(node, isFor, kind) {
   return node
 }
 
+pp.parseVarId = function(decl) {
+  decl.id = this.parseBindingAtom()
+  this.checkLVal(decl.id, true)
+}
+
 // Parse a function declaration or literal (depending on the
 // `isStatement` parameter).
 
@@ -395,10 +399,14 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody) {
     node.generator = this.eat(tt.star)
   if (isStatement || this.type === tt.name)
     node.id = this.parseIdent()
-  this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, false)
+  this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
+}
+
+pp.parseFunctionParams = function(node) {
+  this.expect(tt.parenL)
+  node.params = this.parseBindingList(tt.parenR, false, false)
 }
 
 // Parse a class declaration or literal (depending on the
@@ -406,8 +414,8 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody) {
 
 pp.parseClass = function(node, isStatement) {
   this.next()
-  node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null
-  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts() : null
+  this.parseClassId(node, isStatement)
+  this.parseClassSuper(node)
   let classBody = this.startNode()
   classBody.body = []
   this.expect(tt.braceL)
@@ -438,11 +446,23 @@ pp.parseClass = function(node, isStatement) {
         method.kind = "constructor"
       }
     }
-    method.value = this.parseMethod(isGenerator)
-    classBody.body.push(this.finishNode(method, "MethodDefinition"))
+    this.parseClassMethod(classBody, method, isGenerator)
   }
   node.body = this.finishNode(classBody, "ClassBody")
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
+}
+
+pp.parseClassMethod = function(classBody, method, isGenerator) {
+  method.value = this.parseMethod(isGenerator)
+  classBody.body.push(this.finishNode(method, "MethodDefinition"))
+}
+
+pp.parseClassId = function(node, isStatement) {
+  node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null
+}
+
+pp.parseClassSuper = function(node) {
+  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts() : null
 }
 
 // Parses module export declaration.
@@ -473,7 +493,7 @@ pp.parseExport = function(node) {
     return this.finishNode(node, "ExportDefaultDeclaration")
   }
   // export var|const|let|function|class ...
-  if (this.type.keyword) {
+  if (this.shouldParseExportStatement()) {
     node.declaration = this.parseStatement(true)
     node.specifiers = []
     node.source = null
@@ -488,6 +508,10 @@ pp.parseExport = function(node) {
     this.semicolon()
   }
   return this.finishNode(node, "ExportNamedDeclaration")
+}
+
+pp.shouldParseExportStatement = function() {
+  return this.type.keyword
 }
 
 // Parses a comma-separated list of module exports.

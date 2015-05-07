@@ -125,14 +125,22 @@ pp.parseBindingList = function(close, allowEmpty, allowTrailingComma) {
     } else if (allowTrailingComma && this.afterTrailingComma(close)) {
       break
     } else if (this.type === tt.ellipsis) {
-      elts.push(this.parseRest())
+      let rest = this.parseRest()
+      this.parseBindingListItem(rest)
+      elts.push(rest)
       this.expect(close)
       break
     } else {
-      elts.push(this.parseMaybeDefault(this.start, this.startLoc))
+      let elem = this.parseMaybeDefault(this.start, this.startLoc)
+      this.parseBindingListItem(elem)
+      elts.push(elem)
     }
   }
   return elts
+}
+
+pp.parseBindingListItem = function(param) {
+  return param
 }
 
 // Parses assignment pattern around given atom if possible.
