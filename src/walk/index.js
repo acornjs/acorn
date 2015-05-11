@@ -16,13 +16,13 @@
 // walker, and state can be used to give this walked an initial
 // state.
 
-export function simple(node, visitors, base, state) {
+export function simple(node, visitors, base, state, override) {
   if (!base) base = exports.base
   ;(function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
     base[type](node, st, c)
     if (found) found(node, st)
-  })(node, state)
+  })(node, state, override)
 }
 
 // An ancestor walk builds up an array of ancestor nodes (including
@@ -46,11 +46,11 @@ export function ancestor(node, visitors, base, state) {
 // threaded through the walk, and can opt how and whether to walk
 // their child nodes (by calling their third argument on these
 // nodes).
-export function recursive(node, state, funcs, base) {
+export function recursive(node, state, funcs, base, override) {
   let visitor = funcs ? exports.make(funcs, base) : base
   ;(function c(node, st, override) {
     visitor[override || node.type](node, st, c)
-  })(node, state)
+  })(node, state, override)
 }
 
 function makeTest(test) {
@@ -187,11 +187,14 @@ base.SwitchStatement = (node, st, c) => {
 base.ReturnStatement = base.YieldExpression = (node, st, c) => {
   if (node.argument) c(node.argument, st, "Expression")
 }
-base.ThrowStatement = base.SpreadElement = base.RestElement =
+base.ThrowStatement = base.SpreadElement =
   (node, st, c) => c(node.argument, st, "Expression")
 base.TryStatement = (node, st, c) => {
   c(node.block, st, "Statement")
-  if (node.handler) c(node.handler.body, st, "ScopeBody")
+  if (node.handler) {
+    c(node.handler.param, st, "Pattern")
+    c(node.handler.body, st, "ScopeBody")
+  }
   if (node.finalizer) c(node.finalizer, st, "Statement")
 }
 base.WhileStatement = base.DoWhileStatement = (node, st, c) => {
@@ -241,16 +244,27 @@ base.Pattern = (node, st, c) => {
 }
 base.VariablePattern = ignore
 base.MemberPattern = skipThrough
+base.RestElement = (node, st, c) => c(node.argument, st, "Pattern")
+base.ArrayPattern =  (node, st, c) => {
+  for (let i = 0; i < node.elements.length; ++i) {
+    let elt = node.elements[i]
+    if (elt) c(elt, st, "Pattern")
+  }
+}
+base.ObjectPattern = (node, st, c) => {
+  for (let i = 0; i < node.properties.length; ++i)
+    c(node.properties[i].value, st, "Pattern")
+}
 
 base.Expression = skipThrough
 base.ThisExpression = base.Super = base.MetaProperty = ignore
-base.ArrayExpression = base.ArrayPattern =  (node, st, c) => {
+base.ArrayExpression = (node, st, c) => {
   for (let i = 0; i < node.elements.length; ++i) {
     let elt = node.elements[i]
     if (elt) c(elt, st, "Expression")
   }
 }
-base.ObjectExpression = base.ObjectPattern = (node, st, c) => {
+base.ObjectExpression = (node, st, c) => {
   for (let i = 0; i < node.properties.length; ++i)
     c(node.properties[i], st)
 }
@@ -284,7 +298,9 @@ base.MemberExpression = (node, st, c) => {
   c(node.object, st, "Expression")
   if (node.computed) c(node.property, st, "Expression")
 }
-base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => c(node.declaration, st)
+base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
+  if (node.declaration) c(node.declaration, st)
+}
 base.ImportDeclaration = (node, st, c) => {
   for (let i = 0; i < node.specifiers.length; i++)
     c(node.specifiers[i], st)
@@ -295,7 +311,9 @@ base.TaggedTemplateExpression = (node, st, c) => {
   c(node.tag, st, "Expression")
   c(node.quasi, st)
 }
-base.ClassDeclaration = base.ClassExpression = (node, st, c) => {
+base.ClassDeclaration = base.ClassExpression = (node, st, c) => c(node, st, "Class")
+base.Class = (node, st, c) => {
+  c(node.id, st, "Pattern")
   if (node.superClass) c(node.superClass, st, "Expression")
   for (let i = 0; i < node.body.body.length; i++)
     c(node.body.body[i], st)
