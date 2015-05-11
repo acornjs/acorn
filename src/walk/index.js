@@ -219,12 +219,28 @@ base.FunctionDeclaration = (node, st, c) => c(node, st, "Function")
 base.VariableDeclaration = (node, st, c) => {
   for (let i = 0; i < node.declarations.length; ++i) {
     let decl = node.declarations[i]
+    c(decl.id, st, "Pattern")
     if (decl.init) c(decl.init, st, "Expression")
   }
 }
 
-base.Function = (node, st, c) => c(node.body, st, "ScopeBody")
+base.Function = (node, st, c) => {
+  for (let i = 0; i < node.params.length; i++)
+    c(node.params[i], st, "Pattern")
+  c(node.body, st, "ScopeBody")
+}
 base.ScopeBody = (node, st, c) => c(node, st, "Statement")
+
+base.Pattern = (node, st, c) => {
+  if (node.type == "Identifier")
+    c(node, st, "VariablePattern")
+  else if (node.type == "MemberExpression")
+    c(node, st, "MemberPattern")
+  else
+    c(node, st)
+}
+base.VariablePattern = ignore
+base.MemberPattern = skipThrough
 
 base.Expression = skipThrough
 base.ThisExpression = base.Super = base.MetaProperty = ignore
@@ -246,8 +262,12 @@ base.SequenceExpression = base.TemplateLiteral = (node, st, c) => {
 base.UnaryExpression = base.UpdateExpression = (node, st, c) => {
   c(node.argument, st, "Expression")
 }
-base.BinaryExpression = base.AssignmentExpression = base.AssignmentPattern = base.LogicalExpression = (node, st, c) => {
+base.BinaryExpression = base.LogicalExpression = (node, st, c) => {
   c(node.left, st, "Expression")
+  c(node.right, st, "Expression")
+}
+base.AssignmentExpression = base.AssignmentPattern = (node, st, c) => {
+  c(node.left, st, "Pattern")
   c(node.right, st, "Expression")
 }
 base.ConditionalExpression = (node, st, c) => {
