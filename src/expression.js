@@ -627,7 +627,7 @@ pp.parseIdent = function(liberal) {
     if (!liberal &&
         ((!this.options.allowReserved && this.isReservedWord(this.value)) ||
          (this.strict && reservedWords.strict(this.value)) &&
-         (this.options.ecmaVersion >= 6 || 
+         (this.options.ecmaVersion >= 6 ||
           this.input.slice(this.start, this.end).indexOf("\\") == -1)))
       this.raise(this.start, "The keyword '" + this.value + "' is reserved")
     node.name = this.value

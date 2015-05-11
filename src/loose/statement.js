@@ -254,7 +254,7 @@ lp.parseClass = function(isStatement) {
   if (this.curIndent + 1 < indent) { indent = this.curIndent; line = this.curLineStart }
   while (!this.closes(tt.braceR, indent, line)) {
     if (this.semicolon()) continue
-    let method = this.startNode(), isGenerator, start
+    let method = this.startNode(), isGenerator
     if (this.options.ecmaVersion >= 6) {
       method['static'] = false
       isGenerator = this.eat(tt.star)
