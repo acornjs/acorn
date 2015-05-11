@@ -15630,3 +15630,5 @@ test("export default function foo() {} false", {
   sourceType: "module",
   type: "Program"
 }, {ecmaVersion: 6, sourceType: "module"})
+
+testFail("(a = b) = {};", "Unexpected token (1:8)", {ecmaVersion: 6})

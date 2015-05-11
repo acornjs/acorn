@@ -100,7 +100,12 @@ pp.parseMaybeAssign = function(noIn, refShorthandDefaultPos, afterLeftParse) {
   if (this.type.isAssign) {
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
-    node.left = this.type === tt.eq ? this.toAssignable(left) : left
+    if (this.type === tt.eq) {
+      node.left = this.toAssignable(left)
+      if (left.type === "AssignmentPattern") this.unexpected()
+    } else {
+      node.left = left
+    }
     refShorthandDefaultPos.start = 0 // reset because shorthand default was used correctly
     this.checkLVal(left)
     this.next()
