@@ -513,12 +513,12 @@ pp.parsePropertyName = function(prop) {
       prop.computed = true
       prop.key = this.parseMaybeAssign()
       this.expect(tt.bracketR)
-      return
+      return prop.key
     } else {
       prop.computed = false
     }
   }
-  prop.key = (this.type === tt.num || this.type === tt.string) ? this.parseExprAtom() : this.parseIdent(true)
+  return prop.key = (this.type === tt.num || this.type === tt.string) ? this.parseExprAtom() : this.parseIdent(true)
 }
 
 // Initialize empty function node.

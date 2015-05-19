@@ -417,33 +417,37 @@ pp.parseClass = function(node, isStatement) {
   this.parseClassId(node, isStatement)
   this.parseClassSuper(node)
   let classBody = this.startNode()
+  let hadConstructor = false
   classBody.body = []
   this.expect(tt.braceL)
   while (!this.eat(tt.braceR)) {
     if (this.eat(tt.semi)) continue
     let method = this.startNode()
     let isGenerator = this.eat(tt.star)
+    let isMaybeStatic = this.type === tt.name && this.value === "static"
     this.parsePropertyName(method)
-    if (this.type !== tt.parenL && !method.computed && method.key.type === "Identifier" &&
-        method.key.name === "static") {
+    method.static = isMaybeStatic && this.type !== tt.parenL
+    if (method.static) {
       if (isGenerator) this.unexpected()
-      method['static'] = true
       isGenerator = this.eat(tt.star)
       this.parsePropertyName(method)
-    } else {
-      method['static'] = false
     }
     method.kind = "method"
-    if (!method.computed && !isGenerator) {
-      if (method.key.type === "Identifier") {
-        if (this.type !== tt.parenL && (method.key.name === "get" || method.key.name === "set")) {
-          method.kind = method.key.name
-          this.parsePropertyName(method)
-        } else if (!method['static'] && method.key.name === "constructor") {
-          method.kind = "constructor"
-        }
-      } else if (!method['static'] && method.key.type === "Literal" && method.key.value === "constructor") {
+    if (!method.computed) {
+      let {key} = method
+      let isGetSet = false
+      if (!isGenerator && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
+        isGetSet = true
+        method.kind = key.name
+        key = this.parsePropertyName(method)
+      }
+      if (key.type === "Identifier" && key.name === "constructor" ||
+          key.type === "Literal" && key.value === "constructor") {
+        if (hadConstructor) this.raise(key.start, "Duplicate constructor in the same class")
+        if (method.static || isGetSet) this.raise(key.start, "Constructor can't have modifiers")
+        if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
         method.kind = "constructor"
+        hadConstructor = true
       }
     }
     this.parseClassMethod(classBody, method, isGenerator)

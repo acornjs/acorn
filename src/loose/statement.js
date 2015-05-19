@@ -256,18 +256,18 @@ lp.parseClass = function(isStatement) {
     if (this.semicolon()) continue
     let method = this.startNode(), isGenerator
     if (this.options.ecmaVersion >= 6) {
-      method['static'] = false
+      method.static = false
       isGenerator = this.eat(tt.star)
     }
     this.parsePropertyName(method)
     if (isDummy(method.key)) { if (isDummy(this.parseMaybeAssign())) this.next(); this.eat(tt.comma); continue }
     if (method.key.type === "Identifier" && !method.computed && method.key.name === "static" &&
         (this.tok.type != tt.parenL && this.tok.type != tt.braceL)) {
-      method['static'] = true
+      method.static = true
       isGenerator = this.eat(tt.star)
       this.parsePropertyName(method)
     } else {
-      method['static'] = false
+      method.static = false
     }
     if (this.options.ecmaVersion >= 5 && method.key.type === "Identifier" &&
         !method.computed && (method.key.name === "get" || method.key.name === "set") &&
@@ -276,7 +276,7 @@ lp.parseClass = function(isStatement) {
       this.parsePropertyName(method)
       method.value = this.parseMethod(false)
     } else {
-      if (!method.computed && !method['static'] && !isGenerator && (
+      if (!method.computed && !method.static && !isGenerator && (
         method.key.type === "Identifier" && method.key.name === "constructor" ||
           method.key.type === "Literal" && method.key.value === "constructor")) {
         method.kind = "constructor"
