@@ -23,12 +23,7 @@
     "type": "git",
     "url": "https://github.com/marijnh/acorn.git"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://raw.githubusercontent.com/marijnh/acorn/master/LICENSE"
-    }
-  ],
+  "license": "MIT",
   "scripts": {
     "test": "node test/run.js",
     "prepublish": "bin/prepublish.sh"
