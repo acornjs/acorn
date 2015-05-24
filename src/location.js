@@ -1,5 +1,6 @@
 import {Parser} from "./state"
 import {lineBreakG} from "./whitespace"
+import {deprecate} from "util"
 
 // These are used when `options.locations` is on, for the
 // `startLoc` and `endLoc` properties.
@@ -61,3 +62,9 @@ pp.raise = function(pos, message) {
 pp.curPosition = function() {
   return new Position(this.curLine, this.pos - this.lineStart)
 }
+
+pp.markPosition = deprecate(function() {
+  return this.options.locations ? [this.start, this.startLoc] : this.start
+},
+  "acron.parser: The member function markPosition() is deprecated and will be removed in version 2.x."
+)
