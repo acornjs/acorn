@@ -146,6 +146,28 @@ pp.parseBindingListItem = function(param) {
 // Parses assignment pattern around given atom if possible.
 
 pp.parseMaybeDefault = function(startPos, startLoc, left) {
+  if (Array.isArray(startPos)){
+    if (this.options.locations && noCalls === undefined) {
+      let warned = false
+      let msg = 'acron.parser: Usage of parseMaybeDefault(startPos, left) is deprecated. Please invoke by parseMaybeDefault(startPos, startLoc, left).'
+      if (!warned) {
+        if (process.throwDeprecation) {
+          throw new Error(msg)
+        } else if (process.traceDeprecation) {
+          console.trace(msg)
+        } else {
+          console.error(msg)
+        }
+        warned = true
+      }
+      startLoc = startPos[1]
+      startPos = startPos[0]
+    }
+    else
+    {
+      throw new Error("acron.parser: parameter 'startPos' to member parseMaybeDefault(startPos, startLoc, left) is expected to be a number, array given.")
+    }
+  }
   left = left || this.parseBindingAtom()
   if (!this.eat(tt.eq)) return left
   let node = this.startNodeAt(startPos, startLoc)
