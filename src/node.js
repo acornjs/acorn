@@ -21,6 +21,13 @@ pp.startNode = function() {
 
 pp.startNodeAt = function(pos, loc) {
   let node = new Node
+  if (Array.isArray(pos)){
+    if (this.options.locations && loc === undefined) {
+      // flatten pos
+      loc = pos[1]
+      pos = pos[0]
+    }
+  }
   node.start = pos
   if (this.options.locations)
     node.loc = new SourceLocation(this, loc)
@@ -47,6 +54,13 @@ pp.finishNode = function(node, type) {
 
 pp.finishNodeAt = function(node, type, pos, loc) {
   node.type = type
+  if (Array.isArray(pos)){
+    if (this.options.locations && loc === undefined) {
+      // flatten pos
+      loc = pos[1]
+      pos = pos[0]
+    }
+  }
   node.end = pos
   if (this.options.locations)
     node.loc.end = loc

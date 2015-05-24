@@ -146,6 +146,15 @@ pp.parseBindingListItem = function(param) {
 // Parses assignment pattern around given atom if possible.
 
 pp.parseMaybeDefault = function(startPos, startLoc, left) {
+  if (Array.isArray(startPos)){
+    if (this.options.locations && noCalls === undefined) {
+      // shift arguments to left by one
+      left = startLoc
+      // flatten startPos
+      startLoc = startPos[1]
+      startPos = startPos[0]
+    }
+  }
   left = left || this.parseBindingAtom()
   if (!this.eat(tt.eq)) return left
   let node = this.startNodeAt(startPos, startLoc)

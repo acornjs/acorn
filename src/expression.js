@@ -146,6 +146,16 @@ pp.parseExprOps = function(noIn, refShorthandDefaultPos) {
 
 pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
   let prec = this.type.binop
+  if (Array.isArray(leftStartPos)){
+    if (this.options.locations && noIn === undefined) {
+      // shift arguments to left by one
+      noIn = minPrec
+      minPrec = leftStartLoc
+      // flatten leftStartPos
+      leftStartLoc = leftStartPos[1]
+      leftStartPos = leftStartPos[0]
+    }
+  }
   if (prec != null && (!noIn || this.type !== tt._in)) {
     if (prec > minPrec) {
       let node = this.startNodeAt(leftStartPos, leftStartLoc)
@@ -203,6 +213,15 @@ pp.parseExprSubscripts = function(refShorthandDefaultPos) {
 }
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
+  if (Array.isArray(startPos)){
+    if (this.options.locations && noCalls === undefined) {
+      // shift arguments to left by one
+      noCalls = startLoc
+      // flatten startPos
+      startLoc = startPos[1]
+      startPos = startPos[0]
+    }
+  }
   for (;;) {
     if (this.eat(tt.dot)) {
       let node = this.startNodeAt(startPos, startLoc)
