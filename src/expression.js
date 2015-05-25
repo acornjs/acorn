@@ -146,6 +146,32 @@ pp.parseExprOps = function(noIn, refShorthandDefaultPos) {
 
 pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
   let prec = this.type.binop
+  if (Array.isArray(leftStartPos)){
+    if (this.options.locations && noIn === undefined) {
+      let warned = false
+      let msg = 'acron.parser: Usage of parseExprOp(left, leftStart, minPrec, noIn) is deprecated. Please invoke by parseExprOp(left, leftStartPos, leftStartLoc, minPrec, noIn).'
+      if (!warned) {
+        if (process.throwDeprecation) {
+          throw new Error(msg)
+        } else if (process.traceDeprecation) {
+          console.trace(msg)
+        } else {
+          console.error(msg)
+        }
+        warned = true
+      }
+      // shift arguments to left by one
+      noIn = minPrec
+      minPrec = leftStartLoc
+      // flatten leftStartPos
+      leftStartLoc = leftStartPos[1]
+      leftStartPos = leftStartPos[0]
+    }
+    else
+    {
+      throw new Error("acron.parser: parameter 'leftStartPos' to member parseExprOp(left, leftStartPos, leftStartLoc, minPrec, noIn) is expected to be a number, array given.")
+    }
+  }
   if (prec != null && (!noIn || this.type !== tt._in)) {
     if (prec > minPrec) {
       let node = this.startNodeAt(leftStartPos, leftStartLoc)
@@ -203,6 +229,31 @@ pp.parseExprSubscripts = function(refShorthandDefaultPos) {
 }
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
+  if (Array.isArray(startPos)){
+    if (this.options.locations && noCalls === undefined) {
+      let warned = false
+      let msg = 'acron.parser: Usage of parseSubscripts(base, start, noCalls) is deprecated. Please invoke by parseExprOp(base, startPos, startLoc, noCalls).'
+      if (!warned) {
+        if (process.throwDeprecation) {
+          throw new Error(msg)
+        } else if (process.traceDeprecation) {
+          console.trace(msg)
+        } else {
+          console.error(msg)
+        }
+        warned = true
+      }
+      // shift arguments to left by one
+      noCalls = startLoc
+      // flatten startPos
+      startLoc = startPos[1]
+      startPos = startPos[0]
+    }
+    else
+    {
+      throw new Error("acron.parser: parameter 'startPos' to member parseSubscripts(base, startPos, startLoc, noCalls) is expected to be a number, array given.")
+    }
+  }
   for (;;) {
     if (this.eat(tt.dot)) {
       let node = this.startNodeAt(startPos, startLoc)
