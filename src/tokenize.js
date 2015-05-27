@@ -26,7 +26,7 @@ export class Token {
 const pp = Parser.prototype
 
 // Are we running under Rhino?
-const isRhino = typeof Packages !== "undefined"
+const isRhino = typeof Packages == "object" && String(Packages) = "[JavaPackage ]"
 
 // Move to the next token
 
