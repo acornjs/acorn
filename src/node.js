@@ -23,18 +23,6 @@ pp.startNodeAt = function(pos, loc) {
   let node = new Node
   if (Array.isArray(pos)){
     if (this.options.locations && loc === undefined) {
-      let warned = false
-      let msg = 'acorn.Parser: Usage of startNodeAt(start) is deprecated. please invoke by startNodeAt(start, loc).'
-      if (!warned) {
-        if (process.throwDeprecation) {
-          throw new Error(msg)
-        } else if (process.traceDeprecation) {
-          console.trace(msg)
-        } else {
-          console.error(msg)
-        }
-        warned = true
-      }
       // flatten pos
       loc = pos[1]
       pos = pos[0]
@@ -72,18 +60,6 @@ pp.finishNodeAt = function(node, type, pos, loc) {
   node.type = type
   if (Array.isArray(pos)){
     if (this.options.locations && loc === undefined) {
-      let warned = false
-      let msg = 'acorn.Parser: Usage of finishNodeAt(start) is deprecated. please invoke by finishNodeAt(start, loc).'
-      if (!warned) {
-        if (process.throwDeprecation) {
-          throw new Error(msg)
-        } else if (process.traceDeprecation) {
-          console.trace(msg)
-        } else {
-          console.error(msg)
-        }
-        warned = true
-      }
       // flatten pos
       loc = pos[1]
       pos = pos[0]

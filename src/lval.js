@@ -148,18 +148,6 @@ pp.parseBindingListItem = function(param) {
 pp.parseMaybeDefault = function(startPos, startLoc, left) {
   if (Array.isArray(startPos)){
     if (this.options.locations && noCalls === undefined) {
-      let warned = false
-      let msg = 'acorn.Parser: Usage of parseMaybeDefault(startPos, left) is deprecated. Please invoke by parseMaybeDefault(startPos, startLoc, left).'
-      if (!warned) {
-        if (process.throwDeprecation) {
-          throw new Error(msg)
-        } else if (process.traceDeprecation) {
-          console.trace(msg)
-        } else {
-          console.error(msg)
-        }
-        warned = true
-      }
       // shift arguments to left by one
       left = startLoc
       // flatten startPos

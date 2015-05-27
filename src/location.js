@@ -63,8 +63,6 @@ pp.curPosition = function() {
   return new Position(this.curLine, this.pos - this.lineStart)
 }
 
-pp.markPosition = deprecate(function() {
+pp.markPosition = function() {
   return this.options.locations ? [this.start, this.startLoc] : this.start
-},
-  "acorn.Parser: The member function markPosition() is deprecated and will be removed in version 2.x."
-)
+}
