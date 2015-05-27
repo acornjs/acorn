@@ -354,7 +354,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
 
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
       if (innerParenStart) this.unexpected(innerParenStart)
-        return this.parseParenArrowList(startPos, startLoc, exprList)
+      return this.parseParenArrowList(startPos, startLoc, exprList)
     }
 
     if (!exprList.length) this.unexpected(this.lastTokStart)
