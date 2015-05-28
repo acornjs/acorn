@@ -21,7 +21,7 @@ function acornShim(file) {
     tr._transform = function(chunk, _, callback) {
       if (!sent) {
         sent = true
-        callback(null, "module.exports = typeof acorn != 'undefined' ? acorn : _dereq_(\"./acorn\")")
+        callback(null, "module.exports = typeof acorn != 'undefined' ? acorn : require(\"acorn\")")
       } else {
         callback()
       }
@@ -33,8 +33,8 @@ function acornShim(file) {
 }
 
 browserify({standalone: "acorn.loose"})
-  .plugin(require('browserify-derequire'))
   .transform(acornShim)
+  .plugin(require('browserify-derequire'))
   .transform(babelify)
   .require("./src/loose/index.js", {entry: true})
   .bundle()
@@ -42,8 +42,8 @@ browserify({standalone: "acorn.loose"})
   .pipe(fs.createWriteStream("dist/acorn_loose.js"))
 
 browserify({standalone: "acorn.walk"})
-  .plugin(require('browserify-derequire'))
   .transform(acornShim)
+  .plugin(require('browserify-derequire'))
   .transform(babelify)
   .require("./src/walk/index.js", {entry: true})
   .bundle()
