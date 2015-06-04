@@ -313,7 +313,7 @@ base.TaggedTemplateExpression = (node, st, c) => {
 }
 base.ClassDeclaration = base.ClassExpression = (node, st, c) => c(node, st, "Class")
 base.Class = (node, st, c) => {
-  c(node.id, st, "Pattern")
+  if (node.id) c(node.id, st, "Pattern")
   if (node.superClass) c(node.superClass, st, "Expression")
   for (let i = 0; i < node.body.body.length; i++)
     c(node.body.body[i], st)
