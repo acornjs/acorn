@@ -26,7 +26,7 @@
   "license": "MIT",
   "scripts": {
     "test": "node test/run.js",
-    "prepublish": "bin/prepublish.sh"
+    "prepublish": "node bin/build-acorn.js && node bin/without_eval > dist/acorn_csp.js"
   },
   "bin": {
     "acorn": "./bin/acorn"
