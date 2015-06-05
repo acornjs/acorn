@@ -813,7 +813,7 @@ test("`\\n\\r\\b\\v\\t\\f\\\n\\\r\n`", {
       type: "TemplateLiteral",
       quasis: [{
         type: "TemplateElement",
-        value: {raw: "\\n\\r\\b\\v\\t\\f\\\n\\\r\n", cooked: "\n\r\b\u000b\t\f"},
+        value: {raw: "\\n\\r\\b\\v\\t\\f\\\n\\\n", cooked: "\n\r\b\u000b\t\f"},
         tail: true,
         loc: {
           start: {line: 1, column: 1},
@@ -841,7 +841,7 @@ test("`\\n\\r\\b\\v\\t\\f\\\n\\\r\n`", {
   locations: true
 });
 
-test("`\n\r\n`", {
+test("`\n\r\n\r`", {
   type: "Program",
   body: [{
     type: "ExpressionStatement",
@@ -849,27 +849,27 @@ test("`\n\r\n`", {
       type: "TemplateLiteral",
       quasis: [{
         type: "TemplateElement",
-        value: {raw: "\n\r\n", cooked: "\n\n"},
+        value: {raw: "\n\n\n", cooked: "\n\n\n"},
         tail: true,
         loc: {
           start: {line: 1, column: 1},
-          end: {line: 3, column: 0}
+          end: {line: 4, column: 0}
         }
       }],
       expressions: [],
       loc: {
         start: {line: 1, column: 0},
-        end: {line: 3, column: 1}
+        end: {line: 4, column: 1}
       }
     },
     loc: {
       start: {line: 1, column: 0},
-      end: {line: 3, column: 1}
+      end: {line: 4, column: 1}
     }
   }],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 3, column: 1}
+    end: {line: 4, column: 1}
   }
 }, {
   ecmaVersion: 6,
@@ -14473,26 +14473,6 @@ test('function normal(x, y = 10) {}', {
     expression: false
   }]
 }, {ecmaVersion: 6});
-
-// # https://github.com/marijnh/acorn/issues/268
-test("`1\r\n2\r3\n4`", {
-  type: "Program",
-  body: [{
-    expression: {
-      expressions: [],
-      quasis: [{
-        value: {raw: "1\n2\n3\n4", cooked: "1\n2\n3\n4"},
-        tail: true,
-        type: "TemplateElement"
-      }],
-      type: "TemplateLiteral"
-    },
-    type: "ExpressionStatement"
-  }],
-  sourceType: "script"
-}, {ecmaVersion: 6});
-
-test("'use strict'; function f([x,,z]) {}", {}, {ecmaVersion: 6});
 
 // test preserveParens option with arrow functions
 test("() => 42", {
