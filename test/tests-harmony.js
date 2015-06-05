@@ -14474,6 +14474,24 @@ test('function normal(x, y = 10) {}', {
   }]
 }, {ecmaVersion: 6});
 
+// # https://github.com/marijnh/acorn/issues/268
+test("`1\r\n2\r3\n4`", {
+  type: "Program",
+  body: [{
+    expression: {
+      expressions: [],
+      quasis: [{
+        value: {raw: "1\n2\n3\n4", cooked: "1\n2\n3\n4"},
+        tail: true,
+        type: "TemplateElement"
+      }],
+      type: "TemplateLiteral"
+    },
+    type: "ExpressionStatement"
+  }],
+  sourceType: "script"
+}, {ecmaVersion: 6});
+
 test("'use strict'; function f([x,,z]) {}", {}, {ecmaVersion: 6});
 
 // test preserveParens option with arrow functions
