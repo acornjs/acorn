@@ -40,7 +40,7 @@ This is implemented in `dist/acorn.js`, and is what you get when you
 The `input` parameter is a string, `options` can be undefined or an
 object setting some of the options listed below. The return value will
 be an abstract syntax tree object as specified by the
-[Mozilla Parser API][mozapi].
+[ESTree spec][estree].
 
 When  encountering   a  syntax   error,  the   parser  will   raise  a
 `SyntaxError` object with a meaningful  message. The error object will
@@ -48,7 +48,7 @@ have a `pos` property that indicates the character offset at which the
 error occurred,  and a `loc`  object that contains a  `{line, column}`
 object referring to that same position.
 
-[mozapi]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
+[estree]: https://github.com/estree/estree
 
 - **ecmaVersion**: Indicates the ECMAScript version to parse. Must be
   either 3, 5, or 6. This influences support for strict mode, the set
@@ -247,7 +247,7 @@ Implements an abstract syntax tree walker. Will store its interface in
 **simple**`(node, visitors, base, state)` does a 'simple' walk over
 a tree. `node` should be the AST node to walk, and `visitors` an
 object with properties whose names correspond to node types in the
-[Mozilla Parser API][mozapi]. The properties should contain functions
+[ESTree spec][estree]. The properties should contain functions
 that will be called with the node object and, if applicable the state
 at that point. The last two arguments are optional. `base` is a walker
 algorithm, and `state` is a start state. The default walker will
