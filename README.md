@@ -128,7 +128,7 @@ object referring to that same position.
 - **ranges**: Nodes have their start and end characters offsets
   recorded in `start` and `end` properties (directly on the node,
   rather than the `loc` object, which holds line/column data. To also
-  add a [semi-standardized][range] "range" property holding a
+  add a [semi-standardized][range] `range` property holding a
   `[start, end]` array with the same numbers, set the `ranges` option
   to `true`.
 
