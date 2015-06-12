@@ -298,7 +298,14 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
   for (let i = 0; i < this.labels.length; ++i)
     if (this.labels[i].name === maybeName) this.raise(expr.start, "Label '" + maybeName + "' is already declared")
   let kind = this.type.isLoop ? "loop" : this.type === tt._switch ? "switch" : null
-  this.labels.push({name: maybeName, kind: kind})
+  for (let i = this.labels.length - 1; i >= 0; i--) {
+    let label = this.labels[i]
+    if (label.statementStart == node.start) {
+      label.statementStart = this.start;
+      label.kind = kind;
+    } else break;
+  }
+  this.labels.push({name: maybeName, kind: kind, statementStart: this.start})
   node.body = this.parseStatement(true)
   this.labels.pop()
   node.label = expr

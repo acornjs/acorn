@@ -20660,6 +20660,9 @@ test("done: while (true) { break done; }", {
   }
 });
 
+test("target1: target2: while (true) { continue target1; }", {});
+test("target1: target2: target3: while (true) { continue target1; }", {});
+
 test("(function(){ return })", {
   type: "Program",
   body: [
