@@ -351,7 +351,7 @@ could load them both and parse code with both JSX tags and types.
 
 A plugin should register itself by adding a property to
 `acorn.plugins`, which holds a function. Calling `acorn.parse`, a
-`plugin` option can be passed, holding an object mapping plugin names
+`plugins` option can be passed, holding an object mapping plugin names
 to configuration values (or just `true` for plugins that don't take
 options). After the parser object has been created, the initialization
 functions for the chosen plugins are called with `(parser,
