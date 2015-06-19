@@ -541,11 +541,8 @@ pp.parseMethod = function(isGenerator) {
   let allowExpressionBody
   if (this.options.ecmaVersion >= 6) {
     node.generator = isGenerator
-    allowExpressionBody = true
-  } else {
-    allowExpressionBody = false
   }
-  this.parseFunctionBody(node, allowExpressionBody)
+  this.parseFunctionBody(node, false)
   return this.finishNode(node, "FunctionExpression")
 }
 
