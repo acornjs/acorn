@@ -1,4 +1,5 @@
 /*
+  Copyright (C) 2015 Ingvar Stepanyan <me@rreverser.com>
   Copyright (C) 2012 Ariya Hidayat <ariya.hidayat@gmail.com>
   Copyright (C) 2012 Joost-Wim Boekesteijn <joost-wim@boekesteijn.nl>
   Copyright (C) 2012 Yusuke Suzuki <utatane.tea@gmail.com>
@@ -6,7 +7,6 @@
   Copyright (C) 2011 Ariya Hidayat <ariya.hidayat@gmail.com>
   Copyright (C) 2011 Yusuke Suzuki <utatane.tea@gmail.com>
   Copyright (C) 2011 Arpad Borsos <arpad.borsos@googlemail.com>
-  Copyright (C) 2014 Ingvar Stepanyan <me@rreverser.com>
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
@@ -13716,13 +13716,13 @@ testFail("0B18", "Unexpected token (1:3)", {ecmaVersion: 6});
 
 testFail("0B12", "Unexpected token (1:3)", {ecmaVersion: 6});
 
-testFail("\"\\u{110000}\"", "Unexpected token (1:0)", {ecmaVersion: 6});
+testFail("\"\\u{110000}\"", "Code point out of bounds (1:4)", {ecmaVersion: 6});
 
-testFail("\"\\u{}\"", "Bad character escape sequence (1:0)", {ecmaVersion: 6});
+testFail("\"\\u{}\"", "Bad character escape sequence (1:4)", {ecmaVersion: 6});
 
-testFail("\"\\u{FFFF\"", "Bad character escape sequence (1:0)", {ecmaVersion: 6});
+testFail("\"\\u{FFFF\"", "Bad character escape sequence (1:4)", {ecmaVersion: 6});
 
-testFail("\"\\u{FFZ}\"", "Bad character escape sequence (1:0)", {ecmaVersion: 6});
+testFail("\"\\u{FFZ}\"", "Bad character escape sequence (1:4)", {ecmaVersion: 6});
 
 testFail("[v] += ary", "Assigning to rvalue (1:0)", {ecmaVersion: 6});
 
@@ -15369,14 +15369,12 @@ testFail("`\\07`", "Octal literal in strict mode (1:1)", {ecmaVersion: 6});
 
 // https://github.com/marijnh/acorn/issues/277
 
-testFail("x = { method() 42 }", "Unexpected token (1:15)", {
-  ecmaVersion: 6
-});
+testFail("x = { method() 42 }", "Unexpected token (1:15)", {ecmaVersion: 6});
 
-testFail("x = { get method() 42 }", "Unexpected token (1:19)", {
-  ecmaVersion: 6
-});
+testFail("x = { get method() 42 }", "Unexpected token (1:19)", {ecmaVersion: 6});
 
-testFail("x = { set method(val) v = val }", "Unexpected token (1:22)", {
-  ecmaVersion: 6
-});
+testFail("x = { set method(val) v = val }", "Unexpected token (1:22)", {ecmaVersion: 6});
+
+// https://github.com/marijnh/acorn/issues/278
+
+testFail("/\\u{110000}/u", "Code point out of bounds (1:4)", {ecmaVersion: 6});

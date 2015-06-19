@@ -413,7 +413,12 @@ pp.readRegexp = function() {
       // negatives in unlikely scenarios. For example, `[\u{61}-b]` is a
       // perfectly valid pattern that is equivalent to `[a-b]`, but it would
       // be replaced by `[x-b]` which throws an error.
-      tmp = tmp.replace(/\\u([a-fA-F0-9]{4})|\\u\{([0-9a-fA-F]+)\}|[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "x")
+      tmp = tmp.replace(/\\u\{([0-9a-fA-F]+)\}/g, (match, code, offset) => {
+        code = Number("0x" + code)
+        if (code > 0x10FFFF) this.raise(start + offset + 3, "Code point out of bounds")
+        return "x"
+      });
+      tmp = tmp.replace(/\\u([a-fA-F0-9]{4})|[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "x")
     }
   }
   // Detect invalid regular expressions.
@@ -499,10 +504,10 @@ pp.readCodePoint = function() {
 
   if (ch === 123) {
     if (this.options.ecmaVersion < 6) this.unexpected()
-    ++this.pos
+    let codePos = ++this.pos
     code = this.readHexChar(this.input.indexOf('}', this.pos) - this.pos)
     ++this.pos
-    if (code > 0x10FFFF) this.unexpected()
+    if (code > 0x10FFFF) this.raise(codePos, "Code point out of bounds")
   } else {
     code = this.readHexChar(4)
   }
@@ -622,8 +627,9 @@ pp.readEscapedChar = function(inTemplate) {
 // Used to read character escape sequences ('\x', '\u', '\U').
 
 pp.readHexChar = function(len) {
+  let codePos = this.pos
   let n = this.readInt(16, len)
-  if (n === null) this.raise(this.start, "Bad character escape sequence")
+  if (n === null) this.raise(codePos, "Bad character escape sequence")
   return n
 }
 

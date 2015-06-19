@@ -26907,7 +26907,7 @@ testFail("/test",
          "Unterminated regular expression (1:1)");
 
 testFail("var x = /[a-z]/\\ux",
-         "Bad character escape sequence (1:8)");
+         "Bad character escape sequence (1:17)");
 
 testFail("3 = 4",
          "Assigning to rvalue (1:0)");
@@ -27194,7 +27194,7 @@ testFail("\"\\",
          "Unterminated string constant (1:0)");
 
 testFail("\"\\u",
-         "Bad character escape sequence (1:0)");
+         "Bad character escape sequence (1:3)");
 
 testFail("return",
          "'return' outside of function (1:0)");
