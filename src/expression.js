@@ -241,8 +241,10 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
 pp.parseExprAtom = function(refShorthandDefaultPos) {
   let node, canBeArrow = this.potentialArrowAt == this.start
   switch (this.type) {
-  case tt._this:
   case tt._super:
+    if (!this.inFunction)
+      this.raise(this.start, "'super' outside of function or class")
+  case tt._this:
     let type = this.type === tt._this ? "ThisExpression" : "Super"
     node = this.startNode()
     this.next()

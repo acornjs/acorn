@@ -15378,3 +15378,7 @@ testFail("x = { set method(val) v = val }", "Unexpected token (1:22)", {ecmaVers
 // https://github.com/marijnh/acorn/issues/278
 
 testFail("/\\u{110000}/u", "Code point out of bounds (1:4)", {ecmaVersion: 6});
+
+// https://github.com/marijnh/acorn/issues/279
+
+testFail("super", "'super' outside of function or class (1:0)", {ecmaVersion: 6});
