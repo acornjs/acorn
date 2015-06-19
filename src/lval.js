@@ -34,6 +34,7 @@ pp.toAssignable = function(node, isBinding) {
     case "AssignmentExpression":
       if (node.operator === "=") {
         node.type = "AssignmentPattern"
+        delete node.operator
       } else {
         this.raise(node.left.end, "Only '=' operator can be used for specifying default value.")
       }

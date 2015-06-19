@@ -14363,7 +14363,6 @@ test("var {propName: localVar = defaultValue} = obj", {
           value: {
             type: "AssignmentPattern",
             range: [15, 38],
-            operator: "=",
             left: {
               type: "Identifier",
               range: [15, 23],
@@ -14419,7 +14418,6 @@ test("var {propName = defaultValue} = obj", {
           value: {
             type: "AssignmentPattern",
             range: [5, 28],
-            operator: "=",
             left: {
               type: "Identifier",
               range: [5, 13],
@@ -14462,7 +14460,6 @@ test("var [localVar = defaultValue] = obj", {
         elements: [{
           type: "AssignmentPattern",
           range: [5, 28],
-          operator: "=",
           left: {
             type: "Identifier",
             range: [5, 13],
@@ -14517,7 +14514,6 @@ test("({x = 0} = obj)", {
           value: {
             type: "AssignmentPattern",
             range: [2, 7],
-            operator: "=",
             left: {
               type: "Identifier",
               range: [2, 3],
@@ -14573,7 +14569,6 @@ test("({x = 0}) => x", {
           value: {
             type: "AssignmentPattern",
             range: [2, 7],
-            operator: "=",
             left: {
               type: "Identifier",
               range: [2, 3],
@@ -14650,7 +14645,6 @@ test("[a, {b: {c = 1}}] = arr", {
                   value: {
                     type: "AssignmentPattern",
                     range: [9, 14],
-                    operator: "=",
                     left: {
                       type: "Identifier",
                       range: [9, 10],
@@ -14705,7 +14699,6 @@ test("for ({x = 0} in arr);", {
         value: {
           type: "AssignmentPattern",
           range: [6, 11],
-          operator: "=",
           left: {
             type: "Identifier",
             range: [6, 7],

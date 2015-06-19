@@ -447,6 +447,7 @@ lp.toAssignable = function(node, binding) {
 
     case "AssignmentExpression":
       node.type = "AssignmentPattern"
+      delete node.operator
       break
     }
   }
