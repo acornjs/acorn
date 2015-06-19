@@ -15388,3 +15388,12 @@ testFail("super", "'super' outside of function or class (1:0)", {ecmaVersion: 6}
 testFail("class A { get prop(x) {} }", "getter should have no params (1:18)", {ecmaVersion: 6});
 testFail("class A { set prop() {} }", "setter should have exactly one param (1:18)", {ecmaVersion: 6});
 testFail("class A { set prop(x, y) {} }", "setter should have exactly one param (1:18)", {ecmaVersion: 6});
+
+// https://github.com/marijnh/acorn/issues/276
+
+testFail("({ __proto__: 1, __proto__: 2 })", "Redefinition of __proto__ property (1:17)", {ecmaVersion: 6});
+testFail("({ '__proto__': 1, __proto__: 2 })", "Redefinition of __proto__ property (1:19)", {ecmaVersion: 6});
+test("({ ['__proto__']: 1, __proto__: 2 })", {}, {ecmaVersion: 6});
+test("({ __proto__() { return 1 }, __proto__: 2 })", {}, {ecmaVersion: 6});
+test("({ get __proto__() { return 1 }, __proto__: 2 })", {}, {ecmaVersion: 6});
+test("({ __proto__, __proto__: 2 })", {}, {ecmaVersion: 6});

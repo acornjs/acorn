@@ -29,14 +29,23 @@ const pp = Parser.prototype
 // strict mode, init properties are also not allowed to be repeated.
 
 pp.checkPropClash = function(prop, propHash) {
-  if (this.options.ecmaVersion >= 6) return
+  if (this.options.ecmaVersion >= 6 && (prop.computed || prop.method || prop.shorthand))
+    return
   let key = prop.key, name
   switch (key.type) {
   case "Identifier": name = key.name; break
   case "Literal": name = String(key.value); break
   default: return
   }
-  let kind = prop.kind || "init", other
+  let kind = prop.kind
+  if (this.options.ecmaVersion >= 6) {
+    if (name === "__proto__" && kind === "init") {
+      if (propHash.proto) this.raise(key.start, "Redefinition of __proto__ property");
+      propHash.proto = true
+    }
+    return
+  }
+  let other
   if (has(propHash, name)) {
     other = propHash[name]
     let isGetSet = kind !== "init"
