@@ -15382,3 +15382,9 @@ testFail("/\\u{110000}/u", "Code point out of bounds (1:4)", {ecmaVersion: 6});
 // https://github.com/marijnh/acorn/issues/279
 
 testFail("super", "'super' outside of function or class (1:0)", {ecmaVersion: 6});
+
+// https://github.com/marijnh/acorn/issues/275
+
+testFail("class A { get prop(x) {} }", "getter should have no params (1:18)", {ecmaVersion: 6});
+testFail("class A { set prop() {} }", "setter should have exactly one param (1:18)", {ecmaVersion: 6});
+testFail("class A { set prop(x, y) {} }", "setter should have exactly one param (1:18)", {ecmaVersion: 6});

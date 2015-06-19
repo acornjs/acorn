@@ -28991,3 +28991,9 @@ testAssert("[1,2,] + {foo: 1,}", function() {
     return "Unexpected result for onTrailingComma: " + result;
 }, {onTrailingComma: function(pos) { trailingCommas.push(pos); },
     loose: false})
+
+// https://github.com/marijnh/acorn/issues/275
+
+testFail("({ get prop(x) {} })", "getter should have no params (1:11)");
+testFail("({ set prop() {} })", "setter should have exactly one param (1:11)");
+testFail("({ set prop(x, y) {} })", "setter should have exactly one param (1:11)");

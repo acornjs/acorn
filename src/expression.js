@@ -490,6 +490,14 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
       prop.kind = prop.key.name
       this.parsePropertyName(prop)
       prop.value = this.parseMethod(false)
+      let paramCount = prop.kind === "get" ? 0 : 1
+      if (prop.value.params.length !== paramCount) {
+        let start = prop.value.start
+        if (prop.kind === "get")
+          this.raise(start, "getter should have no params");
+        else
+          this.raise(start, "setter should have exactly one param")
+      }
     } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
       prop.kind = "init"
       if (isPattern) {

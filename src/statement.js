@@ -440,9 +440,9 @@ pp.parseClass = function(node, isStatement) {
       this.parsePropertyName(method)
     }
     method.kind = "method"
+    let isGetSet = false
     if (!method.computed) {
       let {key} = method
-      let isGetSet = false
       if (!isGenerator && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
         isGetSet = true
         method.kind = key.name
@@ -458,6 +458,16 @@ pp.parseClass = function(node, isStatement) {
       }
     }
     this.parseClassMethod(classBody, method, isGenerator)
+    if (isGetSet) {
+      let paramCount = method.kind === "get" ? 0 : 1
+      if (method.value.params.length !== paramCount) {
+        let start = method.value.start
+        if (method.kind === "get")
+          this.raise(start, "getter should have no params");
+        else
+          this.raise(start, "setter should have exactly one param")
+      }
+    }
   }
   node.body = this.finishNode(classBody, "ClassBody")
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
