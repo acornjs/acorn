@@ -877,7 +877,7 @@ test("`\n\r\n\r`", {
   locations: true
 });
 
-test("`\\u{000042}\\u0042\\x42u0\\102\\A`", {
+test("`\\u{000042}\\u0042\\x42u0\\A`", {
   type: "Program",
   body: [{
     type: "ExpressionStatement",
@@ -885,27 +885,27 @@ test("`\\u{000042}\\u0042\\x42u0\\102\\A`", {
       type: "TemplateLiteral",
       quasis: [{
         type: "TemplateElement",
-        value: {raw: "\\u{000042}\\u0042\\x42u0\\102\\A", cooked: "BBBu0BA"},
+        value: {raw: "\\u{000042}\\u0042\\x42u0\\A", cooked: "BBBu0A"},
         tail: true,
         loc: {
           start: {line: 1, column: 1},
-          end: {line: 1, column: 29}
+          end: {line: 1, column: 25}
         }
       }],
       expressions: [],
       loc: {
         start: {line: 1, column: 0},
-        end: {line: 1, column: 30}
+        end: {line: 1, column: 26}
       }
     },
     loc: {
       start: {line: 1, column: 0},
-      end: {line: 1, column: 30}
+      end: {line: 1, column: 26}
     }
   }],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 1, column: 30}
+    end: {line: 1, column: 26}
   }
 }, {
   ecmaVersion: 6,
@@ -15634,3 +15634,7 @@ test("export default function foo() {} false", {
   sourceType: "module",
   type: "Program"
 }, {ecmaVersion: 6, sourceType: "module"})
+
+// https://github.com/marijnh/acorn/issues/274
+
+testFail("`\\07`", "Octal literal in strict mode (1:1)", {ecmaVersion: 6});

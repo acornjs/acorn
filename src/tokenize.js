@@ -524,7 +524,7 @@ pp.readString = function(quote) {
     if (ch === quote) break
     if (ch === 92) { // '\'
       out += this.input.slice(chunkStart, this.pos)
-      out += this.readEscapedChar()
+      out += this.readEscapedChar(false)
       chunkStart = this.pos
     } else {
       if (isNewLine(ch)) this.raise(this.start, "Unterminated string constant")
@@ -557,7 +557,7 @@ pp.readTmplToken = function() {
     }
     if (ch === 92) { // '\'
       out += this.input.slice(chunkStart, this.pos)
-      out += this.readEscapedChar()
+      out += this.readEscapedChar(true)
       chunkStart = this.pos
     } else if (isNewLine(ch)) {
       out += this.input.slice(chunkStart, this.pos)
@@ -585,34 +585,37 @@ pp.readTmplToken = function() {
 
 // Used to read escaped characters
 
-pp.readEscapedChar = function() {
+pp.readEscapedChar = function(inTemplate) {
   let ch = this.input.charCodeAt(++this.pos)
-  let octal = /^[0-7]+/.exec(this.input.slice(this.pos, this.pos + 3))
-  if (octal) octal = octal[0]
-  while (octal && parseInt(octal, 8) > 255) octal = octal.slice(0, -1)
-  if (octal === "0") octal = null
   ++this.pos
-  if (octal) {
-    if (this.strict) this.raise(this.pos - 2, "Octal literal in strict mode")
-    this.pos += octal.length - 1
-    return String.fromCharCode(parseInt(octal, 8))
-  } else {
-    switch (ch) {
-    case 110: return "\n"; // 'n' -> '\n'
-    case 114: return "\r"; // 'r' -> '\r'
-    case 120: return String.fromCharCode(this.readHexChar(2)); // 'x'
-    case 117: return codePointToString(this.readCodePoint()); // 'u'
-    case 116: return "\t"; // 't' -> '\t'
-    case 98: return "\b"; // 'b' -> '\b'
-    case 118: return "\u000b"; // 'v' -> '\u000b'
-    case 102: return "\f"; // 'f' -> '\f'
-    case 48: return "\0"; // 0 -> '\0'
-    case 13: if (this.input.charCodeAt(this.pos) === 10) ++this.pos; // '\r\n'
-    case 10: // ' \n'
-      if (this.options.locations) { this.lineStart = this.pos; ++this.curLine }
-      return ""
-    default: return String.fromCharCode(ch)
+  switch (ch) {
+  case 110: return "\n"; // 'n' -> '\n'
+  case 114: return "\r"; // 'r' -> '\r'
+  case 120: return String.fromCharCode(this.readHexChar(2)); // 'x'
+  case 117: return codePointToString(this.readCodePoint()); // 'u'
+  case 116: return "\t"; // 't' -> '\t'
+  case 98: return "\b"; // 'b' -> '\b'
+  case 118: return "\u000b"; // 'v' -> '\u000b'
+  case 102: return "\f"; // 'f' -> '\f'
+  case 13: if (this.input.charCodeAt(this.pos) === 10) ++this.pos; // '\r\n'
+  case 10: // ' \n'
+    if (this.options.locations) { this.lineStart = this.pos; ++this.curLine }
+    return ""
+  default:
+    if (ch >= 48 && ch <= 55) {
+      let octalStr = this.input.substr(this.pos - 1, 3).match(/^[0-7]+/)[0]
+      let octal = parseInt(octalStr, 8)
+      if (octal > 255) {
+        octalStr = octalStr.slice(0, -1)
+        octal = parseInt(octalStr, 8)
+      }
+      if (octal > 0 && (this.strict || inTemplate)) {
+        this.raise(this.pos - 2, "Octal literal in strict mode")
+      }
+      this.pos += octalStr.length - 1
+      return String.fromCharCode(octal)
     }
+    return String.fromCharCode(ch)
   }
 }
 
