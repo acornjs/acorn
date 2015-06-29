@@ -229,7 +229,7 @@ can thus run without evaluating anything.
 ### dist/acorn_loose.js ###
 
 This file implements an error-tolerant parser. It exposes a single
-function.
+function. The loose parser is accessible in node.js via `require("acorn/dist/acorn_loose")`.
 
 **parse_dammit**`(input, options)` takes the same arguments and
 returns the same syntax tree as the `parse` function in `acorn.js`,
