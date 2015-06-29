@@ -10,7 +10,8 @@ const pp = Parser.prototype
 
 pp.isUseStrict = function(stmt) {
   return this.options.ecmaVersion >= 5 && stmt.type === "ExpressionStatement" &&
-    stmt.expression.type === "Literal" && stmt.expression.value === "use strict"
+    stmt.expression.type === "Literal" &&
+    /^(["'])use strict\1$/.test(stmt.expression.raw);
 }
 
 // Predicate that tests whether the next token is of the given
