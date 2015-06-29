@@ -21205,6 +21205,115 @@ test("with (x) foo = bar;", {
   }
 });
 
+// Test that innocuous string that evaluates to `use strict` is not promoted to
+// Use Strict directive.
+test("'use\\x20strict'; with (x) foo = bar;", {
+  start: 0,
+  loc: { start: { line: 1, column: 0 }, end: { line: 1, column: 36 } },
+  body:
+   [ { start: 0,
+       loc: { start: { line: 1, column: 0 }, end: { line: 1, column: 16 } },
+       expression:
+        { start: 0,
+          loc: { start: { line: 1, column: 0 }, end: { line: 1, column: 15 } },
+          value: 'use strict',
+          raw: '\'use\\x20strict\'',
+          type: 'Literal',
+          end: 15 },
+       type: 'ExpressionStatement',
+       end: 16 },
+     { start: 17,
+       loc: { start: { line: 1, column: 17 }, end: { line: 1, column: 36 } },
+       object:
+        { start: 23,
+          loc: { start: { line: 1, column: 23 }, end: { line: 1, column: 24 } },
+          name: 'x',
+          type: 'Identifier',
+          end: 24 },
+       body:
+        { start: 26,
+          loc: { start: { line: 1, column: 26 }, end: { line: 1, column: 36 } },
+          expression:
+           { start: 26,
+             loc: { start: { line: 1, column: 26 }, end: { line: 1, column: 35 } },
+             operator: '=',
+             left:
+              { start: 26,
+                loc: { start: { line: 1, column: 26 }, end: { line: 1, column: 29 } },
+                name: 'foo',
+                type: 'Identifier',
+                end: 29 },
+             right:
+              { start: 32,
+                loc: { start: { line: 1, column: 32 }, end: { line: 1, column: 35 } },
+                name: 'bar',
+                type: 'Identifier',
+                end: 35 },
+             type: 'AssignmentExpression',
+             end: 35 },
+          type: 'ExpressionStatement',
+          end: 36 },
+       type: 'WithStatement',
+       end: 36 } ],
+  type: 'Program',
+  end: 36
+});
+
+
+// Test that innocuous string that evaluates to `use strict` is not promoted to
+// Use Strict directive.
+test('"use\\x20strict"; with (x) foo = bar;', {
+  start: 0,
+  loc: { start: { line: 1, column: 0 }, end: { line: 1, column: 36 } },
+  body:
+   [ { start: 0,
+       loc: { start: { line: 1, column: 0 }, end: { line: 1, column: 16 } },
+       expression:
+        { start: 0,
+          loc: { start: { line: 1, column: 0 }, end: { line: 1, column: 15 } },
+          value: 'use strict',
+          raw: '\"use\\x20strict\"',
+          type: 'Literal',
+          end: 15 },
+       type: 'ExpressionStatement',
+       end: 16 },
+     { start: 17,
+       loc: { start: { line: 1, column: 17 }, end: { line: 1, column: 36 } },
+       object:
+        { start: 23,
+          loc: { start: { line: 1, column: 23 }, end: { line: 1, column: 24 } },
+          name: 'x',
+          type: 'Identifier',
+          end: 24 },
+       body:
+        { start: 26,
+          loc: { start: { line: 1, column: 26 }, end: { line: 1, column: 36 } },
+          expression:
+           { start: 26,
+             loc: { start: { line: 1, column: 26 }, end: { line: 1, column: 35 } },
+             operator: '=',
+             left:
+              { start: 26,
+                loc: { start: { line: 1, column: 26 }, end: { line: 1, column: 29 } },
+                name: 'foo',
+                type: 'Identifier',
+                end: 29 },
+             right:
+              { start: 32,
+                loc: { start: { line: 1, column: 32 }, end: { line: 1, column: 35 } },
+                name: 'bar',
+                type: 'Identifier',
+                end: 35 },
+             type: 'AssignmentExpression',
+             end: 35 },
+          type: 'ExpressionStatement',
+          end: 36 },
+       type: 'WithStatement',
+       end: 36 } ],
+  type: 'Program',
+  end: 36
+});
+
 test("with (x) { foo = bar }", {
   type: "Program",
   body: [
