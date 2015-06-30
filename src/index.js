@@ -70,6 +70,6 @@ export function tokenizer(input, options) {
   return parser(options, input)
 }
 
-function parser(options, input) {
-  return new Parser(getOptions(options), String(input))
+function parser(options, input, pos) {
+  return new Parser(getOptions(options), String(input), pos)
 }
