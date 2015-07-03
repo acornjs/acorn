@@ -17,8 +17,10 @@ pp.parseTopLevel = function(node) {
   while (this.type !== tt.eof) {
     let stmt = this.parseStatement(true, true)
     node.body.push(stmt)
-    if (first && this.isUseStrict(stmt)) this.setStrict(true)
-    first = false
+    if (first) {
+      if (this.isUseStrict(stmt)) this.setStrict(true)
+      first = false
+    }
   }
   this.next()
   if (this.options.ecmaVersion >= 6) {
@@ -204,7 +206,7 @@ pp.parseSwitchStatement = function(node) {
   // nodes. `cur` is used to keep the node that we are currently
   // adding statements to.
 
-  for (var cur, sawDefault; this.type != tt.braceR;) {
+  for (var cur, sawDefault = false; this.type != tt.braceR;) {
     if (this.type === tt._case || this.type === tt._default) {
       let isCase = this.type === tt._case
       if (cur) this.finishNode(cur, "SwitchCase")

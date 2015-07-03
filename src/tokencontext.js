@@ -9,8 +9,8 @@ import {lineBreak} from "./whitespace"
 export class TokContext {
   constructor(token, isExpr, preserveSpace, override) {
     this.token = token
-    this.isExpr = isExpr
-    this.preserveSpace = preserveSpace
+    this.isExpr = !!isExpr
+    this.preserveSpace = !!preserveSpace
     this.override = override
   }
 }
@@ -32,9 +32,11 @@ pp.initialContext = function() {
 }
 
 pp.braceIsBlock = function(prevType) {
-  let parent
-  if (prevType === tt.colon && (parent = this.curContext()).token == "{")
-    return !parent.isExpr
+  if (prevType === tt.colon) {
+    let parent = this.curContext()
+    if (parent === types.b_stat || parent === types.b_expr)
+      return !parent.isExpr
+  }
   if (prevType === tt._return)
     return lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
   if (prevType === tt._else || prevType === tt.semi || prevType === tt.eof)

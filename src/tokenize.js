@@ -145,41 +145,41 @@ pp.skipLineComment = function(startSkip) {
 // whitespace and comments, and.
 
 pp.skipSpace = function() {
-  while (this.pos < this.input.length) {
+  loop: while (this.pos < this.input.length) {
     let ch = this.input.charCodeAt(this.pos)
-    if (ch === 32) { // ' '
-      ++this.pos
-    } else if (ch === 13) {
-      ++this.pos
-      let next = this.input.charCodeAt(this.pos)
-      if (next === 10) {
+    switch (ch) {
+      case 32: case 160: // ' '
         ++this.pos
-      }
-      if (this.options.locations) {
-        ++this.curLine
-        this.lineStart = this.pos
-      }
-    } else if (ch === 10 || ch === 8232 || ch === 8233) {
-      ++this.pos
-      if (this.options.locations) {
-        ++this.curLine
-        this.lineStart = this.pos
-      }
-    } else if (ch > 8 && ch < 14) {
-      ++this.pos
-    } else if (ch === 47) { // '/'
-      let next = this.input.charCodeAt(this.pos + 1)
-      if (next === 42) { // '*'
-        this.skipBlockComment()
-      } else if (next === 47) { // '/'
-        this.skipLineComment(2)
-      } else break
-    } else if (ch === 160) { // '\xa0'
-      ++this.pos
-    } else if (ch >= 5760 && nonASCIIwhitespace.test(String.fromCharCode(ch))) {
-      ++this.pos
-    } else {
-      break
+        break
+      case 13:
+        if (this.input.charCodeAt(this.pos + 1) === 10) {
+          ++this.pos
+        }
+      case 10: case 8232: case 8233:
+        ++this.pos
+        if (this.options.locations) {
+          ++this.curLine
+          this.lineStart = this.pos
+        }
+        break
+      case 47: // '/'
+        switch (this.input.charCodeAt(this.pos + 1)) {
+          case 42: // '*'
+            this.skipBlockComment()
+            break
+          case 47:
+            this.skipLineComment(2)
+            break
+          default:
+            break loop
+        }
+        break
+      default:
+        if (ch > 8 && ch < 14 || ch >= 5760 && nonASCIIwhitespace.test(String.fromCharCode(ch))) {
+          ++this.pos
+        } else {
+          break loop
+        }
     }
   }
 }
@@ -380,6 +380,12 @@ catch(e) {}
 // Parse a regular expression. Some context-awareness is necessary,
 // since a '/' inside a '[]' set does not end the expression.
 
+function tryCreateRegexp(src, flags) {
+  try {
+    return new RegExp(src, flags);
+  } catch (err) {}
+}
+
 pp.readRegexp = function() {
   let escaped, inClass, start = this.pos
   for (;;) {
@@ -426,17 +432,13 @@ pp.readRegexp = function() {
   // Rhino's regular expression parser is flaky and throws uncatchable exceptions,
   // so don't do detection if we are running under Rhino
   if (!isRhino) {
-    try {
-      new RegExp(tmp)
-    } catch (e) {
+    if (!tryCreateRegexp(tmp)) {
       if (e instanceof SyntaxError) this.raise(start, "Error parsing regular expression: " + e.message)
       this.raise(e)
     }
     // Get a regular expression object for this pattern-flag pair, or `null` in
     // case the current environment doesn't support the flags it uses.
-    try {
-      value = new RegExp(content, mods)
-    } catch (err) {}
+    value = tryCreateRegexp(content, mods)
   }
   return this.finishToken(tt.regexp, {pattern: content, flags: mods, value: value})
 }
@@ -475,12 +477,13 @@ pp.readRadixNumber = function(radix) {
 pp.readNumber = function(startsWithDot) {
   let start = this.pos, isFloat = false, octal = this.input.charCodeAt(this.pos) === 48
   if (!startsWithDot && this.readInt(10) === null) this.raise(start, "Invalid number")
-  if (this.input.charCodeAt(this.pos) === 46) {
+  let next = this.input.charCodeAt(this.pos)
+  if (next === 46) { // '.'
     ++this.pos
     this.readInt(10)
     isFloat = true
+    next = this.input.charCodeAt(this.pos)
   }
-  let next = this.input.charCodeAt(this.pos)
   if (next === 69 || next === 101) { // 'eE'
     next = this.input.charCodeAt(++this.pos)
     if (next === 43 || next === 45) ++this.pos; // '+-'

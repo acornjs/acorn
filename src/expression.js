@@ -620,14 +620,14 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refShorthandD
       if (allowTrailingComma && this.afterTrailingComma(close)) break
     } else first = false
 
-    if (allowEmpty && this.type === tt.comma) {
-      elts.push(null)
-    } else {
-      if (this.type === tt.ellipsis)
-        elts.push(this.parseSpread(refShorthandDefaultPos))
-      else
-        elts.push(this.parseMaybeAssign(false, refShorthandDefaultPos))
-    }
+    let elt
+    if (allowEmpty && this.type === tt.comma)
+      elt = null
+    else if (this.type === tt.ellipsis)
+      elt = this.parseSpread(refShorthandDefaultPos)
+    else
+      elt = this.parseMaybeAssign(false, refShorthandDefaultPos)
+    elts.push(elt)
   }
   return elts
 }
