@@ -25,11 +25,11 @@ import "./parseutil"
 import "./statement"
 import "./lval"
 import "./expression"
+import "./location"
 
 export {Parser, plugins} from "./state"
 export {defaultOptions} from "./options"
-export {SourceLocation} from "./location"
-export {getLineInfo} from "./location"
+export {Position, SourceLocation, getLineInfo} from "./locutil"
 export {Node} from "./node"
 export {TokenType, types as tokTypes} from "./tokentype"
 export {TokContext, types as tokContexts} from "./tokencontext"
@@ -47,7 +47,7 @@ export const version = "2.0.5"
 // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
 
 export function parse(input, options) {
-  let p = parser(options, input)
+  let p = new Parser(options, input)
   let startPos = p.pos, startLoc = p.options.locations && p.curPosition()
   p.nextToken()
   return p.parseTopLevel(p.options.program || p.startNodeAt(startPos, startLoc))
@@ -58,7 +58,7 @@ export function parse(input, options) {
 // that embed JavaScript expressions.
 
 export function parseExpressionAt(input, pos, options) {
-  let p = parser(options, input, pos)
+  let p = new Parser(options, input, pos)
   p.nextToken()
   return p.parseExpression()
 }
@@ -67,9 +67,5 @@ export function parseExpressionAt(input, pos, options) {
 // The `tokenize` export provides an interface to the tokenizer.
 
 export function tokenizer(input, options) {
-  return parser(options, input)
-}
-
-function parser(options, input) {
-  return new Parser(getOptions(options), String(input))
+  return new Parser(options, input)
 }

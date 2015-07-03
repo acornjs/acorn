@@ -1,7 +1,7 @@
 import {isIdentifierStart, isIdentifierChar} from "./identifier"
 import {types as tt, keywords as keywordTypes} from "./tokentype"
 import {Parser} from "./state"
-import {SourceLocation} from "./location"
+import {SourceLocation} from "./locutil"
 import {lineBreak, lineBreakG, isNewLine, nonASCIIwhitespace} from "./whitespace"
 
 // Object type used to represent tokens. Note that normally, tokens

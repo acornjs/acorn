@@ -1,5 +1,5 @@
 import {Parser} from "./state"
-import {SourceLocation} from "./location"
+import {SourceLocation} from "./locutil"
 
 // Start an AST node, attaching a start offset.
 
