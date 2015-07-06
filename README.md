@@ -331,7 +331,7 @@ If you are working on Acorn, you'll probably want to try the code out
 directly, without an intermediate build step. In your scripts, you can
 register the Babel require shim like this:
 
-    require("babelify/node_modules/babel-core/register")
+    require("babel-core/register")
 
 That will allow you to directly `require` the ES6 modules.
 

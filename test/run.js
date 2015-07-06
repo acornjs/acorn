@@ -5,7 +5,7 @@
     driver = require("./driver.js");
     require("./tests.js");
     require("./tests-harmony.js");
-    require("babelify/node_modules/babel-core/register")
+    require("babel-core/register")
     acorn = require("../src")
     require("../src/loose")
   } else {

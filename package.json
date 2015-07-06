@@ -25,13 +25,14 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "node test/run.js",
-    "prepublish": "node bin/build-acorn.js && node bin/without_eval > dist/acorn_csp.js"
+    "prepublish": "node bin/build-acorn.js && node bin/without_eval > dist/acorn_csp.js",
+    "test": "node test/run.js"
   },
   "bin": {
     "acorn": "./bin/acorn"
   },
   "devDependencies": {
+    "babel-core": "^5.6.15",
     "babelify": "^6.1.2",
     "browserify": "^10.2.4",
     "browserify-derequire": "^0.9.4",
