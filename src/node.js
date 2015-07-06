@@ -1,51 +1,35 @@
 import {Parser} from "./state"
 import {SourceLocation} from "./locutil"
 
+export class Node {
+  constructor(parser, pos, loc) {
+    this.type = ""
+    this.start = pos
+    this.end = 0
+    if (parser.options.locations)
+      this.loc = new SourceLocation(parser, loc)
+    if (parser.options.directSourceFile)
+      this.sourceFile = parser.options.directSourceFile
+    if (parser.options.ranges)
+      this.range = [pos, 0]
+  }
+}
+
 // Start an AST node, attaching a start offset.
 
 const pp = Parser.prototype
 
-export class Node {}
-
 pp.startNode = function() {
-  let node = new Node
-  node.start = this.start
-  if (this.options.locations)
-    node.loc = new SourceLocation(this, this.startLoc)
-  if (this.options.directSourceFile)
-    node.sourceFile = this.options.directSourceFile
-  if (this.options.ranges)
-    node.range = [this.start, 0]
-  return node
+  return new Node(this, this.start, this.startLoc)
 }
 
 pp.startNodeAt = function(pos, loc) {
-  let node = new Node
-  node.start = pos
-  if (this.options.locations)
-    node.loc = new SourceLocation(this, loc)
-  if (this.options.directSourceFile)
-    node.sourceFile = this.options.directSourceFile
-  if (this.options.ranges)
-    node.range = [pos, 0]
-  return node
+  return new Node(this, pos, loc)
 }
 
 // Finish an AST node, adding `type` and `end` properties.
 
-pp.finishNode = function(node, type) {
-  node.type = type
-  node.end = this.lastTokEnd
-  if (this.options.locations)
-    node.loc.end = this.lastTokEndLoc
-  if (this.options.ranges)
-    node.range[1] = this.lastTokEnd
-  return node
-}
-
-// Finish node at given position
-
-pp.finishNodeAt = function(node, type, pos, loc) {
+function finishNodeAt(node, type, pos, loc) {
   node.type = type
   node.end = pos
   if (this.options.locations)
@@ -53,4 +37,14 @@ pp.finishNodeAt = function(node, type, pos, loc) {
   if (this.options.ranges)
     node.range[1] = pos
   return node
+}
+
+pp.finishNode = function(node, type) {
+  return finishNodeAt.call(this, node, type, this.lastTokEnd, this.lastTokEndLoc)
+}
+
+// Finish node at given position
+
+pp.finishNodeAt = function(node, type, pos, loc) {
+  return finishNodeAt.call(this, node, type, pos, loc)
 }
