@@ -32,7 +32,6 @@
 import * as acorn from ".."
 import {LooseParser} from "./state"
 import "./tokenize"
-import "./parseutil"
 import "./statement"
 import "./expression"
 
