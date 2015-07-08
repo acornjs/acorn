@@ -48,7 +48,7 @@ export const version = "2.0.5"
 
 export function parse(input, options) {
   let p = new Parser(options, input)
-  let startPos = p.pos, startLoc = p.options.locations && p.curPosition()
+  let startPos = p.pos, startLoc = p.curPosition()
   p.nextToken()
   return p.parseTopLevel(p.options.program || p.startNodeAt(startPos, startLoc))
 }

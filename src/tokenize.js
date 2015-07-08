@@ -111,7 +111,7 @@ pp.fullCharCodeAtPos = function() {
 }
 
 pp.skipBlockComment = function() {
-  let startLoc = this.options.onComment && this.options.locations && this.curPosition()
+  let startLoc = this.options.onComment && this.curPosition()
   let start = this.pos, end = this.input.indexOf("*/", this.pos += 2)
   if (end === -1) this.raise(this.pos - 2, "Unterminated comment")
   this.pos = end + 2
@@ -125,12 +125,12 @@ pp.skipBlockComment = function() {
   }
   if (this.options.onComment)
     this.options.onComment(true, this.input.slice(start + 2, end), start, this.pos,
-                           startLoc, this.options.locations && this.curPosition())
+                           startLoc, this.curPosition())
 }
 
 pp.skipLineComment = function(startSkip) {
   let start = this.pos
-  let startLoc = this.options.onComment && this.options.locations && this.curPosition()
+  let startLoc = this.options.onComment && this.curPosition()
   let ch = this.input.charCodeAt(this.pos+=startSkip)
   while (this.pos < this.input.length && ch !== 10 && ch !== 13 && ch !== 8232 && ch !== 8233) {
     ++this.pos
@@ -138,7 +138,7 @@ pp.skipLineComment = function(startSkip) {
   }
   if (this.options.onComment)
     this.options.onComment(false, this.input.slice(start + startSkip, this.pos), start, this.pos,
-                           startLoc, this.options.locations && this.curPosition())
+                           startLoc, this.curPosition())
 }
 
 // Called at the start of the parse and after every token. Skips

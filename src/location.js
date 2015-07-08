@@ -18,5 +18,7 @@ pp.raise = function(pos, message) {
 }
 
 pp.curPosition = function() {
-  return new Position(this.curLine, this.pos - this.lineStart)
+  if (this.options.locations) {
+    return new Position(this.curLine, this.pos - this.lineStart)
+  }
 }
