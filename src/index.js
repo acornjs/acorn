@@ -47,10 +47,7 @@ export const version = "2.0.5"
 // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
 
 export function parse(input, options) {
-  let p = new Parser(options, input)
-  let startPos = p.pos, startLoc = p.curPosition()
-  p.nextToken()
-  return p.parseTopLevel(p.options.program || p.startNodeAt(startPos, startLoc))
+  return new Parser(options, input).parse()
 }
 
 // This function tries to parse a single expression at a given

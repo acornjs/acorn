@@ -38,7 +38,7 @@ export class Parser {
     this.start = this.end = this.pos
     // And, if locations are used, the {line, column} object
     // corresponding to those offsets
-    this.startLoc = this.endLoc = null
+    this.startLoc = this.endLoc = this.curPosition()
 
     // Position information for the previous token
     this.lastTokEndLoc = this.lastTokStartLoc = null
@@ -76,5 +76,11 @@ export class Parser {
       if (!plugin) throw new Error("Plugin '" + name + "' not found")
       plugin(this, pluginConfigs[name])
     }
+  }
+
+  parse() {
+    let node = this.options.program || this.startNode()
+    this.nextToken()
+    return this.parseTopLevel(node)
   }
 }
