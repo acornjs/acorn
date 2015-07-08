@@ -373,10 +373,6 @@ pp.finishOp = function(type, size) {
   return this.finishToken(type, str)
 }
 
-var regexpUnicodeSupport = false
-try { new RegExp("\uffff", "u"); regexpUnicodeSupport = true }
-catch(e) {}
-
 // Parse a regular expression. Some context-awareness is necessary,
 // since a '/' inside a '[]' set does not end the expression.
 
@@ -385,6 +381,8 @@ function tryCreateRegexp(src, flags) {
     return new RegExp(src, flags);
   } catch (err) {}
 }
+
+var regexpUnicodeSupport = !!tryCreateRegexp("\uffff", "u");
 
 pp.readRegexp = function() {
   let escaped, inClass, start = this.pos
@@ -520,8 +518,8 @@ pp.readCodePoint = function() {
 function codePointToString(code) {
   // UTF-16 Decoding
   if (code <= 0xFFFF) return String.fromCharCode(code)
-  return String.fromCharCode(((code - 0x10000) >> 10) + 0xD800,
-                             ((code - 0x10000) & 1023) + 0xDC00)
+  code -= 0x10000
+  return String.fromCharCode((code >> 10) + 0xD800, (code & 1023) + 0xDC00)
 }
 
 pp.readString = function(quote) {
