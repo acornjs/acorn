@@ -376,10 +376,15 @@ pp.finishOp = function(type, size) {
 // Parse a regular expression. Some context-awareness is necessary,
 // since a '/' inside a '[]' set does not end the expression.
 
-function tryCreateRegexp(src, flags) {
+function tryCreateRegexp(src, flags, throwError) {
   try {
     return new RegExp(src, flags);
-  } catch (err) {}
+  } catch (e) {
+    if (throwError) {
+      if (e instanceof SyntaxError) this.raise(start, "Error parsing regular expression: " + e.message)
+      this.raise(e)
+    }
+  }
 }
 
 var regexpUnicodeSupport = !!tryCreateRegexp("\uffff", "u");
@@ -430,10 +435,7 @@ pp.readRegexp = function() {
   // Rhino's regular expression parser is flaky and throws uncatchable exceptions,
   // so don't do detection if we are running under Rhino
   if (!isRhino) {
-    if (!tryCreateRegexp(tmp)) {
-      if (e instanceof SyntaxError) this.raise(start, "Error parsing regular expression: " + e.message)
-      this.raise(e)
-    }
+    tryCreateRegexp(tmp, undefined, true);
     // Get a regular expression object for this pattern-flag pair, or `null` in
     // case the current environment doesn't support the flags it uses.
     value = tryCreateRegexp(content, mods)
