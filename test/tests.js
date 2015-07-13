@@ -26728,6 +26728,7 @@ test("{}\n/foo/", {});
 test("x++\n{}\n/foo/", {});
 test("{{}\n/foo/}", {});
 test("while (1) /foo/", {});
+test("while (1) {} /foo/", {});
 test("(1) / 2", {});
 test("({a: [1]}+[]) / 2", {});
 test("{[1]}\n/foo/", {});
