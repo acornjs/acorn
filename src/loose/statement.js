@@ -386,6 +386,7 @@ lp.parseImportSpecifierList = function() {
       } else {
         if (this.isContextual("from")) break
         elt.imported = this.parseIdent()
+        if (isDummy(elt.imported)) break
         elt.local = this.eatContextual("as") ? this.parseIdent() : elt.imported
         this.finishNode(elt, "ImportSpecifier")
       }
@@ -408,6 +409,7 @@ lp.parseExportSpecifierList = function() {
     if (this.isContextual("from")) break
     let elt = this.startNode()
     elt.local = this.parseIdent()
+    if (isDummy(elt.local)) break
     elt.exported = this.eatContextual("as") ? this.parseIdent() : elt.local
     this.finishNode(elt, "ExportSpecifier")
     elts.push(elt)
