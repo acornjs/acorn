@@ -7,7 +7,7 @@
 //
 // It starts by sorting the words by length.
 
-function makePredicate(words) {
+export function makePredicate(words) {
   words = words.split(" ")
   let f = "", cats = []
   out: for (let i = 0; i < words.length; ++i) {
