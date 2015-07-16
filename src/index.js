@@ -33,7 +33,7 @@ export {Position, SourceLocation, getLineInfo} from "./locutil"
 export {Node} from "./node"
 export {TokenType, types as tokTypes} from "./tokentype"
 export {TokContext, types as tokContexts} from "./tokencontext"
-export {isIdentifierChar, isIdentifierStart} from "./identifier"
+export {isIdentifierChar, isIdentifierStart, makePredicate} from "./identifier"
 export {Token} from "./tokenize"
 export {isNewLine, lineBreak, lineBreakG} from "./whitespace"
 
