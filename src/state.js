@@ -14,6 +14,11 @@ export class Parser {
     this.isReservedWord = reservedWords[this.options.ecmaVersion]
     this.input = String(input)
 
+    // Used to signal to callers of `readWord1` whether the word
+    // contained any escape sequences. This is needed because words with
+    // escape sequences must not be interpreted as keywords.
+    this.containsEsc = false;
+
     // Load plugins
     this.loadPlugins(this.options.plugins)
 
