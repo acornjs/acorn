@@ -230,9 +230,12 @@ base.VariableDeclaration = (node, st, c) => {
 base.Function = (node, st, c) => {
   for (let i = 0; i < node.params.length; i++)
     c(node.params[i], st, "Pattern")
-  c(node.body, st, "ScopeBody")
+  c(node.body, st, node.expression ? "ScopeExpression" : "ScopeBody")
 }
+// FIXME drop these node types in next major version
+// (They are awkward, and in ES6 every block can be a scope.)
 base.ScopeBody = (node, st, c) => c(node, st, "Statement")
+base.ScopeExpression = (node, st, c) => c(node, st, "Expression")
 
 base.Pattern = (node, st, c) => {
   if (node.type == "Identifier")

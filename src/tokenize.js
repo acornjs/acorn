@@ -636,20 +636,14 @@ pp.readHexChar = function(len) {
   return n
 }
 
-// Used to signal to callers of `readWord1` whether the word
-// contained any escape sequences. This is needed because words with
-// escape sequences must not be interpreted as keywords.
-
-var containsEsc
-
-// Read an identifier, and return it as a string. Sets `containsEsc`
+// Read an identifier, and return it as a string. Sets `this.containsEsc`
 // to whether the word contained a '\u' escape.
 //
 // Incrementally adds only escaped chars, adding other chunks as-is
 // as a micro-optimization.
 
 pp.readWord1 = function() {
-  containsEsc = false
+  this.containsEsc = false
   let word = "", first = true, chunkStart = this.pos
   let astral = this.options.ecmaVersion >= 6
   while (this.pos < this.input.length) {
@@ -657,7 +651,7 @@ pp.readWord1 = function() {
     if (isIdentifierChar(ch, astral)) {
       this.pos += ch <= 0xffff ? 1 : 2
     } else if (ch === 92) { // "\"
-      containsEsc = true
+      this.containsEsc = true
       word += this.input.slice(chunkStart, this.pos)
       let escStart = this.pos
       if (this.input.charCodeAt(++this.pos) != 117) // "u"
@@ -682,7 +676,7 @@ pp.readWord1 = function() {
 pp.readWord = function() {
   let word = this.readWord1()
   let type = tt.name
-  if ((this.options.ecmaVersion >= 6 || !containsEsc) && this.isKeyword(word))
+  if ((this.options.ecmaVersion >= 6 || !this.containsEsc) && this.isKeyword(word))
     type = keywordTypes[word]
   return this.finishToken(type, word)
 }

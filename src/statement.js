@@ -565,7 +565,6 @@ pp.parseImport = function(node) {
   if (this.type === tt.string) {
     node.specifiers = empty
     node.source = this.parseExprAtom()
-    node.kind = ""
   } else {
     node.specifiers = this.parseImportSpecifiers()
     this.expectContextual("from")
