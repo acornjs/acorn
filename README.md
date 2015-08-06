@@ -301,6 +301,8 @@ options:
 - `--ecma3|--ecma5|--ecma6`: Sets the ECMAScript version to parse. Default is
   version 5.
 
+- `--module`: Sets the parsing mode to `"module"`. Is set to `"script"` otherwise.
+
 - `--locations`: Attaches a "loc" object to each node with "start" and
   "end" subobjects, each of which contains the one-based line and
   zero-based column numbers in `{line, column}` form.
