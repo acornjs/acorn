@@ -220,11 +220,12 @@ base.DebuggerStatement = ignore
 
 base.FunctionDeclaration = (node, st, c) => c(node, st, "Function")
 base.VariableDeclaration = (node, st, c) => {
-  for (let i = 0; i < node.declarations.length; ++i) {
-    let decl = node.declarations[i]
-    c(decl.id, st, "Pattern")
-    if (decl.init) c(decl.init, st, "Expression")
-  }
+  for (let i = 0; i < node.declarations.length; ++i)
+    c(node.declarations[i], st)
+}
+base.VariableDeclarator = (node, st, c) => {
+  c(node.id, st, "Pattern")
+  if (node.init) c(node.init, st, "Expression")
 }
 
 base.Function = (node, st, c) => {
