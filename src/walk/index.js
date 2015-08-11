@@ -303,10 +303,15 @@ base.MemberExpression = (node, st, c) => {
 }
 base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
   if (node.declaration) c(node.declaration, st)
+  if (node.source) c(node.source, st, "Expression")
+}
+base.ExportAllDeclaration = (node, st, c) => {
+  c(node.source, st, "Expression")
 }
 base.ImportDeclaration = (node, st, c) => {
   for (let i = 0; i < node.specifiers.length; i++)
     c(node.specifiers[i], st)
+  c(node.source, st, "Expression")
 }
 base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.Literal = ignore
 
