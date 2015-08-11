@@ -78,9 +78,9 @@ export function findNodeAt(node, start, end, test, base, state) {
       if ((start == null || node.start <= start) &&
           (end == null || node.end >= end))
         base[type](node, st, c)
-      if (test(type, node) &&
-          (start == null || node.start == start) &&
-          (end == null || node.end == end))
+      if ((start == null || node.start == start) &&
+          (end == null || node.end == end) &&
+          test(type, node))
         throw new Found(node, st)
     })(node, state)
   } catch (e) {
