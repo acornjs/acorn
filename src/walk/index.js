@@ -229,6 +229,7 @@ base.VariableDeclarator = (node, st, c) => {
 }
 
 base.Function = (node, st, c) => {
+  if (node.id) c(node.id, st, "Pattern")
   for (let i = 0; i < node.params.length; i++)
     c(node.params[i], st, "Pattern")
   c(node.body, st, node.expression ? "ScopeExpression" : "ScopeBody")
