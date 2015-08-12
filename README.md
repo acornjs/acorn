@@ -117,8 +117,13 @@ object referring to that same position.
   {
     "type": "Line" | "Block",
     "value": "comment text",
-    "range": ...,
-    "loc": ...
+    "start": Number,
+    "end": Number
+    // If `locations` option is on:
+    "loc": {
+      "start": {line: Number, column: Number}
+      "end": {line: Number, column: Number}
+    }
   }
   ```
 
