@@ -26952,7 +26952,7 @@ testFail("1 + {",
          "Unexpected token (1:5)");
 
 testFail("1 + { t:t ",
-         "Unexpected token (1:10)");
+         "Expected ',' (1:10)");
 
 testFail("1 + { t:t,",
          "Unexpected token (1:10)");
@@ -26994,13 +26994,13 @@ testFail("({ set s(.) { } })",
          "Unexpected token (1:9)");
 
 testFail("({ set: s() { } })",
-         "Unexpected token (1:12)");
+         "Expected ',' (1:12)");
 
 testFail("({ set: s(a, b) { } })",
-         "Unexpected token (1:16)");
+         "Expected ',' (1:16)");
 
 testFail("({ get: g(d) { } })",
-         "Unexpected token (1:13)");
+         "Expected ',' (1:13)");
 
 testFail("({ get i() { }, i: 42 })",
          "Redefinition of property (1:16)");
@@ -27028,7 +27028,7 @@ testFail("function t(...) { }",
          { ecmaVersion: 6 });
 
 testFail("function t(...rest, b) { }",
-         "Unexpected token (1:18)",
+         "Expected ')' (1:18)",
          { ecmaVersion: 6 });
 
 testFail("function t(if) { }",
@@ -27059,7 +27059,7 @@ testFail("a b;",
          "Unexpected token (1:2)");
 
 testFail("if.a;",
-         "Unexpected token (1:2)");
+         "Expected '(' (1:2)");
 
 testFail("a if;",
          "Unexpected token (1:2)");
@@ -27086,10 +27086,10 @@ testFail("throw;",
          "Unexpected token (1:5)");
 
 testFail("for (var i, i2 in {});",
-         "Unexpected token (1:15)");
+         "Expected ';' (1:15)");
 
 testFail("for ((i in {}));",
-         "Unexpected token (1:14)");
+         "Expected ';' (1:14)");
 
 testFail("for (i + 1 in {});",
          "Assigning to rvalue (1:5)");
@@ -27218,7 +27218,7 @@ testFail("switch (x) { default: continue; }",
          "Unsyntactic continue (1:22)");
 
 testFail("do { x } *",
-         "Unexpected token (1:9)");
+         "Expected 'while' (1:9)");
 
 testFail("while (true) { break x; }",
          "Unsyntactic break (1:15)");
@@ -27433,9 +27433,9 @@ testFail("const a = 1;", "Unexpected token (1:6)");
 
 testFail("let a = 1;", "Unexpected token (1:4)");
 
-testFail("for(const x = 0;;);", "Unexpected token (1:10)");
+testFail("for(const x = 0;;);", "Expected ';' (1:10)");
 
-testFail("for(let x = 0;;);", "Unexpected token (1:8)");
+testFail("for(let x = 0;;);", "Expected ';' (1:8)");
 
 test("let++", {
   type: "Program",
@@ -28751,9 +28751,9 @@ test("for(const x = 0;;);", {
   range: [0, 19]
 }, {ecmaVersion: 6, ranges: true});
 
-testFail("for(x of a);", "Unexpected token (1:6)");
+testFail("for(x of a);", "Expected ';' (1:6)");
 
-testFail("for(var x of a);", "Unexpected token (1:10)");
+testFail("for(var x of a);", "Expected ';' (1:10)");
 
 // Assertion Tests
 test(function TestComments() {
