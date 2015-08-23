@@ -41,7 +41,7 @@ pp.eatContextual = function(name) {
 // Asserts that following token is given contextual keyword.
 
 pp.expectContextual = function(name) {
-  if (!this.eatContextual(name)) this.unexpected()
+  if (!this.eatContextual(name)) this.raise(this.start, "Expected '" + name + "'")
 }
 
 // Test whether a semicolon can be inserted at the current position.
@@ -80,7 +80,7 @@ pp.afterTrailingComma = function(tokType) {
 // raise an unexpected token error.
 
 pp.expect = function(type) {
-  this.eat(type) || this.unexpected()
+  if (!this.eat(type)) this.raise(this.start, "Expected '" + type.label + "'")
 }
 
 // Raise an unexpected token error.

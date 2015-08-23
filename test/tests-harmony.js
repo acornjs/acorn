@@ -4655,7 +4655,7 @@ test("export default class A {}", {
   }]
 }, {ecmaVersion: 6, sourceType: "module", ranges: true});
 
-testFail("export *", "Unexpected token (1:8)", {ecmaVersion: 6, sourceType: "module"});
+testFail("export *", "Expected 'from' (1:8)", {ecmaVersion: 6, sourceType: "module"});
 
 test("export * from \"crypto\"", {
   type: "Program",
@@ -5272,7 +5272,7 @@ test("import crypto, { decrypt, encrypt as enc } from \"crypto\"", {
   locations: true
 });
 
-testFail("import default from \"foo\"", "Unexpected token (1:7)", {ecmaVersion: 6, sourceType: "module"});
+testFail("import default from \"foo\"", "Expected '{' (1:7)", {ecmaVersion: 6, sourceType: "module"});
 
 test("import { null as nil } from \"bar\"", {
   type: "Program",
@@ -13754,13 +13754,13 @@ testFail("\"use strict\"; ({ v: eval }) = obj", "Assigning to eval in strict mod
 
 testFail("\"use strict\"; ({ v: arguments }) = obj", "Assigning to arguments in strict mode (1:20)", {ecmaVersion: 6});
 
-testFail("for (let x = 42 in list) process(x);", "Unexpected token (1:16)", {ecmaVersion: 6});
+testFail("for (let x = 42 in list) process(x);", "Expected ';' (1:16)", {ecmaVersion: 6});
 
-testFail("for (let x = 42 of list) process(x);", "Unexpected token (1:16)", {ecmaVersion: 6});
+testFail("for (let x = 42 of list) process(x);", "Expected ';' (1:16)", {ecmaVersion: 6});
 
-testFail("import foo", "Unexpected token (1:10)", {ecmaVersion: 6, sourceType: "module"});
+testFail("import foo", "Expected 'from' (1:10)", {ecmaVersion: 6, sourceType: "module"});
 
-testFail("import { foo, bar }", "Unexpected token (1:19)", {ecmaVersion: 6, sourceType: "module"});
+testFail("import { foo, bar }", "Expected 'from' (1:19)", {ecmaVersion: 6, sourceType: "module"});
 
 testFail("import foo from bar", "Unexpected token (1:16)", {ecmaVersion: 6, sourceType: "module"});
 
@@ -13794,7 +13794,7 @@ testFail("yield v", "Unexpected token (1:6)", {ecmaVersion: 6});
 
 testFail("yield 10", "Unexpected token (1:6)", {ecmaVersion: 6});
 
-testFail("void { [1, 2]: 3 };", "Unexpected token (1:9)", {ecmaVersion: 6});
+testFail("void { [1, 2]: 3 };", "Expected ']' (1:9)", {ecmaVersion: 6});
 
 test("yield* 10", {
   type: "Program",
@@ -13976,23 +13976,23 @@ test("(function () { yield* 10 })", {
   locations: true
 });
 
-testFail("(function() { \"use strict\"; f(yield v) })", "Unexpected token (1:36)", {ecmaVersion: 6});
+testFail("(function() { \"use strict\"; f(yield v) })", "Expected ',' (1:36)", {ecmaVersion: 6});
 
-testFail("var obj = { *test** }", "Unexpected token (1:17)", {ecmaVersion: 6});
+testFail("var obj = { *test** }", "Expected ',' (1:17)", {ecmaVersion: 6});
 
-testFail("class A extends yield B { }", "Unexpected token (1:22)", {ecmaVersion: 6});
+testFail("class A extends yield B { }", "Expected '{' (1:22)", {ecmaVersion: 6});
 
 testFail("class default", "Unexpected token (1:6)", {ecmaVersion: 6});
 
 testFail("`test", "Unterminated template (1:1)", {ecmaVersion: 6});
 
-testFail("switch `test`", "Unexpected token (1:7)", {ecmaVersion: 6});
+testFail("switch `test`", "Expected '(' (1:7)", {ecmaVersion: 6});
 
-testFail("`hello ${10 `test`", "Unexpected token (1:18)", {ecmaVersion: 6});
+testFail("`hello ${10 `test`", "Expected '}' (1:18)", {ecmaVersion: 6});
 
-testFail("`hello ${10;test`", "Unexpected token (1:11)", {ecmaVersion: 6});
+testFail("`hello ${10;test`", "Expected '}' (1:11)", {ecmaVersion: 6});
 
-testFail("function a() 1 // expression closure is not supported", "Unexpected token (1:13)", {ecmaVersion: 6});
+testFail("function a() 1 // expression closure is not supported", "Expected '{' (1:13)", {ecmaVersion: 6});
 
 testFail("[for (let x of []) x]", "Unexpected token (1:6)", {ecmaVersion: 7});
 
@@ -14000,7 +14000,7 @@ testFail("[for (const x of []) x]", "Unexpected token (1:6)", {ecmaVersion: 7});
 
 testFail("[for (var x of []) x]", "Unexpected token (1:6)", {ecmaVersion: 7});
 
-testFail("[for (a in []) x] // (a,b) ", "Unexpected token (1:8)", {ecmaVersion: 7});
+testFail("[for (a in []) x] // (a,b) ", "Expected 'of' (1:8)", {ecmaVersion: 7});
 
 testFail("var a = [if (x) x]", "Unexpected token (1:9)", {ecmaVersion: 6});
 
@@ -14010,9 +14010,9 @@ testFail("({ \"chance\" }) = obj", "Unexpected token (1:12)", {ecmaVersion: 6});
 
 testFail("({ 42 }) = obj", "Unexpected token (1:6)", {ecmaVersion: 6});
 
-testFail("function f(a, ...b, c)", "Unexpected token (1:18)", {ecmaVersion: 6});
+testFail("function f(a, ...b, c)", "Expected ')' (1:18)", {ecmaVersion: 6});
 
-testFail("function f(a, ...b = 0)", "Unexpected token (1:19)", {ecmaVersion: 6});
+testFail("function f(a, ...b = 0)", "Expected ')' (1:19)", {ecmaVersion: 6});
 
 testFail("function x(...{ a }){}", "Unexpected token (1:14)", {ecmaVersion: 6});
 
@@ -14022,7 +14022,7 @@ testFail("\"use strict\"; function x({ b: { a } }, [{ b: { a } }]){}", "Argument
 
 testFail("\"use strict\"; function x(a, ...[a]){}", "Argument name clash in strict mode (1:32)", {ecmaVersion: 6});
 
-testFail("(...a, b) => {}", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("(...a, b) => {}", "Expected ')' (1:5)", {ecmaVersion: 6});
 
 testFail("([ 5 ]) => {}", "Assigning to rvalue (1:3)", {ecmaVersion: 6});
 
@@ -15369,11 +15369,11 @@ testFail("`\\07`", "Octal literal in strict mode (1:1)", {ecmaVersion: 6});
 
 // https://github.com/marijnh/acorn/issues/277
 
-testFail("x = { method() 42 }", "Unexpected token (1:15)", {ecmaVersion: 6});
+testFail("x = { method() 42 }", "Expected '{' (1:15)", {ecmaVersion: 6});
 
-testFail("x = { get method() 42 }", "Unexpected token (1:19)", {ecmaVersion: 6});
+testFail("x = { get method() 42 }", "Expected '{' (1:19)", {ecmaVersion: 6});
 
-testFail("x = { set method(val) v = val }", "Unexpected token (1:22)", {ecmaVersion: 6});
+testFail("x = { set method(val) v = val }", "Expected '{' (1:22)", {ecmaVersion: 6});
 
 // https://github.com/marijnh/acorn/issues/278
 
