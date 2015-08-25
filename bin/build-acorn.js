@@ -14,14 +14,15 @@ browserify({standalone: "acorn"})
   .on("error", function (err) { console.log("Error: " + err.message) })
   .pipe(fs.createWriteStream("dist/acorn.js"))
 
-function acornShim(file) {
+var ACORN_PLACEHOLDER = "this_function_call_should_be_replaced_with_a_call_to_load_acorn()";
+function acornShimPrepare(file) {
   var tr = new stream.Transform
   if (file == path.resolve(__dirname, "../src/index.js")) {
     var sent = false
     tr._transform = function(chunk, _, callback) {
       if (!sent) {
         sent = true
-        callback(null, "module.exports = typeof acorn != 'undefined' ? acorn : _dereq_(\"./acorn\")")
+        callback(null, ACORN_PLACEHOLDER);
       } else {
         callback()
       }
@@ -31,21 +32,36 @@ function acornShim(file) {
   }
   return tr
 }
+function acornShimComplete() {
+  var tr = new stream.Transform
+  var buffer = "";
+  tr._transform = function(chunk, _, callback) {
+    buffer += chunk.toString("utf8");
+    callback();
+  };
+  tr._flush = function (callback) {
+    tr.push(buffer.replace(ACORN_PLACEHOLDER, "module.exports = typeof acorn != 'undefined' ? acorn : require(\"./acorn\")"));
+    callback(null);
+  };
+  return tr;
+}
 
 browserify({standalone: "acorn.loose"})
   .plugin(require('browserify-derequire'))
-  .transform(acornShim)
+  .transform(acornShimPrepare)
   .transform(babelify)
   .require("./src/loose/index.js", {entry: true})
   .bundle()
   .on("error", function (err) { console.log("Error: " + err.message) })
+  .pipe(acornShimComplete())
   .pipe(fs.createWriteStream("dist/acorn_loose.js"))
 
 browserify({standalone: "acorn.walk"})
   .plugin(require('browserify-derequire'))
-  .transform(acornShim)
+  .transform(acornShimPrepare)
   .transform(babelify)
   .require("./src/walk/index.js", {entry: true})
   .bundle()
   .on("error", function (err) { console.log("Error: " + err.message) })
+  .pipe(acornShimComplete())
   .pipe(fs.createWriteStream("dist/walk.js"))
