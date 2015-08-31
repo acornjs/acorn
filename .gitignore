@@ -2,3 +2,4 @@
 /.tern-port
 /local
 /dist
+/test/browserify.js
