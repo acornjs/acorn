@@ -27437,6 +27437,8 @@ testFail("for(const x = 0;;);", "Unexpected token (1:10)");
 
 testFail("for(let x = 0;;);", "Unexpected token (1:8)");
 
+testFail("function a(b = c) {}", "Unexpected token (1:13)")
+
 test("let++", {
   type: "Program",
   loc: {
