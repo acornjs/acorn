@@ -42,9 +42,9 @@ export const defaultOptions = {
   locations: false,
   // A function can be passed as `onToken` option, which will
   // cause Acorn to call that function with object in the same
-  // format as tokenize() returns. Note that you are not
-  // allowed to call the parser from the callback—that will
-  // corrupt its internal state.
+  // format as tokens returned from `tokenizer().getToken()`. Note
+  // that you are not allowed to call the parser from the
+  // callback—that will corrupt its internal state.
   onToken: null,
   // A function can be passed as `onComment` option, which will
   // cause Acorn to call that function with `(block, text, start,

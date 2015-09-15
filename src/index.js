@@ -61,7 +61,7 @@ export function parseExpressionAt(input, pos, options) {
 }
 
 // Acorn is organized as a tokenizer and a recursive-descent parser.
-// The `tokenize` export provides an interface to the tokenizer.
+// The `tokenizer` export provides an interface to the tokenizer.
 
 export function tokenizer(input, options) {
   return new Parser(options, input)

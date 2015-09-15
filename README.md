@@ -89,7 +89,8 @@ object referring to that same position.
   form. Default is `false`.
 
 - **onToken**: If a function is passed for this option, each found
-  token will be passed in same format as `tokenize()` returns.
+  token will be passed in same format as tokens returned from
+  `tokenizer().getToken()`.
 
   If array is passed, each found token is pushed to it.
 
@@ -180,12 +181,12 @@ In ES6 environment, returned result can be used as any other
 protocol-compliant iterable:
 
 ```javascript
-for (let token of acorn.tokenize(str)) {
+for (let token of acorn.tokenizer(str)) {
   // iterate over the tokens
 }
 
 // transform code to array of tokens:
-var tokens = [...acorn.tokenize(str)];
+var tokens = [...acorn.tokenizer(str)];
 ```
 
 **tokTypes** holds an object mapping names to the token type objects
