@@ -37,12 +37,12 @@ try {
   if (!tokenize)
     parsed = acorn.parse(code, options);
   else {
-    var get = acorn.tokenize(code, options);
+    var tokenizer = acorn.tokenizer(code, options);
     tokens = [];
     while (true) {
-      var token = get();
+      var token = tokenizer.getToken();
       tokens.push(token);
-      if (token.type.type == "eof")
+      if (token.type == acorn.tokTypes.eof)
         break;
     }
   }
