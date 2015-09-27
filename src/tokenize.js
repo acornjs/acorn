@@ -46,6 +46,61 @@ pp.getToken = function() {
   return new Token(this)
 }
 
+pp.saveState = function() {
+  return {
+    containsEsc: this.containsEsc,
+    lineStart: this.lineStart,
+    pos: this.pos,
+    curLine: this.curLine,
+    type: this.type,
+    value: this.value,
+    start: this.start,
+    end: this.end,
+    startLoc: this.startLoc,
+    endLoc: this.endLoc,
+    lastTokStart: this.lastTokStart,
+    lastTokEnd: this.lastTokEnd,
+    lastTokStartLoc: this.lastTokStartLoc,
+    lastTokEndLoc: this.lastTokEndLoc,
+    context: this.context.slice(),
+    exprAllowed: this.exprAllowed,
+    strict: this.strict,
+    potentialArrowAt: this.potentialArrowAt,
+    inGenerator: this.inGenerator,
+    inFunction: this.inFunction
+  }
+}
+
+pp.restoreState = function(old) {
+  this.containsEsc = old.containsEsc
+  this.lineStart = old.lineStart
+  this.pos = old.pos
+  this.curLine = old.curLine
+  this.type = old.type
+  this.value = old.value
+  this.start = old.start
+  this.end = old.end
+  this.startLoc = old.startLoc
+  this.endLoc = old.endLoc
+  this.lastTokStart = old.lastTokStart
+  this.lastTokEnd = old.lastTokEnd
+  this.lastTokStartLoc = old.lastTokStartLoc
+  this.lastTokEndLoc = old.lastTokEndLoc
+  this.context = old.context
+  this.exprAllowed = old.exprAllowed
+  this.strict = old.strict
+  this.potentialArrowAt = old.potentialArrowAt
+  this.inGenerator = old.inGenerator
+  this.inFunction = old.inFunction
+}
+
+pp.lookahead = function() {
+  var old = this.saveState()
+  var token = this.getToken()
+  this.restoreState(old)
+  return token
+}
+
 // If we're in an ES6 environment, make parsers iterable
 if (typeof Symbol !== "undefined")
   pp[Symbol.iterator] = function () {
