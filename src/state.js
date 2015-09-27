@@ -11,7 +11,12 @@ export class Parser {
     this.options = getOptions(options)
     this.sourceFile = this.options.sourceFile
     this.isKeyword = keywords[this.options.ecmaVersion >= 6 ? 6 : 5]
-    this.isReservedWord = reservedWords[this.options.ecmaVersion]
+    this.isReservedWord = function (str) {
+      return reservedWords[this.options.ecmaVersion](str) ||
+        (this.options.ecmaVersion >= 6 &&
+         reservedWords[this.options.sourceType] &&
+         reservedWords[this.options.sourceType](str))
+    }
     this.input = String(input)
 
     // Used to signal to callers of `readWord1` whether the word
