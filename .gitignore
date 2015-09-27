@@ -1,4 +1,5 @@
 /node_modules
 /.tern-port
 /local
+/bin/acorn
 /dist
