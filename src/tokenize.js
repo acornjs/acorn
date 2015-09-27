@@ -735,3 +735,13 @@ pp.readWord = function() {
     type = keywordTypes[word]
   return this.finishToken(type, word)
 }
+
+// Check if the token starts a LexicalDeclaration.
+
+pp.checkLexicalDeclarationToken = function(tok) {
+  return tok.type === tt.name ||
+         tok.type === tt._let ||
+      // tok.type === tt._yield ||
+         tok.type === tt.braceL ||
+         tok.type === tt.bracketL
+}
