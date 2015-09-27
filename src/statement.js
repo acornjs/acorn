@@ -61,7 +61,7 @@ pp.parseStatement = function(declaration, topLevel) {
   case tt._switch: return this.parseSwitchStatement(node)
   case tt._throw: return this.parseThrowStatement(node)
   case tt._try: return this.parseTryStatement(node)
-  case tt._let: case tt._const: if (!declaration) this.unexpected() // NOTE: falls through to _var
+  case tt._const: if (!declaration) this.unexpected() // NOTE: falls through to _var
   case tt._var: return this.parseVarStatement(node, starttype)
   case tt._while: return this.parseWhileStatement(node)
   case tt._with: return this.parseWithStatement(node)
@@ -76,6 +76,16 @@ pp.parseStatement = function(declaration, topLevel) {
         this.raise(this.start, "'import' and 'export' may appear only with 'sourceType: module'")
     }
     return starttype === tt._import ? this.parseImport(node) : this.parseExport(node)
+
+  case tt._let:
+    if (this.checkLexicalDeclarationToken(this.lookahead())) {
+      if (!declaration) this.unexpected()
+      return this.parseVarStatement(node, starttype)
+    }
+    this.type = tt.name
+    starttype = tt.name
+    this.value = 'let'
+    // falls through to default
 
     // If the statement does not start with a statement keyword or a
     // brace, it's an ExpressionStatement or LabeledStatement. We
@@ -94,7 +104,7 @@ pp.parseBreakContinueStatement = function(node, keyword) {
   let isBreak = keyword == "break"
   this.next()
   if (this.eat(tt.semi) || this.insertSemicolon()) node.label = null
-  else if (this.type !== tt.name) this.unexpected()
+  else if (this.type !== tt.name && this.type !== tt._let) this.unexpected()
   else {
     node.label = this.parseIdent()
     this.semicolon()
@@ -146,7 +156,11 @@ pp.parseForStatement = function(node) {
   this.labels.push(loopLabel)
   this.expect(tt.parenL)
   if (this.type === tt.semi) return this.parseFor(node, null)
-  if (this.type === tt._var || this.type === tt._let || this.type === tt._const) {
+  var oldState = this.saveState()
+  this.next()
+  var letAsKeyword = oldState.type === tt._let && this.checkLexicalDeclarationToken(this) && !this.isContextual("of")
+  this.restoreState(oldState)
+  if (this.type === tt._var || letAsKeyword || this.type === tt._const) {
     let init = this.startNode(), varKind = this.type
     this.next()
     this.parseVar(init, true, varKind)
@@ -378,7 +392,7 @@ pp.parseVar = function(node, isFor, kind) {
   node.kind = kind.keyword
   for (;;) {
     let decl = this.startNode()
-    this.parseVarId(decl)
+    this.parseVarId(decl, kind)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
     } else if (kind === tt._const && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
@@ -394,9 +408,11 @@ pp.parseVar = function(node, isFor, kind) {
   return node
 }
 
-pp.parseVarId = function(decl) {
+pp.parseVarId = function(decl, kind) {
   decl.id = this.parseBindingAtom()
   this.checkLVal(decl.id, true)
+  if (kind !== tt._var && decl.id.name === 'let')
+    this.unexpected(decl.start)
 }
 
 // Parse a function declaration or literal (depending on the
@@ -406,7 +422,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody) {
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
     node.generator = this.eat(tt.star)
-  if (isStatement || this.type === tt.name)
+  if (isStatement || this.type === tt.name || this.type === tt._let)
     node.id = this.parseIdent()
   this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
@@ -481,7 +497,7 @@ pp.parseClassMethod = function(classBody, method, isGenerator) {
 }
 
 pp.parseClassId = function(node, isStatement) {
-  node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null
+  node.id = this.type === tt.name || this.type === tt._let ? this.parseIdent() : isStatement ? this.unexpected() : null
 }
 
 pp.parseClassSuper = function(node) {
@@ -578,7 +594,7 @@ pp.parseImport = function(node) {
 
 pp.parseImportSpecifiers = function() {
   let nodes = [], first = true
-  if (this.type === tt.name) {
+  if (this.type === tt.name || this.type === tt._let) {
     // import defaultObj, { x, y as z } from '...'
     let node = this.startNode()
     node.local = this.parseIdent()

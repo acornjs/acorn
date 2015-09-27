@@ -102,7 +102,7 @@ pp.parseMaybeAssign = function(noIn, refShorthandDefaultPos, afterLeftParse) {
     failOnShorthandAssign = false
   }
   let startPos = this.start, startLoc = this.startLoc
-  if (this.type == tt.parenL || this.type == tt.name)
+  if (this.type == tt.parenL || this.type == tt.name || this.type == tt._let && !this.checkLexicalDeclarationToken(this.lookahead()))
     this.potentialArrowAt = this.start
   let left = this.parseMaybeConditional(noIn, refShorthandDefaultPos)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
@@ -260,7 +260,15 @@ pp.parseExprAtom = function(refShorthandDefaultPos) {
     return this.finishNode(node, type)
 
   case tt._yield:
-    if (this.inGenerator) this.unexpected()
+  case tt._let:
+    if (this.type === tt._yield && this.inGenerator ||
+        this.type === tt._let && this.checkLexicalDeclarationToken(this.lookahead()))
+      this.unexpected()
+    else if (this.type === tt._let) {
+      this.value = this.type.label
+      this.type = tt.name
+    }
+    // falls through
 
   case tt.name:
     let startPos = this.start, startLoc = this.startLoc
@@ -639,6 +647,10 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refShorthandD
 pp.parseIdent = function(liberal) {
   let node = this.startNode()
   if (liberal && this.options.allowReserved == "never") liberal = false
+  if (this.type === tt._let && !this.checkLexicalDeclarationToken(this.lookahead())) {
+    this.type = tt.name
+    this.value = "let"
+  }
   if (this.type === tt.name) {
     if (!liberal &&
         ((!this.options.allowReserved && this.isReservedWord(this.value)) ||

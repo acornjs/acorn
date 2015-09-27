@@ -90,7 +90,7 @@ pp.parseSpread = function(refShorthandDefaultPos) {
 pp.parseRest = function() {
   let node = this.startNode()
   this.next()
-  node.argument = this.type === tt.name || this.type === tt.bracketL ? this.parseBindingAtom() : this.unexpected()
+  node.argument = this.type === tt.name || this.type === tt._let || this.type === tt.bracketL ? this.parseBindingAtom() : this.unexpected()
   return this.finishNode(node, "RestElement")
 }
 
@@ -99,6 +99,7 @@ pp.parseRest = function() {
 pp.parseBindingAtom = function() {
   if (this.options.ecmaVersion < 6) return this.parseIdent()
   switch (this.type) {
+  case tt._let:
   case tt.name:
     return this.parseIdent()
 
