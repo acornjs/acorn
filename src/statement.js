@@ -61,7 +61,7 @@ pp.parseStatement = function(declaration, topLevel) {
   case tt._switch: return this.parseSwitchStatement(node)
   case tt._throw: return this.parseThrowStatement(node)
   case tt._try: return this.parseTryStatement(node)
-  case tt._let: case tt._const: if (!declaration) this.unexpected() // NOTE: falls through to _var
+  case tt._const: if (!declaration) this.unexpected() // NOTE: falls through to _var
   case tt._var: return this.parseVarStatement(node, starttype)
   case tt._while: return this.parseWhileStatement(node)
   case tt._with: return this.parseWithStatement(node)
@@ -83,6 +83,11 @@ pp.parseStatement = function(declaration, topLevel) {
     // next token is a colon and the expression was a simple
     // Identifier node, we switch to interpreting it as a label.
   default:
+    if (this.isContextual("let") && this.isLexicalBinding(this.lookAhead())) {
+      if (!declaration) this.unexpected()
+      this.type = tt._let
+      return this.parseVarStatement(node, tt._let)
+    }
     let maybeName = this.value, expr = this.parseExpression()
     if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon))
       return this.parseLabeledStatement(node, maybeName, expr)
@@ -146,6 +151,18 @@ pp.parseForStatement = function(node) {
   this.labels.push(loopLabel)
   this.expect(tt.parenL)
   if (this.type === tt.semi) return this.parseFor(node, null)
+
+  if (this.options.ecmaVersion >= 6 && this.isContextual("let")) {
+    const oldState = this.saveState()
+    this.next()
+    if (this.isContextual("of")) {
+      this.unexpected(oldState.start)
+    } else if (this.isLexicalBinding(this)) {
+      oldState.type = tt._let
+    }
+    this.restoreState(oldState)
+  }
+
   if (this.type === tt._var || this.type === tt._let || this.type === tt._const) {
     let init = this.startNode(), varKind = this.type
     this.next()
@@ -376,7 +393,7 @@ pp.parseVar = function(node, isFor, kind) {
   node.kind = kind.keyword
   for (;;) {
     let decl = this.startNode()
-    this.parseVarId(decl)
+    this.parseVarId(decl, kind)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
     } else if (kind === tt._const && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
@@ -392,9 +409,11 @@ pp.parseVar = function(node, isFor, kind) {
   return node
 }
 
-pp.parseVarId = function(decl) {
+pp.parseVarId = function(decl, kind) {
   decl.id = this.parseBindingAtom()
   this.checkLVal(decl.id, true)
+  if (kind !== tt._var && decl.id.name === "let")
+    this.unexpected(decl.start)
 }
 
 // Parse a function declaration or literal (depending on the
@@ -532,7 +551,7 @@ pp.parseExport = function(node) {
 }
 
 pp.shouldParseExportStatement = function() {
-  return this.type.keyword
+  return this.type.keyword || this.isContextual("let") && this.isLexicalBinding(this.lookAhead())
 }
 
 // Parses a comma-separated list of module exports.

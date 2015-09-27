@@ -14,6 +14,17 @@ pp.isUseStrict = function(stmt) {
     stmt.expression.raw.slice(1, -1) === "use strict"
 }
 
+// Test whether the token can be the starting point of a LexicalBinding
+// (BindingIdentifier or BindingPattern).
+
+pp.isLexicalBinding = function(tok) {
+  return this.options.ecmaVersion >= 6 &&
+           tok.type === tt.name ||
+        // tok.type === tt._yield ||
+           tok.type === tt.braceL ||
+           tok.type === tt.bracketL
+}
+
 // Predicate that tests whether the next token is of the given
 // type, and if yes, consumes it as a side effect.
 
