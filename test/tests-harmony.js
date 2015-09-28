@@ -15399,3 +15399,99 @@ test("({ get __proto__() { return 1 }, __proto__: 2 })", {}, {ecmaVersion: 6});
 test("({ __proto__, __proto__: 2 })", {}, {ecmaVersion: 6});
 
 test("export default /foo/", {}, {ecmaVersion: 6, sourceType: "module"});
+
+test("var await = 0", {
+  type: "Program",
+  start: 0,
+  end: 13,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 1,
+      column: 13
+    }
+  },
+  body: [
+    {
+      type: "VariableDeclaration",
+      start: 0,
+      end: 13,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 13
+        }
+      },
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          start: 4,
+          end: 13,
+          loc: {
+            start: {
+              line: 1,
+              column: 4
+            },
+            end: {
+              line: 1,
+              column: 13
+            }
+          },
+          id: {
+            type: "Identifier",
+            start: 4,
+            end: 9,
+            loc: {
+              start: {
+                line: 1,
+                column: 4
+              },
+              end: {
+                line: 1,
+                column: 9
+              }
+            },
+            name: "await"
+          },
+          init: {
+            type: "Literal",
+            start: 12,
+            end: 13,
+            loc: {
+              start: {
+                line: 1,
+                column: 12
+              },
+              end: {
+                line: 1,
+                column: 13
+              }
+            },
+            value: 0,
+            raw: "0"
+          }
+        }
+      ],
+      kind: "var"
+    }
+  ],
+  sourceType: "script"
+}, {
+  ecmaVersion: 6,
+  sourceType: "script",
+  allowReserved: false,
+  locations: true
+})
+testFail("var await = 0", "The keyword 'await' is reserved (1:4)", {
+  ecmaVersion: 6,
+  sourceType: "module",
+  allowReserved: false,
+  locations: true
+})
