@@ -15399,3 +15399,79 @@ test("({ get __proto__() { return 1 }, __proto__: 2 })", {}, {ecmaVersion: 6});
 test("({ __proto__, __proto__: 2 })", {}, {ecmaVersion: 6});
 
 test("export default /foo/", {}, {ecmaVersion: 6, sourceType: "module"});
+
+// https://github.com/marijnh/acorn/issues/227
+
+test("var let", {
+  type: "Program",
+  start: 0,
+  end: 7,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 1,
+      column: 7
+    }
+  },
+  body: [
+    {
+      type: "VariableDeclaration",
+      start: 0,
+      end: 7,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 7
+        }
+      },
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          start: 4,
+          end: 7,
+          loc: {
+            start: {
+              line: 1,
+              column: 4
+            },
+            end: {
+              line: 1,
+              column: 7
+            }
+          },
+          id: {
+            type: "Identifier",
+            start: 4,
+            end: 7,
+            loc: {
+              start: {
+                line: 1,
+                column: 4
+              },
+              end: {
+                line: 1,
+                column: 7
+              }
+            },
+            name: "let"
+          },
+          init: null
+        }
+      ],
+      kind: "var"
+    }
+  ],
+  sourceType: "script"
+}, {
+  ecmaVersion: 6,
+  ranges: true,
+  locations: true
+})
+testFail("const let = 0", "Unexpected token (1:6)", {ecmaVersion: 6})
