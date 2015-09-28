@@ -15434,17 +15434,6 @@ test("var await = 0", {
     {
       type: "VariableDeclaration",
       start: 0,
-      end: 13,
-      loc: {
-        start: {
-          line: 1,
-          column: 0
-        },
-        end: {
-          line: 1,
-          column: 13
-        }
-      },
       declarations: [
         {
           type: "VariableDeclarator",
@@ -15505,9 +15494,160 @@ test("var await = 0", {
   allowReserved: false,
   locations: true
 })
+
 testFail("var await = 0", "The keyword 'await' is reserved (1:4)", {
   ecmaVersion: 6,
   sourceType: "module",
   allowReserved: false,
   locations: true
 })
+
+// https://github.com/marijnh/acorn/issues/227
+
+test("let", {
+  type: "Program",
+  start: 0,
+  end: 3,
+  body: [
+    {
+      type: "ExpressionStatement",
+      start: 0,
+      end: 3,
+      expression: {
+        type: "Identifier",
+        start: 0,
+        end: 3,
+        name: "let"
+      }
+    }
+  ],
+  sourceType: "script"
+}, { ecmaVersion: 6 })
+
+test("let => 0", {
+  type: "Program",
+  start: 0,
+  end: 8,
+  body: [
+    {
+      type: "ExpressionStatement",
+      start: 0,
+      end: 8,
+      expression: {
+        type: "ArrowFunctionExpression",
+        start: 0,
+        end: 8,
+        id: null,
+        generator: false,
+        expression: true,
+        params: [ { type: "Identifier", start: 0, end: 3, name: "let" } ],
+        body: { type: "Literal", start: 7, end: 8, value: 0, raw: "0" }
+      }
+    }
+  ],
+  sourceType: "script"
+}, { ecmaVersion: 6 })
+
+test("function let() {}", {
+  type: "Program",
+  start: 0,
+  end: 17,
+  body: [
+    {
+      type: "FunctionDeclaration",
+      start: 0,
+      end: 17,
+      id: { type: "Identifier", start: 9, end: 12, name: "let" },
+      generator: false,
+      expression: false,
+      params: [],
+      body: { type: "BlockStatement", start: 15, end: 17, body: [] }
+    }
+  ],
+  sourceType: "script"
+}, { ecmaVersion: 6 })
+
+test("for (let in obj);", {
+  type: "Program",
+  start: 0,
+  end: 17,
+  body: [
+    {
+      type: "ForInStatement",
+      start: 0,
+      end: 17,
+      left: { type: "Identifier", start: 5, end: 8, name: "let" },
+      right: { type: "Identifier", start: 12, end: 15, name: "obj" },
+      body: { type: "EmptyStatement", start: 16, end: 17 }
+    }
+  ],
+  sourceType: "script"
+}, { ecmaVersion: 6 })
+
+testFail("for (let of obj);", "Unexpected token (1:5)", { ecmaVersion: 6 })
+
+test("var let", {
+  type: "Program",
+  start: 0,
+  end: 7,
+  body: [
+    {
+      type: "VariableDeclaration",
+      start: 0,
+      end: 7,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 7
+        }
+      },
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          start: 4,
+          end: 7,
+          id: { type: "Identifier", start: 4, end: 7, name: "let" },
+          init: null
+        }
+      ],
+      kind: "var"
+    }
+  ],
+  sourceType: "script"
+}, {
+  ecmaVersion: 6,
+  sourceType: "script",
+  allowReserved: false,
+  locations: true
+})
+
+test("let of", {
+  type: "Program",
+  start: 0,
+  end: 6,
+  body: [
+    {
+      type: "VariableDeclaration",
+      start: 0,
+      end: 6,
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          start: 4,
+          end: 6,
+          id: { type: "Identifier", start: 4, end: 6, name: "of" },
+          init: null
+        }
+      ],
+      kind: "let"
+    }
+  ],
+  sourceType: "script"
+}, { ecmaVersion: 6 })
+
+testFail("const let = 0", "Unexpected token (1:6)", {ecmaVersion: 6})
+testFail("let let = 0", "Unexpected token (1:4)", {ecmaVersion: 6})
