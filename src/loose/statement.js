@@ -47,6 +47,16 @@ lp.parseStatement = function() {
     this.pushCx()
     this.expect(tt.parenL)
     if (this.tok.type === tt.semi) return this.parseFor(node, null)
+
+    if (this.options.ecmaVersion >= 6 && this.isContextual("let")) {
+      let nextTok = this.lookAhead(1)
+      if (nextTok.type === tt.name && nextTok.value === "of") {
+        this.tok.value = this.dummyIdent().name
+      } else if (this.isLexicalBinding(nextTok)) {
+        this.tok.type = tt._let
+      }
+    }
+
     if (this.tok.type === tt._var || this.tok.type === tt._let || this.tok.type === tt._const) {
       let init = this.parseVar(true)
       if (init.declarations.length === 1 && (this.tok.type === tt._in || this.isContextual("of"))) {
@@ -166,6 +176,10 @@ lp.parseStatement = function() {
     return this.parseExport()
 
   default:
+    if (this.isContextual("let") && this.isLexicalBinding(this.lookAhead(1))) {
+      this.tok.type = tt._let
+      return this.parseVar()
+    }
     let expr = this.parseExpression()
     if (isDummy(expr)) {
       this.next()
@@ -226,6 +240,7 @@ lp.parseVar = function(noIn) {
   do {
     let decl = this.startNode()
     decl.id = this.options.ecmaVersion >= 6 ? this.toAssignable(this.parseExprAtom(), true) : this.parseIdent()
+    if (decl.id.name === "let" && node.kind !== "var") decl.id = this.dummyIdent()
     decl.init = this.eat(tt.eq) ? this.parseMaybeAssign(noIn) : null
     node.declarations.push(this.finishNode(decl, "VariableDeclarator"))
   } while (this.eat(tt.comma))
@@ -329,7 +344,8 @@ lp.parseExport = function() {
     this.semicolon()
     return this.finishNode(node, "ExportDefaultDeclaration")
   }
-  if (this.tok.type.keyword) {
+  if (this.tok.type.keyword ||
+      this.isContextual("let") && this.isLexicalBinding(this.lookAhead(1))) {
     node.declaration = this.parseStatement()
     node.specifiers = []
     node.source = null
