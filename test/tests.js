@@ -28984,6 +28984,31 @@ test("function f() {} / 1 /", {
   ]
 });
 
+// https://github.com/marijnh/acorn/issues/320
+
+test("do /x/; while (false);", {
+  type: "Program",
+  body: [
+    {
+      type: "DoWhileStatement",
+      body: {
+        type: "ExpressionStatement",
+        expression: {
+          type: "Literal",
+          value: /x/,
+          raw: "/x/",
+          regex: { pattern: "x", flags: "" }
+        }
+      },
+      test: {
+        type: "Literal",
+        value: false,
+        raw: "false"
+      }
+    }
+  ]
+});
+
 var semicolons = []
 testAssert("var x\nreturn\n10", function() {
   var result = semicolons.join(" ");
