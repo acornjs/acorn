@@ -12,6 +12,11 @@
 // be followed by an expression (thus, a slash after them would be a
 // regular expression).
 //
+// The `startsExpr` property is used to check if the token ends a
+// `yield` expression. It is set on all token types that either can
+// directly start an expression (like a quotation mark) or can
+// continue an expression (like the body of a string).
+//
 // `isLoop` marks a keyword as starting a loop, which is important
 // to know when parsing a label, in order to allow or disallow
 // continue jumps to that label.
