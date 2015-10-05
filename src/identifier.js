@@ -51,9 +51,10 @@ function makePredicate(words) {
 export const reservedWords = {
   3: makePredicate("abstract boolean byte char class double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile"),
   5: makePredicate("class enum extends super const export import"),
-  6: makePredicate("enum await"),
+  6: makePredicate("enum"),
   strict: makePredicate("implements interface let package private protected public static yield"),
-  strictBind: makePredicate("eval arguments")
+  strictBind: makePredicate("eval arguments"),
+  module: makePredicate("await")
 }
 
 // And the keywords
