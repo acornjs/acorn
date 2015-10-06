@@ -15,7 +15,8 @@ export class Parser {
     this.options = getOptions(options)
     this.sourceFile = this.options.sourceFile
     this.keywords = keywordRegexp(keywords[this.options.ecmaVersion >= 6 ? 6 : 5])
-    let reserved = this.options.allowReserved ? "" : reservedWords[this.options.ecmaVersion]
+    let reserved = this.options.allowReserved ? "" :
+        reservedWords[this.options.ecmaVersion] + (options.sourceType == "module" ? " await" : "")
     this.reservedWords = keywordRegexp(reserved)
     let reservedStrict = (reserved ? reserved + " " : "") + reservedWords.strict
     this.reservedWordsStrict = keywordRegexp(reservedStrict)
