@@ -160,7 +160,7 @@ pp.parseMaybeDefault = function(startPos, startLoc, left) {
 pp.checkLVal = function(expr, isBinding, checkClashes) {
   switch (expr.type) {
   case "Identifier":
-    if (this.strict && this.reservedWordsStrictBind.test(expr.name)) // FIXME match shorter regexp?
+    if (this.strict && this.reservedWordsStrictBind.test(expr.name))
       this.raise(expr.start, (isBinding ? "Binding " : "Assigning to ") + expr.name + " in strict mode")
     if (checkClashes) {
       if (has(checkClashes, expr.name))
