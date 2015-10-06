@@ -422,7 +422,7 @@ pp.readRegexp = function() {
       // negatives in unlikely scenarios. For example, `[\u{61}-b]` is a
       // perfectly valid pattern that is equivalent to `[a-b]`, but it would
       // be replaced by `[x-b]` which throws an error.
-      tmp = tmp.replace(/\\u\{([0-9a-fA-F]+)\}/g, (match, code, offset) => {
+      tmp = tmp.replace(/\\u\{([0-9a-fA-F]+)\}/g, (_match, code, offset) => {
         code = Number("0x" + code)
         if (code > 0x10FFFF) this.raise(start + offset + 3, "Code point out of bounds")
         return "x"

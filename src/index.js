@@ -20,7 +20,6 @@
 // [walk]: util/walk.js
 
 import {Parser} from "./state"
-import {getOptions} from "./options"
 import "./parseutil"
 import "./statement"
 import "./lval"

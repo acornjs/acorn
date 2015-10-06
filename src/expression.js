@@ -555,10 +555,8 @@ pp.parseMethod = function(isGenerator) {
   this.initFunction(node)
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, false)
-  let allowExpressionBody
-  if (this.options.ecmaVersion >= 6) {
+  if (this.options.ecmaVersion >= 6)
     node.generator = isGenerator
-  }
   this.parseFunctionBody(node, false)
   return this.finishNode(node, "FunctionExpression")
 }
