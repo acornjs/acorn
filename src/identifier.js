@@ -7,53 +7,14 @@
 //
 // It starts by sorting the words by length.
 
-function makePredicate(words) {
-  words = words.split(" ")
-  let f = "", cats = []
-  out: for (let i = 0; i < words.length; ++i) {
-    for (let j = 0; j < cats.length; ++j)
-      if (cats[j][0].length == words[i].length) {
-        cats[j].push(words[i])
-        continue out
-      }
-    cats.push([words[i]])
-  }
-  function compareTo(arr) {
-    if (arr.length == 1) return f += "return str === " + JSON.stringify(arr[0]) + ";"
-    f += "switch(str){"
-    for (let i = 0; i < arr.length; ++i) f += "case " + JSON.stringify(arr[i]) + ":"
-    f += "return true}return false;"
-  }
-
-  // When there are more than three length categories, an outer
-  // switch first dispatches on the lengths, to save on comparisons.
-
-  if (cats.length > 3) {
-    cats.sort((a, b) => b.length - a.length)
-    f += "switch(str.length){"
-    for (let i = 0; i < cats.length; ++i) {
-      let cat = cats[i]
-      f += "case " + cat[0].length + ":"
-      compareTo(cat)
-    }
-    f += "}"
-
-    // Otherwise, simply generate a flat `switch` statement.
-
-  } else {
-    compareTo(words)
-  }
-  return new Function("str", f)
-}
-
 // Reserved word lists for various dialects of the language
 
 export const reservedWords = {
-  3: makePredicate("abstract boolean byte char class double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile"),
-  5: makePredicate("class enum extends super const export import"),
-  6: makePredicate("enum await"),
-  strict: makePredicate("implements interface let package private protected public static yield"),
-  strictBind: makePredicate("eval arguments")
+  3: "abstract boolean byte char class double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile",
+  5: "class enum extends super const export import",
+  6: "enum await",
+  strict: "implements interface let package private protected public static yield",
+  strictBind: "eval arguments"
 }
 
 // And the keywords
@@ -61,8 +22,8 @@ export const reservedWords = {
 var ecma5AndLessKeywords = "break case catch continue debugger default do else finally for function if return switch throw try var while with null true false instanceof typeof void delete new in this"
 
 export const keywords = {
-  5: makePredicate(ecma5AndLessKeywords),
-  6: makePredicate(ecma5AndLessKeywords + " let const class extends export import yield super")
+  5: ecma5AndLessKeywords,
+  6: ecma5AndLessKeywords + " let const class extends export import yield super"
 }
 
 // ## Character categories

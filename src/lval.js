@@ -1,6 +1,5 @@
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
-import {reservedWords} from "./identifier"
 import {has} from "./util"
 
 const pp = Parser.prototype
@@ -161,7 +160,7 @@ pp.parseMaybeDefault = function(startPos, startLoc, left) {
 pp.checkLVal = function(expr, isBinding, checkClashes) {
   switch (expr.type) {
   case "Identifier":
-    if (this.strict && (reservedWords.strictBind(expr.name) || reservedWords.strict(expr.name)))
+    if (this.strict && this.reservedWordsStrictBind.test(expr.name)) // FIXME match shorter regexp?
       this.raise(expr.start, (isBinding ? "Binding " : "Assigning to ") + expr.name + " in strict mode")
     if (checkClashes) {
       if (has(checkClashes, expr.name))

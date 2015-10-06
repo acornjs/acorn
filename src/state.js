@@ -6,12 +6,20 @@ import {getOptions} from "./options"
 // Registered plugins
 export const plugins = {}
 
+function keywordRegexp(words) {
+  return new RegExp("^(" + words.replace(/ /g, "|") + ")$")
+}
+
 export class Parser {
   constructor(options, input, startPos) {
     this.options = getOptions(options)
     this.sourceFile = this.options.sourceFile
-    this.isKeyword = keywords[this.options.ecmaVersion >= 6 ? 6 : 5]
-    this.isReservedWord = reservedWords[this.options.ecmaVersion]
+    this.keywords = keywordRegexp(keywords[this.options.ecmaVersion >= 6 ? 6 : 5])
+    let reserved = this.options.allowReserved ? "" : reservedWords[this.options.ecmaVersion]
+    this.reservedWords = keywordRegexp(reserved)
+    let reservedStrict = (reserved ? reserved + " " : "") + reservedWords.strict
+    this.reservedWordsStrict = keywordRegexp(reservedStrict)
+    this.reservedWordsStrictBind = keywordRegexp(reservedStrict + " " + reservedWords.strictBind)
     this.input = String(input)
 
     // Used to signal to callers of `readWord1` whether the word
@@ -70,6 +78,10 @@ export class Parser {
     if (this.pos === 0 && this.options.allowHashBang && this.input.slice(0, 2) === '#!')
       this.skipLineComment(2)
   }
+
+  // DEPRECATED Kept for backwards compatibility until 3.0 in case a plugin uses them
+  isKeyword(word) { return this.keywords.test(word) }
+  isReservedWord(word) { return this.reservedWords.test(word) }
 
   extend(name, f) {
     this[name] = f(this[name])

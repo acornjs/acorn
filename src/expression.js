@@ -18,7 +18,6 @@
 
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
-import {reservedWords} from "./identifier"
 import {has} from "./util"
 
 const pp = Parser.prototype
@@ -510,9 +509,8 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
     } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
       prop.kind = "init"
       if (isPattern) {
-        if (this.isKeyword(prop.key.name) ||
-            (this.strict && (reservedWords.strictBind(prop.key.name) || reservedWords.strict(prop.key.name))) ||
-            (!this.options.allowReserved && this.isReservedWord(prop.key.name)))
+        if (this.keywords.test(prop.key.name) ||
+            (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name))
           this.raise(prop.key.start, "Binding " + prop.key.name)
         prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
       } else if (this.type === tt.eq && refShorthandDefaultPos) {
@@ -641,10 +639,9 @@ pp.parseIdent = function(liberal) {
   if (liberal && this.options.allowReserved == "never") liberal = false
   if (this.type === tt.name) {
     if (!liberal &&
-        ((!this.options.allowReserved && this.isReservedWord(this.value)) ||
-         (this.strict && reservedWords.strict(this.value)) &&
-         (this.options.ecmaVersion >= 6 ||
-          this.input.slice(this.start, this.end).indexOf("\\") == -1)))
+        (this.strict ? this.reservedWordsStrict : this.reservedWords).test(this.value) &&
+        (this.options.ecmaVersion >= 6 ||
+         this.input.slice(this.start, this.end).indexOf("\\") == -1))
       this.raise(this.start, "The keyword '" + this.value + "' is reserved")
     node.name = this.value
   } else if (liberal && this.type.keyword) {
