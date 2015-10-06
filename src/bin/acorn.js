@@ -16,20 +16,25 @@ function help(status) {
 
 for (let i = 2; i < process.argv.length; ++i) {
   const arg = process.argv[i]
-  if (arg[0] != "-" && !infile) infile = arg
-  else if (arg == "--" && !infile && i + 2 == process.argv.length) infile = process.argv[++i]
-  else if (arg == "--ecma3") options.ecmaVersion = 3
-  else if (arg == "--ecma5") options.ecmaVersion = 5
-  else if (arg == "--ecma6") options.ecmaVersion = 6
-  else if (arg == "--ecma7") options.ecmaVersion = 7
-  else if (arg == "--locations") options.locations = true
-  else if (arg == "--allow-hash-bang") options.allowHashBang = true
-  else if (arg == "--silent") silent = true
-  else if (arg == "--compact") compact = true
-  else if (arg == "--help") help(0)
-  else if (arg == "--tokenize") tokenize = true
-  else if (arg == "--module") options.sourceType = 'module'
-  else help(1)
+  switch (arg) {
+  case "--ecma3":           options.ecmaVersion   = 3;        break
+  case "--ecma5":           options.ecmaVersion   = 5;        break
+  case "--ecma6":           options.ecmaVersion   = 6;        break
+  case "--ecma7":           options.ecmaVersion   = 7;        break
+  case "--locations":       options.locations     = true;     break
+  case "--allow-hash-bang": options.allowHashBang = true;     break
+  case "--module":          options.sourceType    = "module"; break
+  case "--silent":          silent   = true;                  break
+  case "--compact":         compact  = true;                  break
+  case "--tokenize":        tokenize = true;                  break
+  case "--help":            help(0);                          break
+  case "--":
+    if (!infile && i + 2 == process.argv.length) infile = process.argv[++i]
+    break
+  default:
+    if (arg[0] !== "-" && !infile) infile = arg
+    else help(1)
+  }
 }
 
 try {
