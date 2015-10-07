@@ -1,6 +1,6 @@
 import {tokenizer, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from ".."
 
-export class LooseParser{
+export class LooseParser {
   constructor(input, options) {
     this.toks = tokenizer(input, options)
     this.options = this.toks.options
@@ -43,16 +43,28 @@ export class LooseParser{
     return node
   }
 
-  dummyIdent() {
+  dummyNode(type) {
     let dummy = this.startNode()
+    dummy.type = type
+    dummy.end = dummy.start
+    if (this.options.locations)
+      dummy.loc.end = dummy.loc.start
+    if (this.options.ranges)
+      dummy.range[1] = dummy.start
+    this.last = {type: tt.name, start: dummy.start, end: dummy.start, loc: dummy.loc}
+    return dummy
+  }
+
+  dummyIdent() {
+    let dummy = this.dummyNode("Identifier")
     dummy.name = "✖"
-    return this.finishNode(dummy, "Identifier")
+    return dummy
   }
 
   dummyString() {
-    let dummy = this.startNode()
+    let dummy = this.dummyNode("Literal")
     dummy.value = dummy.raw = "✖"
-    return this.finishNode(dummy, "Literal")
+    return dummy
   }
 
   eat(type) {
