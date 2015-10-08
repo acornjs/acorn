@@ -27389,7 +27389,7 @@ testFail("\"use strict\"; function static() { }",
          "The keyword 'static' is reserved (1:23)");
 
 testFail("function a(t, t) { \"use strict\"; }",
-         "Argument name clash in strict mode (1:14)");
+         "Argument name clash (1:14)");
 
 testFail("function a(eval) { \"use strict\"; }",
          "Binding eval in strict mode (1:11)");
@@ -27398,13 +27398,13 @@ testFail("function a(package) { \"use strict\"; }",
          "Binding package in strict mode (1:11)");
 
 testFail("function a() { \"use strict\"; function b(t, t) { }; }",
-         "Argument name clash in strict mode (1:43)");
+         "Argument name clash (1:43)");
 
 testFail("(function a(t, t) { \"use strict\"; })",
-         "Argument name clash in strict mode (1:15)");
+         "Argument name clash (1:15)");
 
 testFail("function a() { \"use strict\"; (function b(t, t) { }); }",
-         "Argument name clash in strict mode (1:44)");
+         "Argument name clash (1:44)");
 
 testFail("(function a(eval) { \"use strict\"; })",
          "Binding eval in strict mode (1:12)");

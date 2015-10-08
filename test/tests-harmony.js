@@ -1713,7 +1713,6 @@ test("([a, , b]) => 42", {
 });
 
 testFail("([a.a]) => 42", "Assigning to rvalue (1:2)", {ecmaVersion: 6});
-
 testFail("console.log(typeof () => {});", "Unexpected token (1:20)", {ecmaVersion: 6})
 
 test("(x=1) => x * x", {
@@ -2445,62 +2444,6 @@ test("foo((x, y) => {})", {
     start: {line: 1, column: 0},
     end: {line: 1, column: 17}
   }
-}, {
-  ecmaVersion: 6,
-  ranges: true,
-  locations: true
-});
-
-test("(a, a) => 42", {
-  type: "Program",
-  loc: {
-    start: {line: 1, column: 0},
-    end: {line: 1, column: 12}
-  },
-  body: [{
-    type: "ExpressionStatement",
-    loc: {
-      start: {line: 1, column: 0},
-      end: {line: 1, column: 12}
-    },
-    expression: {
-      type: "ArrowFunctionExpression",
-      loc: {
-        start: {line: 1, column: 0},
-        end: {line: 1, column: 12}
-      },
-      id: null,
-      params: [
-        {
-          type: "Identifier",
-          loc: {
-            start: {line: 1, column: 1},
-            end: {line: 1, column: 2}
-          },
-          name: "a"
-        },
-        {
-          type: "Identifier",
-          loc: {
-            start: {line: 1, column: 4},
-            end: {line: 1, column: 5}
-          },
-          name: "a"
-        }
-      ],
-      generator: false,
-      body: {
-        type: "Literal",
-        loc: {
-          start: {line: 1, column: 10},
-          end: {line: 1, column: 12}
-        },
-        value: 42,
-        raw: "42"
-      },
-      expression: true
-    }
-  }]
 }, {
   ecmaVersion: 6,
   ranges: true,
@@ -13064,7 +13007,7 @@ testFail("function default() {}", "Unexpected token (1:9)", {ecmaVersion: 6});
 
 testFail("function hello() {'use strict'; ({ i: 10, s(eval) { } }); }", "Binding eval in strict mode (1:44)", {ecmaVersion: 6});
 
-testFail("function a() { \"use strict\"; ({ b(t, t) { } }); }", "Argument name clash in strict mode (1:37)", {ecmaVersion: 6});
+testFail("function a() { \"use strict\"; ({ b(t, t) { } }); }", "Argument name clash (1:37)", {ecmaVersion: 6});
 
 testFail("var super", "Unexpected token (1:4)", {ecmaVersion: 6});
 
@@ -13104,7 +13047,9 @@ testFail("\"use strict\"; (arguments, a) => 42", "Binding arguments in strict mo
 
 testFail("\"use strict\"; (eval, a = 10) => 42", "Binding eval in strict mode (1:15)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; (a, a) => 42", "Argument name clash in strict mode (1:18)", {ecmaVersion: 6});
+testFail("(a, a) => 42", "Argument name clash (1:4)", {ecmaVersion: 6});
+
+testFail("\"use strict\"; (a, a) => 42", "Argument name clash (1:18)", {ecmaVersion: 6});
 
 testFail("\"use strict\"; (a) => 00", "Invalid number (1:21)", {ecmaVersion: 6});
 
@@ -13340,9 +13285,9 @@ testFail("function f(a, ...b = 0)", "Unexpected token (1:19)", {ecmaVersion: 6})
 
 testFail("function x(...{ a }){}", "Unexpected token (1:14)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; function x(a, { a }){}", "Argument name clash in strict mode (1:30)", {ecmaVersion: 6});
+testFail("\"use strict\"; function x(a, { a }){}", "Argument name clash (1:30)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; function x({ b: { a } }, [{ b: { a } }]){}", "Argument name clash in strict mode (1:47)", {ecmaVersion: 6});
+testFail("\"use strict\"; function x({ b: { a } }, [{ b: { a } }]){}", "Argument name clash (1:47)", {ecmaVersion: 6});
 
 testFail("\"use strict\"; function x(a, ...[a]){}", "Unexpected token (1:31)", {ecmaVersion: 6});
 
