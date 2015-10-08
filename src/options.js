@@ -21,11 +21,11 @@ export const defaultOptions = {
   // `onTrailingComma` is similar to `onInsertedSemicolon`, but for
   // trailing commas.
   onTrailingComma: null,
-  // By default, reserved words are not enforced. Disable
-  // `allowReserved` to enforce them. When this option has the
-  // value "never", reserved words and keywords can also not be
-  // used as property names.
-  allowReserved: true,
+  // By default, reserved words are only enforced if ecmaVersion >= 5.
+  // Set `allowReserved` to a boolean value to explicitly turn this on
+  // an off. When this option has the value "never", reserved words
+  // and keywords can also not be used as property names.
+  allowReserved: null,
   // When enabled, a return at the top level is not considered an
   // error.
   allowReturnOutsideFunction: false,
@@ -90,6 +90,8 @@ export function getOptions(opts) {
   let options = {}
   for (let opt in defaultOptions)
     options[opt] = opts && has(opts, opt) ? opts[opt] : defaultOptions[opt]
+  if (options.allowReserved == null)
+    options.allowReserved = options.ecmaVersion >= 5
 
   if (isArray(options.onToken)) {
     let tokens = options.onToken

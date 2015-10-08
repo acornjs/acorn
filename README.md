@@ -67,9 +67,10 @@ object referring to that same position.
   commas.
 
 - **allowReserved**: If `false`, using a reserved word will generate
-  an error. Defaults to `true`. When given the value `"never"`,
-  reserved words and keywords can also not be used as property names
-  (as in Internet Explorer's old parser).
+  an error. Defaults to `true` for `ecmaVersion` 3, `false` for higher
+  versions. When given the value `"never"`, reserved words and
+  keywords can also not be used as property names (as in Internet
+  Explorer's old parser).
 
 - **allowReturnOutsideFunction**: By default, a return statement at
   the top level raises an error. Set this to `true` to accept such
