@@ -413,6 +413,8 @@ pp.parseNew = function() {
     node.property = this.parseIdent(true)
     if (node.property.name !== "target")
       this.raise(node.property.start, "The only valid meta property for new is new.target")
+    if (!this.inFunction)
+      this.raise(node.start, "new.target can only be used in functions")
     return this.finishNode(node, "MetaProperty")
   }
   let startPos = this.start, startLoc = this.startLoc
