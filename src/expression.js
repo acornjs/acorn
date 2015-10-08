@@ -572,8 +572,8 @@ pp.parseArrowExpression = function(node, params) {
 
 // Parse function body and check parameters.
 
-pp.parseFunctionBody = function(node, allowExpression) {
-  let isExpression = allowExpression && this.type !== tt.braceL
+pp.parseFunctionBody = function(node, isArrowFunction) {
+  let isExpression = isArrowFunction && this.type !== tt.braceL
 
   if (isExpression) {
     node.body = this.parseMaybeAssign()
@@ -592,15 +592,25 @@ pp.parseFunctionBody = function(node, allowExpression) {
   // are not repeated, and it does not try to bind the words `eval`
   // or `arguments`.
   if (this.strict || !isExpression && node.body.body.length && this.isUseStrict(node.body.body[0])) {
-    let nameHash = {}, oldStrict = this.strict
+    let oldStrict = this.strict
     this.strict = true
     if (node.id)
       this.checkLVal(node.id, true)
-    for (let i = 0; i < node.params.length; i++)
-      this.checkLVal(node.params[i], true, nameHash)
+    this.checkParams(node);
     this.strict = oldStrict
+  } else if (isArrowFunction) {
+    this.checkParams(node);
   }
 }
+
+// Checks function params for various disallowed patterns such as using "eval"
+// or "arguments" and duplicate parameters.
+
+pp.checkParams = function(node) {
+    let nameHash = {};
+    for (let i = 0; i < node.params.length; i++)
+      this.checkLVal(node.params[i], true, nameHash)
+};
 
 // Parses a comma-separated list of expressions, and returns them as
 // an array. `close` is the token type that ends the list, and

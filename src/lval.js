@@ -164,7 +164,7 @@ pp.checkLVal = function(expr, isBinding, checkClashes) {
       this.raise(expr.start, (isBinding ? "Binding " : "Assigning to ") + expr.name + " in strict mode")
     if (checkClashes) {
       if (has(checkClashes, expr.name))
-        this.raise(expr.start, "Argument name clash in strict mode")
+        this.raise(expr.start, "Argument name clash")
       checkClashes[expr.name] = true
     }
     break
