@@ -15316,20 +15316,37 @@ testFail("[...eval] = arr", "Assigning to eval in strict mode (1:4)", {ecmaVersi
 
 testFail("function* y({yield}) {}", "Binding yield (1:13)", {ecmaVersion: 6});
 
-test("new.target", {
+test("function foo() { new.target; }", {
   type: "Program",
-  body: [{
-    type: "ExpressionStatement",
-    expression: {
-      type: "MetaProperty",
-      meta: {type: "Identifier", name: "new"},
-      property: {type: "Identifier", name: "target"}
+  body: [
+    {
+      type: "FunctionDeclaration",
+      id: {
+        type: "Identifier",
+        name: "foo"
+      },
+      body: {
+        type: "BlockStatement",
+        body: [
+          {
+            type: "ExpressionStatement",
+            expression: {
+              type: "MetaProperty",
+              meta: {type: "Identifier", name: "new"},
+              property: {type: "Identifier", name: "target"}
+            }
+          }
+        ]
+      },
+      generator: false,
+      expression: false
     }
-  }],
+  ],
   sourceType: "script"
 }, {ecmaVersion: 6});
 
 testFail("new.prop", "The only valid meta property for new is new.target (1:4)", {ecmaVersion: 6});
+testFail("new.target", "new.target can only be used in functions (1:0)", {ecmaVersion: 6});
 
 test("export default function foo() {} false", {
   body: [
