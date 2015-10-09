@@ -256,11 +256,9 @@ pp.parseTryStatement = function(node) {
     clause.param = this.parseBindingAtom()
     this.checkLVal(clause.param, true)
     this.expect(tt.parenR)
-    clause.guard = null
     clause.body = this.parseBlock()
     node.handler = this.finishNode(clause, "CatchClause")
   }
-  node.guardedHandlers = empty
   node.finalizer = this.eat(tt._finally) ? this.parseBlock() : null
   if (!node.handler && !node.finalizer)
     this.raise(node.start, "Missing catch or finally clause")

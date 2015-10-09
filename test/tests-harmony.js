@@ -14769,7 +14769,6 @@ test("try {} catch ({message}) {}", {
           }
         }]
       },
-      guard: null,
       body: {
         type: "BlockStatement",
         range: [25, 27],

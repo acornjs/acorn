@@ -22066,7 +22066,6 @@ test("try { } catch (e) { }", {
               }
             }
           },
-          guard: null,
           body: {
             type: "BlockStatement",
             body: [],
@@ -22154,7 +22153,6 @@ test("try { } catch (eval) { }", {
               }
             }
           },
-          guard: null,
           body: {
             type: "BlockStatement",
             body: [],
@@ -22242,7 +22240,6 @@ test("try { } catch (arguments) { }", {
               }
             }
           },
-          guard: null,
           body: {
             type: "BlockStatement",
             body: [],
@@ -22330,7 +22327,6 @@ test("try { } catch (e) { say(e) }", {
               }
             }
           },
-          guard: null,
           body: {
             type: "BlockStatement",
             body: [
@@ -22632,7 +22628,6 @@ test("try { doThat(); } catch (e) { say(e) }", {
               }
             }
           },
-          guard: null,
           body: {
             type: "BlockStatement",
             body: [
@@ -22819,7 +22814,6 @@ test("try { doThat(); } catch (e) { say(e) } finally { cleanup(stuff) }", {
               }
             }
           },
-          guard: null,
           body: {
             type: "BlockStatement",
             body: [

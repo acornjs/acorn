@@ -125,7 +125,6 @@ lp.parseStatement = function() {
       this.expect(tt.parenL)
       clause.param = this.toAssignable(this.parseExprAtom(), true)
       this.expect(tt.parenR)
-      clause.guard = null
       clause.body = this.parseBlock()
       node.handler = this.finishNode(clause, "CatchClause")
     }
