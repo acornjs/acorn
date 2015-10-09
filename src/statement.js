@@ -524,6 +524,13 @@ pp.parseExport = function(node) {
     if (this.eatContextual("from")) {
       node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected()
     } else {
+      // check for keywords used as local names
+      for (let i = 0; i < node.specifiers.length; i++) {
+        if (this.keywords.test(node.specifiers[i].local.name) || this.reservedWords.test(node.specifiers[i].local.name)) {
+          this.unexpected(node.specifiers[i].local.start)
+        }
+      }
+
       node.source = null
     }
     this.semicolon()
