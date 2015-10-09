@@ -4977,6 +4977,12 @@ test("export { default } from \"other\"", {
   locations: true
 });
 
+testFail("export { default }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("export { if }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("export { if } from 'foo'", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("export { default as foo }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("export { if as foo }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
+
 test("import \"jquery\"", {
   type: "Program",
   body: [{
