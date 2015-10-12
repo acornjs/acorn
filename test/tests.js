@@ -27014,6 +27014,9 @@ testFail("({ get i() { }, get i() { } })",
 testFail("({ set i(x) { }, set i(x) { } })",
          "Redefinition of property (1:21)");
 
+testFail("'use strict'; ({ __proto__: 1, __proto__: 2 })",
+         "Redefinition of property (1:31)");
+
 testFail("function t(...) { }",
          "Unexpected token (1:11)");
 

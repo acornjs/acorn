@@ -18,7 +18,6 @@
 
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
-import {has} from "./util"
 
 const pp = Parser.prototype
 
@@ -30,13 +29,13 @@ const pp = Parser.prototype
 pp.checkPropClash = function(prop, propHash) {
   if (this.options.ecmaVersion >= 6 && (prop.computed || prop.method || prop.shorthand))
     return
-  let key = prop.key, name
+  let {key} = prop, name
   switch (key.type) {
   case "Identifier": name = key.name; break
   case "Literal": name = String(key.value); break
   default: return
   }
-  let kind = prop.kind
+  let {kind} = prop
   if (this.options.ecmaVersion >= 6) {
     if (name === "__proto__" && kind === "init") {
       if (propHash.proto) this.raise(key.start, "Redefinition of __proto__ property");
@@ -44,9 +43,9 @@ pp.checkPropClash = function(prop, propHash) {
     }
     return
   }
-  let other
-  if (has(propHash, name)) {
-    other = propHash[name]
+  name = "$" + name
+  let other = propHash[name]
+  if (other) {
     let isGetSet = kind !== "init"
     if ((this.strict || isGetSet) && other[kind] || !(isGetSet ^ other.init))
       this.raise(key.start, "Redefinition of property")
