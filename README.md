@@ -369,6 +369,4 @@ The `nextMethod` argument passed to `extend`'s second argument is the
 previous value of this method, and should usually be called through to
 whenever the extended method does not handle the call itself.
 
-There is a proof-of-concept JSX plugin in the [`jsx`
-branch](https://github.com/marijnh/acorn/tree/jsx) branch of the
-Github repository.
+There is a proof-of-concept JSX plugin in the [`acorn-jsx`](https://github.com/RReverser/acorn-jsx) project.
