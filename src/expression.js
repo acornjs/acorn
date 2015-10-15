@@ -205,7 +205,8 @@ pp.parseMaybeUnary = function(refShorthandDefaultPos) {
 pp.parseExprSubscripts = function(refShorthandDefaultPos) {
   let startPos = this.start, startLoc = this.startLoc
   let expr = this.parseExprAtom(refShorthandDefaultPos)
-  if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr
+  let skipArrowSubscripts = expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")";
+  if ((refShorthandDefaultPos && refShorthandDefaultPos.start) || skipArrowSubscripts) return expr
   return this.parseSubscripts(expr, startPos, startLoc)
 }
 

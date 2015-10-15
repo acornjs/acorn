@@ -1713,7 +1713,101 @@ test("([a, , b]) => 42", {
 });
 
 testFail("([a.a]) => 42", "Assigning to rvalue (1:2)", {ecmaVersion: 6});
+testFail("() => {}()", "Unexpected token (1:8)", {ecmaVersion: 6})
+testFail("(a) => {}()", "Unexpected token (1:9)", {ecmaVersion: 6})
+testFail("a => {}()", "Unexpected token (1:7)", {ecmaVersion: 6})
 testFail("console.log(typeof () => {});", "Unexpected token (1:20)", {ecmaVersion: 6})
+
+test("(() => {})()", {
+  type: "Program",
+  body: [{
+    type: "ExpressionStatement",
+    expression: {
+        type: "CallExpression",
+        start: 0,
+        end: 12,
+        callee: {
+          type: "ArrowFunctionExpression",
+          id: null,
+          params: [],
+          body: {
+            type: "BlockStatement",
+            body: [],
+            start: 7,
+            end: 9,
+            loc: {
+              start: {line: 1, column: 7},
+              end: {line: 1, column: 9}
+            }
+          },
+          generator: false,
+          expression: false,
+          loc: {
+            start: {line: 1, column: 1},
+            end: {line: 1, column: 9}
+          }
+        }
+    },
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 12}
+    }
+  }],
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 12}
+  }
+}, {
+  ecmaVersion: 6,
+  ranges: true,
+  locations: true
+});
+
+test("((() => {}))()", {
+  type: "Program",
+  body: [{
+    type: "ExpressionStatement",
+    expression: {
+        type: "CallExpression",
+        start: 0,
+        end: 14,
+        callee: {
+          type: "ArrowFunctionExpression",
+          id: null,
+          params: [],
+          body: {
+            type: "BlockStatement",
+            body: [],
+            start: 8,
+            end: 10,
+            loc: {
+              start: {line: 1, column: 8},
+              end: {line: 1, column: 10}
+            }
+          },
+          generator: false,
+          expression: false,
+          loc: {
+            start: {line: 1, column: 2},
+            end: {line: 1, column: 10}
+          }
+        }
+    },
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 14}
+    }
+  }],
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 14}
+  }
+}, {
+  ecmaVersion: 6,
+  ranges: true,
+  locations: true
+});
+
 
 test("(x=1) => x * x", {
   type: "Program",
