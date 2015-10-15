@@ -413,7 +413,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody) {
 
 pp.parseFunctionParams = function(node) {
   this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, false)
+  node.params = this.parseBindingList(tt.parenR, false, false, true)
 }
 
 // Parse a class declaration or literal (depending on the
