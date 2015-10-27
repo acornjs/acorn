@@ -36,7 +36,7 @@ export {isIdentifierChar, isIdentifierStart} from "./identifier"
 export {Token} from "./tokenize"
 export {isNewLine, lineBreak, lineBreakG} from "./whitespace"
 
-export const version = "2.5.1"
+export const version = "2.5.2"
 
 // The main exported interface (under `self.acorn` when in the
 // browser) is a `parse` function that takes a code string and
