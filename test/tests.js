@@ -16363,6 +16363,66 @@ test("var x", {
   }
 });
 
+test("var await", {
+  type: "Program",
+  body: [
+    {
+      type: "VariableDeclaration",
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          id: {
+            type: "Identifier",
+            name: "await",
+            loc: {
+              start: {
+                line: 1,
+                column: 4
+              },
+              end: {
+                line: 1,
+                column: 9
+              }
+            }
+          },
+          init: null,
+          loc: {
+            start: {
+              line: 1,
+              column: 4
+            },
+            end: {
+              line: 1,
+              column: 9
+            }
+          }
+        }
+      ],
+      kind: "var",
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 9
+        }
+      }
+    }
+  ],
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 1,
+      column: 9
+    }
+  }
+});
+
 test("var x, y;", {
   type: "Program",
   body: [
@@ -27422,15 +27482,15 @@ testFail("throw\n10;", "Illegal newline after throw (1:5)");
 
 // ECMA < 6 mode should work as before
 
-testFail("const a;", "Unexpected token (1:6)");
+testFail("const a;", "The keyword 'const' is reserved (1:0)");
 
 testFail("let x;", "Unexpected token (1:4)");
 
-testFail("const a = 1;", "Unexpected token (1:6)");
+testFail("const a = 1;", "The keyword 'const' is reserved (1:0)");
 
 testFail("let a = 1;", "Unexpected token (1:4)");
 
-testFail("for(const x = 0;;);", "Unexpected token (1:10)");
+testFail("for(const x = 0;;);", "The keyword 'const' is reserved (1:4)");
 
 testFail("for(let x = 0;;);", "Unexpected token (1:8)");
 

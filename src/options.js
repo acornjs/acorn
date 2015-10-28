@@ -91,7 +91,7 @@ export function getOptions(opts) {
   for (let opt in defaultOptions)
     options[opt] = opts && has(opts, opt) ? opts[opt] : defaultOptions[opt]
   if (options.allowReserved == null)
-    options.allowReserved = options.ecmaVersion >= 5
+    options.allowReserved = options.ecmaVersion < 5
 
   if (isArray(options.onToken)) {
     let tokens = options.onToken
