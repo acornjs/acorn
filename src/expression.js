@@ -648,8 +648,7 @@ pp.parseIdent = function(liberal) {
   let node = this.startNode()
   if (liberal && this.options.allowReserved == "never") liberal = false
   if (this.type === tt.name) {
-    if (!liberal &&
-        (this.strict ? this.reservedWordsStrict : this.reservedWords).test(this.value) &&
+    if (!liberal && (this.strict ? this.reservedWordsStrict : this.reservedWords).test(this.value) &&
         (this.options.ecmaVersion >= 6 ||
          this.input.slice(this.start, this.end).indexOf("\\") == -1))
       this.raise(this.start, "The keyword '" + this.value + "' is reserved")

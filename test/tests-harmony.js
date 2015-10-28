@@ -33,6 +33,9 @@ if (typeof exports != "undefined") {
   var test = require("./driver.js").test;
   var testFail = require("./driver.js").testFail;
   var testAssert = require("./driver.js").testAssert;
+  var testOnly = require("./driver.js").testOnly;
+  var testFailOnly = require("./driver.js").testFailOnly;
+  var testAssertOnly = require("./driver.js").testAssertOnly;
 }
 
 /*
@@ -4324,6 +4327,8 @@ test("export var document = { }", {
   ranges: true,
   locations: true
 });
+
+testFail("export var await", "The keyword 'await' is reserved (1:11)", { ecmaVersion: 6, sourceType: "module" })
 
 test("export let document", {
   type: "Program",
