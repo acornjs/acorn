@@ -13,7 +13,6 @@ pp.toAssignable = function(node, isBinding) {
     case "Identifier":
     case "ObjectPattern":
     case "ArrayPattern":
-    case "AssignmentPattern":
       break
 
     case "ObjectExpression":
@@ -34,10 +33,16 @@ pp.toAssignable = function(node, isBinding) {
       if (node.operator === "=") {
         node.type = "AssignmentPattern"
         delete node.operator
+        // falls through to AssignmentPattern
       } else {
         this.raise(node.left.end, "Only '=' operator can be used for specifying default value.")
+        break;
       }
-      break
+
+    case "AssignmentPattern":
+      if (node.right.type === "YieldExpression")
+        this.raise(node.right.start, "Yield expression cannot be a default value")
+      break;
 
     case "ParenthesizedExpression":
       node.expression = this.toAssignable(node.expression, isBinding)
