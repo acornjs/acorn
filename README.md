@@ -1,6 +1,6 @@
 # Acorn
 
-[![Build Status](https://travis-ci.org/marijnh/acorn.svg?branch=master)](https://travis-ci.org/marijnh/acorn)
+[![Build Status](https://travis-ci.org/ternjs/acorn.svg?branch=master)](https://travis-ci.org/ternjs/acorn)
 [![NPM version](https://img.shields.io/npm/v/acorn.svg)](https://www.npmjs.org/package/acorn)  
 [Author funding status: ![maintainer happiness](https://marijnhaverbeke.nl/fund/status_s.png?force)](https://marijnhaverbeke.nl/fund/)
 
@@ -19,7 +19,7 @@ npm install acorn
 Alternately, download the source.
 
 ```sh
-git clone https://github.com/marijnh/acorn.git
+git clone https://github.com/ternjs/acorn.git
 ```
 
 ## Components

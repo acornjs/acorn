@@ -1,7 +1,7 @@
 {
   "name": "acorn",
   "description": "ECMAScript parser",
-  "homepage": "https://github.com/marijnh/acorn",
+  "homepage": "https://github.com/ternjs/acorn",
   "main": "dist/acorn.js",
   "version": "2.5.3",
   "engines": {
@@ -21,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/marijnh/acorn.git"
+    "url": "https://github.com/ternjs/acorn.git"
   },
   "license": "MIT",
   "scripts": {
