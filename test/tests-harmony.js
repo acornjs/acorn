@@ -5928,6 +5928,9 @@ test("(function* () { yield yield 10 })", {
   locations: true
 });
 
+testFail("function *g() { (x = yield) => {} }", "Yield expression cannot be a default value (1:21)", { ecmaVersion: 6 })
+testFail("function *g() { ({x = yield}) => {} }", "Yield expression cannot be a default value (1:22)", { ecmaVersion: 6 })
+
 // Harmony: Iterators
 
 test("for(x of list) process(x);", {
