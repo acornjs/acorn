@@ -6,6 +6,17 @@
 
 A tiny, fast JavaScript parser, written completely in JavaScript.
 
+## Community
+
+Acorn is open source software released under an
+[MIT license](https://github.com/ternjs/acorn/blob/master/LICENSE).
+
+You are welcome to
+[report bugs](https://github.com/ternjs/acorn/issues) or create pull
+requests on [github](https://github.com/ternjs/acorn). For questions
+and discussion, please use the
+[Tern discussion forum](http://discuss.ternjs.net).
+
 ## Installation
 
 The easiest way to install acorn is with [`npm`][npm].
