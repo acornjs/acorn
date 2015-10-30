@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import {basename} from "path"
-import {readSync as read, readFileSync as readFile} from "fs"
+import {readFileSync as readFile} from "fs"
 import * as acorn from "../dist/acorn.js"
 
-let infile, forceFile, parsed, tokens, silent = false, compact = false, tokenize = false
+let infile, forceFile, silent = false, compact = false, tokenize = false
 const options = {}
 
 function help(status) {
@@ -32,47 +32,29 @@ for (let i = 2; i < process.argv.length; ++i) {
   else help(1)
 }
 
-try {
-  let code = ""
-  if (forceFile || infile && infile != "-") code = readFile(infile, "utf8")
-  else {
-    // Read synchronously until running out of input
-    // See http://stackoverflow.com/a/16048083
-    const bufferSize = 4096
-    let bytesRead, buffer = new Buffer(bufferSize)
+function run(code) {
+  let result
+  if (!tokenize) {
+    try { result = acorn.parse(code, options) }
+    catch(e) { console.error(e.message); process.exit(1) }
+  } else {
+    result = []
+    let tokenizer = acorn.tokenizer(code, options), token
     while (true) {
-      bytesRead = 0
-      try {
-        bytesRead = read(process.stdin.fd, buffer, 0, bufferSize)
-      } catch(e) {
-        // Honor end of input
-        if (e.code == "EOF") break
-
-        // Rethrow other errors, but provide a specific message if possible
-        if (e.code == "EAGAIN") console.error("Interactive input not supported")
-        throw e
-      }
-      if (bytesRead == 0) break
-      code += buffer.toString(null, 0, bytesRead)
+      try { token = tokenizer.getToken() }
+      catch(e) { console.error(e.message); process.exit(1) }
+      result.push(token)
+      if (token.type == acorn.tokTypes.eof) break
     }
   }
-
-  if (!tokenize)
-    parsed = acorn.parse(code, options)
-  else {
-    const tokenizer = acorn.tokenizer(code, options)
-    tokens = []
-    while (true) {
-      const token = tokenizer.getToken()
-      tokens.push(token)
-      if (token.type == acorn.tokTypes.eof)
-        break
-    }
-  }
-} catch(e) {
-  console.log(e.message)
-  process.exit(1)
+  if (!silent) console.log(JSON.stringify(result, null, compact ? null : 2))
 }
 
-if (!silent)
-  console.log(JSON.stringify(tokenize ? tokens : parsed, null, compact ? null : 2))
+if (forceFile || infile && infile != "-") {
+  run(readFile(infile, "utf8"))
+} else {
+  let code = ""
+  process.stdin.resume()
+  process.stdin.on("data", chunk => code += chunk)
+  process.stdin.on("end", () => run(code))
+}
