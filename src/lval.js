@@ -82,10 +82,10 @@ pp.toAssignableList = function(exprList, isBinding) {
 
 // Parses spread element.
 
-pp.parseSpread = function(refShorthandDefaultPos) {
+pp.parseSpread = function(refDestructuringErrors) {
   let node = this.startNode()
   this.next()
-  node.argument = this.parseMaybeAssign(refShorthandDefaultPos)
+  node.argument = this.parseMaybeAssign(refDestructuringErrors)
   return this.finishNode(node, "SpreadElement")
 }
 

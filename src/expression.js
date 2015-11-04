@@ -74,13 +74,13 @@ pp.checkPropClash = function(prop, propHash) {
 // and object pattern might appear (so it's possible to raise
 // delayed syntax error at correct position).
 
-pp.parseExpression = function(noIn, refShorthandDefaultPos) {
+pp.parseExpression = function(noIn, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseMaybeAssign(noIn, refShorthandDefaultPos)
+  let expr = this.parseMaybeAssign(noIn, refDestructuringErrors)
   if (this.type === tt.comma) {
     let node = this.startNodeAt(startPos, startLoc)
     node.expressions = [expr]
-    while (this.eat(tt.comma)) node.expressions.push(this.parseMaybeAssign(noIn, refShorthandDefaultPos))
+    while (this.eat(tt.comma)) node.expressions.push(this.parseMaybeAssign(noIn, refDestructuringErrors))
     return this.finishNode(node, "SequenceExpression")
   }
   return expr
@@ -89,42 +89,41 @@ pp.parseExpression = function(noIn, refShorthandDefaultPos) {
 // Parse an assignment expression. This includes applications of
 // operators like `+=`.
 
-pp.parseMaybeAssign = function(noIn, refShorthandDefaultPos, afterLeftParse) {
+pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   if (this.type == tt._yield && this.inGenerator) return this.parseYield()
 
-  let failOnShorthandAssign
-  if (!refShorthandDefaultPos) {
-    refShorthandDefaultPos = {start: 0}
-    failOnShorthandAssign = true
-  } else {
-    failOnShorthandAssign = false
+  let validateDestructuring = false
+  if (!refDestructuringErrors) {
+    refDestructuringErrors = {shorthandAssign: 0, trailingComma: 0}
+    validateDestructuring = true
   }
   let startPos = this.start, startLoc = this.startLoc
   if (this.type == tt.parenL || this.type == tt.name)
     this.potentialArrowAt = this.start
-  let left = this.parseMaybeConditional(noIn, refShorthandDefaultPos)
+  let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
+    if (validateDestructuring) this.checkPatternErrors(refDestructuringErrors, true)
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
     node.left = this.type === tt.eq ? this.toAssignable(left) : left
-    refShorthandDefaultPos.start = 0 // reset because shorthand default was used correctly
+    refDestructuringErrors.shorthandAssign = 0 // reset because shorthand default was used correctly
     this.checkLVal(left)
     this.next()
     node.right = this.parseMaybeAssign(noIn)
     return this.finishNode(node, "AssignmentExpression")
-  } else if (failOnShorthandAssign && refShorthandDefaultPos.start) {
-    this.unexpected(refShorthandDefaultPos.start)
+  } else {
+    if (validateDestructuring) this.checkExpressionErrors(refDestructuringErrors, true)
   }
   return left
 }
 
 // Parse a ternary conditional (`?:`) operator.
 
-pp.parseMaybeConditional = function(noIn, refShorthandDefaultPos) {
+pp.parseMaybeConditional = function(noIn, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseExprOps(noIn, refShorthandDefaultPos)
-  if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr
+  let expr = this.parseExprOps(noIn, refDestructuringErrors)
+  if (this.checkExpressionErrors(refDestructuringErrors)) return expr
   if (this.eat(tt.question)) {
     let node = this.startNodeAt(startPos, startLoc)
     node.test = expr
@@ -138,10 +137,10 @@ pp.parseMaybeConditional = function(noIn, refShorthandDefaultPos) {
 
 // Start the precedence parser.
 
-pp.parseExprOps = function(noIn, refShorthandDefaultPos) {
+pp.parseExprOps = function(noIn, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseMaybeUnary(refShorthandDefaultPos)
-  if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr
+  let expr = this.parseMaybeUnary(refDestructuringErrors)
+  if (this.checkExpressionErrors(refDestructuringErrors)) return expr
   return this.parseExprOp(expr, startPos, startLoc, -1, noIn)
 }
 
@@ -171,14 +170,14 @@ pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
 
 // Parse unary operators, both prefix and postfix.
 
-pp.parseMaybeUnary = function(refShorthandDefaultPos) {
+pp.parseMaybeUnary = function(refDestructuringErrors) {
   if (this.type.prefix) {
     let node = this.startNode(), update = this.type === tt.incDec
     node.operator = this.value
     node.prefix = true
     this.next()
     node.argument = this.parseMaybeUnary()
-    if (refShorthandDefaultPos && refShorthandDefaultPos.start) this.unexpected(refShorthandDefaultPos.start)
+    this.checkExpressionErrors(refDestructuringErrors, true)
     if (update) this.checkLVal(node.argument)
     else if (this.strict && node.operator === "delete" &&
              node.argument.type === "Identifier")
@@ -186,8 +185,8 @@ pp.parseMaybeUnary = function(refShorthandDefaultPos) {
     return this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
   }
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseExprSubscripts(refShorthandDefaultPos)
-  if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr
+  let expr = this.parseExprSubscripts(refDestructuringErrors)
+  if (this.checkExpressionErrors(refDestructuringErrors)) return expr
   while (this.type.postfix && !this.canInsertSemicolon()) {
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
@@ -202,11 +201,11 @@ pp.parseMaybeUnary = function(refShorthandDefaultPos) {
 
 // Parse call, dot, and `[]`-subscript expressions.
 
-pp.parseExprSubscripts = function(refShorthandDefaultPos) {
+pp.parseExprSubscripts = function(refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseExprAtom(refShorthandDefaultPos)
+  let expr = this.parseExprAtom(refDestructuringErrors)
   let skipArrowSubscripts = expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")";
-  if ((refShorthandDefaultPos && refShorthandDefaultPos.start) || skipArrowSubscripts) return expr
+  if (this.checkExpressionErrors(refDestructuringErrors) || skipArrowSubscripts) return expr
   return this.parseSubscripts(expr, startPos, startLoc)
 }
 
@@ -246,7 +245,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
 // `new`, or an expression wrapped in punctuation like `()`, `[]`,
 // or `{}`.
 
-pp.parseExprAtom = function(refShorthandDefaultPos) {
+pp.parseExprAtom = function(refDestructuringErrors) {
   let node, canBeArrow = this.potentialArrowAt == this.start
   switch (this.type) {
   case tt._super:
@@ -294,11 +293,11 @@ pp.parseExprAtom = function(refShorthandDefaultPos) {
     if (this.options.ecmaVersion >= 7 && this.type === tt._for) {
       return this.parseComprehension(node, false)
     }
-    node.elements = this.parseExprList(tt.bracketR, true, true, refShorthandDefaultPos)
+    node.elements = this.parseExprList(tt.bracketR, true, true, refDestructuringErrors)
     return this.finishNode(node, "ArrayExpression")
 
   case tt.braceL:
-    return this.parseObj(false, refShorthandDefaultPos)
+    return this.parseObj(false, refDestructuringErrors)
 
   case tt._function:
     node = this.startNode()
@@ -345,7 +344,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
 
     let innerStartPos = this.start, innerStartLoc = this.startLoc
     let exprList = [], first = true
-    let refShorthandDefaultPos = {start: 0}, spreadStart, innerParenStart
+    let refDestructuringErrors = {shorthandAssign: 0, trailingComma: 0}, spreadStart, innerParenStart
     while (this.type !== tt.parenR) {
       first ? first = false : this.expect(tt.comma)
       if (this.type === tt.ellipsis) {
@@ -356,20 +355,21 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
         if (this.type === tt.parenL && !innerParenStart) {
           innerParenStart = this.start
         }
-        exprList.push(this.parseMaybeAssign(false, refShorthandDefaultPos, this.parseParenItem))
+        exprList.push(this.parseMaybeAssign(false, refDestructuringErrors, this.parseParenItem))
       }
     }
     let innerEndPos = this.start, innerEndLoc = this.startLoc
     this.expect(tt.parenR)
 
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
+      this.checkPatternErrors(refDestructuringErrors, true)
       if (innerParenStart) this.unexpected(innerParenStart)
       return this.parseParenArrowList(startPos, startLoc, exprList)
     }
 
     if (!exprList.length) this.unexpected(this.lastTokStart)
     if (spreadStart) this.unexpected(spreadStart)
-    if (refShorthandDefaultPos.start) this.unexpected(refShorthandDefaultPos.start)
+    this.checkExpressionErrors(refDestructuringErrors, true)
 
     if (exprList.length > 1) {
       val = this.startNodeAt(innerStartPos, innerStartLoc)
@@ -455,7 +455,7 @@ pp.parseTemplate = function() {
 
 // Parse an object literal or binding pattern.
 
-pp.parseObj = function(isPattern, refShorthandDefaultPos) {
+pp.parseObj = function(isPattern, refDestructuringErrors) {
   let node = this.startNode(), first = true, propHash = {}
   node.properties = []
   this.next()
@@ -469,7 +469,7 @@ pp.parseObj = function(isPattern, refShorthandDefaultPos) {
     if (this.options.ecmaVersion >= 6) {
       prop.method = false
       prop.shorthand = false
-      if (isPattern || refShorthandDefaultPos) {
+      if (isPattern || refDestructuringErrors) {
         startPos = this.start
         startLoc = this.startLoc
       }
@@ -477,16 +477,16 @@ pp.parseObj = function(isPattern, refShorthandDefaultPos) {
         isGenerator = this.eat(tt.star)
     }
     this.parsePropertyName(prop)
-    this.parsePropertyValue(prop, isPattern, isGenerator, startPos, startLoc, refShorthandDefaultPos)
+    this.parsePropertyValue(prop, isPattern, isGenerator, startPos, startLoc, refDestructuringErrors)
     this.checkPropClash(prop, propHash)
     node.properties.push(this.finishNode(prop, "Property"))
   }
   return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression")
 }
 
-pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLoc, refShorthandDefaultPos) {
+pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLoc, refDestructuringErrors) {
   if (this.eat(tt.colon)) {
-      prop.value = isPattern ? this.parseMaybeDefault(this.start, this.startLoc) : this.parseMaybeAssign(false, refShorthandDefaultPos)
+      prop.value = isPattern ? this.parseMaybeDefault(this.start, this.startLoc) : this.parseMaybeAssign(false, refDestructuringErrors)
       prop.kind = "init"
     } else if (this.options.ecmaVersion >= 6 && this.type === tt.parenL) {
       if (isPattern) this.unexpected()
@@ -515,9 +515,9 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
             (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name))
           this.raise(prop.key.start, "Binding " + prop.key.name)
         prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
-      } else if (this.type === tt.eq && refShorthandDefaultPos) {
-        if (!refShorthandDefaultPos.start)
-          refShorthandDefaultPos.start = this.start
+      } else if (this.type === tt.eq && refDestructuringErrors) {
+        if (!refDestructuringErrors.shorthandAssign)
+          refDestructuringErrors.shorthandAssign = this.start
         prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
       } else {
         prop.value = prop.key
@@ -620,11 +620,14 @@ pp.checkParams = function(node) {
 // nothing in between them to be parsed as `null` (which is needed
 // for array literals).
 
-pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refShorthandDefaultPos) {
+pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructuringErrors) {
   let elts = [], first = true
   while (!this.eat(close)) {
     if (!first) {
       this.expect(tt.comma)
+      if (this.type === close && refDestructuringErrors && !refDestructuringErrors.trailingComma) {
+        refDestructuringErrors.trailingComma = this.lastTokStart
+      }
       if (allowTrailingComma && this.afterTrailingComma(close)) break
     } else first = false
 
@@ -632,9 +635,9 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refShorthandD
     if (allowEmpty && this.type === tt.comma)
       elt = null
     else if (this.type === tt.ellipsis)
-      elt = this.parseSpread(refShorthandDefaultPos)
+      elt = this.parseSpread(refDestructuringErrors)
     else
-      elt = this.parseMaybeAssign(false, refShorthandDefaultPos)
+      elt = this.parseMaybeAssign(false, refDestructuringErrors)
     elts.push(elt)
   }
   return elts

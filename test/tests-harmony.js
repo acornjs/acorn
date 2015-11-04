@@ -13408,62 +13408,7 @@ testFail("\"use strict\"; `${test}\\02`;", "Octal literal in strict mode (1:22)"
 
 testFail("if (1) import \"acorn\";", "'import' and 'export' may only appear at the top level (1:7)", {ecmaVersion: 6});
 
-test("[...a, ] = b", {
-  type: "Program",
-  loc: {
-    start: {line: 1, column: 0},
-    end: {line: 1, column: 12}
-  },
-  body: [{
-    type: "ExpressionStatement",
-    loc: {
-      start: {line: 1, column: 0},
-      end: {line: 1, column: 12}
-    },
-    expression: {
-      type: "AssignmentExpression",
-      loc: {
-        start: {line: 1, column: 0},
-        end: {line: 1, column: 12}
-      },
-      operator: "=",
-      left: {
-        type: "ArrayPattern",
-        loc: {
-          start: {line: 1, column: 0},
-          end: {line: 1, column: 8}
-        },
-        elements: [{
-          type: "RestElement",
-          loc: {
-            start: {line: 1, column: 1},
-            end: {line: 1, column: 5}
-          },
-          argument: {
-            type: "Identifier",
-            loc: {
-              start: {line: 1, column: 4},
-              end: {line: 1, column: 5}
-            },
-            name: "a"
-          }
-        }]
-      },
-      right: {
-        type: "Identifier",
-        loc: {
-          start: {line: 1, column: 11},
-          end: {line: 1, column: 12}
-        },
-        name: "b"
-      }
-    }
-  }]
-}, {
-  ecmaVersion: 6,
-  ranges: true,
-  locations: true
-});
+testFail("[...a, ] = b", "Trailing comma is not permitted in destructuring patterns (1:5)", {ecmaVersion: 6});
 
 testFail("if (b,...a, );", "Unexpected token (1:6)", {ecmaVersion: 6});
 
@@ -14095,9 +14040,9 @@ test("for ({x = 0} in arr);", {
   ranges: true
 });
 
-testFail("obj = {x = 0}", "Unexpected token (1:9)", {ecmaVersion: 6});
+testFail("obj = {x = 0}", "Shorthand property assignments are valid only in destructuring patterns (1:9)", {ecmaVersion: 6});
 
-testFail("f({x = 0})", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("f({x = 0})", "Shorthand property assignments are valid only in destructuring patterns (1:5)", {ecmaVersion: 6});
 
 // https://github.com/ternjs/acorn/issues/191
 
@@ -14597,33 +14542,7 @@ test("let {x} = y", {
   "end": 11
 }, {ecmaVersion: 6})
 
-test("[x,,] = 1", {
-  type: "Program",
-  body: [
-    {
-      type: "ExpressionStatement",
-      expression: {
-        type: "AssignmentExpression",
-        operator: "=",
-        left: {
-          type: "ArrayPattern",
-          elements: [
-            {
-              type: "Identifier",
-              name: "x"
-            },
-            null
-          ]
-        },
-        right: {
-          type: "Literal",
-          value: 1,
-          raw: "1"
-        }
-      }
-    }
-  ]
-}, {ecmaVersion: 6});
+testFail("[x,,] = 1", "Trailing comma is not permitted in destructuring patterns (1:3)", {ecmaVersion: 6});
 
 test("for (var [name, value] in obj) {}", {
   body: [

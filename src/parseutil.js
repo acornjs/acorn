@@ -88,3 +88,15 @@ pp.expect = function(type) {
 pp.unexpected = function(pos) {
   this.raise(pos != null ? pos : this.start, "Unexpected token")
 }
+
+pp.checkPatternErrors = function(refDestructuringErrors, andThrow) {
+  let pos = refDestructuringErrors && refDestructuringErrors.trailingComma
+  if (!andThrow) return !!pos
+  if (pos) this.raise(pos, "Trailing comma is not permitted in destructuring patterns")
+}
+
+pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {
+  let pos = refDestructuringErrors && refDestructuringErrors.shorthandAssign
+  if (!andThrow) return !!pos
+  if (pos) this.raise(pos, "Shorthand property assignments are valid only in destructuring patterns")
+}

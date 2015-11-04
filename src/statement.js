@@ -156,14 +156,15 @@ pp.parseForStatement = function(node) {
       return this.parseForIn(node, init)
     return this.parseFor(node, init)
   }
-  let refShorthandDefaultPos = {start: 0}
-  let init = this.parseExpression(true, refShorthandDefaultPos)
+  let refDestructuringErrors = {shorthandAssign: 0, trailingComma: 0}
+  let init = this.parseExpression(true, refDestructuringErrors)
   if (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
+    this.checkPatternErrors(refDestructuringErrors, true)
     this.toAssignable(init)
     this.checkLVal(init)
     return this.parseForIn(node, init)
-  } else if (refShorthandDefaultPos.start) {
-    this.unexpected(refShorthandDefaultPos.start)
+  } else {
+    this.checkExpressionErrors(refDestructuringErrors, true)
   }
   return this.parseFor(node, init)
 }
