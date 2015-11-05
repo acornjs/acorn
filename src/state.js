@@ -12,11 +12,11 @@ function keywordRegexp(words) {
 
 export class Parser {
   constructor(options, input, startPos) {
-    this.options = getOptions(options)
-    this.sourceFile = this.options.sourceFile
-    this.keywords = keywordRegexp(keywords[this.options.ecmaVersion >= 6 ? 6 : 5])
-    let reserved = this.options.allowReserved ? "" :
-        reservedWords[this.options.ecmaVersion] + (options.sourceType == "module" ? " await" : "")
+    this.options = options = getOptions(options)
+    this.sourceFile = options.sourceFile
+    this.keywords = keywordRegexp(keywords[options.ecmaVersion >= 6 ? 6 : 5])
+    let reserved = options.allowReserved ? "" :
+        reservedWords[options.ecmaVersion] + (options.sourceType == "module" ? " await" : "")
     this.reservedWords = keywordRegexp(reserved)
     let reservedStrict = (reserved ? reserved + " " : "") + reservedWords.strict
     this.reservedWordsStrict = keywordRegexp(reservedStrict)
@@ -29,7 +29,7 @@ export class Parser {
     this.containsEsc = false;
 
     // Load plugins
-    this.loadPlugins(this.options.plugins)
+    this.loadPlugins(options.plugins)
 
     // Set up token state
 
@@ -65,7 +65,7 @@ export class Parser {
     this.exprAllowed = true
 
     // Figure out if it's a module code.
-    this.strict = this.inModule = this.options.sourceType === "module"
+    this.strict = this.inModule = options.sourceType === "module"
 
     // Used to signify the start of a potential arrow function
     this.potentialArrowAt = -1
@@ -76,7 +76,7 @@ export class Parser {
     this.labels = []
 
     // If enabled, skip leading hashbang line.
-    if (this.pos === 0 && this.options.allowHashBang && this.input.slice(0, 2) === '#!')
+    if (this.pos === 0 && options.allowHashBang && this.input.slice(0, 2) === '#!')
       this.skipLineComment(2)
   }
 
