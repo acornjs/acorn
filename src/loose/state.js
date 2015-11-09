@@ -1,5 +1,8 @@
 import {tokenizer, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from ".."
 
+// Registered plugins
+export const pluginsLoose = {}
+
 export class LooseParser {
   constructor(input, options) {
     this.toks = tokenizer(input, options)
@@ -15,6 +18,9 @@ export class LooseParser {
     this.curIndent = 0
     this.curLineStart = 0
     this.nextLineStart = this.lineEnd(this.curLineStart) + 1
+    // Load plugins
+    this.options.pluginsLoose = options.pluginsLoose || {}
+    this.loadPlugins(this.options.pluginsLoose)
   }
 
   startNode() {
@@ -138,5 +144,17 @@ export class LooseParser {
       if (ch !== 9 && ch !== 32) return false
     }
     return true
+  }
+
+  extend(name, f) {
+    this[name] = f(this[name])
+  }
+
+  loadPlugins(pluginConfigs) {
+    for (let name in pluginConfigs) {
+      let plugin = pluginsLoose[name]
+      if (!plugin) throw new Error("Plugin '" + name + "' not found")
+      plugin(this, pluginConfigs[name])
+    }
   }
 }
