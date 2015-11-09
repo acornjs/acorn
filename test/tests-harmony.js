@@ -32,10 +32,6 @@
 if (typeof exports != "undefined") {
   var test = require("./driver.js").test;
   var testFail = require("./driver.js").testFail;
-  var testAssert = require("./driver.js").testAssert;
-  var testOnly = require("./driver.js").testOnly;
-  var testFailOnly = require("./driver.js").testFailOnly;
-  var testAssertOnly = require("./driver.js").testAssertOnly;
 }
 
 /*
