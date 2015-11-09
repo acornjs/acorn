@@ -30,12 +30,12 @@
 // tangle.
 
 import * as acorn from ".."
-import {LooseParser} from "./state"
+import {LooseParser, pluginsLoose} from "./state"
 import "./tokenize"
 import "./statement"
 import "./expression"
 
-export {LooseParser} from "./state"
+export {LooseParser, pluginsLoose} from "./state"
 
 acorn.defaultOptions.tabSize = 4
 
@@ -47,3 +47,4 @@ export function parse_dammit(input, options) {
 
 acorn.parse_dammit = parse_dammit
 acorn.LooseParser = LooseParser
+acorn.pluginsLoose = pluginsLoose
