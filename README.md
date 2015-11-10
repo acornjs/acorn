@@ -380,4 +380,17 @@ The `nextMethod` argument passed to `extend`'s second argument is the
 previous value of this method, and should usually be called through to
 whenever the extended method does not handle the call itself.
 
+Similarly, the loose parser allows plugins to register themselves via
+`acorn.pluginsLoose`.  The extension mechanism is the same as for the
+normal parser:
+
+```javascript
+looseParser.extend("readToken", function(nextMethod) {
+  return function() {
+    console.log("Reading a token in the loose parser!")
+    return nextMethod.call(this)
+  }
+})
+```
+
 There is a proof-of-concept JSX plugin in the [`acorn-jsx`](https://github.com/RReverser/acorn-jsx) project.
