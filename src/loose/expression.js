@@ -4,25 +4,16 @@ import {tokTypes as tt} from ".."
 
 const lp = LooseParser.prototype
 
-lp.checkLVal = function(expr, binding) {
+lp.checkLVal = function(expr) {
   if (!expr) return expr
   switch (expr.type) {
   case "Identifier":
-    return expr
-
   case "MemberExpression":
-    return binding ? this.dummyIdent() : expr
+    return expr
 
   case "ParenthesizedExpression":
-    expr.expression = this.checkLVal(expr.expression, binding)
+    expr.expression = this.checkLVal(expr.expression)
     return expr
-
-  // FIXME recursively check contents
-  case "ObjectPattern":
-  case "ArrayPattern":
-  case "RestElement":
-  case "AssignmentPattern":
-    if (this.options.ecmaVersion >= 6) return expr
 
   default:
     return this.dummyIdent()
@@ -426,32 +417,30 @@ lp.initFunction = function(node) {
 // if possible.
 
 lp.toAssignable = function(node, binding) {
-  if (this.options.ecmaVersion >= 6 && node) {
-    switch (node.type) {
-    case "ObjectExpression":
-      node.type = "ObjectPattern"
-      let props = node.properties
-      for (let i = 0; i < props.length; i++)
-        this.toAssignable(props[i].value, binding)
-      break
-
-    case "ArrayExpression":
-      node.type = "ArrayPattern"
-      this.toAssignableList(node.elements, binding)
-      break
-
-    case "SpreadElement":
-      node.type = "RestElement"
-      node.argument = this.toAssignable(node.argument, binding)
-      break
-
-    case "AssignmentExpression":
-      node.type = "AssignmentPattern"
-      delete node.operator
-      break
-    }
+  if (!node || node.type == "Identifier" || (node.type == "MemberExpression" && !binding)) {
+    // Okay
+  } else if (node.type == "ParenthesizedExpression") {
+    node.expression = this.toAssignable(node.expression, binding)
+  } else if (this.options.ecmaVersion < 6) {
+    return this.dummyIdent()
+  } else if (node.type == "ObjectExpression") {
+    node.type = "ObjectPattern"
+    let props = node.properties
+    for (let i = 0; i < props.length; i++)
+      props[i].value = this.toAssignable(props[i].value, binding)
+  } else if (node.type == "ArrayExpression") {
+    node.type = "ArrayPattern"
+    this.toAssignableList(node.elements, binding)
+  } else if (node.type == "SpreadElement") {
+    node.type = "RestElement"
+    node.argument = this.toAssignable(node.argument, binding)
+  } else if (node.type == "AssignmentExpression") {
+    node.type = "AssignmentPattern"
+    delete node.operator
+  } else {
+    return this.dummyIdent()
   }
-  return this.checkLVal(node, binding)
+  return node
 }
 
 lp.toAssignableList = function(exprList, binding) {
