@@ -258,7 +258,7 @@ that will be called with the node object and, if applicable the state
 at that point. The last two arguments are optional. `base` is a walker
 algorithm, and `state` is a start state. The default walker will
 simply visit all statements and expressions and not produce a
-meaningful state. (An example of a use of state it to track scope at
+meaningful state. (An example of a use of state is to track scope at
 each point in the tree.)
 
 **ancestor**`(node, visitors, base, state)` does a 'simple' walk over
@@ -282,7 +282,7 @@ taking defaults from `base`.
 
 **findNodeAt**`(node, start, end, test, base, state)` tries to
 locate a node in a tree at the given start and/or end offsets, which
-satisfies the predicate `test`. `start` end `end` can be either `null`
+satisfies the predicate `test`. `start` and `end` can be either `null`
 (as wildcard) or a number. `test` may be a string (indicating a node
 type) or a function that takes `(nodeType, node)` arguments and
 returns a boolean indicating whether this node is interesting. `base`
