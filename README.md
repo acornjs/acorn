@@ -1,7 +1,7 @@
 # Acorn
 
 [![Build Status](https://travis-ci.org/ternjs/acorn.svg?branch=master)](https://travis-ci.org/ternjs/acorn)
-[![NPM version](https://img.shields.io/npm/v/acorn.svg)](https://www.npmjs.org/package/acorn)  
+[![NPM version](https://img.shields.io/npm/v/acorn.svg)](https://www.npmjs.com/package/acorn)  
 [Author funding status: ![maintainer happiness](https://marijnhaverbeke.nl/fund/status_s.png?force)](https://marijnhaverbeke.nl/fund/)
 
 A tiny, fast JavaScript parser, written completely in JavaScript.
@@ -21,7 +21,7 @@ and discussion, please use the
 
 The easiest way to install acorn is with [`npm`][npm].
 
-[npm]: http://npmjs.org
+[npm]: https://www.npmjs.com/
 
 ```sh
 npm install acorn
@@ -230,7 +230,7 @@ console.log(escodegen.generate(ast, {comment: true}));
 // > 'var x = 42;    // answer'
 ```
 
-[escodegen]: https://github.com/Constellation/escodegen
+[escodegen]: https://github.com/estools/escodegen
 
 ### dist/acorn_loose.js ###
 
