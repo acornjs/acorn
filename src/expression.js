@@ -510,6 +510,8 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
         else
           this.raise(start, "setter should have exactly one param")
       }
+      if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
+        this.raise(prop.value.params[0].start, "Setter cannot use rest params")
     } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
       prop.kind = "init"
       if (isPattern) {

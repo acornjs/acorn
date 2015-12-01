@@ -11189,6 +11189,8 @@ test("(function x({ a, b }){})", {
 });
 
 testFail("(function x(...[ a, b ]){})", "Unexpected token (1:15)", {ecmaVersion: 6});
+testFail("var a = { set foo(...v) {} };", "Setter cannot use rest params (1:18)", {ecmaVersion: 6});
+testFail("class a { set foo(...v) {} };", "Setter cannot use rest params (1:18)", {ecmaVersion: 6});
 
 testFail("(function x({ a: { w, x }, b: [y, z] }, ...[a, b, c]){})", "Unexpected token (1:43)", {ecmaVersion: 6});
 
