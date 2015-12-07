@@ -380,7 +380,7 @@ lp.parseImportSpecifierList = function() {
     while (!this.closes(tt.braceR, indent + (this.curLineStart <= continuedLine ? 1 : 0), line)) {
       let elt = this.startNode()
       if (this.eat(tt.star)) {
-        if (this.eatContextual("as")) elt.local = this.parseIdent()
+        elt.local = this.eatContextual("as") ? this.parseIdent() : this.dummyIdent()
         this.finishNode(elt, "ImportNamespaceSpecifier")
       } else {
         if (this.isContextual("from")) break
