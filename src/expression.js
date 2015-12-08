@@ -98,7 +98,10 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     validateDestructuring = true
   }
   let startPos = this.start, startLoc = this.startLoc
-  if (this.type == tt.parenL || this.type == tt.name)
+  if (this.type == tt.parenL ||
+      this.type == tt.name &&
+        !(this.isContextual("let") &&
+          this.isLexicalBinding(this.lookAhead())))
     this.potentialArrowAt = this.start
   let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
@@ -692,6 +695,7 @@ pp.parseComprehension = function(node, isGenerator) {
     let block = this.startNode()
     this.next()
     this.expect(tt.parenL)
+    if (this.isContextual("let") && this.isLexicalBinding(this.lookAhead())) this.unexpected()
     block.left = this.parseBindingAtom()
     this.checkLVal(block.left, true)
     this.expectContextual("of")

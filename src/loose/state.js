@@ -73,6 +73,17 @@ export class LooseParser {
     return dummy
   }
 
+  // Test whether the token can be the starting point of a LexicalBinding
+  // (BindingIdentifier or BindingPattern).
+
+  isLexicalBinding(tok) {
+    return this.options.ecmaVersion >= 6 &&
+             tok.type === tt.name ||
+          // tok.type === tt._yield ||
+             tok.type === tt.braceL ||
+             tok.type === tt.bracketL
+  }
+
   eat(type) {
     if (this.tok.type === type) {
       this.next()
