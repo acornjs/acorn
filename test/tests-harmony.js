@@ -14799,3 +14799,22 @@ testFail("var await = 0", "The keyword 'await' is reserved (1:4)", {
   allowReserved: false,
   locations: true
 })
+
+// https://github.com/ternjs/acorn/issues/363
+
+test("/[a-z]/gimuy", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "Literal",
+        regex: {
+          pattern: "[a-z]",
+          flags: "gimuy"
+        }
+      }
+    }
+  ]
+}, {ecmaVersion: 6});
+testFail("/[a-z]/s", "Invalid regular expression flag (1:1)", {ecmaVersion: 6});

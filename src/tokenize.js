@@ -410,8 +410,8 @@ pp.readRegexp = function() {
   let mods = this.readWord1()
   let tmp = content
   if (mods) {
-    let validFlags = /^[gmsiy]*$/
-    if (this.options.ecmaVersion >= 6) validFlags = /^[gmsiyu]*$/
+    let validFlags = /^[gim]*$/
+    if (this.options.ecmaVersion >= 6) validFlags = /^[gimuy]*$/
     if (!validFlags.test(mods)) this.raise(start, "Invalid regular expression flag")
     if (mods.indexOf('u') >= 0 && !regexpUnicodeSupport) {
       // Replace each astral symbol and every Unicode escape sequence that

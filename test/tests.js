@@ -29090,3 +29090,25 @@ testAssert("[1,2,] + {foo: 1,}", function() {
 testFail("({ get prop(x) {} })", "getter should have no params (1:11)");
 testFail("({ set prop() {} })", "setter should have exactly one param (1:11)");
 testFail("({ set prop(x, y) {} })", "setter should have exactly one param (1:11)");
+
+// https://github.com/ternjs/acorn/issues/363
+
+test("/[a-z]/gim", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "Literal",
+        value: /[a-z]/gim,
+        regex: {
+          pattern: "[a-z]",
+          flags: "gim"
+        }
+      }
+    }
+  ]
+});
+testFail("/[a-z]/u", "Invalid regular expression flag (1:1)");
+testFail("/[a-z]/y", "Invalid regular expression flag (1:1)");
+testFail("/[a-z]/s", "Invalid regular expression flag (1:1)");
