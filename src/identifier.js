@@ -9,10 +9,12 @@
 
 // Reserved word lists for various dialects of the language
 
+let ecma5ReservedWords = "break case catch class const continue debugger default delete do else enum export extends false finally for function if import in instanceof new null return super switch this throw true try typeof var void while with"
+
 export const reservedWords = {
-  3: "abstract boolean byte char class double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile",
-  5: "class enum extends super const export import",
-  6: "enum",
+  3: "abstract boolean break byte case catch char class const continue debugger default delete do double else enum export extends false final finally float for function goto if implements import in instanceof int interface long native new null package private protected public return short static super switch synchronized this throw throws transient true try typeof var void volatile while with",
+  5: ecma5ReservedWords,
+  6: ecma5ReservedWords + " yield",
   strict: "implements interface let package private protected public static yield",
   strictBind: "eval arguments"
 }
