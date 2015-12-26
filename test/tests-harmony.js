@@ -5414,6 +5414,14 @@ test("import * as crypto from \"crypto\"", {
   locations: true
 });
 
+testFail("import { class } from 'foo'", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import { class, var } from 'foo'", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import { a as class } from 'foo'", "Unexpected token (1:14)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import * as class from 'foo'", "Unexpected token (1:12)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import { enum } from 'foo'", "The keyword 'enum' is reserved (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import { a as enum } from 'foo'", "The keyword 'enum' is reserved (1:14)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import * as enum from 'foo'", "The keyword 'enum' is reserved (1:12)", {ecmaVersion: 6, sourceType: "module" });
+
 // Harmony: Yield Expression
 
 test("(function* () { yield v })", {
