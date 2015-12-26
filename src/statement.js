@@ -612,7 +612,13 @@ pp.parseImportSpecifiers = function() {
 
     let node = this.startNode()
     node.imported = this.parseIdent(true)
-    node.local = this.eatContextual("as") ? this.parseIdent() : node.imported
+    if (this.eatContextual("as")) {
+      node.local = this.parseIdent()
+    } else {
+      node.local = node.imported
+      if (this.isKeyword(node.local.name)) this.unexpected(node.local.start)
+      if (this.reservedWordsStrict.test(node.local.name)) this.raise(node.local.start, "The keyword '" + node.local.name + "' is reserved")
+    }
     this.checkLVal(node.local, true)
     nodes.push(this.finishNode(node, "ImportSpecifier"))
   }
