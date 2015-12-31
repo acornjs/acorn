@@ -617,7 +617,7 @@ pp.readEscapedChar = function(inTemplate) {
         octalStr = octalStr.slice(0, -1)
         octal = parseInt(octalStr, 8)
       }
-      if (octal > 0 && (this.strict || inTemplate)) {
+      if (octalStr !== "0" && (this.strict || inTemplate)) {
         this.raise(this.pos - 2, "Octal literal in strict mode")
       }
       this.pos += octalStr.length - 1
