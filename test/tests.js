@@ -26669,6 +26669,9 @@ test("price_9̶9̶_89", {
   ]
 });
 
+// `\0` is valid even in strict mode
+test("function hello() { 'use strict'; \"\\0\"; }", {});
+
 // option tests
 
 test("var a = 1;", {
@@ -27404,6 +27407,12 @@ testFail("function hello() { 'use strict'; function inner(arguments) {} }",
          "Binding arguments in strict mode (1:48)");
 
 testFail("function hello() { 'use strict'; \"\\1\"; }",
+         "Octal literal in strict mode (1:34)");
+
+testFail("function hello() { 'use strict'; \"\\00\"; }",
+         "Octal literal in strict mode (1:34)");
+
+testFail("function hello() { 'use strict'; \"\\000\"; }",
          "Octal literal in strict mode (1:34)");
 
 testFail("function hello() { 'use strict'; 021; }",
