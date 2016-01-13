@@ -1,6 +1,7 @@
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
-import {lineBreak} from "./whitespace"
+import {lineBreak, skipWhiteSpace} from "./whitespace"
+import {isIdentifierStart, isIdentifierChar} from "./identifier"
 
 const pp = Parser.prototype
 
@@ -31,6 +32,20 @@ pp.parseTopLevel = function(node) {
 
 const loopLabel = {kind: "loop"}, switchLabel = {kind: "switch"}
 
+pp.isLet = function() {
+  if (this.type !== tt.name || this.options.ecmaVersion < 6 || this.value != "let") return false
+  skipWhiteSpace.lastIndex = this.pos
+  let skip = skipWhiteSpace.exec(this.input)
+  let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
+  if (nextCh === 91 || nextCh == 123) return true // '{' and '['
+  if (isIdentifierStart(nextCh, true)) {
+    for (var pos = next + 1; isIdentifierChar(this.input.charCodeAt(pos, true)); ++pos) {}
+    let ident = this.input.slice(next, pos)
+    if (!this.isKeyword(ident)) return true
+  }
+  return false
+}
+
 // Parse a single statement.
 //
 // If expecting a statement and finding a slash operator, parse a
@@ -39,7 +54,12 @@ const loopLabel = {kind: "loop"}, switchLabel = {kind: "switch"}
 // does not help.
 
 pp.parseStatement = function(declaration, topLevel) {
-  let starttype = this.type, node = this.startNode()
+  let starttype = this.type, node = this.startNode(), kind
+
+  if (this.isLet()) {
+    starttype = tt._var
+    kind = "let"
+  }
 
   // Most types of statements are recognized by the keyword they
   // start with. Many are trivial to parse, some require a bit of
@@ -61,8 +81,10 @@ pp.parseStatement = function(declaration, topLevel) {
   case tt._switch: return this.parseSwitchStatement(node)
   case tt._throw: return this.parseThrowStatement(node)
   case tt._try: return this.parseTryStatement(node)
-  case tt._let: case tt._const: if (!declaration) this.unexpected() // NOTE: falls through to _var
-  case tt._var: return this.parseVarStatement(node, starttype)
+  case tt._const: case tt._var:
+    kind = kind || this.value
+    if (!declaration && kind != "var") this.unexpected()
+    return this.parseVarStatement(node, kind)
   case tt._while: return this.parseWhileStatement(node)
   case tt._with: return this.parseWithStatement(node)
   case tt.braceL: return this.parseBlock()
@@ -146,13 +168,14 @@ pp.parseForStatement = function(node) {
   this.labels.push(loopLabel)
   this.expect(tt.parenL)
   if (this.type === tt.semi) return this.parseFor(node, null)
-  if (this.type === tt._var || this.type === tt._let || this.type === tt._const) {
-    let init = this.startNode(), varKind = this.type
+  let isLet = this.isLet()
+  if (this.type === tt._var || this.type === tt._const || isLet) {
+    let init = this.startNode(), kind = isLet ? "let" : this.value
     this.next()
-    this.parseVar(init, true, varKind)
+    this.parseVar(init, true, kind)
     this.finishNode(init, "VariableDeclaration")
     if ((this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1 &&
-        !(varKind !== tt._var && init.declarations[0].init))
+        !(kind !== "var" && init.declarations[0].init))
       return this.parseForIn(node, init)
     return this.parseFor(node, init)
   }
@@ -374,13 +397,13 @@ pp.parseForIn = function(node, init) {
 
 pp.parseVar = function(node, isFor, kind) {
   node.declarations = []
-  node.kind = kind.keyword
+  node.kind = kind
   for (;;) {
     let decl = this.startNode()
     this.parseVarId(decl)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
-    } else if (kind === tt._const && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
+    } else if (kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
       this.unexpected()
     } else if (decl.id.type != "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
       this.raise(this.lastTokEnd, "Complex binding patterns require an initialization value")
@@ -542,7 +565,7 @@ pp.parseExport = function(node) {
 }
 
 pp.shouldParseExportStatement = function() {
-  return this.type.keyword
+  return this.type.keyword || this.isLet()
 }
 
 // Parses a comma-separated list of module exports.

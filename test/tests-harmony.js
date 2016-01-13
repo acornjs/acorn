@@ -13353,7 +13353,79 @@ test("(function () { yield* 10 })", {
   locations: true
 });
 
-testFail("(function() { \"use strict\"; f(yield v) })", "Unexpected token (1:36)", {ecmaVersion: 6});
+test("let + 1", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "Identifier",
+          "name": "let"
+        },
+        "operator": "+",
+        "right": {
+          "type": "Literal",
+          "value": 1,
+          "raw": "1"
+        }
+      }
+    }
+  ]
+}, {ecmaVersion: 6})
+
+test("var let = 1", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "let"
+          },
+          "init": {
+            "type": "Literal",
+            "value": 1,
+            "raw": "1"
+          }
+        }
+      ],
+      "kind": "var"
+    }
+  ]
+}, {ecmaVersion: 6})
+
+testFail("'use strict'; let + 1", "The keyword 'let' is reserved (1:14)", {ecmaVersion: 6})
+
+test("var yield = 2", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "yield"
+          },
+          "init": {
+            "type": "Literal",
+            "value": 2,
+            "raw": "2"
+          }
+        }
+      ],
+      "kind": "var"
+    }
+  ]
+}, {ecmaVersion: 6})
+
+testFail("(function() { \"use strict\"; f(yield v) })", "The keyword 'yield' is reserved (1:30)", {ecmaVersion: 6});
 
 testFail("var obj = { *test** }", "Unexpected token (1:17)", {ecmaVersion: 6});
 
@@ -13371,7 +13443,7 @@ testFail("`hello ${10;test`", "Unexpected token (1:11)", {ecmaVersion: 6});
 
 testFail("function a() 1 // expression closure is not supported", "Unexpected token (1:13)", {ecmaVersion: 6});
 
-testFail("[for (let x of []) x]", "Unexpected token (1:6)", {ecmaVersion: 7});
+testFail("[for (let x of []) x]", "Unexpected token (1:10)", {ecmaVersion: 7});
 
 testFail("[for (const x of []) x]", "Unexpected token (1:6)", {ecmaVersion: 7});
 
@@ -14608,8 +14680,6 @@ testFail("'use strict'; [...eval] = arr", "Assigning to eval in strict mode (1:1
 testFail("'use strict'; ({eval = defValue} = obj)", "Assigning to eval in strict mode (1:16)", {ecmaVersion: 6});
 
 testFail("[...eval] = arr", "Assigning to eval in strict mode (1:4)", {ecmaVersion: 6, sourceType: "module"});
-
-testFail("function* y({yield}) {}", "Binding yield (1:13)", {ecmaVersion: 6});
 
 test("function foo() { new.target; }", {
   type: "Program",
