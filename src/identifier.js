@@ -23,7 +23,7 @@ var ecma5AndLessKeywords = "break case catch continue debugger default do else f
 
 export const keywords = {
   5: ecma5AndLessKeywords,
-  6: ecma5AndLessKeywords + " const class extends export import yield super"
+  6: ecma5AndLessKeywords + " const class extends export import super"
 }
 
 // ## Character categories
