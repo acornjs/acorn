@@ -90,7 +90,7 @@ pp.parseExpression = function(noIn, refDestructuringErrors) {
 // operators like `+=`.
 
 pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
-  if (this.type == tt._yield && this.inGenerator) return this.parseYield()
+  if (this.inGenerator && this.isContextual("yield")) return this.parseYield()
 
   let validateDestructuring = false
   if (!refDestructuringErrors) {
@@ -251,14 +251,12 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   case tt._super:
     if (!this.inFunction)
       this.raise(this.start, "'super' outside of function or class")
+
   case tt._this:
     let type = this.type === tt._this ? "ThisExpression" : "Super"
     node = this.startNode()
     this.next()
     return this.finishNode(node, type)
-
-  case tt._yield:
-    if (this.inGenerator) this.unexpected()
 
   case tt.name:
     let startPos = this.start, startLoc = this.startLoc
@@ -516,7 +514,8 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
       prop.kind = "init"
       if (isPattern) {
         if (this.keywords.test(prop.key.name) ||
-            (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name))
+            (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name) ||
+            (this.inGenerator && prop.key.name == "yield"))
           this.raise(prop.key.start, "Binding " + prop.key.name)
         prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
       } else if (this.type === tt.eq && refDestructuringErrors) {
@@ -557,22 +556,27 @@ pp.initFunction = function(node) {
 // Parse object or class method.
 
 pp.parseMethod = function(isGenerator) {
-  let node = this.startNode()
+  let node = this.startNode(), oldInGen = this.inGenerator
+  this.inGenerator = isGenerator
   this.initFunction(node)
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, false)
   if (this.options.ecmaVersion >= 6)
     node.generator = isGenerator
   this.parseFunctionBody(node, false)
+  this.inGenerator = oldInGen
   return this.finishNode(node, "FunctionExpression")
 }
 
 // Parse arrow function expression with given parameters.
 
 pp.parseArrowExpression = function(node, params) {
+  let oldInGen = this.inGenerator
+  this.inGenerator = false
   this.initFunction(node)
   node.params = this.toAssignableList(params, true)
   this.parseFunctionBody(node, true)
+  this.inGenerator = oldInGen
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
@@ -587,11 +591,11 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
   } else {
     // Start a new scope with regard to labels and the `inFunction`
     // flag (restore them to their old value afterwards).
-    let oldInFunc = this.inFunction, oldInGen = this.inGenerator, oldLabels = this.labels
-    this.inFunction = true; this.inGenerator = node.generator; this.labels = []
+    let oldInFunc = this.inFunction, oldLabels = this.labels
+    this.inFunction = true; this.labels = []
     node.body = this.parseBlock(true)
     node.expression = false
-    this.inFunction = oldInFunc; this.inGenerator = oldInGen; this.labels = oldLabels
+    this.inFunction = oldInFunc; this.labels = oldLabels
   }
 
   // If this is a strict mode function, verify that argument names
@@ -659,6 +663,8 @@ pp.parseIdent = function(liberal) {
         (this.options.ecmaVersion >= 6 ||
          this.input.slice(this.start, this.end).indexOf("\\") == -1))
       this.raise(this.start, "The keyword '" + this.value + "' is reserved")
+    if (!liberal && this.inGenerator && this.value === "yield")
+      this.raise(this.start, "Can not use 'yield' as identifier inside a generator")
     node.name = this.value
   } else if (liberal && this.type.keyword) {
     node.name = this.type.keyword

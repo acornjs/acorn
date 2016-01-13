@@ -13401,7 +13401,31 @@ test("var let = 1", {
 
 testFail("'use strict'; let + 1", "The keyword 'let' is reserved (1:14)", {ecmaVersion: 6})
 
-testFail("(function() { \"use strict\"; f(yield v) })", "Unexpected token (1:36)", {ecmaVersion: 6});
+test("var yield = 2", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "yield"
+          },
+          "init": {
+            "type": "Literal",
+            "value": 2,
+            "raw": "2"
+          }
+        }
+      ],
+      "kind": "var"
+    }
+  ]
+}, {ecmaVersion: 6})
+
+testFail("(function() { \"use strict\"; f(yield v) })", "The keyword 'yield' is reserved (1:30)", {ecmaVersion: 6});
 
 testFail("var obj = { *test** }", "Unexpected token (1:17)", {ecmaVersion: 6});
 

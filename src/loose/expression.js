@@ -42,6 +42,19 @@ lp.parseParenExpression = function() {
 }
 
 lp.parseMaybeAssign = function(noIn) {
+  if (this.toks.isContextual("yield")) {
+    let node = this.startNode()
+    this.next()
+    if (this.semicolon() || this.canInsertSemicolon() || (this.tok.type != tt.star && !this.tok.type.startsExpr)) {
+      node.delegate = false
+      node.argument = null
+    } else {
+      node.delegate = this.eat(tt.star)
+      node.argument = this.parseMaybeAssign()
+    }
+    return this.finishNode(node, "YieldExpression")
+  }
+
   let start = this.storeCurrentPos()
   let left = this.parseMaybeConditional(noIn)
   if (this.tok.type.isAssign) {
@@ -244,18 +257,6 @@ lp.parseExprAtom = function() {
 
   case tt._new:
     return this.parseNew()
-
-  case tt._yield:
-    node = this.startNode()
-    this.next()
-    if (this.semicolon() || this.canInsertSemicolon() || (this.tok.type != tt.star && !this.tok.type.startsExpr)) {
-      node.delegate = false
-      node.argument = null
-    } else {
-      node.delegate = this.eat(tt.star)
-      node.argument = this.parseMaybeAssign()
-    }
-    return this.finishNode(node, "YieldExpression")
 
   case tt.backQuote:
     return this.parseTemplate()

@@ -428,10 +428,13 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody) {
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
     node.generator = this.eat(tt.star)
+  var oldInGen = this.inGenerator
+  this.inGenerator = node.generator
   if (isStatement || this.type === tt.name)
     node.id = this.parseIdent()
   this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
+  this.inGenerator = oldInGen
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 
