@@ -38,7 +38,7 @@ pp.checkPropClash = function(prop, propHash) {
   let {kind} = prop
   if (this.options.ecmaVersion >= 6) {
     if (name === "__proto__" && kind === "init") {
-      if (propHash.proto) this.raise(key.start, "Redefinition of __proto__ property");
+      if (propHash.proto) this.raise(key.start, "Redefinition of __proto__ property")
       propHash.proto = true
     }
     return
@@ -204,7 +204,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors) {
 pp.parseExprSubscripts = function(refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
   let expr = this.parseExprAtom(refDestructuringErrors)
-  let skipArrowSubscripts = expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")";
+  let skipArrowSubscripts = expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")"
   if (this.checkExpressionErrors(refDestructuringErrors) || skipArrowSubscripts) return expr
   return this.parseSubscripts(expr, startPos, startLoc)
 }
@@ -496,7 +496,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
       if (prop.value.params.length !== paramCount) {
         let start = prop.value.start
         if (prop.kind === "get")
-          this.raise(start, "getter should have no params");
+          this.raise(start, "getter should have no params")
         else
           this.raise(start, "setter should have exactly one param")
       }
@@ -598,10 +598,10 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     this.strict = true
     if (node.id)
       this.checkLVal(node.id, true)
-    this.checkParams(node);
+    this.checkParams(node)
     this.strict = oldStrict
   } else if (isArrowFunction) {
-    this.checkParams(node);
+    this.checkParams(node)
   }
 }
 
@@ -609,10 +609,10 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
 // or "arguments" and duplicate parameters.
 
 pp.checkParams = function(node) {
-    let nameHash = {};
+    let nameHash = {}
     for (let i = 0; i < node.params.length; i++)
       this.checkLVal(node.params[i], true, nameHash)
-};
+}
 
 // Parses a comma-separated list of expressions, and returns them as
 // an array. `close` is the token type that ends the list, and

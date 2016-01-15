@@ -325,9 +325,9 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
   for (let i = this.labels.length - 1; i >= 0; i--) {
     let label = this.labels[i]
     if (label.statementStart == node.start) {
-      label.statementStart = this.start;
-      label.kind = kind;
-    } else break;
+      label.statementStart = this.start
+      label.kind = kind
+    } else break
   }
   this.labels.push({name: maybeName, kind: kind, statementStart: this.start})
   node.body = this.parseStatement(true)
@@ -490,7 +490,7 @@ pp.parseClass = function(node, isStatement) {
       if (method.value.params.length !== paramCount) {
         let start = method.value.start
         if (method.kind === "get")
-          this.raise(start, "getter should have no params");
+          this.raise(start, "getter should have no params")
         else
           this.raise(start, "setter should have exactly one param")
       }

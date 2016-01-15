@@ -36,13 +36,13 @@ pp.toAssignable = function(node, isBinding) {
         // falls through to AssignmentPattern
       } else {
         this.raise(node.left.end, "Only '=' operator can be used for specifying default value.")
-        break;
+        break
       }
 
     case "AssignmentPattern":
       if (node.right.type === "YieldExpression")
         this.raise(node.right.start, "Yield expression cannot be a default value")
-      break;
+      break
 
     case "ParenthesizedExpression":
       node.expression = this.toAssignable(node.expression, isBinding)
@@ -76,7 +76,7 @@ pp.toAssignableList = function(exprList, isBinding) {
     }
 
     if (isBinding && last.type === "RestElement" && last.argument.type !== "Identifier")
-      this.unexpected(last.argument.start);
+      this.unexpected(last.argument.start)
   }
   for (let i = 0; i < end; i++) {
     let elt = exprList[i]

@@ -476,7 +476,7 @@ lp.parseArrowExpression = function(node, params) {
 lp.parseExprList = function(close, allowEmpty) {
   this.pushCx()
   let indent = this.curIndent, line = this.curLineStart, elts = []
-  this.next(); // Opening bracket
+  this.next() // Opening bracket
   while (!this.closes(close, indent + 1, line)) {
     if (this.eat(tt.comma)) {
       elts.push(allowEmpty ? null : this.dummyIdent())
