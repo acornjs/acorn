@@ -287,10 +287,6 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   case tt.bracketL:
     node = this.startNode()
     this.next()
-    // check whether this is array comprehension or regular array
-    if (this.options.ecmaVersion >= 7 && this.type === tt._for) {
-      return this.parseComprehension(node, false)
-    }
     node.elements = this.parseExprList(tt.bracketR, true, true, refDestructuringErrors)
     return this.finishNode(node, "ArrayExpression")
 
@@ -335,10 +331,6 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
   let startPos = this.start, startLoc = this.startLoc, val
   if (this.options.ecmaVersion >= 6) {
     this.next()
-
-    if (this.options.ecmaVersion >= 7 && this.type === tt._for) {
-      return this.parseComprehension(this.startNodeAt(startPos, startLoc), true)
-    }
 
     let innerStartPos = this.start, innerStartLoc = this.startLoc
     let exprList = [], first = true
@@ -688,26 +680,4 @@ pp.parseYield = function() {
     node.argument = this.parseMaybeAssign()
   }
   return this.finishNode(node, "YieldExpression")
-}
-
-// Parses array and generator comprehensions.
-
-pp.parseComprehension = function(node, isGenerator) {
-  node.blocks = []
-  while (this.type === tt._for) {
-    let block = this.startNode()
-    this.next()
-    this.expect(tt.parenL)
-    block.left = this.parseBindingAtom()
-    this.checkLVal(block.left, true)
-    this.expectContextual("of")
-    block.right = this.parseExpression()
-    this.expect(tt.parenR)
-    node.blocks.push(this.finishNode(block, "ComprehensionBlock"))
-  }
-  node.filter = this.eat(tt._if) ? this.parseParenExpression() : null
-  node.body = this.parseExpression()
-  this.expect(isGenerator ? tt.parenR : tt.bracketR)
-  node.generator = isGenerator
-  return this.finishNode(node, "ComprehensionExpression")
 }
