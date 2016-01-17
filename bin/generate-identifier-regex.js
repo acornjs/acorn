@@ -41,7 +41,7 @@ function generate(chars) {
 
 var startData = generate(start), contData = generate(cont);
 
-console.log("  var nonASCIIidentifierStartChars = \"" + startData.nonASCII + "\";");
-console.log("  var nonASCIIidentifierChars = \"" + contData.nonASCII + "\";");
-console.log("  var astralIdentifierStartCodes = " + JSON.stringify(startData.astral) + ";");
-console.log("  var astralIdentifierCodes = " + JSON.stringify(contData.astral) + ";");
+console.log("let nonASCIIidentifierStartChars = \"" + startData.nonASCII + "\"");
+console.log("let nonASCIIidentifierChars = \"" + contData.nonASCII + "\"");
+console.log("const astralIdentifierStartCodes = " + JSON.stringify(startData.astral));
+console.log("const astralIdentifierCodes = " + JSON.stringify(contData.astral));
