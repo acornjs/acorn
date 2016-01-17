@@ -36,6 +36,6 @@
     "babelify": "^6.1.2",
     "browserify": "^10.2.4",
     "browserify-derequire": "^0.9.4",
-    "unicode-7.0.0": "~0.1.5"
+    "unicode-8.0.0": "^0.1.5"
   }
 }

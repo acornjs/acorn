@@ -1,7 +1,5 @@
-// Note: run `npm install unicode-7.0.0` first.
-
 // Which Unicode version should be used?
-var version = '7.0.0';
+var version = '8.0.0';
 
 var start = require('unicode-' + version + '/properties/ID_Start/code-points')
     .filter(function(ch) { return ch > 127; });
