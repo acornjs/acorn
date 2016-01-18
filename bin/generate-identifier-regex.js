@@ -3,8 +3,16 @@ var version = '8.0.0';
 
 var start = require('unicode-' + version + '/properties/ID_Start/code-points')
     .filter(function(ch) { return ch > 127; });
+var last = -1;
 var cont = [0x200c, 0x200d].concat(require('unicode-' + version + '/properties/ID_Continue/code-points')
-    .filter(function(ch) { return ch > 127 && start.indexOf(ch) == -1; }));
+    .filter(function(ch) { return ch > 127 && search(start, ch, last + 1) == -1; }));
+
+function search(arr, ch, starting) {
+  for (var i = starting; arr[i] <= ch && i < arr.length; last = i++)
+    if (arr[i] === ch)
+      return i;
+  return -1;
+}
 
 function pad(str, width) {
   while (str.length < width) str = "0" + str;
