@@ -240,7 +240,7 @@ pp.parseSwitchStatement = function(node) {
       if (isCase) {
         cur.test = this.parseExpression()
       } else {
-        if (sawDefault) this.raise(this.lastTokStart, "Multiple default clauses")
+        if (sawDefault) this.raiseRecoverable(this.lastTokStart, "Multiple default clauses")
         sawDefault = true
         cur.test = null
       }
@@ -490,9 +490,9 @@ pp.parseClass = function(node, isStatement) {
       if (method.value.params.length !== paramCount) {
         let start = method.value.start
         if (method.kind === "get")
-          this.raise(start, "getter should have no params")
+          this.raiseRecoverable(start, "getter should have no params")
         else
-          this.raise(start, "setter should have exactly one param")
+          this.raiseRecoverable(start, "setter should have exactly one param")
       }
       if (method.kind === "set" && method.value.params[0].type === "RestElement")
         this.raise(method.value.params[0].start, "Setter cannot use rest params")
