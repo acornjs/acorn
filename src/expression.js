@@ -38,7 +38,7 @@ pp.checkPropClash = function(prop, propHash) {
   let {kind} = prop
   if (this.options.ecmaVersion >= 6) {
     if (name === "__proto__" && kind === "init") {
-      if (propHash.proto) this.raise(key.start, "Redefinition of __proto__ property")
+      if (propHash.proto) this.raiseRecoverable(key.start, "Redefinition of __proto__ property")
       propHash.proto = true
     }
     return
@@ -48,7 +48,7 @@ pp.checkPropClash = function(prop, propHash) {
   if (other) {
     let isGetSet = kind !== "init"
     if ((this.strict || isGetSet) && other[kind] || !(isGetSet ^ other.init))
-      this.raise(key.start, "Redefinition of property")
+      this.raiseRecoverable(key.start, "Redefinition of property")
   } else {
     other = propHash[name] = {
       init: false,
@@ -181,7 +181,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors) {
     if (update) this.checkLVal(node.argument)
     else if (this.strict && node.operator === "delete" &&
              node.argument.type === "Identifier")
-      this.raise(node.start, "Deleting local variable in strict mode")
+      this.raiseRecoverable(node.start, "Deleting local variable in strict mode")
     return this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
   }
   let startPos = this.start, startLoc = this.startLoc
@@ -404,9 +404,9 @@ pp.parseNew = function() {
     node.meta = meta
     node.property = this.parseIdent(true)
     if (node.property.name !== "target")
-      this.raise(node.property.start, "The only valid meta property for new is new.target")
+      this.raiseRecoverable(node.property.start, "The only valid meta property for new is new.target")
     if (!this.inFunction)
-      this.raise(node.start, "new.target can only be used in functions")
+      this.raiseRecoverable(node.start, "new.target can only be used in functions")
     return this.finishNode(node, "MetaProperty")
   }
   let startPos = this.start, startLoc = this.startLoc
@@ -496,19 +496,19 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
       if (prop.value.params.length !== paramCount) {
         let start = prop.value.start
         if (prop.kind === "get")
-          this.raise(start, "getter should have no params")
+          this.raiseRecoverable(start, "getter should have no params")
         else
-          this.raise(start, "setter should have exactly one param")
+          this.raiseRecoverable(start, "setter should have exactly one param")
       }
       if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
-        this.raise(prop.value.params[0].start, "Setter cannot use rest params")
+        this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
     } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
       prop.kind = "init"
       if (isPattern) {
         if (this.keywords.test(prop.key.name) ||
             (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name) ||
             (this.inGenerator && prop.key.name == "yield"))
-          this.raise(prop.key.start, "Binding " + prop.key.name)
+          this.raiseRecoverable(prop.key.start, "Binding " + prop.key.name)
         prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
       } else if (this.type === tt.eq && refDestructuringErrors) {
         if (!refDestructuringErrors.shorthandAssign)
@@ -654,9 +654,9 @@ pp.parseIdent = function(liberal) {
     if (!liberal && (this.strict ? this.reservedWordsStrict : this.reservedWords).test(this.value) &&
         (this.options.ecmaVersion >= 6 ||
          this.input.slice(this.start, this.end).indexOf("\\") == -1))
-      this.raise(this.start, "The keyword '" + this.value + "' is reserved")
+      this.raiseRecoverable(this.start, "The keyword '" + this.value + "' is reserved")
     if (!liberal && this.inGenerator && this.value === "yield")
-      this.raise(this.start, "Can not use 'yield' as identifier inside a generator")
+      this.raiseRecoverable(this.start, "Can not use 'yield' as identifier inside a generator")
     node.name = this.value
   } else if (liberal && this.type.keyword) {
     node.name = this.type.keyword
