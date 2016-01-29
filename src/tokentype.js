@@ -95,7 +95,8 @@ export const types = {
   plusMin: new TokenType("+/-", {beforeExpr: true, binop: 9, prefix: true, startsExpr: true}),
   modulo: binop("%", 10),
   star: binop("*", 10),
-  slash: binop("/", 10)
+  slash: binop("/", 10),
+  starstar: binop("**", 11)
 }
 
 // Map keyword names to token types.
