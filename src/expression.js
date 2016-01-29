@@ -17,6 +17,7 @@
 // [opp]: http://en.wikipedia.org/wiki/Operator-precedence_parser
 
 import {types as tt} from "./tokentype"
+import {types as tc} from "./tokencontext"
 import {Parser} from "./state"
 
 const pp = Parser.prototype
@@ -162,10 +163,17 @@ pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
       let startPos = this.start, startLoc = this.startLoc
       node.right = this.parseExprOp(this.parseMaybeUnary(), startPos, startLoc, prec, noIn)
       this.finishNode(node, (op === tt.logicalOR || op === tt.logicalAND) ? "LogicalExpression" : "BinaryExpression")
+      if (this.options.ecmaVersion >= 7 && op === tt.starstar)
+        this.checkExponentiationOperand(node.left)
       return this.parseExprOp(node, leftStartPos, leftStartLoc, minPrec, noIn)
     }
   }
   return left
+}
+
+pp.checkExponentiationOperand = function(node) {
+  if (node.type === "UnaryExpression" && node.operator !== "++" && node.operator !== "--")
+    this.raiseRecoverable(node.start, "Base operand of ** cannot use a unary expression")
 }
 
 // Parse unary operators, both prefix and postfix.
