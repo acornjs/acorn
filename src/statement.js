@@ -527,10 +527,11 @@ pp.parseExport = function(node) {
     return this.finishNode(node, "ExportAllDeclaration")
   }
   if (this.eat(tt._default)) { // export default ...
+    let parens = this.type == tt.parenL
     let expr = this.parseMaybeAssign()
     let needsSemi = true
-    if (expr.type == "FunctionExpression" ||
-        expr.type == "ClassExpression") {
+    if (!parens && (expr.type == "FunctionExpression" ||
+                    expr.type == "ClassExpression")) {
       needsSemi = false
       if (expr.id) {
         expr.type = expr.type == "FunctionExpression"

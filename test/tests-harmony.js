@@ -4237,6 +4237,24 @@ test("export default class A {}", {
   }]
 }, {ecmaVersion: 6, sourceType: "module", ranges: true});
 
+test("export default (class{});", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExportDefaultDeclaration",
+      "declaration": {
+        "type": "ClassExpression",
+        "id": null,
+        "superClass": null,
+        "body": {
+          "type": "ClassBody",
+          "body": []
+        }
+      }
+    }
+  ]
+}, {ecmaVersion: 6, sourceType: "module"})
+
 testFail("export *", "Unexpected token (1:8)", {ecmaVersion: 6, sourceType: "module"});
 
 test("export * from \"crypto\"", {
