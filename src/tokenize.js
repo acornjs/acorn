@@ -228,10 +228,20 @@ pp.readToken_slash = function() { // '/'
   return this.finishOp(tt.slash, 1)
 }
 
-pp.readToken_mult_modulo = function(code) { // '%*'
+pp.readToken_mult_modulo_exp = function(code) { // '%*'
   let next = this.input.charCodeAt(this.pos + 1)
-  if (next === 61) return this.finishOp(tt.assign, 2)
-  return this.finishOp(code === 42 ? tt.star : tt.modulo, 1)
+  let size = 1
+  let tokentype = code === 42 ? tt.star : tt.modulo
+
+  // exponentiation operator ** and **=
+  if (this.options.ecmaVersion >= 7 && next === 42) {
+    ++size
+    tokentype = tt.starstar
+    next = this.input.charCodeAt(this.pos + 2)
+  }
+
+  if (next === 61) return this.finishOp(tt.assign, size + 1)
+  return this.finishOp(tokentype, size)
 }
 
 pp.readToken_pipe_amp = function(code) { // '|&'
@@ -343,7 +353,7 @@ pp.getTokenFromCode = function(code) {
     return this.readToken_slash()
 
   case 37: case 42: // '%*'
-    return this.readToken_mult_modulo(code)
+    return this.readToken_mult_modulo_exp(code)
 
   case 124: case 38: // '|&'
     return this.readToken_pipe_amp(code)

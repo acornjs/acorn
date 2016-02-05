@@ -5,6 +5,7 @@
     driver = require("./driver.js");
     require("./tests.js");
     require("./tests-harmony.js");
+    require("./tests-es7.js");
     require("babel-core/register")
     acorn = require("../src")
     require("../src/loose")
