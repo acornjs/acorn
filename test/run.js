@@ -60,8 +60,7 @@
         loose: true,
         filter: function (test) {
           var opts = test.options || {};
-          if (opts.loose === false) return false;
-          return (opts.ecmaVersion || 5) <= 6;
+          return opts.loose !== false;
         }
       }
     }

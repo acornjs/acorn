@@ -18,6 +18,7 @@
       var test = tests[i];
       if (config.filter && !config.filter(test)) continue;
       var testOpts = test.options || {locations: true};
+      if (!testOpts.ecmaVersion) testOpts.ecmaVersion = 5;
       var expected = {};
       if (expected.onComment = testOpts.onComment)
         testOpts.onComment = []
