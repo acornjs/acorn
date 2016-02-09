@@ -17,7 +17,6 @@
 // [opp]: http://en.wikipedia.org/wiki/Operator-precedence_parser
 
 import {types as tt} from "./tokentype"
-import {types as tc} from "./tokencontext"
 import {Parser} from "./state"
 
 const pp = Parser.prototype
