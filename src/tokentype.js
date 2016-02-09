@@ -96,7 +96,7 @@ export const types = {
   modulo: binop("%", 10),
   star: binop("*", 10),
   slash: binop("/", 10),
-  starstar: binop("**", 11)
+  starstar: new TokenType("**", {beforeExpr: true})
 }
 
 // Map keyword names to token types.

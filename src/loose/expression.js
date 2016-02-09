@@ -134,6 +134,15 @@ lp.parseMaybeUnary = function(noIn) {
     this.next()
     expr = this.finishNode(node, "UpdateExpression")
   }
+
+  if (this.eat(tt.starstar)) {
+    let node = this.startNodeAt(start)
+    node.operator = "**"
+    node.left = expr
+    node.right = this.parseMaybeUnary(noIn)
+    return this.finishNode(node, "BinaryExpression")
+  }
+
   return expr
 }
 
