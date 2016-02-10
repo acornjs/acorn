@@ -2,7 +2,7 @@
 
 ### Breaking changes
 
-The default value of the `ecmaScript` option is now 6 (used to be 5).
+The default value of the `ecmaVersion` option is now 6 (used to be 5).
 
 Support for comprehension syntax (which was dropped from the draft
 spec) has been removed.
