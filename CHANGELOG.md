@@ -1,3 +1,10 @@
+## 3.0.2 (2016-02-10)
+
+### Fixes
+
+Fix bug that accidentally made `undefined` a reserved word when
+parsing ES7.
+
 ## 3.0.0 (2016-02-10)
 
 ### Breaking changes
@@ -96,4 +103,3 @@ strict mode.
 Don't allow rest parameters to be non-identifier patterns.
 
 Check for duplicate paramter names in arrow functions.
-
