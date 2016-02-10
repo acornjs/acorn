@@ -139,7 +139,7 @@ pp.parseMaybeConditional = function(noIn, refDestructuringErrors) {
 
 pp.parseExprOps = function(noIn, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseMaybeUnary(false, refDestructuringErrors)
+  let expr = this.parseMaybeUnary(refDestructuringErrors, false)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
   return this.parseExprOp(expr, startPos, startLoc, -1, noIn)
 }
@@ -154,30 +154,36 @@ pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
   let prec = this.type.binop
   if (prec != null && (!noIn || this.type !== tt._in)) {
     if (prec > minPrec) {
-      let node = this.startNodeAt(leftStartPos, leftStartLoc)
-      node.left = left
-      node.operator = this.value
-      let op = this.type
+      let logical = this.type === tt.logicalOR || this.type === tt.logicalAND
+      let op = this.value
       this.next()
       let startPos = this.start, startLoc = this.startLoc
-      node.right = this.parseExprOp(this.parseMaybeUnary(false), startPos, startLoc, prec, noIn)
-      this.finishNode(node, (op === tt.logicalOR || op === tt.logicalAND) ? "LogicalExpression" : "BinaryExpression")
+      let right = this.parseExprOp(this.parseMaybeUnary(null, false), startPos, startLoc, prec, noIn)
+      let node = this.buildBinary(leftStartPos, leftStartLoc, left, right, op, logical)
       return this.parseExprOp(node, leftStartPos, leftStartLoc, minPrec, noIn)
     }
   }
   return left
 }
 
+pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
+  let node = this.startNodeAt(startPos, startLoc)
+  node.left = left
+  node.operator = op
+  node.right = right
+  return this.finishNode(node, logical ? "LogicalExpression" : "BinaryExpression")
+}
+
 // Parse unary operators, both prefix and postfix.
 
-pp.parseMaybeUnary = function(sawUnary, refDestructuringErrors) {
+pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
   if (this.type.prefix) {
     sawUnary = true
     let node = this.startNode(), update = this.type === tt.incDec
     node.operator = this.value
     node.prefix = true
     this.next()
-    node.argument = this.parseMaybeUnary(true)
+    node.argument = this.parseMaybeUnary(null, true)
     this.checkExpressionErrors(refDestructuringErrors, true)
     if (update) this.checkLVal(node.argument)
     else if (this.strict && node.operator === "delete" &&
@@ -199,15 +205,10 @@ pp.parseMaybeUnary = function(sawUnary, refDestructuringErrors) {
     expr = this.finishNode(node, "UpdateExpression")
   }
 
-  return !sawUnary && this.eat(tt.starstar) ? this.parseExponent(expr, startPos, startLoc, refDestructuringErrors) : expr
-}
-
-pp.parseExponent = function(expr, startPos, startLoc, refDestructuringErrors) {
-  let node = this.startNodeAt(startPos, startLoc)
-  node.operator = "**"
-  node.left = expr
-  node.right = this.parseMaybeUnary(false, refDestructuringErrors)
-  return this.finishNode(node, "BinaryExpression")
+  if (!sawUnary && this.eat(tt.starstar))
+    return this.buildBinary(startPos, startLoc, expr, this.parseMaybeUnary(null, false), "**", false)
+  else
+    return expr
 }
 
 // Parse call, dot, and `[]`-subscript expressions.
