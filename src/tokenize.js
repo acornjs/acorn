@@ -289,8 +289,7 @@ pp.readToken_lt_gt = function(code) { // '<>'
     this.skipSpace()
     return this.nextToken()
   }
-  if (next === 61)
-    size = this.input.charCodeAt(this.pos + 2) === 61 ? 3 : 2
+  if (next === 61) size = 2
   return this.finishOp(tt.relational, size)
 }
 
