@@ -84,7 +84,7 @@ lp.parseMaybeConditional = function(noIn) {
 lp.parseExprOps = function(noIn) {
   let start = this.storeCurrentPos()
   let indent = this.curIndent, line = this.curLineStart
-  return this.parseExprOp(this.parseMaybeUnary(noIn), start, -1, noIn, indent, line)
+  return this.parseExprOp(this.parseMaybeUnary(false), start, -1, noIn, indent, line)
 }
 
 lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
@@ -100,7 +100,7 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
         node.right = this.dummyIdent()
       } else {
         let rightStart = this.storeCurrentPos()
-        node.right = this.parseExprOp(this.parseMaybeUnary(noIn), rightStart, prec, noIn, indent, line)
+        node.right = this.parseExprOp(this.parseMaybeUnary(false), rightStart, prec, noIn, indent, line)
       }
       this.finishNode(node, /&&|\|\|/.test(node.operator) ? "LogicalExpression" : "BinaryExpression")
       return this.parseExprOp(node, start, minPrec, noIn, indent, line)
@@ -109,37 +109,39 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
   return left
 }
 
-lp.parseMaybeUnary = function(noIn) {
+lp.parseMaybeUnary = function(sawUnary) {
+  let start = this.storeCurrentPos(), expr
   if (this.tok.type.prefix) {
     let node = this.startNode(), update = this.tok.type === tt.incDec
+    if (!update) sawUnary = true
     node.operator = this.tok.value
     node.prefix = true
     this.next()
-    node.argument = this.parseMaybeUnary(noIn)
+    node.argument = this.parseMaybeUnary(true)
     if (update) node.argument = this.checkLVal(node.argument)
-    return this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
+    expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
   } else if (this.tok.type === tt.ellipsis) {
     let node = this.startNode()
     this.next()
-    node.argument = this.parseMaybeUnary(noIn)
-    return this.finishNode(node, "SpreadElement")
-  }
-  let start = this.storeCurrentPos()
-  let expr = this.parseExprSubscripts()
-  while (this.tok.type.postfix && !this.canInsertSemicolon()) {
-    let node = this.startNodeAt(start)
-    node.operator = this.tok.value
-    node.prefix = false
-    node.argument = this.checkLVal(expr)
-    this.next()
-    expr = this.finishNode(node, "UpdateExpression")
+    node.argument = this.parseMaybeUnary(sawUnary)
+    expr = this.finishNode(node, "SpreadElement")
+  } else {
+    expr = this.parseExprSubscripts()
+    while (this.tok.type.postfix && !this.canInsertSemicolon()) {
+      let node = this.startNodeAt(start)
+      node.operator = this.tok.value
+      node.prefix = false
+      node.argument = this.checkLVal(expr)
+      this.next()
+      expr = this.finishNode(node, "UpdateExpression")
+    }
   }
 
-  if (this.eat(tt.starstar)) {
+  if (!sawUnary && this.eat(tt.starstar)) {
     let node = this.startNodeAt(start)
     node.operator = "**"
     node.left = expr
-    node.right = this.parseMaybeUnary(noIn)
+    node.right = this.parseMaybeUnary(false)
     return this.finishNode(node, "BinaryExpression")
   }
 

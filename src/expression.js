@@ -177,8 +177,8 @@ pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
 // Parse unary operators, both prefix and postfix.
 
 pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
+  let startPos = this.start, startLoc = this.startLoc, expr
   if (this.type.prefix) {
-    sawUnary = true
     let node = this.startNode(), update = this.type === tt.incDec
     node.operator = this.value
     node.prefix = true
@@ -189,20 +189,20 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     else if (this.strict && node.operator === "delete" &&
              node.argument.type === "Identifier")
       this.raiseRecoverable(node.start, "Deleting local variable in strict mode")
-    return this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
-  }
-  let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseExprSubscripts(refDestructuringErrors)
-  if (this.checkExpressionErrors(refDestructuringErrors)) return expr
-  while (this.type.postfix && !this.canInsertSemicolon()) {
-    sawUnary = true
-    let node = this.startNodeAt(startPos, startLoc)
-    node.operator = this.value
-    node.prefix = false
-    node.argument = expr
-    this.checkLVal(expr)
-    this.next()
-    expr = this.finishNode(node, "UpdateExpression")
+    else sawUnary = true
+    expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
+  } else {
+    expr = this.parseExprSubscripts(refDestructuringErrors)
+    if (this.checkExpressionErrors(refDestructuringErrors)) return expr
+    while (this.type.postfix && !this.canInsertSemicolon()) {
+      let node = this.startNodeAt(startPos, startLoc)
+      node.operator = this.value
+      node.prefix = false
+      node.argument = expr
+      this.checkLVal(expr)
+      this.next()
+      expr = this.finishNode(node, "UpdateExpression")
+    }
   }
 
   if (!sawUnary && this.eat(tt.starstar))

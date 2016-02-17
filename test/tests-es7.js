@@ -287,3 +287,59 @@ test("(-5) ** y", {
 }, {
   ecmaVersion: 7
 });
+
+test("++a ** 2", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "UpdateExpression",
+          "operator": "++",
+          "prefix": true,
+          "argument": {
+            "type": "Identifier",
+            "name": "a"
+          }
+        },
+        "operator": "**",
+        "right": {
+          "type": "Literal",
+          "value": 2,
+          "raw": "2"
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 7})
+
+test("a-- ** 2", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "UpdateExpression",
+          "operator": "--",
+          "prefix": false,
+          "argument": {
+            "type": "Identifier",
+            "name": "a"
+          }
+        },
+        "operator": "**",
+        "right": {
+          "type": "Literal",
+          "value": 2,
+          "raw": "2"
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 7})
