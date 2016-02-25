@@ -1,3 +1,10 @@
+## 3.0.4 (2016-02-25)
+
+### Fixes
+
+Allow update expressions as left-hand-side of the ES7 exponential
+operator.
+
 ## 3.0.2 (2016-02-10)
 
 ### Fixes
