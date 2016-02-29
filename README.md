@@ -65,6 +65,10 @@ object referring to that same position.
   either 3, 5, 6, or 7. This influences support for strict mode, the set
   of reserved words, and support for new syntax features. Default is 6.
 
+  **NOTE**: Only 'stage 4' (finalized) ECMAScript 7 features are being
+  implemented by Acorn. That means that most of the draft standard is
+  not yet being parsed.
+
 - **sourceType**: Indicate the mode the code should be parsed in. Can be
   either `"script"` or `"module"`.
 
