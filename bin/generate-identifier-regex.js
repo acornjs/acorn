@@ -21,8 +21,8 @@ function pad(str, width) {
 
 function esc(code) {
   var hex = code.toString(16);
-  if (hex.length <= 2) return "\\x" + pad(hex, 2);
-  else return "\\u" + pad(hex, 4);
+  if (hex.length <= 2) return "\\\\x" + pad(hex, 2);
+  else return "\\\\u" + pad(hex, 4);
 }
 
 function generate(chars) {
