@@ -169,7 +169,8 @@ object referring to that same position.
   choose.
 
 - **directSourceFile**: Like `sourceFile`, but a `sourceFile` property
-  will be added directly to the nodes, rather than the `loc` object.
+  will be added (regardless of the `location` option) directly to the
+  nodes, rather than the `loc` object.
 
 - **preserveParens**: If this option is `true`, parenthesized expressions
   are represented by (non-standard) `ParenthesizedExpression` nodes
