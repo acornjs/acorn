@@ -26801,6 +26801,11 @@ test("switch(a) { case 1: {}\n/foo/ }", {});
 test("({1: {} / 2})", {});
 test("+x++ / 2", {});
 test("foo.in\n{}\n/foo/", {});
+test("var x = function f() {} / 3;", {});
+test("+function f() {} / 3;", {});
+test("foo: function x() {} /regexp/", {});
+test("x = {foo: function x() {} / divide}", {});
+test("foo; function f() {} /regexp/", {});
 
 test("{}/=/", {
   type: "Program",
