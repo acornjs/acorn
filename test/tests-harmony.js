@@ -13009,7 +13009,7 @@ testFail("({ \"chance\" }) = obj", "Unexpected token (1:12)", {ecmaVersion: 6});
 
 testFail("({ 42 }) = obj", "Unexpected token (1:6)", {ecmaVersion: 6});
 
-testFail("function f(a, ...b, c)", "Unexpected token (1:18)", {ecmaVersion: 6});
+testFail("function f(a, ...b, c)", "Comma is not permitted after the rest element (1:18)", {ecmaVersion: 6});
 
 testFail("function f(a, ...b = 0)", "Unexpected token (1:19)", {ecmaVersion: 6});
 
@@ -13031,7 +13031,7 @@ testFail("(...[ 5 ]) => {}", "Unexpected token (1:6)", {ecmaVersion: 6});
 
 testFail("[...{ a }] = b", "Unexpected token (1:4)", {ecmaVersion: 6});
 
-testFail("[...a, b] = c", "Assigning to rvalue (1:1)", {ecmaVersion: 6});
+testFail("[...a, b] = c", "Comma is not permitted after the rest element (1:4)", {ecmaVersion: 6});
 
 testFail("({ t(eval) { \"use strict\"; } });", "Binding eval in strict mode (1:5)", {ecmaVersion: 6});
 
@@ -13039,7 +13039,7 @@ testFail("\"use strict\"; `${test}\\02`;", "Octal literal in strict mode (1:22)"
 
 testFail("if (1) import \"acorn\";", "'import' and 'export' may only appear at the top level (1:7)", {ecmaVersion: 6});
 
-testFail("[...a, ] = b", "Trailing comma is not permitted in destructuring patterns (1:5)", {ecmaVersion: 6});
+testFail("[...a, ] = b", "Comma is not permitted after the rest element (1:4)", {ecmaVersion: 6});
 
 testFail("if (b,...a, );", "Unexpected token (1:6)", {ecmaVersion: 6});
 
@@ -14162,7 +14162,7 @@ test("let {x} = y", {
   "end": 11
 }, {ecmaVersion: 6})
 
-testFail("[x,,] = 1", "Trailing comma is not permitted in destructuring patterns (1:3)", {ecmaVersion: 6});
+test("[x,,] = 1", {}, {ecmaVersion: 6});
 
 test("for (var [name, value] in obj) {}", {
   body: [

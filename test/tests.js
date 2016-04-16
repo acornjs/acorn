@@ -27093,7 +27093,7 @@ testFail("function t(...) { }",
          { ecmaVersion: 6 });
 
 testFail("function t(...rest, b) { }",
-         "Unexpected token (1:18)",
+         "Comma is not permitted after the rest element (1:18)",
          { ecmaVersion: 6 });
 
 testFail("function t(if) { }",
