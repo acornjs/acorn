@@ -192,10 +192,13 @@ base.ThrowStatement = base.SpreadElement =
 base.TryStatement = (node, st, c) => {
   c(node.block, st, "Statement")
   if (node.handler) {
-    c(node.handler.param, st, "Pattern")
-    c(node.handler.body, st, "ScopeBody")
+    c(node.handler, st, "CatchClause")
   }
   if (node.finalizer) c(node.finalizer, st, "Statement")
+}
+base.CatchClause = (node, st, c) => {
+  c(node.param, st, "Pattern")
+  c(node.body, st, "ScopeBody")
 }
 base.WhileStatement = base.DoWhileStatement = (node, st, c) => {
   c(node.test, st, "Expression")
