@@ -1,3 +1,19 @@
+## 3.1.0 (2015-04-18)
+
+### Bug fixes
+
+Fix issue where the loose parser created invalid TemplateElement nodes
+for unclosed template literals.
+
+Properly tokenize the division operator directly after a function
+expression.
+
+Allow trailing comma in destructuring arrays.
+
+### New features
+
+The walker now allows defining handlers for `CatchClause` nodes.
+
 ## 3.0.4 (2016-02-25)
 
 ### Fixes
