@@ -191,9 +191,7 @@ base.ThrowStatement = base.SpreadElement =
   (node, st, c) => c(node.argument, st, "Expression")
 base.TryStatement = (node, st, c) => {
   c(node.block, st, "Statement")
-  if (node.handler) {
-    c(node.handler, st, "CatchClause")
-  }
+  if (node.handler) c(node.handler, st)
   if (node.finalizer) c(node.finalizer, st, "Statement")
 }
 base.CatchClause = (node, st, c) => {
