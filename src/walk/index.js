@@ -140,15 +140,11 @@ export function findNodeBefore(node, pos, test, base, state) {
 }
 
 // Fallback to an Object.create polyfill for older environments.
-const create = Object.create ? Object.create : (() => {
-  let Temp = function() {}
-  return function(prototype) {
-    Temp.prototype = prototype
-    let result = new Temp()
-    Temp.prototype = null
-    return result
-  }
-})()
+const create = Object.create || function(proto) {
+  function Ctor() {}
+  Ctor.prototype = proto
+  return new Ctor
+}
 
 // Used to create a custom walker. Will fill in all missing node
 // type properties with the defaults.
