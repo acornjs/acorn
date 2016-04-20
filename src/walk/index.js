@@ -143,8 +143,7 @@ export function findNodeBefore(node, pos, test, base, state) {
 // type properties with the defaults.
 export function make(funcs, base) {
   if (!base) base = exports.base
-  let visitor = {}
-  for (var type in base) visitor[type] = base[type]
+  let visitor = Object.create(base)
   for (var type in funcs) visitor[type] = funcs[type]
   return visitor
 }
