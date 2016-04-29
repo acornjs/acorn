@@ -14300,7 +14300,7 @@ testFail("x = { set method(val) v = val }", "Unexpected token (1:22)", {ecmaVers
 
 // https://github.com/ternjs/acorn/issues/278
 
-testFail("/\\u{110000}/u", "~(1:1)", {ecmaVersion: 6});
+testFail("/\\u{110000}/u", "~", {ecmaVersion: 6});
 
 // https://github.com/ternjs/acorn/issues/279
 
