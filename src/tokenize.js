@@ -417,7 +417,7 @@ pp.readRegexp = function() {
   // Need to use `readWord1` because '\uXXXX' sequences are allowed
   // here (don't ask).
   let mods = this.readWord1()
-  let tmp = content
+  let tmp = content, tmpFlags = mods
   if (mods) {
     let validFlags = /^[gim]*$/
     if (this.options.ecmaVersion >= 6) validFlags = /^[gimuy]*$/
@@ -437,6 +437,7 @@ pp.readRegexp = function() {
         return "x"
       })
       tmp = tmp.replace(/\\u([a-fA-F0-9]{4})|[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "x")
+      tmpFlags = tmpFlags.replace("u", "")
     }
   }
   // Detect invalid regular expressions.
@@ -444,7 +445,7 @@ pp.readRegexp = function() {
   // Rhino's regular expression parser is flaky and throws uncatchable exceptions,
   // so don't do detection if we are running under Rhino
   if (!isRhino) {
-    tryCreateRegexp(tmp, undefined, start, this)
+    tryCreateRegexp(tmp, tmpFlags, start, this)
     // Get a regular expression object for this pattern-flag pair, or `null` in
     // case the current environment doesn't support the flags it uses.
     value = tryCreateRegexp(content, mods)
