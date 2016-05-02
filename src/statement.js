@@ -2,6 +2,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {lineBreak, skipWhiteSpace} from "./whitespace"
 import {isIdentifierStart, isIdentifierChar} from "./identifier"
+import {DestructuringErrors} from "./parseutil"
 
 const pp = Parser.prototype
 
@@ -179,7 +180,7 @@ pp.parseForStatement = function(node) {
       return this.parseForIn(node, init)
     return this.parseFor(node, init)
   }
-  let refDestructuringErrors = {shorthandAssign: 0, trailingComma: 0}
+  let refDestructuringErrors = new DestructuringErrors
   let init = this.parseExpression(true, refDestructuringErrors)
   if (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
     this.checkPatternErrors(refDestructuringErrors, true)
@@ -459,12 +460,12 @@ pp.parseClass = function(node, isStatement) {
     let method = this.startNode()
     let isGenerator = this.eat(tt.star)
     let isMaybeStatic = this.type === tt.name && this.value === "static"
-    this.parsePropertyName(method)
+    this.parsePropertyName(method, false)
     method.static = isMaybeStatic && this.type !== tt.parenL
     if (method.static) {
       if (isGenerator) this.unexpected()
       isGenerator = this.eat(tt.star)
-      this.parsePropertyName(method)
+      this.parsePropertyName(method, false)
     }
     method.kind = "method"
     let isGetSet = false
@@ -473,7 +474,7 @@ pp.parseClass = function(node, isStatement) {
       if (!isGenerator && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
         isGetSet = true
         method.kind = key.name
-        key = this.parsePropertyName(method)
+        key = this.parsePropertyName(method, false)
       }
       if (!method.static && (key.type === "Identifier" && key.name === "constructor" ||
           key.type === "Literal" && key.value === "constructor")) {

@@ -12735,6 +12735,14 @@ testFail("yield 10", "Unexpected token (1:6)", {ecmaVersion: 6});
 
 testFail("void { [1, 2]: 3 };", "Unexpected token (1:9)", {ecmaVersion: 6});
 
+testFail("let [this] = [10]", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("let {this} = x", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("let [function] = [10]", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("let [function] = x", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("([function] = [10])", "Unexpected token (1:10)", {ecmaVersion: 6});
+testFail("([this] = [10])", "Assigning to rvalue (1:2)", {ecmaVersion: 6});
+testFail("({this} = x)", "Invalid property name in destructuring pattern (1:2)", {ecmaVersion: 6});
+
 test("yield* 10", {
   type: "Program",
   body: [{
@@ -14220,7 +14228,7 @@ testFail("'use strict'; ({eval = defValue} = obj)", "Assigning to eval in strict
 
 testFail("[...eval] = arr", "Assigning to eval in strict mode (1:4)", {ecmaVersion: 6, sourceType: "module"});
 
-testFail("function* y({yield}) {}", "Binding yield (1:13)", {ecmaVersion: 6});
+testFail("function* y({yield}) {}", "Can not use 'yield' as identifier inside a generator (1:13)", {ecmaVersion: 6});
 
 test("function foo() { new.target; }", {
   type: "Program",
