@@ -93,22 +93,13 @@ export class DestructuringErrors {
   constructor() {
     this.shorthandAssign = 0
     this.trailingComma = 0
-    this.keywordProperty = 0
   }
 }
 
 pp.checkPatternErrors = function(refDestructuringErrors, andThrow) {
   let trailing = refDestructuringErrors && refDestructuringErrors.trailingComma
-  if (trailing) {
-    if (andThrow) this.raise(trailing, "Comma is not permitted after the rest element")
-    return true
-  }
-  let keyword = refDestructuringErrors && refDestructuringErrors.keywordProperty
-  if (keyword) {
-    if (andThrow) this.raise(keyword, "Invalid property name in destructuring pattern")
-    return true
-  }
-  return false
+  if (!andThrow) return !!trailing
+  if (trailing) this.raise(trailing, "Comma is not permitted after the rest element")
 }
 
 pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {

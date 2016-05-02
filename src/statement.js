@@ -460,12 +460,12 @@ pp.parseClass = function(node, isStatement) {
     let method = this.startNode()
     let isGenerator = this.eat(tt.star)
     let isMaybeStatic = this.type === tt.name && this.value === "static"
-    this.parsePropertyName(method, false)
+    this.parsePropertyName(method)
     method.static = isMaybeStatic && this.type !== tt.parenL
     if (method.static) {
       if (isGenerator) this.unexpected()
       isGenerator = this.eat(tt.star)
-      this.parsePropertyName(method, false)
+      this.parsePropertyName(method)
     }
     method.kind = "method"
     let isGetSet = false
@@ -474,7 +474,7 @@ pp.parseClass = function(node, isStatement) {
       if (!isGenerator && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
         isGetSet = true
         method.kind = key.name
-        key = this.parsePropertyName(method, false)
+        key = this.parsePropertyName(method)
       }
       if (!method.static && (key.type === "Identifier" && key.name === "constructor" ||
           key.type === "Literal" && key.value === "constructor")) {

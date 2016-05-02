@@ -12736,12 +12736,13 @@ testFail("yield 10", "Unexpected token (1:6)", {ecmaVersion: 6});
 testFail("void { [1, 2]: 3 };", "Unexpected token (1:9)", {ecmaVersion: 6});
 
 testFail("let [this] = [10]", "Unexpected token (1:5)", {ecmaVersion: 6});
-testFail("let {this} = x", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("let {this} = x", "'this' can not be used as shorthand property (1:5)", {ecmaVersion: 6});
 testFail("let [function] = [10]", "Unexpected token (1:5)", {ecmaVersion: 6});
 testFail("let [function] = x", "Unexpected token (1:5)", {ecmaVersion: 6});
 testFail("([function] = [10])", "Unexpected token (1:10)", {ecmaVersion: 6});
 testFail("([this] = [10])", "Assigning to rvalue (1:2)", {ecmaVersion: 6});
-testFail("({this} = x)", "Invalid property name in destructuring pattern (1:2)", {ecmaVersion: 6});
+testFail("({this} = x)", "'this' can not be used as shorthand property (1:2)", {ecmaVersion: 6});
+testFail("var x = {this}", "'this' can not be used as shorthand property (1:9)", {ecmaVersion: 6});
 
 test("yield* 10", {
   type: "Program",
@@ -14224,11 +14225,11 @@ testFail("while (1) function foo(){}", "Unexpected token (1:10)", {ecmaVersion: 
 testFail("if (1) ; else class Cls {}", "Unexpected token (1:14)", {ecmaVersion: 6});
 
 testFail("'use strict'; [...eval] = arr", "Assigning to eval in strict mode (1:18)", {ecmaVersion: 6});
-testFail("'use strict'; ({eval = defValue} = obj)", "Assigning to eval in strict mode (1:16)", {ecmaVersion: 6});
+testFail("'use strict'; ({eval = defValue} = obj)", "'eval' can not be used as shorthand property (1:16)", {ecmaVersion: 6});
 
 testFail("[...eval] = arr", "Assigning to eval in strict mode (1:4)", {ecmaVersion: 6, sourceType: "module"});
 
-testFail("function* y({yield}) {}", "Can not use 'yield' as identifier inside a generator (1:13)", {ecmaVersion: 6});
+testFail("function* y({yield}) {}", "'yield' can not be used as shorthand property (1:13)", {ecmaVersion: 6});
 
 test("function foo() { new.target; }", {
   type: "Program",

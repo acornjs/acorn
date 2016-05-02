@@ -482,7 +482,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
       if (!isPattern)
         isGenerator = this.eat(tt.star)
     }
-    this.parsePropertyName(prop, isPattern, refDestructuringErrors)
+    this.parsePropertyName(prop)
     this.parsePropertyValue(prop, isPattern, isGenerator, startPos, startLoc, refDestructuringErrors)
     this.checkPropClash(prop, propHash)
     node.properties.push(this.finishNode(prop, "Property"))
@@ -504,7 +504,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
              (this.type != tt.comma && this.type != tt.braceR)) {
     if (isGenerator || isPattern) this.unexpected()
     prop.kind = prop.key.name
-    this.parsePropertyName(prop, isPattern, refDestructuringErrors)
+    this.parsePropertyName(prop)
     prop.value = this.parseMethod(false)
     let paramCount = prop.kind === "get" ? 0 : 1
     if (prop.value.params.length !== paramCount) {
@@ -517,12 +517,12 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
     if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
       this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
+    if (this.keywords.test(prop.key.name) ||
+        (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name) ||
+        (this.inGenerator && prop.key.name == "yield"))
+      this.raiseRecoverable(prop.key.start, "'" + prop.key.name + "' can not be used as shorthand property")
     prop.kind = "init"
     if (isPattern) {
-      if (this.keywords.test(prop.key.name) ||
-          (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name) ||
-          (this.inGenerator && prop.key.name == "yield"))
-        this.raiseRecoverable(prop.key.start, "Binding " + prop.key.nampe)
       prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
     } else if (this.type === tt.eq && refDestructuringErrors) {
       if (!refDestructuringErrors.shorthandAssign)
@@ -535,7 +535,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
   } else this.unexpected()
 }
 
-pp.parsePropertyName = function(prop, pattern, refDestructuringErrors) {
+pp.parsePropertyName = function(prop) {
   if (this.options.ecmaVersion >= 6) {
     if (this.eat(tt.bracketL)) {
       prop.computed = true
@@ -546,11 +546,7 @@ pp.parsePropertyName = function(prop, pattern, refDestructuringErrors) {
       prop.computed = false
     }
   }
-  if (this.type === tt.num || this.type === tt.string)
-    return prop.key = this.parseExprAtom()
-  if (refDestructuringErrors && this.type != tt.name)
-    refDestructuringErrors.keywordProperty = this.start
-  return prop.key = this.parseIdent(!pattern)
+  return prop.key = this.type === tt.num || this.type === tt.string ? this.parseExprAtom() : this.parseIdent(true)
 }
 
 // Initialize empty function node.
