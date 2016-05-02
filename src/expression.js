@@ -492,47 +492,47 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
 
 pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLoc, refDestructuringErrors) {
   if (this.eat(tt.colon)) {
-      prop.value = isPattern ? this.parseMaybeDefault(this.start, this.startLoc) : this.parseMaybeAssign(false, refDestructuringErrors)
-      prop.kind = "init"
-    } else if (this.options.ecmaVersion >= 6 && this.type === tt.parenL) {
-      if (isPattern) this.unexpected()
-      prop.kind = "init"
-      prop.method = true
-      prop.value = this.parseMethod(isGenerator)
-    } else if (this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
-               (prop.key.name === "get" || prop.key.name === "set") &&
-               (this.type != tt.comma && this.type != tt.braceR)) {
-      if (isGenerator || isPattern) this.unexpected()
-      prop.kind = prop.key.name
-      this.parsePropertyName(prop, isPattern, refDestructuringErrors)
-      prop.value = this.parseMethod(false)
-      let paramCount = prop.kind === "get" ? 0 : 1
-      if (prop.value.params.length !== paramCount) {
-        let start = prop.value.start
-        if (prop.kind === "get")
-          this.raiseRecoverable(start, "getter should have no params")
-        else
-          this.raiseRecoverable(start, "setter should have exactly one param")
-      }
-      if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
-        this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
-    } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
-      prop.kind = "init"
-      if (isPattern) {
-        if (this.keywords.test(prop.key.name) ||
-            (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name) ||
-            (this.inGenerator && prop.key.name == "yield"))
-          this.raiseRecoverable(prop.key.start, "Binding " + prop.key.nampe)
-        prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
-      } else if (this.type === tt.eq && refDestructuringErrors) {
-        if (!refDestructuringErrors.shorthandAssign)
-          refDestructuringErrors.shorthandAssign = this.start
-        prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
-      } else {
-        prop.value = prop.key
-      }
-      prop.shorthand = true
-    } else this.unexpected()
+    prop.value = isPattern ? this.parseMaybeDefault(this.start, this.startLoc) : this.parseMaybeAssign(false, refDestructuringErrors)
+    prop.kind = "init"
+  } else if (this.options.ecmaVersion >= 6 && this.type === tt.parenL) {
+    if (isPattern) this.unexpected()
+    prop.kind = "init"
+    prop.method = true
+    prop.value = this.parseMethod(isGenerator)
+  } else if (this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
+             (prop.key.name === "get" || prop.key.name === "set") &&
+             (this.type != tt.comma && this.type != tt.braceR)) {
+    if (isGenerator || isPattern) this.unexpected()
+    prop.kind = prop.key.name
+    this.parsePropertyName(prop, isPattern, refDestructuringErrors)
+    prop.value = this.parseMethod(false)
+    let paramCount = prop.kind === "get" ? 0 : 1
+    if (prop.value.params.length !== paramCount) {
+      let start = prop.value.start
+      if (prop.kind === "get")
+        this.raiseRecoverable(start, "getter should have no params")
+      else
+        this.raiseRecoverable(start, "setter should have exactly one param")
+    }
+    if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
+      this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
+  } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
+    prop.kind = "init"
+    if (isPattern) {
+      if (this.keywords.test(prop.key.name) ||
+          (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name) ||
+          (this.inGenerator && prop.key.name == "yield"))
+        this.raiseRecoverable(prop.key.start, "Binding " + prop.key.nampe)
+      prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
+    } else if (this.type === tt.eq && refDestructuringErrors) {
+      if (!refDestructuringErrors.shorthandAssign)
+        refDestructuringErrors.shorthandAssign = this.start
+      prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
+    } else {
+      prop.value = prop.key
+    }
+    prop.shorthand = true
+  } else this.unexpected()
 }
 
 pp.parsePropertyName = function(prop, pattern, refDestructuringErrors) {
