@@ -375,7 +375,7 @@ lp.parseImportSpecifierList = function() {
   if (this.tok.type === tt.star) {
     let elt = this.startNode()
     this.next()
-    elt.local = this.eatContextual("as") ? this.parseIdent() : this.dummyIdent();
+    if (this.eatContextual("as")) elt.local = this.parseIdent()
     elts.push(this.finishNode(elt, "ImportNamespaceSpecifier"))
   } else {
     let indent = this.curIndent, line = this.curLineStart, continuedLine = this.nextLineStart
