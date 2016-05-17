@@ -319,7 +319,7 @@ lp.parseExport = function() {
   let node = this.startNode()
   this.next()
   if (this.eat(tt.star)) {
-    node.source = this.eatContextual("from") ? this.parseExprAtom() : null
+    node.source = this.eatContextual("from") ? this.parseExprAtom() : this.dummyString()
     return this.finishNode(node, "ExportAllDeclaration")
   }
   if (this.eat(tt._default)) {
