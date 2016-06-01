@@ -398,4 +398,8 @@ looseParser.extend("readToken", function(nextMethod) {
 })
 ```
 
-There is a proof-of-concept JSX plugin in the [`acorn-jsx`](https://github.com/RReverser/acorn-jsx) project.
+### Existing plugins
+
+ - [`acorn-jsx`](https://github.com/RReverser/acorn-jsx): Parse [Facebook JSX syntax extensions](https://github.com/facebook/jsx)
+ - [`acorn-es7-plugin`](https://github.com/MatAtBread/acorn-es7-plugin/): Parse [async/await syntax proposal](https://github.com/tc39/ecmascript-asyncawait)
+ - [`acorn-object-spread`](https://github.com/UXtemple/acorn-object-spread): Parse [object spread syntax proposal](https://github.com/sebmarkbage/ecmascript-rest-spread)
