@@ -403,3 +403,5 @@ looseParser.extend("readToken", function(nextMethod) {
  - [`acorn-jsx`](https://github.com/RReverser/acorn-jsx): Parse [Facebook JSX syntax extensions](https://github.com/facebook/jsx)
  - [`acorn-es7-plugin`](https://github.com/MatAtBread/acorn-es7-plugin/): Parse [async/await syntax proposal](https://github.com/tc39/ecmascript-asyncawait)
  - [`acorn-object-spread`](https://github.com/UXtemple/acorn-object-spread): Parse [object spread syntax proposal](https://github.com/sebmarkbage/ecmascript-rest-spread)
+ - [`acorn-es7`](https://www.npmjs.com/package/acorn-es7): Parse [decorator syntax proposal](https://github.com/wycats/javascript-decorators)
+ - [`acorn-objj`](https://www.npmjs.com/package/acorn-objj): [Objective-J](http://www.cappuccino-project.org/learn/objective-j.html) language parser built as Acorn plugin
