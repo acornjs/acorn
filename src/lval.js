@@ -90,7 +90,7 @@ pp.toAssignableList = function(exprList, isBinding) {
 pp.parseSpread = function(refDestructuringErrors) {
   let node = this.startNode()
   this.next()
-  node.argument = this.parseMaybeAssign(refDestructuringErrors)
+  node.argument = this.parseMaybeAssign(false, refDestructuringErrors)
   return this.finishNode(node, "SpreadElement")
 }
 
