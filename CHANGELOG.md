@@ -1,3 +1,21 @@
+## 3.2.0 (2016-06-07)
+
+## Bug fixes
+
+Improve handling of lack of unicode regexp support in host
+environment.
+
+Properly reject shorthand properties whose name is a keyword.
+
+Don't crash when the loose parser is called without options object.
+
+### New features
+
+Visitors created with `visit.make` now have their base as _prototype_,
+rather than copying properties into a fresh object.
+
+Make it possible to use `visit.ancestor` with a walk state.
+
 ## 3.1.0 (2016-04-18)
 
 ### Bug fixes
