@@ -26806,6 +26806,7 @@ test("+function f() {} / 3;", {});
 test("foo: function x() {} /regexp/", {});
 test("x = {foo: function x() {} / divide}", {});
 test("foo; function f() {} /regexp/", {});
+test("{function f() {} /regexp/}", {});
 
 test("{}/=/", {
   type: "Program",
