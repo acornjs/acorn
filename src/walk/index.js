@@ -25,19 +25,19 @@ export function simple(node, visitors, base, state, override) {
   })(node, state, override)
 }
 
-// An ancestor walk builds up an array of ancestor nodes (including
-// the current node) and passes them to the callback as the state parameter.
+// An ancestor walk keeps an array of ancestor nodes (including the
+// current node) and passes them to the callback as third parameter
+// (and also as state parameter when no other state is present).
 export function ancestor(node, visitors, base, state) {
   if (!base) base = exports.base
-  if (!state) state = []
+  let ancestors = []
   ;(function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
-    if (node != st[st.length - 1]) {
-      st = st.slice()
-      st.push(node)
-    }
+    let isNew = node != ancestors[ancestors.length - 1]
+    if (isNew) ancestors.push(node)
     base[type](node, st, c)
-    if (found) found(node, st)
+    if (found) found(node, st || ancestors, ancestors)
+    if (isNew) ancestors.pop()
   })(node, state)
 }
 
