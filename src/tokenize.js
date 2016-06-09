@@ -91,7 +91,7 @@ pp.nextToken = function() {
   if (this.pos >= this.input.length) return this.finishToken(tt.eof)
 
   if (curContext.override) return curContext.override(this)
-  else this.readToken(this.fullCharCodeAtPos())
+  else this.readToken(this.input.codePointAt(this.pos))
 }
 
 pp.readToken = function(code) {
@@ -101,13 +101,6 @@ pp.readToken = function(code) {
     return this.readWord()
 
   return this.getTokenFromCode(code)
-}
-
-pp.fullCharCodeAtPos = function() {
-  let code = this.input.charCodeAt(this.pos)
-  if (code <= 0xd7ff || code >= 0xe000) return code
-  let next = this.input.charCodeAt(this.pos + 1)
-  return (code << 10) + next - 0x35fdc00
 }
 
 pp.skipBlockComment = function() {
@@ -482,7 +475,7 @@ pp.readRadixNumber = function(radix) {
   this.pos += 2 // 0x
   let val = this.readInt(radix)
   if (val == null) this.raise(this.start + 2, "Expected number in radix " + radix)
-  if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
+  if (isIdentifierStart(this.input.codePointAt(this.pos))) this.raise(this.pos, "Identifier directly after number")
   return this.finishToken(tt.num, val)
 }
 
@@ -504,7 +497,7 @@ pp.readNumber = function(startsWithDot) {
     if (this.readInt(10) === null) this.raise(start, "Invalid number")
     isFloat = true
   }
-  if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
+  if (isIdentifierStart(this.input.codePointAt(this.pos))) this.raise(this.pos, "Identifier directly after number")
 
   let str = this.input.slice(start, this.pos), val
   if (isFloat) val = parseFloat(str)
@@ -661,7 +654,7 @@ pp.readWord1 = function() {
   let word = "", first = true, chunkStart = this.pos
   let astral = this.options.ecmaVersion >= 6
   while (this.pos < this.input.length) {
-    let ch = this.fullCharCodeAtPos()
+    let ch = this.input.codePointAt(this.pos)
     if (isIdentifierChar(ch, astral)) {
       this.pos += ch <= 0xffff ? 1 : 2
     } else if (ch === 92) { // "\"
