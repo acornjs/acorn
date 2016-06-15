@@ -9150,6 +9150,98 @@ test("function f([x] = [1]) {}", {
   locations: true
 });
 
+test("function f([x] = [1]) { 'use strict' }", {
+  type: "Program",
+  body: [{
+    type: "FunctionDeclaration",
+    id: {
+      type: "Identifier",
+      name: "f",
+      loc: {
+        start: {line: 1, column: 9},
+        end: {line: 1, column: 10}
+      }
+    },
+    params: [{
+      type: "AssignmentPattern",
+      left: {
+        type: "ArrayPattern",
+        elements: [{
+          type: "Identifier",
+          name: "x",
+          loc: {
+            start: {line: 1, column: 12},
+            end: {line: 1, column: 13}
+          }
+        }],
+        loc: {
+          start: {line: 1, column: 11},
+          end: {line: 1, column: 14}
+        }
+      },
+      right: {
+        type: "ArrayExpression",
+        elements: [{
+          type: "Literal",
+          value: 1,
+          raw: "1",
+          loc: {
+            start: {line: 1, column: 18},
+            end: {line: 1, column: 19}
+          }
+        }],
+        loc: {
+          start: {line: 1, column: 17},
+          end: {line: 1, column: 20}
+        }
+      },
+      loc: {
+        start: {line: 1, column: 11},
+        end: {line: 1, column: 20}
+      }
+    }],
+    body: {
+      type: "BlockStatement",
+      body: [
+        {
+          type: "ExpressionStatement",
+          loc: {
+            start: {line: 1, column: 24},
+            end: {line: 1, column: 36}
+          },
+          expression: {
+            type: "Literal",
+            loc: {
+              start: {line: 1, column: 24},
+              end: {line: 1, column: 36}
+            },
+            value: "use strict",
+            raw: "'use strict'"
+          }
+        }
+      ],
+      loc: {
+        start: {line: 1, column: 22},
+        end: {line: 1, column: 38}
+      }
+    },
+    generator: false,
+    expression: false,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 38}
+    }
+  }],
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 38}
+  }
+}, {
+  ecmaVersion: 6,
+  ranges: true,
+  locations: true
+});
+
 test("function f({x} = {x: 10}) {}", {
   type: "Program",
   body: [{
