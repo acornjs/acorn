@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import {basename} from "path"
 import {readFileSync as readFile} from "fs"
 import * as acorn from "../dist/acorn.js"

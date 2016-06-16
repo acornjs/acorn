@@ -7,8 +7,8 @@
     require("./tests-harmony.js");
     require("./tests-es7.js");
     require("babel-core/register")
-    acorn = require("../src")
-    require("../src/loose")
+    acorn = require("../dist/acorn")
+    require("../dist/acorn_loose")
   } else {
     driver = window;
     acorn = window.acorn;
