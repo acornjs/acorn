@@ -6,7 +6,6 @@
     require("./tests.js");
     require("./tests-harmony.js");
     require("./tests-es7.js");
-    require("babel-core/register")
     acorn = require("../dist/acorn")
     require("../dist/acorn_loose")
   } else {
