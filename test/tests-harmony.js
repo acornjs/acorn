@@ -14448,3 +14448,22 @@ test("/[a-z]/gimuy", {
 testFail("/[a-z]/s", "Invalid regular expression flag (1:1)", {ecmaVersion: 6});
 
 testFail("[...x in y] = []", "Assigning to rvalue (1:4)", {ecmaVersion: 6});
+
+test("(([,]) => 0)", {
+  type: "Program",
+  body: [{
+    type: "ExpressionStatement",
+    expression: {
+      type: "ArrowFunctionExpression",
+      params: [{
+        type: "ArrayPattern",
+        elements: [null]
+      }],
+      body: {
+        type: "Literal",
+        value: 0,
+        raw: "0"
+      }
+    }
+  }]
+}, {ecmaVersion: 6});
