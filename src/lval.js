@@ -75,7 +75,7 @@ pp.toAssignableList = function(exprList, isBinding) {
       --end
     }
 
-    if (isBinding && last.type === "RestElement" && last.argument.type !== "Identifier")
+    if (isBinding && last && last.type === "RestElement" && last.argument.type !== "Identifier")
       this.unexpected(last.argument.start)
   }
   for (let i = 0; i < end; i++) {
