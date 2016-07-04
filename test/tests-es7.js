@@ -348,3 +348,4 @@ testFail("function foo(a=2) { 'use strict'; }", "Illegal 'use strict' directive 
 testFail("(a=2) => { 'use strict'; }", "Illegal 'use strict' directive in function with non-simple parameter list (1:11)", { ecmaVersion: 7 })
 testFail("function foo({a}) { 'use strict'; }", "Illegal 'use strict' directive in function with non-simple parameter list (1:20)", { ecmaVersion: 7 })
 testFail("({a}) => { 'use strict'; }", "Illegal 'use strict' directive in function with non-simple parameter list (1:11)", { ecmaVersion: 7 })
+test("function foo(a) { 'use strict'; }", {}, { ecmaVersion: 7 });

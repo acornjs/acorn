@@ -626,7 +626,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
 pp.checkParams = function(node, useStrict) {
     let nameHash = {}
     for (let i = 0; i < node.params.length; i++) {
-      if (useStrict && this.options.ecmaVersion >= 7 && node.params.type !== "Identifier")
+      if (useStrict && this.options.ecmaVersion >= 7 && node.params[i].type !== "Identifier")
         this.raiseRecoverable(useStrict.start, "Illegal 'use strict' directive in function with non-simple parameter list");
       this.checkLVal(node.params[i], true, nameHash)
     }
