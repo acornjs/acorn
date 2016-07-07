@@ -29127,3 +29127,141 @@ test("/[a-z]/gim", {
 testFail("/[a-z]/u", "Invalid regular expression flag (1:1)");
 testFail("/[a-z]/y", "Invalid regular expression flag (1:1)");
 testFail("/[a-z]/s", "Invalid regular expression flag (1:1)");
+
+// https://github.com/ternjs/acorn/issues/255
+
+test("(a) = {}", {
+  type: "Program",
+  start: 0,
+  end: 8,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 8}
+  },
+  range: [0, 8],
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 8,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 8}
+    },
+    range: [0, 8],
+    expression: {
+      type: "AssignmentExpression",
+      start: 0,
+      end: 8,
+      loc: {
+        start: {line: 1, column: 0},
+        end: {line: 1, column: 8}
+      },
+      range: [0, 8],
+      operator: "=",
+      left: {
+        type: "Identifier",
+        start: 1,
+        end: 2,
+        loc: {
+          start: {line: 1, column: 1},
+          end: {line: 1, column: 2}
+        },
+        range: [1, 2],
+        name: "a"
+      },
+      right: {
+        type: "ObjectExpression",
+        start: 6,
+        end: 8,
+        loc: {
+          start: {line: 1, column: 6},
+          end: {line: 1, column: 8}
+        },
+        range: [6, 8],
+        properties: []
+      }
+    }
+  }]
+}, {
+  ranges: true,
+  locations: true
+})
+
+test("(a.b) = {}", {
+  type: "Program",
+  start: 0,
+  end: 10,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 10}
+  },
+  range: [0, 10],
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 10,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 10}
+    },
+    range: [0, 10],
+    expression: {
+      type: "AssignmentExpression",
+      start: 0,
+      end: 10,
+      loc: {
+        start: {line: 1, column: 0},
+        end: {line: 1, column: 10}
+      },
+      range: [0, 10],
+      operator: "=",
+      left: {
+        type: "MemberExpression",
+        start: 1,
+        end: 4,
+        loc: {
+          start: {line: 1, column: 1},
+          end: {line: 1, column: 4}
+        },
+        range: [1, 4],
+        object: {
+          type: "Identifier",
+          start: 1,
+          end: 2,
+          loc: {
+            start: {line: 1, column: 1},
+            end: {line: 1, column: 2}
+          },
+          range: [1, 2],
+          name: "a"
+        },
+        property: {
+          type: "Identifier",
+          start: 3,
+          end: 4,
+          loc: {
+            start: {line: 1, column: 3},
+            end: {line: 1, column: 4}
+          },
+          range: [3, 4],
+          name: "b"
+        },
+        computed: false
+      },
+      right: {
+        type: "ObjectExpression",
+        start: 8,
+        end: 10,
+        loc: {
+          start: {line: 1, column: 8},
+          end: {line: 1, column: 10}
+        },
+        range: [8, 10],
+        properties: []
+      }
+    }
+  }]
+}, {
+  ranges: true,
+  locations: true
+})

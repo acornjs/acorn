@@ -3132,7 +3132,7 @@ test("[a, b] = [b, a]", {
   locations: true
 });
 
-test("({ responseText: text }) = res", {
+test("({ responseText: text } = res)", {
   type: "Program",
   body: [{
     type: "ExpressionStatement",
@@ -3177,13 +3177,13 @@ test("({ responseText: text }) = res", {
         type: "Identifier",
         name: "res",
         loc: {
-          start: {line: 1, column: 27},
-          end: {line: 1, column: 30}
+          start: {line: 1, column: 26},
+          end: {line: 1, column: 29}
         }
       },
       loc: {
-        start: {line: 1, column: 0},
-        end: {line: 1, column: 30}
+        start: {line: 1, column: 1},
+        end: {line: 1, column: 29}
       }
     },
     loc: {
@@ -3765,6 +3765,9 @@ test("var {a:b} = {}", {
   ranges: true,
   locations: true
 });
+
+testFail("({a}) = {}", "Wrapping parentheses are not allowed around destructuring patterns (1:1)", {ecmaVersion: 6})
+testFail("([a]) = []", "Wrapping parentheses are not allowed around destructuring patterns (1:1)", {ecmaVersion: 6})
 
 // Harmony: Modules
 
@@ -12779,9 +12782,9 @@ testFail("let default", "Unexpected token (1:4)", {ecmaVersion: 6});
 
 testFail("const default", "Unexpected token (1:6)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; ({ v: eval }) = obj", "Assigning to eval in strict mode (1:20)", {ecmaVersion: 6});
+testFail("\"use strict\"; ({ v: eval } = obj)", "Assigning to eval in strict mode (1:20)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; ({ v: arguments }) = obj", "Assigning to arguments in strict mode (1:20)", {ecmaVersion: 6});
+testFail("\"use strict\"; ({ v: arguments } = obj)", "Assigning to arguments in strict mode (1:20)", {ecmaVersion: 6});
 
 testFail("for (let x = 42 in list) process(x);", "Unexpected token (1:16)", {ecmaVersion: 6});
 
@@ -14559,3 +14562,7 @@ test("(([,]) => 0)", {
     }
   }]
 }, {ecmaVersion: 6});
+
+// https://github.com/ternjs/acorn/issues/255
+
+testFail("(a = b) = {};", "Invalid left-hand side in assignment (1:1)", {ecmaVersion: 6})
