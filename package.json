@@ -39,7 +39,7 @@
     "acorn": "./bin/acorn"
   },
   "devDependencies": {
-    "rollup": "^0.31.2",
+    "rollup": "^0.34.1",
     "rollup-plugin-buble": "^0.11.0",
     "unicode-8.0.0": "^0.1.5"
   }

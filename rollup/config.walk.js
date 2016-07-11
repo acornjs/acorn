@@ -6,6 +6,6 @@ export default {
 	plugins: [ buble() ],
 	targets: [
 		{ dest: 'dist/walk.js', format: 'umd' },
-		{ dest: 'dist/walk.es.js', format: 'es6' }
+		{ dest: 'dist/walk.es.js', format: 'es' }
 	]
 };

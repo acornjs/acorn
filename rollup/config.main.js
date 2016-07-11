@@ -6,6 +6,6 @@ export default {
 	plugins: [ buble() ],
 	targets: [
 		{ dest: 'dist/acorn.js', format: 'umd' },
-		{ dest: 'dist/acorn.es.js', format: 'es6' }
+		{ dest: 'dist/acorn.es.js', format: 'es' }
 	]
 };
