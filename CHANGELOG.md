@@ -1,6 +1,19 @@
+## 3.3.0 (2016-07-25)
+
+### Bug fixes
+
+Fix bug in tokenizing of regexp operator after a function declaration.
+
+Fix parser crash when parsing an array pattern with a hole.
+
+### New features
+
+Implement check against complex argument lists in functions that
+enable strict mode in ES7.
+
 ## 3.2.0 (2016-06-07)
 
-## Bug fixes
+### Bug fixes
 
 Improve handling of lack of unicode regexp support in host
 environment.
