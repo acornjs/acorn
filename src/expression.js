@@ -513,9 +513,10 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
         this.raiseRecoverable(start, "getter should have no params")
       else
         this.raiseRecoverable(start, "setter should have exactly one param")
+    } else {
+      if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
+        this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
     }
-    if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
-      this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
     if (this.keywords.test(prop.key.name) ||
         (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name) ||
