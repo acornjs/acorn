@@ -101,6 +101,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   let startPos = this.start, startLoc = this.startLoc
   if (this.type == tt.parenL || this.type == tt.name)
     this.potentialArrowAt = this.start
+  let parens = this.type === tt.parenL
   let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
@@ -110,6 +111,10 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     node.operator = this.value
     node.left = this.type === tt.eq ? this.toAssignable(left) : left
     refDestructuringErrors.shorthandAssign = 0 // reset because shorthand default was used correctly
+    if (parens && (node.left.type === "ObjectPattern" || node.left.type === "ArrayPattern"))
+      this.raise(node.left.start, "Wrapping parentheses are not allowed around destructuring patterns")
+    if (left.type === "AssignmentPattern")
+      this.raise(node.left.start, "Invalid left-hand side in assignment")
     this.checkLVal(left)
     this.next()
     node.right = this.parseMaybeAssign(noIn)
