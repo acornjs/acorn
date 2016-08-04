@@ -494,9 +494,10 @@ pp.parseClass = function(node, isStatement) {
           this.raiseRecoverable(start, "getter should have no params")
         else
           this.raiseRecoverable(start, "setter should have exactly one param")
+      } else {
+        if (method.kind === "set" && method.value.params[0].type === "RestElement")
+          this.raise(method.value.params[0].start, "Setter cannot use rest params")
       }
-      if (method.kind === "set" && method.value.params[0].type === "RestElement")
-        this.raise(method.value.params[0].start, "Setter cannot use rest params")
     }
   }
   node.body = this.finishNode(classBody, "ClassBody")
