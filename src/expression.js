@@ -519,7 +519,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
     }
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
     if (this.keywords.test(prop.key.name) ||
-        (this.strict ? this.reservedWordsStrictBind : this.reservedWords).test(prop.key.name) ||
+        (this.strict ? this.reservedWordsStrict : this.reservedWords).test(prop.key.name) ||
         (this.inGenerator && prop.key.name == "yield"))
       this.raiseRecoverable(prop.key.start, "'" + prop.key.name + "' can not be used as shorthand property")
     prop.kind = "init"
