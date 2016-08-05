@@ -72,7 +72,7 @@ pp.parseStatement = function(declaration, topLevel) {
   case tt._do: return this.parseDoStatement(node)
   case tt._for: return this.parseForStatement(node)
   case tt._function:
-    if (!declaration && this.options.ecmaVersion >= 6) this.unexpected()
+    if (!declaration && this.options.ecmaVersion >= 6) break
     return this.parseFunctionStatement(node)
   case tt._class:
     if (!declaration) this.unexpected()
@@ -99,18 +99,17 @@ pp.parseStatement = function(declaration, topLevel) {
         this.raise(this.start, "'import' and 'export' may appear only with 'sourceType: module'")
     }
     return starttype === tt._import ? this.parseImport(node) : this.parseExport(node)
-
-    // If the statement does not start with a statement keyword or a
-    // brace, it's an ExpressionStatement or LabeledStatement. We
-    // simply start parsing an expression, and afterwards, if the
-    // next token is a colon and the expression was a simple
-    // Identifier node, we switch to interpreting it as a label.
-  default:
-    let maybeName = this.value, expr = this.parseExpression()
-    if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon))
-      return this.parseLabeledStatement(node, maybeName, expr)
-    else return this.parseExpressionStatement(node, expr)
   }
+
+  // If the statement does not start with a statement keyword or a
+  // brace, it's an ExpressionStatement or LabeledStatement. We
+  // simply start parsing an expression, and afterwards, if the
+  // next token is a colon and the expression was a simple
+  // Identifier node, we switch to interpreting it as a label.
+  let maybeName = this.value, expr = this.parseExpression()
+  if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon))
+    return this.parseLabeledStatement(node, maybeName, expr)
+  else return this.parseExpressionStatement(node, expr)
 }
 
 pp.parseBreakContinueStatement = function(node, keyword) {
