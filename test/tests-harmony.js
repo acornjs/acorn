@@ -14316,7 +14316,7 @@ testFail("for (;;) const x = 10;", "Unexpected token (1:9)", {ecmaVersion: 6});
 testFail("if (1) ; else class Cls {}", "Unexpected token (1:14)", {ecmaVersion: 6});
 
 testFail("'use strict'; [...eval] = arr", "Assigning to eval in strict mode (1:18)", {ecmaVersion: 6});
-testFail("'use strict'; ({eval = defValue} = obj)", "'eval' can not be used as shorthand property (1:16)", {ecmaVersion: 6});
+testFail("'use strict'; ({eval = defValue} = obj)", "Assigning to eval in strict mode (1:16)", {ecmaVersion: 6});
 
 testFail("[...eval] = arr", "Assigning to eval in strict mode (1:4)", {ecmaVersion: 6, sourceType: "module"});
 
@@ -14564,3 +14564,347 @@ test("(([,]) => 0)", {
 }, {ecmaVersion: 6});
 
 test("if (1) function foo() {}", {})
+
+// 'eval' and 'arguments' are not reserved word, but those can not be a BindingIdentifier.
+
+test("function foo() { return {arguments} }", {
+    "type": "Program",
+    "start": 0,
+    "end": 37,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 37,
+            "id": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "start": 15,
+                "end": 37,
+                "body": [
+                    {
+                        "type": "ReturnStatement",
+                        "start": 17,
+                        "end": 35,
+                        "argument": {
+                            "type": "ObjectExpression",
+                            "start": 24,
+                            "end": 35,
+                            "properties": [
+                                {
+                                    "type": "Property",
+                                    "start": 25,
+                                    "end": 34,
+                                    "method": false,
+                                    "shorthand": true,
+                                    "computed": false,
+                                    "key": {
+                                        "type": "Identifier",
+                                        "start": 25,
+                                        "end": 34,
+                                        "name": "arguments"
+                                    },
+                                    "kind": "init",
+                                    "value": {
+                                        "type": "Identifier",
+                                        "start": 25,
+                                        "end": 34,
+                                        "name": "arguments"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6})
+test("function foo() { return {eval} }", {
+    "type": "Program",
+    "start": 0,
+    "end": 32,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 32,
+            "id": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "start": 15,
+                "end": 32,
+                "body": [
+                    {
+                        "type": "ReturnStatement",
+                        "start": 17,
+                        "end": 30,
+                        "argument": {
+                            "type": "ObjectExpression",
+                            "start": 24,
+                            "end": 30,
+                            "properties": [
+                                {
+                                    "type": "Property",
+                                    "start": 25,
+                                    "end": 29,
+                                    "method": false,
+                                    "shorthand": true,
+                                    "computed": false,
+                                    "key": {
+                                        "type": "Identifier",
+                                        "start": 25,
+                                        "end": 29,
+                                        "name": "eval"
+                                    },
+                                    "kind": "init",
+                                    "value": {
+                                        "type": "Identifier",
+                                        "start": 25,
+                                        "end": 29,
+                                        "name": "eval"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6})
+test("function foo() { 'use strict'; return {arguments} }", {
+    "type": "Program",
+    "start": 0,
+    "end": 51,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 51,
+            "id": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "start": 15,
+                "end": 51,
+                "body": [
+                    {
+                        "type": "ExpressionStatement",
+                        "start": 17,
+                        "end": 30,
+                        "expression": {
+                            "type": "Literal",
+                            "start": 17,
+                            "end": 29,
+                            "value": "use strict",
+                            "raw": "'use strict'"
+                        }
+                    },
+                    {
+                        "type": "ReturnStatement",
+                        "start": 31,
+                        "end": 49,
+                        "argument": {
+                            "type": "ObjectExpression",
+                            "start": 38,
+                            "end": 49,
+                            "properties": [
+                                {
+                                    "type": "Property",
+                                    "start": 39,
+                                    "end": 48,
+                                    "method": false,
+                                    "shorthand": true,
+                                    "computed": false,
+                                    "key": {
+                                        "type": "Identifier",
+                                        "start": 39,
+                                        "end": 48,
+                                        "name": "arguments"
+                                    },
+                                    "kind": "init",
+                                    "value": {
+                                        "type": "Identifier",
+                                        "start": 39,
+                                        "end": 48,
+                                        "name": "arguments"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6})
+test("function foo() { 'use strict'; return {eval} }", {
+    "type": "Program",
+    "start": 0,
+    "end": 46,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 46,
+            "id": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "start": 15,
+                "end": 46,
+                "body": [
+                    {
+                        "type": "ExpressionStatement",
+                        "start": 17,
+                        "end": 30,
+                        "expression": {
+                            "type": "Literal",
+                            "start": 17,
+                            "end": 29,
+                            "value": "use strict",
+                            "raw": "'use strict'"
+                        }
+                    },
+                    {
+                        "type": "ReturnStatement",
+                        "start": 31,
+                        "end": 44,
+                        "argument": {
+                            "type": "ObjectExpression",
+                            "start": 38,
+                            "end": 44,
+                            "properties": [
+                                {
+                                    "type": "Property",
+                                    "start": 39,
+                                    "end": 43,
+                                    "method": false,
+                                    "shorthand": true,
+                                    "computed": false,
+                                    "key": {
+                                        "type": "Identifier",
+                                        "start": 39,
+                                        "end": 43,
+                                        "name": "eval"
+                                    },
+                                    "kind": "init",
+                                    "value": {
+                                        "type": "Identifier",
+                                        "start": 39,
+                                        "end": 43,
+                                        "name": "eval"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6})
+
+test("function foo() { return {yield} }", {
+    "type": "Program",
+    "start": 0,
+    "end": 33,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 33,
+            "id": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "start": 15,
+                "end": 33,
+                "body": [
+                    {
+                        "type": "ReturnStatement",
+                        "start": 17,
+                        "end": 31,
+                        "argument": {
+                            "type": "ObjectExpression",
+                            "start": 24,
+                            "end": 31,
+                            "properties": [
+                                {
+                                    "type": "Property",
+                                    "start": 25,
+                                    "end": 30,
+                                    "method": false,
+                                    "shorthand": true,
+                                    "computed": false,
+                                    "key": {
+                                        "type": "Identifier",
+                                        "start": 25,
+                                        "end": 30,
+                                        "name": "yield"
+                                    },
+                                    "kind": "init",
+                                    "value": {
+                                        "type": "Identifier",
+                                        "start": 25,
+                                        "end": 30,
+                                        "name": "yield"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6})
+testFail("function foo() { 'use strict'; return {yield} }", "'yield' can not be used as shorthand property (1:39)", {ecmaVersion: 6});
+
+testFail("function foo() { 'use strict'; var {arguments} = {} }", "Binding arguments in strict mode (1:36)", {ecmaVersion: 6});
+testFail("function foo() { 'use strict'; var {eval} = {} }", "Binding eval in strict mode (1:36)", {ecmaVersion: 6});
+testFail("function foo() { 'use strict'; var {arguments = 1} = {} }", "Binding arguments in strict mode (1:36)", {ecmaVersion: 6});
+testFail("function foo() { 'use strict'; var {eval = 1} = {} }", "Binding eval in strict mode (1:36)", {ecmaVersion: 6});
