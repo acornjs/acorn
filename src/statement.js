@@ -14,10 +14,10 @@ const pp = Parser.prototype
 // to its body instead of creating a new node.
 
 pp.parseTopLevel = function(node) {
-  let first = true
+  let first = true, exports = {}
   if (!node.body) node.body = []
   while (this.type !== tt.eof) {
-    let stmt = this.parseStatement(true, true)
+    let stmt = this.parseStatement(true, true, exports)
     node.body.push(stmt)
     if (first) {
       if (this.isUseStrict(stmt)) this.setStrict(true)
@@ -54,7 +54,7 @@ pp.isLet = function() {
 // `if (foo) /blah/.exec(foo)`, where looking at the previous token
 // does not help.
 
-pp.parseStatement = function(declaration, topLevel) {
+pp.parseStatement = function(declaration, topLevel, exports) {
   let starttype = this.type, node = this.startNode(), kind
 
   if (this.isLet()) {
@@ -98,7 +98,7 @@ pp.parseStatement = function(declaration, topLevel) {
       if (!this.inModule)
         this.raise(this.start, "'import' and 'export' may appear only with 'sourceType: module'")
     }
-    return starttype === tt._import ? this.parseImport(node) : this.parseExport(node)
+    return starttype === tt._import ? this.parseImport(node) : this.parseExport(node, exports)
   }
 
   // If the statement does not start with a statement keyword or a
@@ -518,7 +518,7 @@ pp.parseClassSuper = function(node) {
 
 // Parses module export declaration.
 
-pp.parseExport = function(node) {
+pp.parseExport = function(node, exports) {
   this.next()
   // export * from '...'
   if (this.eat(tt.star)) {
@@ -528,6 +528,7 @@ pp.parseExport = function(node) {
     return this.finishNode(node, "ExportAllDeclaration")
   }
   if (this.eat(tt._default)) { // export default ...
+    pp.checkExport(exports, "default", this.lastTokStart)
     let parens = this.type == tt.parenL
     let expr = this.parseMaybeAssign()
     let needsSemi = true
@@ -547,11 +548,15 @@ pp.parseExport = function(node) {
   // export var|const|let|function|class ...
   if (this.shouldParseExportStatement()) {
     node.declaration = this.parseStatement(true)
+    if (node.declaration.type === "VariableDeclaration")
+      this.checkVariableExport(exports, node.declaration.declarations)
+    else
+      this.checkExport(exports, node.declaration.id.name, node.declaration.id.start)
     node.specifiers = []
     node.source = null
   } else { // export { x, y as z } [from '...']
     node.declaration = null
-    node.specifiers = this.parseExportSpecifiers()
+    node.specifiers = this.parseExportSpecifiers(exports)
     if (this.eatContextual("from")) {
       node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected()
     } else {
@@ -569,13 +574,44 @@ pp.parseExport = function(node) {
   return this.finishNode(node, "ExportNamedDeclaration")
 }
 
+pp.checkExport = function(exports, name, pos) {
+  if (!exports) return
+  if (Object.prototype.hasOwnProperty.call(exports, name))
+    this.raiseRecoverable(pos, "Duplicate export '" + name + "'")
+  exports[name] = true
+}
+
+pp.checkPatternExport = function(exports, pat) {
+  let type = pat.type
+  if (type == "Identifier")
+    this.checkExport(exports, pat.name, pat.start)
+  else if (type == "ObjectPattern")
+    for (let i = 0; i < pat.properties.length; ++i)
+      this.checkPatternExport(exports, pat.properties[i].value)
+  else if (type == "ArrayPattern")
+    for (let i = 0; i < pat.elements.length; ++i) {
+      let elt = pat.elements[i]
+      if (elt) this.checkPatternExport(exports, elt)
+    }
+  else if (type == "AssignmentPattern")
+    this.checkPatternExport(exports, pat.left)
+  else if (type == "ParenthesizedExpression")
+    this.checkPatternExport(exports, pat.expression)
+}
+
+pp.checkVariableExport = function(exports, decls) {
+  if (!exports) return
+  for (let i = 0; i < decls.length; i++)
+    this.checkPatternExport(exports, decls[i].id)
+}
+
 pp.shouldParseExportStatement = function() {
   return this.type.keyword || this.isLet()
 }
 
 // Parses a comma-separated list of module exports.
 
-pp.parseExportSpecifiers = function() {
+pp.parseExportSpecifiers = function(exports) {
   let nodes = [], first = true
   // export { x, y as z } [from '...']
   this.expect(tt.braceL)
@@ -587,6 +623,7 @@ pp.parseExportSpecifiers = function() {
 
     let node = this.startNode()
     node.local = this.parseIdent(this.type === tt._default)
+    this.checkExport(exports, node.local.name, node.local.start)
     node.exported = this.eatContextual("as") ? this.parseIdent(true) : node.local
     nodes.push(this.finishNode(node, "ExportSpecifier"))
   }

@@ -14540,6 +14540,10 @@ testFail("/[a-z]/s", "Invalid regular expression flag (1:1)", {ecmaVersion: 6});
 
 testFail("[...x in y] = []", "Assigning to rvalue (1:4)", {ecmaVersion: 6});
 
+testFail("export let x = a; export function x() {}", "Duplicate export 'x' (1:34)", {ecmaVersion: 6, sourceType: "module"})
+testFail("export let [{x = 2}] = a; export {x}", "Duplicate export 'x' (1:34)", {ecmaVersion: 6, sourceType: "module"})
+testFail("export default 100; export default 3", "Duplicate export 'default' (1:27)", {ecmaVersion: 6, sourceType: "module"})
+
 test("(([,]) => 0)", {
   type: "Program",
   body: [{
