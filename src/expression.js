@@ -275,6 +275,8 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   case tt.name:
     let startPos = this.start, startLoc = this.startLoc
     let id = this.parseIdent(this.type !== tt.name)
+    if (this.options.ecmaVersion >= 8 && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
+      return this.parseFunction(this.startNodeAt(startPos, startLoc), false, false, true)
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow))
       return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id])
     return id
@@ -520,7 +522,8 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
     if (this.keywords.test(prop.key.name) ||
         (this.strict ? this.reservedWordsStrict : this.reservedWords).test(prop.key.name) ||
-        (this.inGenerator && prop.key.name == "yield"))
+        (this.inGenerator && prop.key.name == "yield") ||
+        (this.inAsync && prop.key.name == "await"))
       this.raiseRecoverable(prop.key.start, "'" + prop.key.name + "' can not be used as shorthand property")
     prop.kind = "init"
     if (isPattern) {
@@ -558,6 +561,8 @@ pp.initFunction = function(node) {
     node.generator = false
     node.expression = false
   }
+  if (this.options.ecmaVersion >= 8)
+    node.async = false
 }
 
 // Parse object or class method.
@@ -681,6 +686,8 @@ pp.parseIdent = function(liberal) {
       this.raiseRecoverable(this.start, "The keyword '" + this.value + "' is reserved")
     if (!liberal && this.inGenerator && this.value === "yield")
       this.raiseRecoverable(this.start, "Can not use 'yield' as identifier inside a generator")
+    if (this.inAsync && this.value === "await")
+      this.raiseRecoverable(this.start, "Can not use 'await' as identifier inside an async function")
     node.name = this.value
   } else if (liberal && this.type.keyword) {
     node.name = this.type.keyword

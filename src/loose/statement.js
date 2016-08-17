@@ -171,6 +171,11 @@ lp.parseStatement = function() {
     return this.parseExport()
 
   default:
+    if (this.toks.isAsyncFunction()) {
+      this.next()
+      this.next()
+      return this.parseFunction(node, true, true)
+    }
     let expr = this.parseExpression()
     if (isDummy(expr)) {
       this.next()
@@ -303,10 +308,13 @@ lp.parseClass = function(isStatement) {
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
-lp.parseFunction = function(node, isStatement) {
+lp.parseFunction = function(node, isStatement, isAsync) {
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6) {
     node.generator = this.eat(tt.star)
+  }
+  if (this.options.ecmaVersion >= 8) {
+    node.async = !!isAsync
   }
   if (this.tok.type === tt.name) node.id = this.parseIdent()
   else if (isStatement) node.id = this.dummyIdent()
@@ -334,7 +342,7 @@ lp.parseExport = function() {
     this.semicolon()
     return this.finishNode(node, "ExportDefaultDeclaration")
   }
-  if (this.tok.type.keyword || this.toks.isLet()) {
+  if (this.tok.type.keyword || this.toks.isLet() || this.toks.isAsyncFunction()) {
     node.declaration = this.parseStatement()
     node.specifiers = []
     node.source = null

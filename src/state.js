@@ -71,7 +71,7 @@ export class Parser {
     this.potentialArrowAt = -1
 
     // Flags to track whether we are in a function, a generator.
-    this.inFunction = this.inGenerator = false
+    this.inFunction = this.inGenerator = this.inAsync = false
     // Labels in scope.
     this.labels = []
 
