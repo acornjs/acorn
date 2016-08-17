@@ -724,7 +724,7 @@ pp.parseIdent = function(liberal) {
         (this.options.ecmaVersion >= 6 ||
          this.input.slice(this.start, this.end).indexOf("\\") == -1))
       this.raiseRecoverable(this.start, "The keyword '" + this.value + "' is reserved")
-    if (!liberal && this.inGenerator && this.value === "yield")
+    if (this.inGenerator && this.value === "yield")
       this.raiseRecoverable(this.start, "Can not use 'yield' as identifier inside a generator")
     if (this.inAsync && this.value === "await")
       this.raiseRecoverable(this.start, "Can not use 'await' as identifier inside an async function")
