@@ -529,6 +529,9 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
 }
 
 pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors) {
+  if ((isGenerator || isAsync) && this.type === tt.colon)
+    this.unexpected()
+
   if (this.eat(tt.colon)) {
     prop.value = isPattern ? this.parseMaybeDefault(this.start, this.startLoc, null, refDestructuringErrors) : this.parseMaybeAssign(false, refDestructuringErrors)
     prop.kind = "init"
