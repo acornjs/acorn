@@ -317,6 +317,7 @@ lp.parseClass = function(isStatement) {
 }
 
 lp.parseFunction = function(node, isStatement, isAsync) {
+  let oldInAsync = this.inAsync
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6) {
     node.generator = this.eat(tt.star)
@@ -326,8 +327,10 @@ lp.parseFunction = function(node, isStatement, isAsync) {
   }
   if (this.tok.type === tt.name) node.id = this.parseIdent()
   else if (isStatement) node.id = this.dummyIdent()
+  this.inAsync = node.async
   node.params = this.parseFunctionParams()
   node.body = this.parseBlock()
+  this.inAsync = oldInAsync
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 

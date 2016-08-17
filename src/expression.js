@@ -180,7 +180,10 @@ pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
 
 pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
   let startPos = this.start, startLoc = this.startLoc, expr
-  if (this.type.prefix) {
+  if (this.inAsync && (this.type === tt._await || this.isContextual("await"))) {
+    expr = this.parseAwait(refDestructuringErrors)
+    sawUnary = true
+  } else if (this.type.prefix) {
     let node = this.startNode(), update = this.type === tt.incDec
     node.operator = this.value
     node.prefix = true
@@ -742,4 +745,11 @@ pp.parseYield = function() {
     node.argument = this.parseMaybeAssign()
   }
   return this.finishNode(node, "YieldExpression")
+}
+
+pp.parseAwait = function() {
+  let node = this.startNode()
+  this.next()
+  node.argument = this.parseMaybeUnary(null, true)
+  return this.finishNode(node, "AwaitExpression")
 }
