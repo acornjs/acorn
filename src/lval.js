@@ -10,7 +10,11 @@ const pp = Parser.prototype
 pp.toAssignable = function(node, isBinding) {
   if (this.options.ecmaVersion >= 6 && node) {
     switch (node.type) {
-    case "Identifier":
+      case "Identifier":
+      if (this.inAsync && node.name === "await")
+        this.raise(node.start, "Can not use 'await' as identifier inside an async function")
+      break
+
     case "ObjectPattern":
     case "ArrayPattern":
       break
@@ -33,6 +37,7 @@ pp.toAssignable = function(node, isBinding) {
       if (node.operator === "=") {
         node.type = "AssignmentPattern"
         delete node.operator
+        this.toAssignable(node.left, isBinding)
         // falls through to AssignmentPattern
       } else {
         this.raise(node.left.end, "Only '=' operator can be used for specifying default value.")

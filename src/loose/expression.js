@@ -162,6 +162,8 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
         return base
     }
 
+    let maybeAsyncArrow = base.type === "Identifier" && base.name === "async" && !this.canInsertSemicolon()
+
     if (this.eat(tt.dot)) {
       let node = this.startNodeAt(start)
       node.object = base
@@ -182,9 +184,12 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
       this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
     } else if (!noCalls && this.tok.type == tt.parenL) {
+      let exprList = this.parseExprList(tt.parenR)
+      if (maybeAsyncArrow && this.eat(tt.arrow))
+        return this.parseArrowExpression(this.startNodeAt(start), exprList, true)
       let node = this.startNodeAt(start)
       node.callee = base
-      node.arguments = this.parseExprList(tt.parenR)
+      node.arguments = exprList
       base = this.finishNode(node, "CallExpression")
     } else if (this.tok.type == tt.backQuote) {
       let node = this.startNodeAt(start)
@@ -210,9 +215,16 @@ lp.parseExprAtom = function() {
   case tt.name:
     let start = this.storeCurrentPos()
     let id = this.parseIdent()
-    if (id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
-      return this.parseFunction(this.startNodeAt(start), false, true)
-    return this.eat(tt.arrow) ? this.parseArrowExpression(this.startNodeAt(start), [id]) : id
+    let isAsync = false
+    if (id.name === "async" && !this.canInsertSemicolon()) {
+      if (this.eat(tt._function))
+        return this.parseFunction(this.startNodeAt(start), false, true)
+      if (this.tok.type === tt.name) {
+        id = this.parseIdent()
+        isAsync = true
+      }
+    }
+    return this.eat(tt.arrow) ? this.parseArrowExpression(this.startNodeAt(start), [id], isAsync) : id
 
   case tt.regexp:
     node = this.startNode()
@@ -481,8 +493,10 @@ lp.parseMethod = function(isGenerator) {
   return this.finishNode(node, "FunctionExpression")
 }
 
-lp.parseArrowExpression = function(node, params) {
+lp.parseArrowExpression = function(node, params, isAsync) {
   this.initFunction(node)
+  if (this.options.ecmaVersion >= 8)
+    node.async = !!isAsync
   node.params = this.toAssignableList(params, true)
   node.expression = this.tok.type !== tt.braceL
   node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock()

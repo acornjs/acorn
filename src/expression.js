@@ -225,6 +225,7 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
   for (;;) {
+    let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" && !this.canInsertSemicolon()
     if (this.eat(tt.dot)) {
       let node = this.startNodeAt(startPos, startLoc)
       node.object = base
@@ -239,9 +240,15 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
       this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
     } else if (!noCalls && this.eat(tt.parenL)) {
+      let refDestructuringErrors = new DestructuringErrors
+      let exprList = this.parseExprList(tt.parenR, false, false, refDestructuringErrors)
+      if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
+        return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, true)
+      }
+      this.checkExpressionErrors(refDestructuringErrors, true)
       let node = this.startNodeAt(startPos, startLoc)
       node.callee = base
-      node.arguments = this.parseExprList(tt.parenR, false)
+      node.arguments = exprList
       base = this.finishNode(node, "CallExpression")
     } else if (this.type === tt.backQuote) {
       let node = this.startNodeAt(startPos, startLoc)
@@ -277,8 +284,16 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     let id = this.parseIdent(this.type !== tt.name)
     if (this.options.ecmaVersion >= 8 && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
       return this.parseFunction(this.startNodeAt(startPos, startLoc), false, false, true)
-    if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow))
-      return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id])
+    if (canBeArrow && !this.canInsertSemicolon()) {
+      if (this.eat(tt.arrow))
+        return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false)
+      if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name) {
+        id = this.parseIdent()
+        if (this.canInsertSemicolon() || !this.eat(tt.arrow))
+          this.unexpected()
+        return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], true)
+      }
+    }
     return id
 
   case tt.regexp:
@@ -582,13 +597,17 @@ pp.parseMethod = function(isGenerator) {
 
 // Parse arrow function expression with given parameters.
 
-pp.parseArrowExpression = function(node, params) {
-  let oldInGen = this.inGenerator
-  this.inGenerator = false
+pp.parseArrowExpression = function(node, params, isAsync) {
+  let oldInGen = this.inGenerator, oldInAsync = this.inAsync
   this.initFunction(node)
+  if (this.options.ecmaVersion >= 8)
+    node.async = !!isAsync
+  this.inGenerator = false
+  this.inAsync = node.async
   node.params = this.toAssignableList(params, true)
   this.parseFunctionBody(node, true)
   this.inGenerator = oldInGen
+  this.inAsync = oldInAsync
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
