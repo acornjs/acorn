@@ -88,8 +88,13 @@ export const defaultOptions = {
 
 export function getOptions(opts) {
   let options = {}
+
   for (let opt in defaultOptions)
     options[opt] = opts && has(opts, opt) ? opts[opt] : defaultOptions[opt]
+
+  if (options.ecmaVersion >= 2015)
+    options.ecmaVersion -= 2009
+
   if (options.allowReserved == null)
     options.allowReserved = options.ecmaVersion < 5
 
