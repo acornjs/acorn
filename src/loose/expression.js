@@ -111,7 +111,10 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
 
 lp.parseMaybeUnary = function(sawUnary) {
   let start = this.storeCurrentPos(), expr
-  if (this.tok.type.prefix) {
+  if (this.options.ecmaVersion >= 8 && this.inAsync && (this.tok.type === tt._await || this.toks.isContextual("await"))) {
+    expr = this.parseAwait()
+    sawUnary = true
+  } else if (this.tok.type.prefix) {
     let node = this.startNode(), update = this.tok.type === tt.incDec
     if (!update) sawUnary = true
     node.operator = this.tok.value
@@ -492,25 +495,30 @@ lp.parseFunctionParams = function(params) {
 }
 
 lp.parseMethod = function(isGenerator, isAsync) {
-  let node = this.startNode()
+  let node = this.startNode(), oldInAsync = this.inAsync
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
     node.generator = !!isGenerator
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
+  this.inAsync = node.async
   node.params = this.parseFunctionParams()
   node.expression = this.options.ecmaVersion >= 6 && this.tok.type !== tt.braceL
   node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock()
+  this.inAsync = oldInAsync
   return this.finishNode(node, "FunctionExpression")
 }
 
 lp.parseArrowExpression = function(node, params, isAsync) {
+  let oldInAsync = this.inAsync
   this.initFunction(node)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
+  this.inAsync = node.async
   node.params = this.toAssignableList(params, true)
   node.expression = this.tok.type !== tt.braceL
   node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock()
+  this.inAsync = oldInAsync
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
@@ -540,4 +548,11 @@ lp.parseExprList = function(close, allowEmpty) {
     if (this.options.locations) this.last.loc.end = this.tok.loc.start
   }
   return elts
+}
+
+lp.parseAwait = function() {
+  let node = this.startNode()
+  this.next()
+  node.argument = this.parseMaybeUnary()
+  return this.finishNode(node, "AwaitExpression")
 }

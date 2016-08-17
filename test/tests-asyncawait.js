@@ -1641,3 +1641,546 @@ testFail("async function wrap() {\nclass A {async await() { }}\n}", "Can not use
 testFail("class A {async foo() { var await }}", "Can not use 'await' as identifier inside an async function (1:27)", {ecmaVersion: 8})
 testFail("class A {async foo(await) { }}", "Can not use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 8})
 testFail("class A {async foo() { return {await} }}", "Can not use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 8})
+//-----------------------------------------------------------------------------
+// Await Expressions
+
+// 'await' is an identifier in scripts.
+test("await", {
+    "type": "Program",
+    "start": 0,
+    "end": 5,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 5,
+            "expression": {
+                "type": "Identifier",
+                "start": 0,
+                "end": 5,
+                "name": "await"
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// 'await' is a keyword in modules.
+testFail("await", "Unexpected token (1:0)", {ecmaVersion: 8, sourceType: "module"})
+
+// Await expressions is invalid outside of async functions.
+testFail("await a", "Unexpected token (1:6)", {ecmaVersion: 8})
+testFail("await a", "Unexpected token (1:0)", {ecmaVersion: 8, sourceType: "module"})
+
+// Await expressions in async functions.
+test("async function foo(a, b) { await a }", {
+    "type": "Program",
+    "start": 0,
+    "end": 36,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 36,
+            "id": {
+                "type": "Identifier",
+                "start": 15,
+                "end": 18,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "async": true,
+            "params": [
+                {
+                    "type": "Identifier",
+                    "start": 19,
+                    "end": 20,
+                    "name": "a"
+                },
+                {
+                    "type": "Identifier",
+                    "start": 22,
+                    "end": 23,
+                    "name": "b"
+                }
+            ],
+            "body": {
+                "type": "BlockStatement",
+                "start": 25,
+                "end": 36,
+                "body": [
+                    {
+                        "type": "ExpressionStatement",
+                        "start": 27,
+                        "end": 34,
+                        "expression": {
+                            "type": "AwaitExpression",
+                            "start": 27,
+                            "end": 34,
+                            "argument": {
+                                "type": "Identifier",
+                                "start": 33,
+                                "end": 34,
+                                "name": "a"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("(async function foo(a) { await a })", {
+    "type": "Program",
+    "start": 0,
+    "end": 35,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 35,
+            "expression": {
+                "type": "FunctionExpression",
+                "start": 1,
+                "end": 34,
+                "id": {
+                    "type": "Identifier",
+                    "start": 16,
+                    "end": 19,
+                    "name": "foo"
+                },
+                "generator": false,
+                "expression": false,
+                "async": true,
+                "params": [
+                    {
+                        "type": "Identifier",
+                        "start": 20,
+                        "end": 21,
+                        "name": "a"
+                    }
+                ],
+                "body": {
+                    "type": "BlockStatement",
+                    "start": 23,
+                    "end": 34,
+                    "body": [
+                        {
+                            "type": "ExpressionStatement",
+                            "start": 25,
+                            "end": 32,
+                            "expression": {
+                                "type": "AwaitExpression",
+                                "start": 25,
+                                "end": 32,
+                                "argument": {
+                                    "type": "Identifier",
+                                    "start": 31,
+                                    "end": 32,
+                                    "name": "a"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("(async (a) => await a)", {
+    "type": "Program",
+    "start": 0,
+    "end": 22,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 22,
+            "expression": {
+                "type": "ArrowFunctionExpression",
+                "start": 1,
+                "end": 21,
+                "id": null,
+                "generator": false,
+                "expression": true,
+                "async": true,
+                "params": [
+                    {
+                        "type": "Identifier",
+                        "start": 8,
+                        "end": 9,
+                        "name": "a"
+                    }
+                ],
+                "body": {
+                    "type": "AwaitExpression",
+                    "start": 14,
+                    "end": 21,
+                    "argument": {
+                        "type": "Identifier",
+                        "start": 20,
+                        "end": 21,
+                        "name": "a"
+                    }
+                }
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("({async foo(a) { await a }})", {
+    "type": "Program",
+    "start": 0,
+    "end": 28,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 28,
+            "expression": {
+                "type": "ObjectExpression",
+                "start": 1,
+                "end": 27,
+                "properties": [
+                    {
+                        "type": "Property",
+                        "start": 2,
+                        "end": 26,
+                        "method": true,
+                        "shorthand": false,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 8,
+                            "end": 11,
+                            "name": "foo"
+                        },
+                        "kind": "init",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 11,
+                            "end": 26,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": true,
+                            "params": [
+                                {
+                                    "type": "Identifier",
+                                    "start": 12,
+                                    "end": 13,
+                                    "name": "a"
+                                }
+                            ],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 15,
+                                "end": 26,
+                                "body": [
+                                    {
+                                        "type": "ExpressionStatement",
+                                        "start": 17,
+                                        "end": 24,
+                                        "expression": {
+                                            "type": "AwaitExpression",
+                                            "start": 17,
+                                            "end": 24,
+                                            "argument": {
+                                                "type": "Identifier",
+                                                "start": 23,
+                                                "end": 24,
+                                                "name": "a"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("(class {async foo(a) { await a }})", {
+    "type": "Program",
+    "start": 0,
+    "end": 34,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 34,
+            "expression": {
+                "type": "ClassExpression",
+                "start": 1,
+                "end": 33,
+                "id": null,
+                "superClass": null,
+                "body": {
+                    "type": "ClassBody",
+                    "start": 7,
+                    "end": 33,
+                    "body": [
+                        {
+                            "type": "MethodDefinition",
+                            "start": 8,
+                            "end": 32,
+                            "computed": false,
+                            "key": {
+                                "type": "Identifier",
+                                "start": 14,
+                                "end": 17,
+                                "name": "foo"
+                            },
+                            "static": false,
+                            "kind": "method",
+                            "value": {
+                                "type": "FunctionExpression",
+                                "start": 17,
+                                "end": 32,
+                                "id": null,
+                                "generator": false,
+                                "expression": false,
+                                "async": true,
+                                "params": [
+                                    {
+                                        "type": "Identifier",
+                                        "start": 18,
+                                        "end": 19,
+                                        "name": "a"
+                                    }
+                                ],
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "start": 21,
+                                    "end": 32,
+                                    "body": [
+                                        {
+                                            "type": "ExpressionStatement",
+                                            "start": 23,
+                                            "end": 30,
+                                            "expression": {
+                                                "type": "AwaitExpression",
+                                                "start": 23,
+                                                "end": 30,
+                                                "argument": {
+                                                    "type": "Identifier",
+                                                    "start": 29,
+                                                    "end": 30,
+                                                    "name": "a"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// Await expressions are an unary expression.
+test("async function foo(a, b) { await a + await b }", {
+    "type": "Program",
+    "start": 0,
+    "end": 46,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 46,
+            "id": {
+                "type": "Identifier",
+                "start": 15,
+                "end": 18,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "async": true,
+            "params": [
+                {
+                    "type": "Identifier",
+                    "start": 19,
+                    "end": 20,
+                    "name": "a"
+                },
+                {
+                    "type": "Identifier",
+                    "start": 22,
+                    "end": 23,
+                    "name": "b"
+                }
+            ],
+            "body": {
+                "type": "BlockStatement",
+                "start": 25,
+                "end": 46,
+                "body": [
+                    {
+                        "type": "ExpressionStatement",
+                        "start": 27,
+                        "end": 44,
+                        "expression": {
+                            "type": "BinaryExpression",
+                            "start": 27,
+                            "end": 44,
+                            "left": {
+                                "type": "AwaitExpression",
+                                "start": 27,
+                                "end": 34,
+                                "argument": {
+                                    "type": "Identifier",
+                                    "start": 33,
+                                    "end": 34,
+                                    "name": "a"
+                                }
+                            },
+                            "operator": "+",
+                            "right": {
+                                "type": "AwaitExpression",
+                                "start": 37,
+                                "end": 44,
+                                "argument": {
+                                    "type": "Identifier",
+                                    "start": 43,
+                                    "end": 44,
+                                    "name": "b"
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// 'await + 1' is a binary expression outside of async functions.
+test("function foo() { await + 1 }", {
+    "type": "Program",
+    "start": 0,
+    "end": 28,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 28,
+            "id": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "async": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "start": 15,
+                "end": 28,
+                "body": [
+                    {
+                        "type": "ExpressionStatement",
+                        "start": 17,
+                        "end": 26,
+                        "expression": {
+                            "type": "BinaryExpression",
+                            "start": 17,
+                            "end": 26,
+                            "left": {
+                                "type": "Identifier",
+                                "start": 17,
+                                "end": 22,
+                                "name": "await"
+                            },
+                            "operator": "+",
+                            "right": {
+                                "type": "Literal",
+                                "start": 25,
+                                "end": 26,
+                                "value": 1,
+                                "raw": "1"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// 'await + 1' is an await expression in async functions.
+test("async function foo() { await + 1 }", {
+    "type": "Program",
+    "start": 0,
+    "end": 34,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 34,
+            "id": {
+                "type": "Identifier",
+                "start": 15,
+                "end": 18,
+                "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "async": true,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "start": 21,
+                "end": 34,
+                "body": [
+                    {
+                        "type": "ExpressionStatement",
+                        "start": 23,
+                        "end": 32,
+                        "expression": {
+                            "type": "AwaitExpression",
+                            "start": 23,
+                            "end": 32,
+                            "argument": {
+                                "type": "UnaryExpression",
+                                "start": 29,
+                                "end": 32,
+                                "operator": "+",
+                                "prefix": true,
+                                "argument": {
+                                    "type": "Literal",
+                                    "start": 31,
+                                    "end": 32,
+                                    "value": 1,
+                                    "raw": "1"
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// Await expressions need one argument.
+testFail("async function foo() { await }", "Unexpected token (1:29)", {ecmaVersion: 8})
+testFail("(async function foo() { await })", "Unexpected token (1:30)", {ecmaVersion: 8})
+testFail("async () => await", "Unexpected token (1:17)", {ecmaVersion: 8})
+testFail("({async foo() { await }})", "Unexpected token (1:22)", {ecmaVersion: 8})
+testFail("(class {async foo() { await }})", "Unexpected token (1:28)", {ecmaVersion: 8})
