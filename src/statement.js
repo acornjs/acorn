@@ -47,6 +47,19 @@ pp.isLet = function() {
   return false
 }
 
+// check 'async [no LineTerminator here] function'
+// - 'async /*foo*/ function' is OK.
+// - 'async /*\n*/ function' is invalid.
+pp.isAsyncFunction = function() {
+  if (this.type !== tt.name || this.options.ecmaVersion < 8 || this.value != "async")
+    return false
+
+  skipWhiteSpace.lastIndex = this.pos
+  let skip = skipWhiteSpace.exec(this.input)
+  let next = this.pos + skip[0].length
+  return !lineBreak.test(this.input.slice(this.pos, next)) && this.input.slice(next, next + 8) === "function"
+}
+
 // Parse a single statement.
 //
 // If expecting a statement and finding a slash operator, parse a
@@ -99,6 +112,10 @@ pp.parseStatement = function(declaration, topLevel, exports) {
         this.raise(this.start, "'import' and 'export' may appear only with 'sourceType: module'")
     }
     return starttype === tt._import ? this.parseImport(node) : this.parseExport(node, exports)
+  }
+
+  if (this.isAsyncFunction() && declaration) {
+    return this.parseFunctionStatement(node)
   }
 
   // If the statement does not start with a statement keyword or a
@@ -193,8 +210,9 @@ pp.parseForStatement = function(node) {
 }
 
 pp.parseFunctionStatement = function(node) {
+  let isAsync = this.options.ecmaVersion >= 8 && this.eatContextual("async")
   this.next()
-  return this.parseFunction(node, true)
+  return this.parseFunction(node, true, false, isAsync)
 }
 
 pp.parseIfStatement = function(node) {
@@ -424,17 +442,23 @@ pp.parseVarId = function(decl) {
 // Parse a function declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.parseFunction = function(node, isStatement, allowExpressionBody) {
+pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.initFunction(node)
-  if (this.options.ecmaVersion >= 6)
+  if (this.options.ecmaVersion >= 6 && !isAsync)
     node.generator = this.eat(tt.star)
-  var oldInGen = this.inGenerator
+  if (this.options.ecmaVersion >= 8)
+    node.async = !!isAsync
+  if (isStatement && this.type === tt.name)
+    node.id = this.parseIdent()
+  var oldInGen = this.inGenerator, oldInAsync = this.inAsync
   this.inGenerator = node.generator
-  if (isStatement || this.type === tt.name)
+  this.inAsync = node.async
+  if (!isStatement && this.type === tt.name)
     node.id = this.parseIdent()
   this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
   this.inGenerator = oldInGen
+  this.inAsync = oldInAsync
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 
@@ -606,7 +630,7 @@ pp.checkVariableExport = function(exports, decls) {
 }
 
 pp.shouldParseExportStatement = function() {
-  return this.type.keyword || this.isLet()
+  return this.type.keyword || this.isLet() || this.isAsyncFunction()
 }
 
 // Parses a comma-separated list of module exports.

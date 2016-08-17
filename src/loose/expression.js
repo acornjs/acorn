@@ -210,6 +210,8 @@ lp.parseExprAtom = function() {
   case tt.name:
     let start = this.storeCurrentPos()
     let id = this.parseIdent()
+    if (id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
+      return this.parseFunction(this.startNodeAt(start), false, true)
     return this.eat(tt.arrow) ? this.parseArrowExpression(this.startNodeAt(start), [id]) : id
 
   case tt.regexp:
@@ -424,6 +426,8 @@ lp.initFunction = function(node) {
     node.generator = false
     node.expression = false
   }
+  if (this.options.ecmaVersion >= 8)
+    node.async = false
 }
 
 // Convert existing expression atom to assignable pattern
