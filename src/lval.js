@@ -10,7 +10,7 @@ const pp = Parser.prototype
 pp.toAssignable = function(node, isBinding) {
   if (this.options.ecmaVersion >= 6 && node) {
     switch (node.type) {
-      case "Identifier":
+    case "Identifier":
       if (this.inAsync && node.name === "await")
         this.raise(node.start, "Can not use 'await' as identifier inside an async function")
       break
@@ -45,8 +45,6 @@ pp.toAssignable = function(node, isBinding) {
       }
 
     case "AssignmentPattern":
-      if (node.right.type === "YieldExpression")
-        this.raise(node.right.start, "Yield expression cannot be a default value")
       break
 
     case "ParenthesizedExpression":
@@ -99,20 +97,20 @@ pp.parseSpread = function(refDestructuringErrors) {
   return this.finishNode(node, "SpreadElement")
 }
 
-pp.parseRest = function(allowNonIdent) {
+pp.parseRest = function(allowNonIdent, refDestructuringErrors) {
   let node = this.startNode()
   this.next()
 
   // RestElement inside of a function parameter must be an identifier
   if (allowNonIdent) node.argument = this.type === tt.name ? this.parseIdent() : this.unexpected()
-  else node.argument = this.type === tt.name || this.type === tt.bracketL ? this.parseBindingAtom() : this.unexpected()
+  else node.argument = this.type === tt.name || this.type === tt.bracketL ? this.parseBindingAtom(refDestructuringErrors) : this.unexpected()
 
   return this.finishNode(node, "RestElement")
 }
 
 // Parses lvalue (assignable) atom.
 
-pp.parseBindingAtom = function() {
+pp.parseBindingAtom = function(refDestructuringErrors) {
   if (this.options.ecmaVersion < 6) return this.parseIdent()
   switch (this.type) {
   case tt.name:
@@ -121,18 +119,18 @@ pp.parseBindingAtom = function() {
   case tt.bracketL:
     let node = this.startNode()
     this.next()
-    node.elements = this.parseBindingList(tt.bracketR, true, true)
+    node.elements = this.parseBindingList(tt.bracketR, true, true, false, refDestructuringErrors)
     return this.finishNode(node, "ArrayPattern")
 
   case tt.braceL:
-    return this.parseObj(true)
+    return this.parseObj(true, refDestructuringErrors)
 
   default:
     this.unexpected()
   }
 }
 
-pp.parseBindingList = function(close, allowEmpty, allowTrailingComma, allowNonIdent) {
+pp.parseBindingList = function(close, allowEmpty, allowTrailingComma, allowNonIdent, refDestructuringErrors) {
   let elts = [], first = true
   while (!this.eat(close)) {
     if (first) first = false
@@ -142,14 +140,14 @@ pp.parseBindingList = function(close, allowEmpty, allowTrailingComma, allowNonId
     } else if (allowTrailingComma && this.afterTrailingComma(close)) {
       break
     } else if (this.type === tt.ellipsis) {
-      let rest = this.parseRest(allowNonIdent)
+      let rest = this.parseRest(allowNonIdent, refDestructuringErrors)
       this.parseBindingListItem(rest)
       elts.push(rest)
       if (this.type === tt.comma) this.raise(this.start, "Comma is not permitted after the rest element")
       this.expect(close)
       break
     } else {
-      let elem = this.parseMaybeDefault(this.start, this.startLoc)
+      let elem = this.parseMaybeDefault(this.start, this.startLoc, null, refDestructuringErrors)
       this.parseBindingListItem(elem)
       elts.push(elem)
     }
@@ -163,12 +161,12 @@ pp.parseBindingListItem = function(param) {
 
 // Parses assignment pattern around given atom if possible.
 
-pp.parseMaybeDefault = function(startPos, startLoc, left) {
-  left = left || this.parseBindingAtom()
+pp.parseMaybeDefault = function(startPos, startLoc, left, refDestructuringErrors) {
+  left = left || this.parseBindingAtom(refDestructuringErrors)
   if (this.options.ecmaVersion < 6 || !this.eat(tt.eq)) return left
   let node = this.startNodeAt(startPos, startLoc)
   node.left = left
-  node.right = this.parseMaybeAssign()
+  node.right = this.parseMaybeAssign(false, refDestructuringErrors)
   return this.finishNode(node, "AssignmentPattern")
 }
 

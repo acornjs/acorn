@@ -93,6 +93,8 @@ export class DestructuringErrors {
   constructor() {
     this.shorthandAssign = 0
     this.trailingComma = 0
+    this.yield = 0
+    this.await = 0
   }
 }
 
@@ -106,4 +108,12 @@ pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {
   let pos = refDestructuringErrors && refDestructuringErrors.shorthandAssign
   if (!andThrow) return !!pos
   if (pos) this.raise(pos, "Shorthand property assignments are valid only in destructuring patterns")
+}
+
+pp.checkDefaultValueErrors = function(refDestructuringErrors, isArrow, andThrow) {
+  let yieldPos = (isArrow || this.inGenerator) && refDestructuringErrors && refDestructuringErrors.yield
+  let awaitPos = (isArrow || this.inAsync) && refDestructuringErrors && refDestructuringErrors.await
+  if (!andThrow) return !!(yieldPos || awaitPos)
+  if (yieldPos && (!awaitPos || yieldPos < awaitPos)) this.raise(yieldPos, "Yield expression cannot be a default value")
+  if (awaitPos) this.raise(awaitPos, "Await expression cannot be a default value")
 }
