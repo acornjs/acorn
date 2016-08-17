@@ -15138,3 +15138,6 @@ testFail("(function* yield() {})", "Can not use 'yield' as identifier inside a g
 testFail("function* wrap() {\nfunction* yield() {}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
 testFail("function* wrap() {\n({*yield() {}})\n}", "Can not use 'yield' as identifier inside a generator (2:3)", {ecmaVersion: 6})
 testFail("function* wrap() {\nclass A {*yield() {}}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
+
+// invalid syntax '*foo: 1'
+testFail("({*foo: 1})", "Unexpected token (1:6)", {ecmaVersion: 6})

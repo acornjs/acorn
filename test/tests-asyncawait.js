@@ -1099,6 +1099,9 @@ testFail("({async foo() { var await }})", "Can not use 'await' as identifier ins
 testFail("({async foo(await) { }})", "Can not use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
 testFail("({async foo() { return {await} }})", "Can not use 'await' as identifier inside an async function (1:24)", {ecmaVersion: 8})
 
+// invalid syntax 'async foo: 1'
+testFail("({async foo: 1})", "Unexpected token (1:11)", {ecmaVersion: 8})
+
 //-----------------------------------------------------------------------------
 // Async Methods (class)
 
