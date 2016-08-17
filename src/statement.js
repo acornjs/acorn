@@ -482,6 +482,7 @@ pp.parseClass = function(node, isStatement) {
     if (this.eat(tt.semi)) continue
     let method = this.startNode()
     let isGenerator = this.eat(tt.star)
+    let isAsync = false
     let isMaybeStatic = this.type === tt.name && this.value === "static"
     this.parsePropertyName(method)
     method.static = isMaybeStatic && this.type !== tt.parenL
@@ -490,11 +491,17 @@ pp.parseClass = function(node, isStatement) {
       isGenerator = this.eat(tt.star)
       this.parsePropertyName(method)
     }
+    if (this.options.ecmaVersion >= 8 && !isGenerator && !method.computed &&
+        method.key.type === "Identifier" && method.key.name === "async" && this.type !== tt.parenL &&
+        !this.canInsertSemicolon()) {
+      isAsync = true
+      this.parsePropertyName(method)
+    }
     method.kind = "method"
     let isGetSet = false
     if (!method.computed) {
       let {key} = method
-      if (!isGenerator && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
+      if (!isGenerator && !isAsync && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
         isGetSet = true
         method.kind = key.name
         key = this.parsePropertyName(method)
@@ -504,11 +511,12 @@ pp.parseClass = function(node, isStatement) {
         if (hadConstructor) this.raise(key.start, "Duplicate constructor in the same class")
         if (isGetSet) this.raise(key.start, "Constructor can't have get/set modifier")
         if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
+        if (isAsync) this.raise(key.start, "Constructor can't be an async method")
         method.kind = "constructor"
         hadConstructor = true
       }
     }
-    this.parseClassMethod(classBody, method, isGenerator)
+    this.parseClassMethod(classBody, method, isGenerator, isAsync)
     if (isGetSet) {
       let paramCount = method.kind === "get" ? 0 : 1
       if (method.value.params.length !== paramCount) {
@@ -527,8 +535,8 @@ pp.parseClass = function(node, isStatement) {
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
-pp.parseClassMethod = function(classBody, method, isGenerator) {
-  method.value = this.parseMethod(isGenerator)
+pp.parseClassMethod = function(classBody, method, isGenerator, isAsync) {
+  method.value = this.parseMethod(isGenerator, isAsync)
   classBody.body.push(this.finishNode(method, "MethodDefinition"))
 }
 

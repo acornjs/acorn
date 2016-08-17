@@ -351,7 +351,7 @@ lp.parseObj = function() {
   this.eat(tt.braceL)
   if (this.curIndent + 1 < indent) { indent = this.curIndent; line = this.curLineStart }
   while (!this.closes(tt.braceR, indent, line)) {
-    let prop = this.startNode(), isGenerator, start
+    let prop = this.startNode(), isGenerator, isAsync, start
     if (this.options.ecmaVersion >= 6) {
       start = this.storeCurrentPos()
       prop.method = false
@@ -359,6 +359,14 @@ lp.parseObj = function() {
       isGenerator = this.eat(tt.star)
     }
     this.parsePropertyName(prop)
+    if (!prop.computed &&
+        prop.key.type === "Identifier" && prop.key.name === "async" && this.tok.type !== tt.parenL &&
+        !this.canInsertSemicolon()) {
+      this.parsePropertyName(prop)
+      isAsync = true
+    } else {
+      isAsync = false
+    }
     if (isDummy(prop.key)) { if (isDummy(this.parseMaybeAssign())) this.next(); this.eat(tt.comma); continue }
     if (this.eat(tt.colon)) {
       prop.kind = "init"
@@ -366,7 +374,7 @@ lp.parseObj = function() {
     } else if (this.options.ecmaVersion >= 6 && (this.tok.type === tt.parenL || this.tok.type === tt.braceL)) {
       prop.kind = "init"
       prop.method = true
-      prop.value = this.parseMethod(isGenerator)
+      prop.value = this.parseMethod(isGenerator, isAsync)
     } else if (this.options.ecmaVersion >= 5 && prop.key.type === "Identifier" &&
                !prop.computed && (prop.key.name === "get" || prop.key.name === "set") &&
                (this.tok.type != tt.comma && this.tok.type != tt.braceR)) {
@@ -483,11 +491,14 @@ lp.parseFunctionParams = function(params) {
   return this.toAssignableList(params, true)
 }
 
-lp.parseMethod = function(isGenerator) {
+lp.parseMethod = function(isGenerator, isAsync) {
   let node = this.startNode()
   this.initFunction(node)
+  if (this.options.ecmaVersion >= 6)
+    node.generator = !!isGenerator
+  if (this.options.ecmaVersion >= 8)
+    node.async = !!isAsync
   node.params = this.parseFunctionParams()
-  node.generator = isGenerator || false
   node.expression = this.options.ecmaVersion >= 6 && this.tok.type !== tt.braceL
   node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock()
   return this.finishNode(node, "FunctionExpression")

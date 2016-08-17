@@ -488,7 +488,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
       if (this.afterTrailingComma(tt.braceR)) break
     } else first = false
 
-    let prop = this.startNode(), isGenerator, startPos, startLoc
+    let prop = this.startNode(), isGenerator, isAsync, startPos, startLoc
     if (this.options.ecmaVersion >= 6) {
       prop.method = false
       prop.shorthand = false
@@ -500,14 +500,22 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
         isGenerator = this.eat(tt.star)
     }
     this.parsePropertyName(prop)
-    this.parsePropertyValue(prop, isPattern, isGenerator, startPos, startLoc, refDestructuringErrors)
+    if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && !prop.computed &&
+        prop.key.type === "Identifier" && prop.key.name === "async" && this.type !== tt.parenL &&
+        !this.canInsertSemicolon()) {
+      isAsync = true
+      this.parsePropertyName(prop, refDestructuringErrors)
+    } else {
+      isAsync = false
+    }
+    this.parsePropertyValue(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
     this.checkPropClash(prop, propHash)
     node.properties.push(this.finishNode(prop, "Property"))
   }
   return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression")
 }
 
-pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLoc, refDestructuringErrors) {
+pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors) {
   if (this.eat(tt.colon)) {
     prop.value = isPattern ? this.parseMaybeDefault(this.start, this.startLoc) : this.parseMaybeAssign(false, refDestructuringErrors)
     prop.kind = "init"
@@ -515,11 +523,11 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, startPos, startLo
     if (isPattern) this.unexpected()
     prop.kind = "init"
     prop.method = true
-    prop.value = this.parseMethod(isGenerator)
+    prop.value = this.parseMethod(isGenerator, isAsync)
   } else if (this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
              (prop.key.name === "get" || prop.key.name === "set") &&
              (this.type != tt.comma && this.type != tt.braceR)) {
-    if (isGenerator || isPattern) this.unexpected()
+    if (isGenerator || isAsync || isPattern) this.unexpected()
     prop.kind = prop.key.name
     this.parsePropertyName(prop)
     prop.value = this.parseMethod(false)
@@ -582,16 +590,20 @@ pp.initFunction = function(node) {
 
 // Parse object or class method.
 
-pp.parseMethod = function(isGenerator) {
-  let node = this.startNode(), oldInGen = this.inGenerator
-  this.inGenerator = isGenerator
+pp.parseMethod = function(isGenerator, isAsync) {
+  let node = this.startNode(), oldInGen = this.inGenerator, oldInAsync = this.inAsync
   this.initFunction(node)
-  this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, false)
   if (this.options.ecmaVersion >= 6)
     node.generator = isGenerator
+  if (this.options.ecmaVersion >= 8)
+    node.async = !!isAsync
+  this.inGenerator = node.generator
+  this.inAsync = node.async
+  this.expect(tt.parenL)
+  node.params = this.parseBindingList(tt.parenR, false, false)
   this.parseFunctionBody(node, false)
   this.inGenerator = oldInGen
+  this.inAsync = oldInAsync
   return this.finishNode(node, "FunctionExpression")
 }
 
