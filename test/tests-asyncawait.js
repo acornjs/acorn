@@ -869,3 +869,775 @@ test("async yield => 1", {
     ],
     "sourceType": "script"
 }, {ecmaVersion: 8})
+
+//-----------------------------------------------------------------------------
+// Async Methods (object)
+
+// async == false
+test("({foo() { }})", {
+    "type": "Program",
+    "start": 0,
+    "end": 13,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 13,
+            "expression": {
+                "type": "ObjectExpression",
+                "start": 1,
+                "end": 12,
+                "properties": [
+                    {
+                        "type": "Property",
+                        "start": 2,
+                        "end": 11,
+                        "method": true,
+                        "shorthand": false,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 2,
+                            "end": 5,
+                            "name": "foo"
+                        },
+                        "kind": "init",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 5,
+                            "end": 11,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 8,
+                                "end": 11,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// async == true
+test("({async foo() { }})", {
+    "type": "Program",
+    "start": 0,
+    "end": 19,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 19,
+            "expression": {
+                "type": "ObjectExpression",
+                "start": 1,
+                "end": 18,
+                "properties": [
+                    {
+                        "type": "Property",
+                        "start": 2,
+                        "end": 17,
+                        "method": true,
+                        "shorthand": false,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 8,
+                            "end": 11,
+                            "name": "foo"
+                        },
+                        "kind": "init",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 11,
+                            "end": 17,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": true,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 14,
+                                "end": 17,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// OK with 'async' as a method name
+test("({async() { }})", {
+    "type": "Program",
+    "start": 0,
+    "end": 15,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 15,
+            "expression": {
+                "type": "ObjectExpression",
+                "start": 1,
+                "end": 14,
+                "properties": [
+                    {
+                        "type": "Property",
+                        "start": 2,
+                        "end": 13,
+                        "method": true,
+                        "shorthand": false,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 2,
+                            "end": 7,
+                            "name": "async"
+                        },
+                        "kind": "init",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 7,
+                            "end": 13,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 10,
+                                "end": 13,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// invalid syntax if there is a linebreak after 'async'.
+testFail("({async\nfoo() { }})", "Unexpected token (2:0)", {ecmaVersion: 8})
+
+// cannot combine with getters/setters/generators.
+testFail("({async get foo() { }})", "Unexpected token (1:12)", {ecmaVersion: 8})
+testFail("({async set foo(value) { }})", "Unexpected token (1:12)", {ecmaVersion: 8})
+testFail("({async* foo() { }})", "Unexpected token (1:7)", {ecmaVersion: 8})
+
+// 'await' is valid as function names.
+test("({async await() { }})", {
+    "type": "Program",
+    "start": 0,
+    "end": 21,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 21,
+            "expression": {
+                "type": "ObjectExpression",
+                "start": 1,
+                "end": 20,
+                "properties": [
+                    {
+                        "type": "Property",
+                        "start": 2,
+                        "end": 19,
+                        "method": true,
+                        "shorthand": false,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 8,
+                            "end": 13,
+                            "name": "await"
+                        },
+                        "kind": "init",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 13,
+                            "end": 19,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": true,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 16,
+                                "end": 19,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// cannot use 'await' inside async functions.
+testFail("async function wrap() {\n({async await() { }})\n}", "Can not use 'await' as identifier inside an async function (2:8)", {ecmaVersion: 8})
+testFail("({async foo() { var await }})", "Can not use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
+testFail("({async foo(await) { }})", "Can not use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
+testFail("({async foo() { return {await} }})", "Can not use 'await' as identifier inside an async function (1:24)", {ecmaVersion: 8})
+
+//-----------------------------------------------------------------------------
+// Async Methods (class)
+
+// async == false
+test("class A {foo() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 19,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 19,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 19,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 18,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 9,
+                            "end": 12,
+                            "name": "foo"
+                        },
+                        "static": false,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 12,
+                            "end": 18,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 15,
+                                "end": 18,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// async == true
+test("class A {async foo() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 25,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 25,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 25,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 24,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 15,
+                            "end": 18,
+                            "name": "foo"
+                        },
+                        "static": false,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 18,
+                            "end": 24,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": true,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 21,
+                                "end": 24,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("class A {static async foo() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 32,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 32,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 32,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 31,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 22,
+                            "end": 25,
+                            "name": "foo"
+                        },
+                        "static": true,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 25,
+                            "end": 31,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": true,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 28,
+                                "end": 31,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// OK 'async' as a method name.
+test("class A {async() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 21,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 21,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 21,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 20,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 9,
+                            "end": 14,
+                            "name": "async"
+                        },
+                        "static": false,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 14,
+                            "end": 20,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 17,
+                                "end": 20,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("class A {static async() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 28,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 28,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 28,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 27,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 16,
+                            "end": 21,
+                            "name": "async"
+                        },
+                        "static": true,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 21,
+                            "end": 27,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 24,
+                                "end": 27,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("class A {*async() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 22,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 22,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 22,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 21,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 10,
+                            "end": 15,
+                            "name": "async"
+                        },
+                        "static": false,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 15,
+                            "end": 21,
+                            "id": null,
+                            "generator": true,
+                            "expression": false,
+                            "async": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 18,
+                                "end": 21,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("class A {static* async() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 29,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 29,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 29,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 28,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 17,
+                            "end": 22,
+                            "name": "async"
+                        },
+                        "static": true,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 22,
+                            "end": 28,
+                            "id": null,
+                            "generator": true,
+                            "expression": false,
+                            "async": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 25,
+                                "end": 28,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// invalid syntax if there is a linebreak after 'async'.
+testFail("class A {async\nfoo() { }}", "Unexpected token (2:0)", {ecmaVersion: 8})
+testFail("class A {static async\nfoo() { }}", "Unexpected token (2:0)", {ecmaVersion: 8})
+
+// cannot combine with constructors/getters/setters/generators.
+testFail("class A {async constructor() { }}", "Constructor can't be an async method (1:15)", {ecmaVersion: 8})
+testFail("class A {async get foo() { }}", "Unexpected token (1:19)", {ecmaVersion: 8})
+testFail("class A {async set foo(value) { }}", "Unexpected token (1:19)", {ecmaVersion: 8})
+testFail("class A {async* foo() { }}", "Unexpected token (1:14)", {ecmaVersion: 8})
+testFail("class A {static async get foo() { }}", "Unexpected token (1:26)", {ecmaVersion: 8})
+testFail("class A {static async set foo(value) { }}", "Unexpected token (1:26)", {ecmaVersion: 8})
+testFail("class A {static async* foo() { }}", "Unexpected token (1:21)", {ecmaVersion: 8})
+
+// 'await' is valid as function names.
+test("class A {async await() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 27,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 27,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 27,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 26,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 15,
+                            "end": 20,
+                            "name": "await"
+                        },
+                        "static": false,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 20,
+                            "end": 26,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": true,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 23,
+                                "end": 26,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+test("class A {static async await() { }}", {
+    "type": "Program",
+    "start": 0,
+    "end": 34,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 34,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 34,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 33,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 22,
+                            "end": 27,
+                            "name": "await"
+                        },
+                        "static": true,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 27,
+                            "end": 33,
+                            "id": null,
+                            "generator": false,
+                            "expression": false,
+                            "async": true,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 30,
+                                "end": 33,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// cannot use 'await' inside async functions.
+testFail("async function wrap() {\nclass A {async await() { }}\n}", "Can not use 'await' as identifier inside an async function (2:15)", {ecmaVersion: 8})
+testFail("class A {async foo() { var await }}", "Can not use 'await' as identifier inside an async function (1:27)", {ecmaVersion: 8})
+testFail("class A {async foo(await) { }}", "Can not use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 8})
+testFail("class A {async foo() { return {await} }}", "Can not use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 8})

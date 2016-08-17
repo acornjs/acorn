@@ -263,7 +263,7 @@ lp.parseClass = function(isStatement) {
   if (this.curIndent + 1 < indent) { indent = this.curIndent; line = this.curLineStart }
   while (!this.closes(tt.braceR, indent, line)) {
     if (this.semicolon()) continue
-    let method = this.startNode(), isGenerator
+    let method = this.startNode(), isGenerator, isAsync
     if (this.options.ecmaVersion >= 6) {
       method.static = false
       isGenerator = this.eat(tt.star)
@@ -278,6 +278,14 @@ lp.parseClass = function(isStatement) {
     } else {
       method.static = false
     }
+    if (!method.computed &&
+        method.key.type === "Identifier" && method.key.name === "async" && this.tok.type !== tt.parenL &&
+        !this.canInsertSemicolon()) {
+      this.parsePropertyName(method)
+      isAsync = true
+    } else {
+      isAsync = false
+    }
     if (this.options.ecmaVersion >= 5 && method.key.type === "Identifier" &&
         !method.computed && (method.key.name === "get" || method.key.name === "set") &&
         this.tok.type !== tt.parenL && this.tok.type !== tt.braceL) {
@@ -285,14 +293,14 @@ lp.parseClass = function(isStatement) {
       this.parsePropertyName(method)
       method.value = this.parseMethod(false)
     } else {
-      if (!method.computed && !method.static && !isGenerator && (
+      if (!method.computed && !method.static && !isGenerator && !isAsync && (
         method.key.type === "Identifier" && method.key.name === "constructor" ||
           method.key.type === "Literal" && method.key.value === "constructor")) {
         method.kind = "constructor"
       } else {
         method.kind =  "method"
       }
-      method.value = this.parseMethod(isGenerator)
+      method.value = this.parseMethod(isGenerator, isAsync)
     }
     node.body.body.push(this.finishNode(method, "MethodDefinition"))
   }
