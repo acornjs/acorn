@@ -464,16 +464,19 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
 
 pp.parseFunctionParams = function(node) {
   this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, false, true)
+
+  let refDestructuringErrors = new DestructuringErrors
+  node.params = this.parseBindingList(tt.parenR, false, false, true, refDestructuringErrors)
+  this.checkDefaultValueErrors(refDestructuringErrors, false, true)
 }
 
 // Parse a class declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.parseClass = function(node, isStatement) {
+pp.parseClass = function(node, isStatement, refDestructuringErrors) {
   this.next()
   this.parseClassId(node, isStatement)
-  this.parseClassSuper(node)
+  this.parseClassSuper(node, refDestructuringErrors)
   let classBody = this.startNode()
   let hadConstructor = false
   classBody.body = []
@@ -484,18 +487,18 @@ pp.parseClass = function(node, isStatement) {
     let isGenerator = this.eat(tt.star)
     let isAsync = false
     let isMaybeStatic = this.type === tt.name && this.value === "static"
-    this.parsePropertyName(method)
+    this.parsePropertyName(method, refDestructuringErrors)
     method.static = isMaybeStatic && this.type !== tt.parenL
     if (method.static) {
       if (isGenerator) this.unexpected()
       isGenerator = this.eat(tt.star)
-      this.parsePropertyName(method)
+      this.parsePropertyName(method, refDestructuringErrors)
     }
     if (this.options.ecmaVersion >= 8 && !isGenerator && !method.computed &&
         method.key.type === "Identifier" && method.key.name === "async" && this.type !== tt.parenL &&
         !this.canInsertSemicolon()) {
       isAsync = true
-      this.parsePropertyName(method)
+      this.parsePropertyName(method, refDestructuringErrors)
     }
     method.kind = "method"
     let isGetSet = false
@@ -504,7 +507,7 @@ pp.parseClass = function(node, isStatement) {
       if (!isGenerator && !isAsync && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
         isGetSet = true
         method.kind = key.name
-        key = this.parsePropertyName(method)
+        key = this.parsePropertyName(method, refDestructuringErrors)
       }
       if (!method.static && (key.type === "Identifier" && key.name === "constructor" ||
           key.type === "Literal" && key.value === "constructor")) {
@@ -544,8 +547,8 @@ pp.parseClassId = function(node, isStatement) {
   node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null
 }
 
-pp.parseClassSuper = function(node) {
-  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts() : null
+pp.parseClassSuper = function(node, refDestructuringErrors) {
+  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts(refDestructuringErrors) : null
 }
 
 // Parses module export declaration.

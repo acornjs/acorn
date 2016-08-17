@@ -14829,3 +14829,89 @@ testFail("function foo() { 'use strict'; var {arguments} = {} }", "Binding argum
 testFail("function foo() { 'use strict'; var {eval} = {} }", "Binding eval in strict mode (1:36)", {ecmaVersion: 6});
 testFail("function foo() { 'use strict'; var {arguments = 1} = {} }", "Binding arguments in strict mode (1:36)", {ecmaVersion: 6});
 testFail("function foo() { 'use strict'; var {eval = 1} = {} }", "Binding eval in strict mode (1:36)", {ecmaVersion: 6});
+
+// cannot use yield expressions in parameters.
+testFail("function* wrap() { function* foo(a = 1 + (yield)) {} }", "Yield expression cannot be a default value (1:42)", {ecmaVersion: 6});
+testFail("function* wrap() { return (a = 1 + (yield)) => a }", "Yield expression cannot be a default value (1:36)", {ecmaVersion: 6});
+
+// can use yield expressions in parameters if it's inside of a nested generator.
+test("function* foo(a = function*(b) { yield b }) { }", {
+    "type": "Program",
+    "start": 0,
+    "end": 47,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 47,
+            "id": {
+                "type": "Identifier",
+                "start": 10,
+                "end": 13,
+                "name": "foo"
+            },
+            "generator": true,
+            "expression": false,
+            "params": [
+                {
+                    "type": "AssignmentPattern",
+                    "start": 14,
+                    "end": 42,
+                    "left": {
+                        "type": "Identifier",
+                        "start": 14,
+                        "end": 15,
+                        "name": "a"
+                    },
+                    "right": {
+                        "type": "FunctionExpression",
+                        "start": 18,
+                        "end": 42,
+                        "id": null,
+                        "generator": true,
+                        "expression": false,
+                        "params": [
+                            {
+                                "type": "Identifier",
+                                "start": 28,
+                                "end": 29,
+                                "name": "b"
+                            }
+                        ],
+                        "body": {
+                            "type": "BlockStatement",
+                            "start": 31,
+                            "end": 42,
+                            "body": [
+                                {
+                                    "type": "ExpressionStatement",
+                                    "start": 33,
+                                    "end": 40,
+                                    "expression": {
+                                        "type": "YieldExpression",
+                                        "start": 33,
+                                        "end": 40,
+                                        "delegate": false,
+                                        "argument": {
+                                            "type": "Identifier",
+                                            "start": 39,
+                                            "end": 40,
+                                            "name": "b"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "body": {
+                "type": "BlockStatement",
+                "start": 44,
+                "end": 47,
+                "body": []
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6});
