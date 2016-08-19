@@ -448,7 +448,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
     node.generator = this.eat(tt.star)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
-  if (isStatement && this.type === tt.name)
+  if (isStatement)
     node.id = this.parseIdent()
   var oldInGen = this.inGenerator, oldInAsync = this.inAsync
   this.inGenerator = node.generator
