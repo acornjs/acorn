@@ -70,7 +70,7 @@ export class Parser {
     // Used to signify the start of a potential arrow function
     this.potentialArrowAt = -1
 
-    // Flags to track whether we are in a function, a generator.
+    // Flags to track whether we are in a function, a generator, an async function.
     this.inFunction = this.inGenerator = this.inAsync = false
     // Labels in scope.
     this.labels = []
