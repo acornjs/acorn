@@ -36,7 +36,7 @@ export class Parser {
     // The current position of the tokenizer in the input.
     if (startPos) {
       this.pos = startPos
-      this.lineStart = Math.max(0, this.input.lastIndexOf("\n", startPos))
+      this.lineStart = this.input.lastIndexOf("\n", startPos - 1) + 1
       this.curLine = this.input.slice(0, this.lineStart).split(lineBreak).length
     } else {
       this.pos = this.lineStart = 0
