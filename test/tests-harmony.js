@@ -10589,87 +10589,6 @@ test("function x({ a, b }){}", {
   locations: true
 });
 
-test("function x(a, { a }){}", {
-  type: "Program",
-  body: [{
-    type: "FunctionDeclaration",
-    id: {
-      type: "Identifier",
-      name: "x",
-      loc: {
-        start: {line: 1, column: 9},
-        end: {line: 1, column: 10}
-      }
-    },
-    params: [
-      {
-        type: "Identifier",
-        name: "a",
-        loc: {
-          start: {line: 1, column: 11},
-          end: {line: 1, column: 12}
-        }
-      },
-      {
-        type: "ObjectPattern",
-        properties: [{
-          type: "Property",
-          key: {
-            type: "Identifier",
-            name: "a",
-            loc: {
-              start: {line: 1, column: 16},
-              end: {line: 1, column: 17}
-            }
-          },
-          value: {
-            type: "Identifier",
-            name: "a",
-            loc: {
-              start: {line: 1, column: 16},
-              end: {line: 1, column: 17}
-            }
-          },
-          kind: "init",
-          method: false,
-          shorthand: true,
-          computed: false,
-          loc: {
-            start: {line: 1, column: 16},
-            end: {line: 1, column: 17}
-          }
-        }],
-        loc: {
-          start: {line: 1, column: 14},
-          end: {line: 1, column: 19}
-        }
-      }
-    ],
-    body: {
-      type: "BlockStatement",
-      body: [],
-      loc: {
-        start: {line: 1, column: 20},
-        end: {line: 1, column: 22}
-      }
-    },
-    generator: false,
-    expression: false,
-    loc: {
-      start: {line: 1, column: 0},
-      end: {line: 1, column: 22}
-    }
-  }],
-  loc: {
-    start: {line: 1, column: 0},
-    end: {line: 1, column: 22}
-  }
-}, {
-  ecmaVersion: 6,
-  ranges: true,
-  locations: true
-});
-
 testFail("function x(...[ a, b ]){}", "Unexpected token (1:14)", {ecmaVersion: 6});
 
 testFail("function x({ a: { w, x }, b: [y, z] }, ...[a, b, c]){}", "Unexpected token (1:42)", {ecmaVersion: 6});
@@ -12810,6 +12729,8 @@ testFail("\"use strict\"; (arguments, a) => 42", "Binding arguments in strict mo
 testFail("\"use strict\"; (eval, a = 10) => 42", "Binding eval in strict mode (1:15)", {ecmaVersion: 6});
 
 testFail("(a, a) => 42", "Argument name clash (1:4)", {ecmaVersion: 6});
+
+testFail("function foo(a, a = 2) {}", "Argument name clash (1:16)", {ecmaVersion: 6});
 
 testFail("\"use strict\"; (a, a) => 42", "Argument name clash (1:18)", {ecmaVersion: 6});
 

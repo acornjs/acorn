@@ -608,29 +608,34 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
   // If this is a strict mode function, verify that argument names
   // are not repeated, and it does not try to bind the words `eval`
   // or `arguments`.
-  let useStrict = (!isExpression && node.body.body.length && this.isUseStrict(node.body.body[0])) ? node.body.body[0] : null;
+  let useStrict = (!isExpression && node.body.body.length && this.isUseStrict(node.body.body[0])) ? node.body.body[0] : null
+  if (useStrict && this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params))
+    this.raiseRecoverable(useStrict.start, "Illegal 'use strict' directive in function with non-simple parameter list")
+    
   if (this.strict || useStrict) {
     let oldStrict = this.strict
     this.strict = true
     if (node.id)
       this.checkLVal(node.id, true)
-    this.checkParams(node, useStrict)
+    this.checkParams(node)
     this.strict = oldStrict
-  } else if (isArrowFunction) {
-    this.checkParams(node, useStrict)
+  } else if (isArrowFunction || !this.isSimpleParamList(node.params)) {
+    this.checkParams(node)
   }
+}
+
+pp.isSimpleParamList = function(params) {
+  for (let i = 0; i < params.length; i++)
+    if (params[i].type !== "Identifier") return false
+  return true
 }
 
 // Checks function params for various disallowed patterns such as using "eval"
 // or "arguments" and duplicate parameters.
 
-pp.checkParams = function(node, useStrict) {
-    let nameHash = {}
-    for (let i = 0; i < node.params.length; i++) {
-      if (useStrict && this.options.ecmaVersion >= 7 && node.params[i].type !== "Identifier")
-        this.raiseRecoverable(useStrict.start, "Illegal 'use strict' directive in function with non-simple parameter list");
-      this.checkLVal(node.params[i], true, nameHash)
-    }
+pp.checkParams = function(node) {
+  let nameHash = {}
+  for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], true, nameHash)
 }
 
 // Parses a comma-separated list of expressions, and returns them as
