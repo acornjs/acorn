@@ -47,6 +47,19 @@ pp.isLet = function() {
   return false
 }
 
+// check 'async [no LineTerminator here] function'
+// - 'async /*foo*/ function' is OK.
+// - 'async /*\n*/ function' is invalid.
+pp.isAsyncFunction = function() {
+  if (this.type !== tt.name || this.options.ecmaVersion < 8 || this.value != "async")
+    return false
+
+  skipWhiteSpace.lastIndex = this.pos
+  let skip = skipWhiteSpace.exec(this.input)
+  let next = this.pos + skip[0].length
+  return !lineBreak.test(this.input.slice(this.pos, next)) && this.input.slice(next, next + 8) === "function"
+}
+
 // Parse a single statement.
 //
 // If expecting a statement and finding a slash operator, parse a
@@ -99,6 +112,10 @@ pp.parseStatement = function(declaration, topLevel, exports) {
         this.raise(this.start, "'import' and 'export' may appear only with 'sourceType: module'")
     }
     return starttype === tt._import ? this.parseImport(node) : this.parseExport(node, exports)
+  }
+
+  if (this.isAsyncFunction() && declaration) {
+    return this.parseFunctionStatement(node)
   }
 
   // If the statement does not start with a statement keyword or a
@@ -193,8 +210,9 @@ pp.parseForStatement = function(node) {
 }
 
 pp.parseFunctionStatement = function(node) {
+  let isAsync = this.options.ecmaVersion >= 8 && this.eatContextual("async")
   this.next()
-  return this.parseFunction(node, true)
+  return this.parseFunction(node, true, false, isAsync)
 }
 
 pp.parseIfStatement = function(node) {
@@ -424,32 +442,41 @@ pp.parseVarId = function(decl) {
 // Parse a function declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.parseFunction = function(node, isStatement, allowExpressionBody) {
+pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.initFunction(node)
-  if (this.options.ecmaVersion >= 6)
+  if (this.options.ecmaVersion >= 6 && !isAsync)
     node.generator = this.eat(tt.star)
-  var oldInGen = this.inGenerator
+  if (this.options.ecmaVersion >= 8)
+    node.async = !!isAsync
+  if (isStatement)
+    node.id = this.parseIdent()
+  var oldInGen = this.inGenerator, oldInAsync = this.inAsync
   this.inGenerator = node.generator
-  if (isStatement || this.type === tt.name)
+  this.inAsync = node.async
+  if (!isStatement && this.type === tt.name)
     node.id = this.parseIdent()
   this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
   this.inGenerator = oldInGen
+  this.inAsync = oldInAsync
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 
 pp.parseFunctionParams = function(node) {
   this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, false, true)
+
+  let refDestructuringErrors = new DestructuringErrors
+  node.params = this.parseBindingList(tt.parenR, false, false, true, refDestructuringErrors)
+  this.checkDefaultValueErrors(refDestructuringErrors, false, true)
 }
 
 // Parse a class declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.parseClass = function(node, isStatement) {
+pp.parseClass = function(node, isStatement, refDestructuringErrors) {
   this.next()
   this.parseClassId(node, isStatement)
-  this.parseClassSuper(node)
+  this.parseClassSuper(node, refDestructuringErrors)
   let classBody = this.startNode()
   let hadConstructor = false
   classBody.body = []
@@ -458,33 +485,41 @@ pp.parseClass = function(node, isStatement) {
     if (this.eat(tt.semi)) continue
     let method = this.startNode()
     let isGenerator = this.eat(tt.star)
+    let isAsync = false
     let isMaybeStatic = this.type === tt.name && this.value === "static"
-    this.parsePropertyName(method)
+    this.parsePropertyName(method, refDestructuringErrors)
     method.static = isMaybeStatic && this.type !== tt.parenL
     if (method.static) {
       if (isGenerator) this.unexpected()
       isGenerator = this.eat(tt.star)
-      this.parsePropertyName(method)
+      this.parsePropertyName(method, refDestructuringErrors)
+    }
+    if (this.options.ecmaVersion >= 8 && !isGenerator && !method.computed &&
+        method.key.type === "Identifier" && method.key.name === "async" && this.type !== tt.parenL &&
+        !this.canInsertSemicolon()) {
+      isAsync = true
+      this.parsePropertyName(method, refDestructuringErrors)
     }
     method.kind = "method"
     let isGetSet = false
     if (!method.computed) {
       let {key} = method
-      if (!isGenerator && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
+      if (!isGenerator && !isAsync && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
         isGetSet = true
         method.kind = key.name
-        key = this.parsePropertyName(method)
+        key = this.parsePropertyName(method, refDestructuringErrors)
       }
       if (!method.static && (key.type === "Identifier" && key.name === "constructor" ||
           key.type === "Literal" && key.value === "constructor")) {
         if (hadConstructor) this.raise(key.start, "Duplicate constructor in the same class")
         if (isGetSet) this.raise(key.start, "Constructor can't have get/set modifier")
         if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
+        if (isAsync) this.raise(key.start, "Constructor can't be an async method")
         method.kind = "constructor"
         hadConstructor = true
       }
     }
-    this.parseClassMethod(classBody, method, isGenerator)
+    this.parseClassMethod(classBody, method, isGenerator, isAsync)
     if (isGetSet) {
       let paramCount = method.kind === "get" ? 0 : 1
       if (method.value.params.length !== paramCount) {
@@ -503,8 +538,8 @@ pp.parseClass = function(node, isStatement) {
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
-pp.parseClassMethod = function(classBody, method, isGenerator) {
-  method.value = this.parseMethod(isGenerator)
+pp.parseClassMethod = function(classBody, method, isGenerator, isAsync) {
+  method.value = this.parseMethod(isGenerator, isAsync)
   classBody.body.push(this.finishNode(method, "MethodDefinition"))
 }
 
@@ -512,8 +547,8 @@ pp.parseClassId = function(node, isStatement) {
   node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null
 }
 
-pp.parseClassSuper = function(node) {
-  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts() : null
+pp.parseClassSuper = function(node, refDestructuringErrors) {
+  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts(refDestructuringErrors) : null
 }
 
 // Parses module export declaration.
@@ -606,7 +641,7 @@ pp.checkVariableExport = function(exports, decls) {
 }
 
 pp.shouldParseExportStatement = function() {
-  return this.type.keyword || this.isLet()
+  return this.type.keyword || this.isLet() || this.isAsyncFunction()
 }
 
 // Parses a comma-separated list of module exports.

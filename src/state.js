@@ -14,9 +14,9 @@ export class Parser {
   constructor(options, input, startPos) {
     this.options = options = getOptions(options)
     this.sourceFile = options.sourceFile
-    this.keywords = keywordRegexp(keywords[options.ecmaVersion >= 6 ? 6 : 5])
+    this.keywords = keywordRegexp(keywords[options.ecmaVersion >= 6 ? 6 : 5] + (options.ecmaVersion >= 8 && options.sourceType == "module" ? " await" : ""))
     let reserved = options.allowReserved ? "" :
-        reservedWords[options.ecmaVersion] + (options.sourceType == "module" ? " await" : "")
+        reservedWords[options.ecmaVersion] + (options.ecmaVersion < 8 && options.sourceType == "module" ? " await" : "")
     this.reservedWords = keywordRegexp(reserved)
     let reservedStrict = (reserved ? reserved + " " : "") + reservedWords.strict
     this.reservedWordsStrict = keywordRegexp(reservedStrict)
@@ -70,8 +70,8 @@ export class Parser {
     // Used to signify the start of a potential arrow function
     this.potentialArrowAt = -1
 
-    // Flags to track whether we are in a function, a generator.
-    this.inFunction = this.inGenerator = false
+    // Flags to track whether we are in a function, a generator, an async function.
+    this.inFunction = this.inGenerator = this.inAsync = false
     // Labels in scope.
     this.labels = []
 

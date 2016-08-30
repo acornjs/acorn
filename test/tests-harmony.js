@@ -14241,7 +14241,7 @@ testFail("'use strict'; ({eval = defValue} = obj)", "Assigning to eval in strict
 
 testFail("[...eval] = arr", "Assigning to eval in strict mode (1:4)", {ecmaVersion: 6, sourceType: "module"});
 
-testFail("function* y({yield}) {}", "'yield' can not be used as shorthand property (1:13)", {ecmaVersion: 6});
+testFail("function* y({yield}) {}", "Can not use 'yield' as identifier inside a generator (1:13)", {ecmaVersion: 6});
 
 test("function foo() { new.target; }", {
   type: "Program",
@@ -14829,3 +14829,236 @@ testFail("function foo() { 'use strict'; var {arguments} = {} }", "Binding argum
 testFail("function foo() { 'use strict'; var {eval} = {} }", "Binding eval in strict mode (1:36)", {ecmaVersion: 6});
 testFail("function foo() { 'use strict'; var {arguments = 1} = {} }", "Binding arguments in strict mode (1:36)", {ecmaVersion: 6});
 testFail("function foo() { 'use strict'; var {eval = 1} = {} }", "Binding eval in strict mode (1:36)", {ecmaVersion: 6});
+
+// cannot use yield expressions in parameters.
+testFail("function* wrap() { function* foo(a = 1 + (yield)) {} }", "Yield expression cannot be a default value (1:42)", {ecmaVersion: 6});
+testFail("function* wrap() { return (a = 1 + (yield)) => a }", "Yield expression cannot be a default value (1:36)", {ecmaVersion: 6});
+
+// can use yield expressions in parameters if it's inside of a nested generator.
+test("function* foo(a = function*(b) { yield b }) { }", {
+    "type": "Program",
+    "start": 0,
+    "end": 47,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 47,
+            "id": {
+                "type": "Identifier",
+                "start": 10,
+                "end": 13,
+                "name": "foo"
+            },
+            "generator": true,
+            "expression": false,
+            "params": [
+                {
+                    "type": "AssignmentPattern",
+                    "start": 14,
+                    "end": 42,
+                    "left": {
+                        "type": "Identifier",
+                        "start": 14,
+                        "end": 15,
+                        "name": "a"
+                    },
+                    "right": {
+                        "type": "FunctionExpression",
+                        "start": 18,
+                        "end": 42,
+                        "id": null,
+                        "generator": true,
+                        "expression": false,
+                        "params": [
+                            {
+                                "type": "Identifier",
+                                "start": 28,
+                                "end": 29,
+                                "name": "b"
+                            }
+                        ],
+                        "body": {
+                            "type": "BlockStatement",
+                            "start": 31,
+                            "end": 42,
+                            "body": [
+                                {
+                                    "type": "ExpressionStatement",
+                                    "start": 33,
+                                    "end": 40,
+                                    "expression": {
+                                        "type": "YieldExpression",
+                                        "start": 33,
+                                        "end": 40,
+                                        "delegate": false,
+                                        "argument": {
+                                            "type": "Identifier",
+                                            "start": 39,
+                                            "end": 40,
+                                            "name": "b"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "body": {
+                "type": "BlockStatement",
+                "start": 44,
+                "end": 47,
+                "body": []
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6});
+
+// 'yield' as function names.
+
+test("function* yield() {}", {
+    "type": "Program",
+    "start": 0,
+    "end": 20,
+    "body": [
+        {
+            "type": "FunctionDeclaration",
+            "start": 0,
+            "end": 20,
+            "id": {
+                "type": "Identifier",
+                "start": 10,
+                "end": 15,
+                "name": "yield"
+            },
+            "generator": true,
+            "expression": false,
+            "params": [],
+            "body": {
+                "type": "BlockStatement",
+                "start": 18,
+                "end": 20,
+                "body": []
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6})
+
+test("({*yield() {}})", {
+    "type": "Program",
+    "start": 0,
+    "end": 15,
+    "body": [
+        {
+            "type": "ExpressionStatement",
+            "start": 0,
+            "end": 15,
+            "expression": {
+                "type": "ObjectExpression",
+                "start": 1,
+                "end": 14,
+                "properties": [
+                    {
+                        "type": "Property",
+                        "start": 2,
+                        "end": 13,
+                        "method": true,
+                        "shorthand": false,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 3,
+                            "end": 8,
+                            "name": "yield"
+                        },
+                        "kind": "init",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 8,
+                            "end": 13,
+                            "id": null,
+                            "generator": true,
+                            "expression": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 11,
+                                "end": 13,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6})
+
+test("class A {*yield() {}}", {
+    "type": "Program",
+    "start": 0,
+    "end": 21,
+    "body": [
+        {
+            "type": "ClassDeclaration",
+            "start": 0,
+            "end": 21,
+            "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 7,
+                "name": "A"
+            },
+            "superClass": null,
+            "body": {
+                "type": "ClassBody",
+                "start": 8,
+                "end": 21,
+                "body": [
+                    {
+                        "type": "MethodDefinition",
+                        "start": 9,
+                        "end": 20,
+                        "computed": false,
+                        "key": {
+                            "type": "Identifier",
+                            "start": 10,
+                            "end": 15,
+                            "name": "yield"
+                        },
+                        "static": false,
+                        "kind": "method",
+                        "value": {
+                            "type": "FunctionExpression",
+                            "start": 15,
+                            "end": 20,
+                            "id": null,
+                            "generator": true,
+                            "expression": false,
+                            "params": [],
+                            "body": {
+                                "type": "BlockStatement",
+                                "start": 18,
+                                "end": 20,
+                                "body": []
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "sourceType": "script"
+}, {ecmaVersion: 6})
+
+testFail("(function* yield() {})", "Can not use 'yield' as identifier inside a generator (1:11)", {ecmaVersion: 6})
+testFail("function* wrap() {\nfunction* yield() {}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
+testFail("function* wrap() {\n({*yield() {}})\n}", "Can not use 'yield' as identifier inside a generator (2:3)", {ecmaVersion: 6})
+testFail("function* wrap() {\nclass A {*yield() {}}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
+
+// invalid syntax '*foo: 1'
+testFail("({*foo: 1})", "Unexpected token (1:6)", {ecmaVersion: 6})
