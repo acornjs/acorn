@@ -65,3 +65,13 @@ export function parseExpressionAt(input, pos, options) {
 export function tokenizer(input, options) {
   return new Parser(options, input)
 }
+
+// This is a terrible kludge to support the existing, pre-ES6
+// interface where the loose parser module retroactively adds exports
+// to this module.
+export let parse_dammit, LooseParser, pluginsLoose
+export function addLooseExports(parse, Parser, plugins) {
+  parse_dammit = parse
+  LooseParser = Parser
+  pluginsLoose = plugins
+}
