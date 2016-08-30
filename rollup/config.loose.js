@@ -1,14 +1,17 @@
 import buble from 'rollup-plugin-buble'
+import {resolve} from 'path'
+
+let acorn = resolve('src/index.js')
 
 export default {
   entry: 'src/loose/index.js',
   moduleName: 'acorn.loose',
-  external: [ 'acorn' ],
+  external: [ acorn ],
   paths: {
-    acorn: './acorn.js'
+    [acorn]: './acorn.js'
   },
   globals: {
-    acorn: 'acorn'
+    [acorn]: 'acorn'
   },
   targets: [
     { dest: 'dist/acorn_loose.js', format: 'umd' },

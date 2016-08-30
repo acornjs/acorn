@@ -29,7 +29,7 @@
 // invasive changes and simplifications without creating a complicated
 // tangle.
 
-import {addLooseExports, defaultOptions} from "acorn"
+import {addLooseExports, defaultOptions} from "../index"
 import {LooseParser, pluginsLoose} from "./state"
 import "./tokenize"
 import "./statement"

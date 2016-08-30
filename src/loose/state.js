@@ -1,4 +1,4 @@
-import {tokenizer, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from "acorn"
+import {tokenizer, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from "../index"
 
 // Registered plugins
 export const pluginsLoose = {}
