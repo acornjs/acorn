@@ -664,7 +664,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
   let useStrict = (!isExpression && node.body.body.length && this.isUseStrict(node.body.body[0])) ? node.body.body[0] : null
   if (useStrict && this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params))
     this.raiseRecoverable(useStrict.start, "Illegal 'use strict' directive in function with non-simple parameter list")
-    
+
   if (this.strict || useStrict) {
     let oldStrict = this.strict
     this.strict = true
