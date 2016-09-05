@@ -64,7 +64,7 @@ object referring to that same position.
 - **ecmaVersion**: Indicates the ECMAScript version to parse. Must be
   either 3, 5, 6 (2015) or 7 (2016). This influences support for strict
   mode, the set of reserved words, and support for new syntax features.
-  Default is 6.
+  Default is 7.
 
   **NOTE**: Only 'stage 4' (finalized) ECMAScript features are being
   implemented by Acorn.
