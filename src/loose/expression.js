@@ -111,7 +111,7 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
 
 lp.parseMaybeUnary = function(sawUnary) {
   let start = this.storeCurrentPos(), expr
-  if (this.options.ecmaVersion >= 8 && this.inAsync && (this.tok.type === tt._await || this.toks.isContextual("await"))) {
+  if (this.options.ecmaVersion >= 8 && this.inAsync && this.toks.isContextual("await")) {
     expr = this.parseAwait()
     sawUnary = true
   } else if (this.tok.type.prefix) {

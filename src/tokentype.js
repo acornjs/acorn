@@ -109,7 +109,6 @@ export const types = {
   starstar: new TokenType("**", {beforeExpr: true}),
 
   // Keyword token types.
-  _await: kw("await"),
   _break: kw("break"),
   _case: kw("case", beforeExpr),
   _catch: kw("catch"),

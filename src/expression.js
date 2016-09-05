@@ -180,7 +180,7 @@ pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
 
 pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
   let startPos = this.start, startLoc = this.startLoc, expr
-  if (this.inAsync && (this.type === tt._await || this.isContextual("await"))) {
+  if (this.inAsync && this.isContextual("await")) {
     expr = this.parseAwait(refDestructuringErrors)
     sawUnary = true
   } else if (this.type.prefix) {
