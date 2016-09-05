@@ -86,7 +86,7 @@ pp.parseStatement = function(declaration, topLevel, exports) {
   case tt._for: return this.parseForStatement(node)
   case tt._function:
     if (!declaration && this.options.ecmaVersion >= 6) break
-    return this.parseFunctionStatement(node)
+    return this.parseFunctionStatement(node, false)
   case tt._class:
     if (!declaration) this.unexpected()
     return this.parseClass(node, true)
@@ -115,7 +115,8 @@ pp.parseStatement = function(declaration, topLevel, exports) {
   }
 
   if (this.isAsyncFunction() && declaration) {
-    return this.parseFunctionStatement(node)
+    this.next()
+    return this.parseFunctionStatement(node, true)
   }
 
   // If the statement does not start with a statement keyword or a
@@ -209,8 +210,7 @@ pp.parseForStatement = function(node) {
   return this.parseFor(node, init)
 }
 
-pp.parseFunctionStatement = function(node) {
-  let isAsync = this.options.ecmaVersion >= 8 && this.eatContextual("async")
+pp.parseFunctionStatement = function(node, isAsync) {
   this.next()
   return this.parseFunction(node, true, false, isAsync)
 }
