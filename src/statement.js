@@ -57,7 +57,9 @@ pp.isAsyncFunction = function() {
   skipWhiteSpace.lastIndex = this.pos
   let skip = skipWhiteSpace.exec(this.input)
   let next = this.pos + skip[0].length
-  return !lineBreak.test(this.input.slice(this.pos, next)) && this.input.slice(next, next + 8) === "function"
+  return !lineBreak.test(this.input.slice(this.pos, next)) &&
+    this.input.slice(next, next + 8) === "function" &&
+    (next + 8 == this.input.length || !isIdentifierChar(this.input.charAt(next + 8)))
 }
 
 // Parse a single statement.
