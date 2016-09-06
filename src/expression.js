@@ -244,8 +244,9 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls, refContextDestr
       base = this.finishNode(node, "MemberExpression")
     } else if (!noCalls && this.eat(tt.parenL)) {
       let refDestructuringErrors = new DestructuringErrors
-      let exprList = this.parseExprList(tt.parenR, false, false, refDestructuringErrors)
+      let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
       if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
+        this.checkPatternErrors(refDestructuringErrors, true)
         this.checkDefaultValueErrors(refDestructuringErrors, true, true)
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, true)
       }
@@ -367,7 +368,7 @@ pp.parseParenExpression = function(refDestructuringErrors) {
 }
 
 pp.parseParenAndDistinguishExpression = function(canBeArrow, refContextDestructuringErrors) {
-  let startPos = this.start, startLoc = this.startLoc, val
+  let startPos = this.start, startLoc = this.startLoc, val, allowTrailingComma = this.options.ecmaVersion >= 8
   if (this.options.ecmaVersion >= 6) {
     this.next()
 
@@ -376,9 +377,12 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow, refContextDestructu
     let refDestructuringErrors = new DestructuringErrors, spreadStart, innerParenStart
     while (this.type !== tt.parenR) {
       first ? first = false : this.expect(tt.comma)
-      if (this.type === tt.ellipsis) {
+      if (allowTrailingComma && this.afterTrailingComma(tt.parenR, true)) {
+        break
+      } else if (this.type === tt.ellipsis) {
         spreadStart = this.start
         exprList.push(this.parseParenItem(this.parseRest(false, refDestructuringErrors)))
+        if (this.type === tt.comma) this.raise(this.start, "Comma is not permitted after the rest element")
         break
       } else {
         if (this.type === tt.parenL && !innerParenStart) {
@@ -455,7 +459,7 @@ pp.parseNew = function(refDestructuringErrors) {
   }
   let startPos = this.start, startLoc = this.startLoc
   node.callee = this.parseSubscripts(this.parseExprAtom(refDestructuringErrors), startPos, startLoc, true, refDestructuringErrors)
-  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, false, false, refDestructuringErrors)
+  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
   else node.arguments = empty
   return this.finishNode(node, "NewExpression")
 }
@@ -616,7 +620,7 @@ pp.parseMethod = function(isGenerator, isAsync) {
   this.inGenerator = node.generator
   this.inAsync = node.async
   this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, false, false, refDestructuringErrors)
+  node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
   this.checkDefaultValueErrors(refDestructuringErrors, false, true)
   this.parseFunctionBody(node, false)
   this.inGenerator = oldInGen
@@ -711,7 +715,7 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructur
     else if (this.type === tt.ellipsis) {
       elt = this.parseSpread(refDestructuringErrors)
       if (this.type === tt.comma && refDestructuringErrors && !refDestructuringErrors.trailingComma) {
-        refDestructuringErrors.trailingComma = this.lastTokStart
+        refDestructuringErrors.trailingComma = this.start
       }
     } else
       elt = this.parseMaybeAssign(false, refDestructuringErrors)

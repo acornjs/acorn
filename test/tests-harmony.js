@@ -13043,7 +13043,7 @@ testFail("\"use strict\"; function x({ b: { a } }, [{ b: { a } }]){}", "Argument
 
 testFail("\"use strict\"; function x(a, ...[a]){}", "Unexpected token (1:31)", {ecmaVersion: 6});
 
-testFail("(...a, b) => {}", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("(...a, b) => {}", "Comma is not permitted after the rest element (1:5)", {ecmaVersion: 6});
 
 testFail("([ 5 ]) => {}", "Assigning to rvalue (1:3)", {ecmaVersion: 6});
 
@@ -13053,7 +13053,7 @@ testFail("(...[ 5 ]) => {}", "Unexpected token (1:6)", {ecmaVersion: 6});
 
 testFail("[...{ a }] = b", "Unexpected token (1:4)", {ecmaVersion: 6});
 
-testFail("[...a, b] = c", "Comma is not permitted after the rest element (1:4)", {ecmaVersion: 6});
+testFail("[...a, b] = c", "Comma is not permitted after the rest element (1:5)", {ecmaVersion: 6});
 
 testFail("({ t(eval) { \"use strict\"; } });", "Binding eval in strict mode (1:5)", {ecmaVersion: 6});
 
@@ -13061,7 +13061,7 @@ testFail("\"use strict\"; `${test}\\02`;", "Octal literal in strict mode (1:22)"
 
 testFail("if (1) import \"acorn\";", "'import' and 'export' may only appear at the top level (1:7)", {ecmaVersion: 6});
 
-testFail("[...a, ] = b", "Comma is not permitted after the rest element (1:4)", {ecmaVersion: 6});
+testFail("[...a, ] = b", "Comma is not permitted after the rest element (1:5)", {ecmaVersion: 6});
 
 testFail("if (b,...a, );", "Unexpected token (1:6)", {ecmaVersion: 6});
 

@@ -7,6 +7,7 @@
     require("./tests-harmony.js");
     require("./tests-es7.js");
     require("./tests-asyncawait.js");
+    require("./tests-trailing-commas-in-func.js");
     acorn = require("../dist/acorn")
     require("../dist/acorn_loose")
   } else {

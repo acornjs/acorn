@@ -258,7 +258,11 @@ lp.parseExprAtom = function() {
     let inner = this.parseExpression()
     this.expect(tt.parenR)
     if (this.eat(tt.arrow)) {
-      return this.parseArrowExpression(this.startNodeAt(parenStart), inner.expressions || (isDummy(inner) ? [] : [inner]))
+      // (a,)=>a // SequenceExpression makes dummy in the last hole. Drop the dummy.
+      let params = inner.expressions || [inner]
+      if (params.length && isDummy(params[params.length - 1]))
+        params.pop()
+      return this.parseArrowExpression(this.startNodeAt(parenStart), params)
     }
     if (this.options.preserveParens) {
       let par = this.startNodeAt(parenStart)

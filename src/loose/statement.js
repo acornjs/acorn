@@ -342,8 +342,10 @@ lp.parseExport = function() {
     return this.finishNode(node, "ExportAllDeclaration")
   }
   if (this.eat(tt._default)) {
+    // export default (function foo() {}) // This is FunctionExpression.
+    let isParenL = this.tok.type === tt.parenL
     let expr = this.parseMaybeAssign()
-    if (expr.id) {
+    if (!isParenL && expr.id) {
       switch (expr.type) {
       case "FunctionExpression": expr.type = "FunctionDeclaration"; break
       case "ClassExpression": expr.type = "ClassDeclaration"; break

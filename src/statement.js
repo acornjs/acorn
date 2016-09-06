@@ -468,7 +468,7 @@ pp.parseFunctionParams = function(node) {
   this.expect(tt.parenL)
 
   let refDestructuringErrors = new DestructuringErrors
-  node.params = this.parseBindingList(tt.parenR, false, false, true, refDestructuringErrors)
+  node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8, true, refDestructuringErrors)
   this.checkDefaultValueErrors(refDestructuringErrors, false, true)
 }
 

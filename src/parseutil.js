@@ -67,11 +67,12 @@ pp.semicolon = function() {
   if (!this.eat(tt.semi) && !this.insertSemicolon()) this.unexpected()
 }
 
-pp.afterTrailingComma = function(tokType) {
+pp.afterTrailingComma = function(tokType, notNext) {
   if (this.type == tokType) {
     if (this.options.onTrailingComma)
       this.options.onTrailingComma(this.lastTokStart, this.lastTokStartLoc)
-    this.next()
+    if (!notNext)
+      this.next()
     return true
   }
 }
