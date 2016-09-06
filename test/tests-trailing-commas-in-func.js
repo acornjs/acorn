@@ -778,3 +778,19 @@ testFail("(class {static foo(...a,) {}})", "Comma is not permitted after the res
 testFail("export default function foo(...a,) { }", "Comma is not permitted after the rest element (1:32)", {ecmaVersion: 8, sourceType: "module"})
 testFail("export default (function foo(...a,) { })", "Comma is not permitted after the rest element (1:33)", {ecmaVersion: 8, sourceType: "module"})
 testFail("export function foo(...a,) { }", "Comma is not permitted after the rest element (1:24)", {ecmaVersion: 8, sourceType: "module"})
+
+//------------------------------------------------------------------------------
+// disallow empty
+
+testFail("function foo(,) { }", "Unexpected token (1:13)", {ecmaVersion: 8})
+testFail("(function(,) { })", "Unexpected token (1:10)", {ecmaVersion: 8})
+testFail("(,) => a", "Unexpected token (1:1)", {ecmaVersion: 8})
+testFail("async (,) => a", "Unexpected token (1:7)", {ecmaVersion: 8})
+testFail("({foo(,) {}})", "Unexpected token (1:6)", {ecmaVersion: 8})
+testFail("class A {foo(,) {}}", "Unexpected token (1:13)", {ecmaVersion: 8})
+testFail("class A {static foo(,) {}}", "Unexpected token (1:20)", {ecmaVersion: 8})
+testFail("(class {foo(,) {}})", "Unexpected token (1:12)", {ecmaVersion: 8})
+testFail("(class {static foo(,) {}})", "Unexpected token (1:19)", {ecmaVersion: 8})
+testFail("export default function foo(,) { }", "Unexpected token (1:28)", {ecmaVersion: 8, sourceType: "module"})
+testFail("export default (function foo(,) { })", "Unexpected token (1:29)", {ecmaVersion: 8, sourceType: "module"})
+testFail("export function foo(,) { }", "Unexpected token (1:20)", {ecmaVersion: 8, sourceType: "module"})
