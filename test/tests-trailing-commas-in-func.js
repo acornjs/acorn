@@ -794,3 +794,10 @@ testFail("(class {static foo(,) {}})", "Unexpected token (1:19)", {ecmaVersion: 
 testFail("export default function foo(,) { }", "Unexpected token (1:28)", {ecmaVersion: 8, sourceType: "module"})
 testFail("export default (function foo(,) { })", "Unexpected token (1:29)", {ecmaVersion: 8, sourceType: "module"})
 testFail("export function foo(,) { }", "Unexpected token (1:20)", {ecmaVersion: 8, sourceType: "module"})
+
+//------------------------------------------------------------------------------
+// disallow in parens without arrow
+
+testFail("(a,)", "Unexpected token (1:3)", {ecmaVersion: 7})
+testFail("(a,)", "Unexpected token (1:3)", {ecmaVersion: 8})
+

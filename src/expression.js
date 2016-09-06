@@ -373,11 +373,12 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow, refContextDestructu
     this.next()
 
     let innerStartPos = this.start, innerStartLoc = this.startLoc
-    let exprList = [], first = true
+    let exprList = [], first = true, lastIsComma = false
     let refDestructuringErrors = new DestructuringErrors, spreadStart, innerParenStart
     while (this.type !== tt.parenR) {
       first ? first = false : this.expect(tt.comma)
       if (allowTrailingComma && this.afterTrailingComma(tt.parenR, true)) {
+        lastIsComma = true
         break
       } else if (this.type === tt.ellipsis) {
         spreadStart = this.start
@@ -401,7 +402,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow, refContextDestructu
       return this.parseParenArrowList(startPos, startLoc, exprList)
     }
 
-    if (!exprList.length) this.unexpected(this.lastTokStart)
+    if (!exprList.length || lastIsComma) this.unexpected(this.lastTokStart)
     if (spreadStart) this.unexpected(spreadStart)
     this.checkExpressionErrors(refDestructuringErrors, true)
     if (refContextDestructuringErrors) {
