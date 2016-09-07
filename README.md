@@ -62,7 +62,7 @@ object referring to that same position.
 [estree]: https://github.com/estree/estree
 
 - **ecmaVersion**: Indicates the ECMAScript version to parse. Must be
-  either 3, 5, 6 (2015) or 7 (2016). This influences support for strict
+  either 3, 5, 6 (2015), 7 (2016), or 8 (2017). This influences support for strict
   mode, the set of reserved words, and support for new syntax features.
   Default is 7.
 
