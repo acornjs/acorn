@@ -1,3 +1,31 @@
+## 4.0.0 (2016-08-07)
+
+### Breaking changes
+
+The default `ecmaVersion` option value is now 7.
+
+A number of internal method signatures changed, so plugins might need
+to be updated.
+
+### Bug fixes
+
+The parser now raises errors on duplicated export names.
+
+`arguments` and `eval` can now be used in shorthand properties.
+
+Duplicate parameter names in non-simple argument lists now always
+produce an error.
+
+### New features
+
+The `ecmaVersion` option now also accepts year-style version numbers
+(2015, etc).
+
+Support for `async`/`await` syntax when `ecmaVersion` is >= 8.
+
+Support for trailing commas in call expressions when `ecmaVersion` is
+>= 8.
+
 ## 3.3.0 (2016-07-25)
 
 ### Bug fixes
