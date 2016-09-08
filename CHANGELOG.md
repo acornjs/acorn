@@ -29,8 +29,8 @@ The `ecmaVersion` option now also accepts year-style version numbers
 
 Support for `async`/`await` syntax when `ecmaVersion` is >= 8.
 
-Support for trailing commas in call expressions when `ecmaVersion` is
->= 8.
+Support for trailing commas in call expressions when `ecmaVersion`
+is >= 8.
 
 ## 3.3.0 (2016-07-25)
 
