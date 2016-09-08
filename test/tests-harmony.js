@@ -15062,3 +15062,14 @@ testFail("function* wrap() {\nclass A {*yield() {}}\n}", "Can not use 'yield' as
 
 // invalid syntax '*foo: 1'
 testFail("({*foo: 1})", "Unexpected token (1:6)", {ecmaVersion: 6})
+
+test("export { x as y } from './y.js';\nexport { x as z } from './z.js';",
+     {}, {sourceType: "module", ecmaVersion: 6})
+
+test("export { default as y } from './y.js';\nexport default 42;",
+     {}, {sourceType: "module", ecmaVersion: 6})
+
+
+testFail("export { default} from './y.js';\nexport default 42;",
+         "Duplicate export 'default' (2:7)",
+         {sourceType: "module", ecmaVersion: 6})

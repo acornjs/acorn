@@ -565,7 +565,7 @@ pp.parseExport = function(node, exports) {
     return this.finishNode(node, "ExportAllDeclaration")
   }
   if (this.eat(tt._default)) { // export default ...
-    pp.checkExport(exports, "default", this.lastTokStart)
+    this.checkExport(exports, "default", this.lastTokStart)
     let parens = this.type == tt.parenL
     let expr = this.parseMaybeAssign()
     let needsSemi = true
@@ -660,8 +660,8 @@ pp.parseExportSpecifiers = function(exports) {
 
     let node = this.startNode()
     node.local = this.parseIdent(this.type === tt._default)
-    this.checkExport(exports, node.local.name, node.local.start)
     node.exported = this.eatContextual("as") ? this.parseIdent(true) : node.local
+    this.checkExport(exports, node.exported.name, node.exported.start)
     nodes.push(this.finishNode(node, "ExportSpecifier"))
   }
   return nodes
