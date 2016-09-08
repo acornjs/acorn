@@ -1,3 +1,9 @@
+## 4.0.1 (2016-08-08)
+
+### Bug fixes
+
+Fix false positives in duplicated export name errors.
+
 ## 4.0.0 (2016-08-07)
 
 ### Breaking changes
