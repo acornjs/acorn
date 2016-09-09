@@ -20,7 +20,7 @@ export function simple(node, visitors, base, state, override) {
   if (!base) base = exports.base
   ;(function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
-    base[type](node, st, c)
+    if (base[type]) base[type](node, st, c)
     if (found) found(node, st)
   })(node, state, override)
 }
