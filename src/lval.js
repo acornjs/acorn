@@ -45,8 +45,6 @@ pp.toAssignable = function(node, isBinding) {
       }
 
     case "AssignmentPattern":
-      if (node.right.type === "YieldExpression")
-        this.raise(node.right.start, "Yield expression cannot be a default value")
       break
 
     case "ParenthesizedExpression":

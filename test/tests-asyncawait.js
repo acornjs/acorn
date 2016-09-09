@@ -2187,3 +2187,884 @@ testFail("(async function foo() { await })", "Unexpected token (1:30)", {ecmaVer
 testFail("async () => await", "Unexpected token (1:17)", {ecmaVersion: 8})
 testFail("({async foo() { await }})", "Unexpected token (1:22)", {ecmaVersion: 8})
 testFail("(class {async foo() { await }})", "Unexpected token (1:28)", {ecmaVersion: 8})
+
+// Forbid await expressions in default parameters:
+testFail("async function foo(a = await b) {}", "Await expression cannot be a default value (1:23)", {ecmaVersion: 8})
+testFail("(async function foo(a = await b) {})", "Await expression cannot be a default value (1:24)", {ecmaVersion: 8})
+testFail("async (a = await b) => {}", "Unexpected token (1:17)", {ecmaVersion: 8})
+testFail("async function wrapper() {\nasync (a = await b) => {}\n}", "Await expression cannot be a default value (2:11)", {ecmaVersion: 8})
+testFail("({async foo(a = await b) {}})", "Await expression cannot be a default value (1:16)", {ecmaVersion: 8})
+testFail("(class {async foo(a = await b) {}})", "Await expression cannot be a default value (1:22)", {ecmaVersion: 8})
+testFail("async function foo(a = class extends (await b) {}) {}", "Await expression cannot be a default value (1:38)", {ecmaVersion: 8})
+
+// Allow await expressions inside functions in default parameters:
+test("async function foo(a = async function foo() { await b }) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 59,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 59,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 18,
+        "name": "foo"
+      },
+      "generator": false,
+      "expression": false,
+      "async": true,
+      "params": [
+        {
+          "type": "AssignmentPattern",
+          "start": 19,
+          "end": 55,
+          "left": {
+            "type": "Identifier",
+            "start": 19,
+            "end": 20,
+            "name": "a"
+          },
+          "right": {
+            "type": "FunctionExpression",
+            "start": 23,
+            "end": 55,
+            "id": {
+              "type": "Identifier",
+              "start": 38,
+              "end": 41,
+              "name": "foo"
+            },
+            "generator": false,
+            "expression": false,
+            "async": true,
+            "params": [],
+            "body": {
+              "type": "BlockStatement",
+              "start": 44,
+              "end": 55,
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "start": 46,
+                  "end": 53,
+                  "expression": {
+                    "type": "AwaitExpression",
+                    "start": 46,
+                    "end": 53,
+                    "argument": {
+                      "type": "Identifier",
+                      "start": 52,
+                      "end": 53,
+                      "name": "b"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "body": {
+        "type": "BlockStatement",
+        "start": 57,
+        "end": 59,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})
+test("async function foo(a = async () => await b) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 46,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 46,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 18,
+        "name": "foo"
+      },
+      "generator": false,
+      "expression": false,
+      "async": true,
+      "params": [
+        {
+          "type": "AssignmentPattern",
+          "start": 19,
+          "end": 42,
+          "left": {
+            "type": "Identifier",
+            "start": 19,
+            "end": 20,
+            "name": "a"
+          },
+          "right": {
+            "type": "ArrowFunctionExpression",
+            "start": 23,
+            "end": 42,
+            "id": null,
+            "generator": false,
+            "expression": true,
+            "async": true,
+            "params": [],
+            "body": {
+              "type": "AwaitExpression",
+              "start": 35,
+              "end": 42,
+              "argument": {
+                "type": "Identifier",
+                "start": 41,
+                "end": 42,
+                "name": "b"
+              }
+            }
+          }
+        }
+      ],
+      "body": {
+        "type": "BlockStatement",
+        "start": 44,
+        "end": 46,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})
+test("async function foo(a = {async bar() { await b }}) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 52,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 52,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 18,
+        "name": "foo"
+      },
+      "generator": false,
+      "expression": false,
+      "async": true,
+      "params": [
+        {
+          "type": "AssignmentPattern",
+          "start": 19,
+          "end": 48,
+          "left": {
+            "type": "Identifier",
+            "start": 19,
+            "end": 20,
+            "name": "a"
+          },
+          "right": {
+            "type": "ObjectExpression",
+            "start": 23,
+            "end": 48,
+            "properties": [
+              {
+                "type": "Property",
+                "start": 24,
+                "end": 47,
+                "method": true,
+                "shorthand": false,
+                "computed": false,
+                "key": {
+                  "type": "Identifier",
+                  "start": 30,
+                  "end": 33,
+                  "name": "bar"
+                },
+                "kind": "init",
+                "value": {
+                  "type": "FunctionExpression",
+                  "start": 33,
+                  "end": 47,
+                  "id": null,
+                  "generator": false,
+                  "expression": false,
+                  "async": true,
+                  "params": [],
+                  "body": {
+                    "type": "BlockStatement",
+                    "start": 36,
+                    "end": 47,
+                    "body": [
+                      {
+                        "type": "ExpressionStatement",
+                        "start": 38,
+                        "end": 45,
+                        "expression": {
+                          "type": "AwaitExpression",
+                          "start": 38,
+                          "end": 45,
+                          "argument": {
+                            "type": "Identifier",
+                            "start": 44,
+                            "end": 45,
+                            "name": "b"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "body": {
+        "type": "BlockStatement",
+        "start": 50,
+        "end": 52,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})
+test("async function foo(a = class {async bar() { await b }}) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 58,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 58,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 18,
+        "name": "foo"
+      },
+      "generator": false,
+      "expression": false,
+      "async": true,
+      "params": [
+        {
+          "type": "AssignmentPattern",
+          "start": 19,
+          "end": 54,
+          "left": {
+            "type": "Identifier",
+            "start": 19,
+            "end": 20,
+            "name": "a"
+          },
+          "right": {
+            "type": "ClassExpression",
+            "start": 23,
+            "end": 54,
+            "id": null,
+            "superClass": null,
+            "body": {
+              "type": "ClassBody",
+              "start": 29,
+              "end": 54,
+              "body": [
+                {
+                  "type": "MethodDefinition",
+                  "start": 30,
+                  "end": 53,
+                  "computed": false,
+                  "key": {
+                    "type": "Identifier",
+                    "start": 36,
+                    "end": 39,
+                    "name": "bar"
+                  },
+                  "static": false,
+                  "kind": "method",
+                  "value": {
+                    "type": "FunctionExpression",
+                    "start": 39,
+                    "end": 53,
+                    "id": null,
+                    "generator": false,
+                    "expression": false,
+                    "async": true,
+                    "params": [],
+                    "body": {
+                      "type": "BlockStatement",
+                      "start": 42,
+                      "end": 53,
+                      "body": [
+                        {
+                          "type": "ExpressionStatement",
+                          "start": 44,
+                          "end": 51,
+                          "expression": {
+                            "type": "AwaitExpression",
+                            "start": 44,
+                            "end": 51,
+                            "argument": {
+                              "type": "Identifier",
+                              "start": 50,
+                              "end": 51,
+                              "name": "b"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "body": {
+        "type": "BlockStatement",
+        "start": 56,
+        "end": 58,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})
+
+// Distinguish ParenthesizedExpression or ArrowFunctionExpression
+test("async function wrap() {\n(a = await b)\n}", {
+  "type": "Program",
+  "start": 0,
+  "end": 39,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 39,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 19,
+        "name": "wrap"
+      },
+      "generator": false,
+      "expression": false,
+      "async": true,
+      "params": [],
+      "body": {
+        "type": "BlockStatement",
+        "start": 22,
+        "end": 39,
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "start": 24,
+            "end": 37,
+            "expression": {
+              "type": "AssignmentExpression",
+              "start": 25,
+              "end": 36,
+              "operator": "=",
+              "left": {
+                "type": "Identifier",
+                "start": 25,
+                "end": 26,
+                "name": "a"
+              },
+              "right": {
+                "type": "AwaitExpression",
+                "start": 29,
+                "end": 36,
+                "argument": {
+                  "type": "Identifier",
+                  "start": 35,
+                  "end": 36,
+                  "name": "b"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})
+testFail("async function wrap() {\n(a = await b) => a\n}", "Await expression cannot be a default value (2:5)", {ecmaVersion: 8})
+
+test("async function wrap() {\n({a = await b} = obj)\n}", {
+  "type": "Program",
+  "start": 0,
+  "end": 47,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 47,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 19,
+        "name": "wrap"
+      },
+      "generator": false,
+      "expression": false,
+      "async": true,
+      "params": [],
+      "body": {
+        "type": "BlockStatement",
+        "start": 22,
+        "end": 47,
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "start": 24,
+            "end": 45,
+            "expression": {
+              "type": "AssignmentExpression",
+              "start": 25,
+              "end": 44,
+              "operator": "=",
+              "left": {
+                "type": "ObjectPattern",
+                "start": 25,
+                "end": 38,
+                "properties": [
+                  {
+                    "type": "Property",
+                    "start": 26,
+                    "end": 37,
+                    "method": false,
+                    "shorthand": true,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 26,
+                      "end": 27,
+                      "name": "a"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "AssignmentPattern",
+                      "start": 26,
+                      "end": 37,
+                      "left": {
+                        "type": "Identifier",
+                        "start": 26,
+                        "end": 27,
+                        "name": "a"
+                      },
+                      "right": {
+                        "type": "AwaitExpression",
+                        "start": 30,
+                        "end": 37,
+                        "argument": {
+                          "type": "Identifier",
+                          "start": 36,
+                          "end": 37,
+                          "name": "b"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "right": {
+                "type": "Identifier",
+                "start": 41,
+                "end": 44,
+                "name": "obj"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})
+testFail("async function wrap() {\n({a = await b} = obj) => a\n}", "Await expression cannot be a default value (2:6)", {ecmaVersion: 8})
+
+test("function* wrap() {\nasync(a = yield b)\n}", {
+  "type": "Program",
+  "start": 0,
+  "end": 39,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 39,
+      "id": {
+        "type": "Identifier",
+        "start": 10,
+        "end": 14,
+        "name": "wrap"
+      },
+      "params": [],
+      "generator": true,
+      "expression": false,
+      "async": false,
+      "body": {
+        "type": "BlockStatement",
+        "start": 17,
+        "end": 39,
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "start": 19,
+            "end": 37,
+            "expression": {
+              "type": "CallExpression",
+              "start": 19,
+              "end": 37,
+              "callee": {
+                "type": "Identifier",
+                "start": 19,
+                "end": 24,
+                "name": "async"
+              },
+              "arguments": [
+                {
+                  "type": "AssignmentExpression",
+                  "start": 25,
+                  "end": 36,
+                  "operator": "=",
+                  "left": {
+                    "type": "Identifier",
+                    "start": 25,
+                    "end": 26,
+                    "name": "a"
+                  },
+                  "right": {
+                    "type": "YieldExpression",
+                    "start": 29,
+                    "end": 36,
+                    "delegate": false,
+                    "argument": {
+                      "type": "Identifier",
+                      "start": 35,
+                      "end": 36,
+                      "name": "b"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})
+testFail("function* wrap() {\nasync(a = yield b) => a\n}", "Yield expression cannot be a default value (2:10)", {ecmaVersion: 8})
+
+// https://github.com/ternjs/acorn/issues/464
+test("f = ({ w = counter(), x = counter(), y = counter(), z = counter() } = { w: null, x: 0, y: false, z: '' }) => {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 111,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 111,
+      "expression": {
+        "type": "AssignmentExpression",
+        "start": 0,
+        "end": 111,
+        "operator": "=",
+        "left": {
+          "type": "Identifier",
+          "start": 0,
+          "end": 1,
+          "name": "f"
+        },
+        "right": {
+          "type": "ArrowFunctionExpression",
+          "start": 4,
+          "end": 111,
+          "id": null,
+          "params": [
+            {
+              "type": "AssignmentPattern",
+              "start": 5,
+              "end": 104,
+              "left": {
+                "type": "ObjectPattern",
+                "start": 5,
+                "end": 67,
+                "properties": [
+                  {
+                    "type": "Property",
+                    "start": 7,
+                    "end": 20,
+                    "method": false,
+                    "shorthand": true,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 7,
+                      "end": 8,
+                      "name": "w"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "AssignmentPattern",
+                      "start": 7,
+                      "end": 20,
+                      "left": {
+                        "type": "Identifier",
+                        "start": 7,
+                        "end": 8,
+                        "name": "w"
+                      },
+                      "right": {
+                        "type": "CallExpression",
+                        "start": 11,
+                        "end": 20,
+                        "callee": {
+                          "type": "Identifier",
+                          "start": 11,
+                          "end": 18,
+                          "name": "counter"
+                        },
+                        "arguments": []
+                      }
+                    }
+                  },
+                  {
+                    "type": "Property",
+                    "start": 22,
+                    "end": 35,
+                    "method": false,
+                    "shorthand": true,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 22,
+                      "end": 23,
+                      "name": "x"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "AssignmentPattern",
+                      "start": 22,
+                      "end": 35,
+                      "left": {
+                        "type": "Identifier",
+                        "start": 22,
+                        "end": 23,
+                        "name": "x"
+                      },
+                      "right": {
+                        "type": "CallExpression",
+                        "start": 26,
+                        "end": 35,
+                        "callee": {
+                          "type": "Identifier",
+                          "start": 26,
+                          "end": 33,
+                          "name": "counter"
+                        },
+                        "arguments": []
+                      }
+                    }
+                  },
+                  {
+                    "type": "Property",
+                    "start": 37,
+                    "end": 50,
+                    "method": false,
+                    "shorthand": true,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 37,
+                      "end": 38,
+                      "name": "y"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "AssignmentPattern",
+                      "start": 37,
+                      "end": 50,
+                      "left": {
+                        "type": "Identifier",
+                        "start": 37,
+                        "end": 38,
+                        "name": "y"
+                      },
+                      "right": {
+                        "type": "CallExpression",
+                        "start": 41,
+                        "end": 50,
+                        "callee": {
+                          "type": "Identifier",
+                          "start": 41,
+                          "end": 48,
+                          "name": "counter"
+                        },
+                        "arguments": []
+                      }
+                    }
+                  },
+                  {
+                    "type": "Property",
+                    "start": 52,
+                    "end": 65,
+                    "method": false,
+                    "shorthand": true,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 52,
+                      "end": 53,
+                      "name": "z"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "AssignmentPattern",
+                      "start": 52,
+                      "end": 65,
+                      "left": {
+                        "type": "Identifier",
+                        "start": 52,
+                        "end": 53,
+                        "name": "z"
+                      },
+                      "right": {
+                        "type": "CallExpression",
+                        "start": 56,
+                        "end": 65,
+                        "callee": {
+                          "type": "Identifier",
+                          "start": 56,
+                          "end": 63,
+                          "name": "counter"
+                        },
+                        "arguments": []
+                      }
+                    }
+                  }
+                ]
+              },
+              "right": {
+                "type": "ObjectExpression",
+                "start": 70,
+                "end": 104,
+                "properties": [
+                  {
+                    "type": "Property",
+                    "start": 72,
+                    "end": 79,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 72,
+                      "end": 73,
+                      "name": "w"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "Literal",
+                      "start": 75,
+                      "end": 79,
+                      "value": null,
+                      "raw": "null"
+                    }
+                  },
+                  {
+                    "type": "Property",
+                    "start": 81,
+                    "end": 85,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 81,
+                      "end": 82,
+                      "name": "x"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "Literal",
+                      "start": 84,
+                      "end": 85,
+                      "value": 0,
+                      "raw": "0"
+                    }
+                  },
+                  {
+                    "type": "Property",
+                    "start": 87,
+                    "end": 95,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 87,
+                      "end": 88,
+                      "name": "y"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "Literal",
+                      "start": 90,
+                      "end": 95,
+                      "value": false,
+                      "raw": "false"
+                    }
+                  },
+                  {
+                    "type": "Property",
+                    "start": 97,
+                    "end": 102,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 97,
+                      "end": 98,
+                      "name": "z"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "Literal",
+                      "start": 100,
+                      "end": 102,
+                      "value": "",
+                      "raw": "''"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "generator": false,
+          "expression": false,
+          "async": false,
+          "body": {
+            "type": "BlockStatement",
+            "start": 109,
+            "end": 111,
+            "body": []
+          }
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})

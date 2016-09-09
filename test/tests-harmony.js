@@ -15060,6 +15060,443 @@ testFail("function* wrap() {\nfunction* yield() {}\n}", "Can not use 'yield' as 
 testFail("function* wrap() {\n({*yield() {}})\n}", "Can not use 'yield' as identifier inside a generator (2:3)", {ecmaVersion: 6})
 testFail("function* wrap() {\nclass A {*yield() {}}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
 
+// Forbid yield expressions in default parameters:
+testFail("function* foo(a = yield b) {}", "Yield expression cannot be a default value (1:18)", {ecmaVersion: 6})
+testFail("(function* foo(a = yield b) {})", "Yield expression cannot be a default value (1:19)", {ecmaVersion: 6})
+testFail("({*foo(a = yield b) {}})", "Yield expression cannot be a default value (1:11)", {ecmaVersion: 6})
+testFail("(class {*foo(a = yield b) {}})", "Yield expression cannot be a default value (1:17)", {ecmaVersion: 6})
+testFail("function* foo(a = class extends (yield b) {}) {}", "Yield expression cannot be a default value (1:33)", {ecmaVersion: 6})
+
+// Allow yield expressions inside functions in default parameters:
+test("function* foo(a = function* foo() { yield b }) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 49,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 49,
+      "id": {
+        "type": "Identifier",
+        "start": 10,
+        "end": 13,
+        "name": "foo"
+      },
+      "generator": true,
+      "expression": false,
+      "params": [
+        {
+          "type": "AssignmentPattern",
+          "start": 14,
+          "end": 45,
+          "left": {
+            "type": "Identifier",
+            "start": 14,
+            "end": 15,
+            "name": "a"
+          },
+          "right": {
+            "type": "FunctionExpression",
+            "start": 18,
+            "end": 45,
+            "id": {
+              "type": "Identifier",
+              "start": 28,
+              "end": 31,
+              "name": "foo"
+            },
+            "generator": true,
+            "expression": false,
+            "params": [],
+            "body": {
+              "type": "BlockStatement",
+              "start": 34,
+              "end": 45,
+              "body": [
+                {
+                  "type": "ExpressionStatement",
+                  "start": 36,
+                  "end": 43,
+                  "expression": {
+                    "type": "YieldExpression",
+                    "start": 36,
+                    "end": 43,
+                    "delegate": false,
+                    "argument": {
+                      "type": "Identifier",
+                      "start": 42,
+                      "end": 43,
+                      "name": "b"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "body": {
+        "type": "BlockStatement",
+        "start": 47,
+        "end": 49,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
+test("function* foo(a = {*bar() { yield b }}) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 42,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 42,
+      "id": {
+        "type": "Identifier",
+        "start": 10,
+        "end": 13,
+        "name": "foo"
+      },
+      "generator": true,
+      "expression": false,
+      "params": [
+        {
+          "type": "AssignmentPattern",
+          "start": 14,
+          "end": 38,
+          "left": {
+            "type": "Identifier",
+            "start": 14,
+            "end": 15,
+            "name": "a"
+          },
+          "right": {
+            "type": "ObjectExpression",
+            "start": 18,
+            "end": 38,
+            "properties": [
+              {
+                "type": "Property",
+                "start": 19,
+                "end": 37,
+                "method": true,
+                "shorthand": false,
+                "computed": false,
+                "key": {
+                  "type": "Identifier",
+                  "start": 20,
+                  "end": 23,
+                  "name": "bar"
+                },
+                "kind": "init",
+                "value": {
+                  "type": "FunctionExpression",
+                  "start": 23,
+                  "end": 37,
+                  "id": null,
+                  "generator": true,
+                  "expression": false,
+                  "params": [],
+                  "body": {
+                    "type": "BlockStatement",
+                    "start": 26,
+                    "end": 37,
+                    "body": [
+                      {
+                        "type": "ExpressionStatement",
+                        "start": 28,
+                        "end": 35,
+                        "expression": {
+                          "type": "YieldExpression",
+                          "start": 28,
+                          "end": 35,
+                          "delegate": false,
+                          "argument": {
+                            "type": "Identifier",
+                            "start": 34,
+                            "end": 35,
+                            "name": "b"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "body": {
+        "type": "BlockStatement",
+        "start": 40,
+        "end": 42,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
+test("function* foo(a = class {*bar() { yield b }}) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 48,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 48,
+      "id": {
+        "type": "Identifier",
+        "start": 10,
+        "end": 13,
+        "name": "foo"
+      },
+      "generator": true,
+      "expression": false,
+      "params": [
+        {
+          "type": "AssignmentPattern",
+          "start": 14,
+          "end": 44,
+          "left": {
+            "type": "Identifier",
+            "start": 14,
+            "end": 15,
+            "name": "a"
+          },
+          "right": {
+            "type": "ClassExpression",
+            "start": 18,
+            "end": 44,
+            "id": null,
+            "superClass": null,
+            "body": {
+              "type": "ClassBody",
+              "start": 24,
+              "end": 44,
+              "body": [
+                {
+                  "type": "MethodDefinition",
+                  "start": 25,
+                  "end": 43,
+                  "computed": false,
+                  "key": {
+                    "type": "Identifier",
+                    "start": 26,
+                    "end": 29,
+                    "name": "bar"
+                  },
+                  "static": false,
+                  "kind": "method",
+                  "value": {
+                    "type": "FunctionExpression",
+                    "start": 29,
+                    "end": 43,
+                    "id": null,
+                    "generator": true,
+                    "expression": false,
+                    "params": [],
+                    "body": {
+                      "type": "BlockStatement",
+                      "start": 32,
+                      "end": 43,
+                      "body": [
+                        {
+                          "type": "ExpressionStatement",
+                          "start": 34,
+                          "end": 41,
+                          "expression": {
+                            "type": "YieldExpression",
+                            "start": 34,
+                            "end": 41,
+                            "delegate": false,
+                            "argument": {
+                              "type": "Identifier",
+                              "start": 40,
+                              "end": 41,
+                              "name": "b"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "body": {
+        "type": "BlockStatement",
+        "start": 46,
+        "end": 48,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
+
+// Distinguish ParenthesizedExpression or ArrowFunctionExpression
+test("function* wrap() {\n(a = yield b)\n}", {
+  "type": "Program",
+  "start": 0,
+  "end": 34,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 34,
+      "id": {
+        "type": "Identifier",
+        "start": 10,
+        "end": 14,
+        "name": "wrap"
+      },
+      "generator": true,
+      "expression": false,
+      "params": [],
+      "body": {
+        "type": "BlockStatement",
+        "start": 17,
+        "end": 34,
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "start": 19,
+            "end": 32,
+            "expression": {
+              "type": "AssignmentExpression",
+              "start": 20,
+              "end": 31,
+              "operator": "=",
+              "left": {
+                "type": "Identifier",
+                "start": 20,
+                "end": 21,
+                "name": "a"
+              },
+              "right": {
+                "type": "YieldExpression",
+                "start": 24,
+                "end": 31,
+                "delegate": false,
+                "argument": {
+                  "type": "Identifier",
+                  "start": 30,
+                  "end": 31,
+                  "name": "b"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
+testFail("function* wrap() {\n(a = yield b) => a\n}", "Yield expression cannot be a default value (2:5)", {ecmaVersion: 6})
+
+test("function* wrap() {\n({a = yield b} = obj)\n}", {
+  "type": "Program",
+  "start": 0,
+  "end": 42,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 42,
+      "id": {
+        "type": "Identifier",
+        "start": 10,
+        "end": 14,
+        "name": "wrap"
+      },
+      "params": [],
+      "generator": true,
+      "expression": false,
+      "body": {
+        "type": "BlockStatement",
+        "start": 17,
+        "end": 42,
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "start": 19,
+            "end": 40,
+            "expression": {
+              "type": "AssignmentExpression",
+              "start": 20,
+              "end": 39,
+              "operator": "=",
+              "left": {
+                "type": "ObjectPattern",
+                "start": 20,
+                "end": 33,
+                "properties": [
+                  {
+                    "type": "Property",
+                    "start": 21,
+                    "end": 32,
+                    "method": false,
+                    "shorthand": true,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 21,
+                      "end": 22,
+                      "name": "a"
+                    },
+                    "kind": "init",
+                    "value": {
+                      "type": "AssignmentPattern",
+                      "start": 21,
+                      "end": 32,
+                      "left": {
+                        "type": "Identifier",
+                        "start": 21,
+                        "end": 22,
+                        "name": "a"
+                      },
+                      "right": {
+                        "type": "YieldExpression",
+                        "start": 25,
+                        "end": 32,
+                        "delegate": false,
+                        "argument": {
+                          "type": "Identifier",
+                          "start": 31,
+                          "end": 32,
+                          "name": "b"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "right": {
+                "type": "Identifier",
+                "start": 36,
+                "end": 39,
+                "name": "obj"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
+testFail("function* wrap() {\n({a = yield b} = obj) => a\n}", "Yield expression cannot be a default value (2:6)", {ecmaVersion: 6})
+
 // invalid syntax '*foo: 1'
 testFail("({*foo: 1})", "Unexpected token (1:6)", {ecmaVersion: 6})
 
