@@ -243,13 +243,20 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
       this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
     } else if (!noCalls && this.eat(tt.parenL)) {
-      let refDestructuringErrors = new DestructuringErrors
+      let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+      this.yieldPos = 0
+      this.awaitPos = 0
       let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
       if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
         this.checkPatternErrors(refDestructuringErrors, true)
+        this.checkYieldAwaitInDefaultParams()
+        this.yieldPos = oldYieldPos
+        this.awaitPos = oldAwaitPos
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, true)
       }
       this.checkExpressionErrors(refDestructuringErrors, true)
+      this.yieldPos = oldYieldPos || this.yieldPos
+      this.awaitPos = oldAwaitPos || this.awaitPos
       let node = this.startNodeAt(startPos, startLoc)
       node.callee = base
       node.arguments = exprList
@@ -369,7 +376,9 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
 
     let innerStartPos = this.start, innerStartLoc = this.startLoc
     let exprList = [], first = true, lastIsComma = false
-    let refDestructuringErrors = new DestructuringErrors, spreadStart, innerParenStart
+    let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, spreadStart, innerParenStart
+    this.yieldPos = 0
+    this.awaitPos = 0
     while (this.type !== tt.parenR) {
       first ? first = false : this.expect(tt.comma)
       if (allowTrailingComma && this.afterTrailingComma(tt.parenR, true)) {
@@ -392,13 +401,18 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
 
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
       this.checkPatternErrors(refDestructuringErrors, true)
+      this.checkYieldAwaitInDefaultParams()
       if (innerParenStart) this.unexpected(innerParenStart)
+      this.yieldPos = oldYieldPos
+      this.awaitPos = oldAwaitPos
       return this.parseParenArrowList(startPos, startLoc, exprList)
     }
 
     if (!exprList.length || lastIsComma) this.unexpected(this.lastTokStart)
     if (spreadStart) this.unexpected(spreadStart)
     this.checkExpressionErrors(refDestructuringErrors, true)
+    this.yieldPos = oldYieldPos || this.yieldPos
+    this.awaitPos = oldAwaitPos || this.awaitPos
 
     if (exprList.length > 1) {
       val = this.startNodeAt(innerStartPos, innerStartLoc)
@@ -602,35 +616,52 @@ pp.initFunction = function(node) {
 // Parse object or class method.
 
 pp.parseMethod = function(isGenerator, isAsync) {
-  let node = this.startNode(), oldInGen = this.inGenerator, oldInAsync = this.inAsync
+  let node = this.startNode(), oldInGen = this.inGenerator, oldInAsync = this.inAsync, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
     node.generator = isGenerator
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
+
   this.inGenerator = node.generator
   this.inAsync = node.async
+  this.yieldPos = 0
+  this.awaitPos = 0
+
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
+  this.checkYieldAwaitInDefaultParams()
   this.parseFunctionBody(node, false)
+
   this.inGenerator = oldInGen
   this.inAsync = oldInAsync
+  this.yieldPos = oldYieldPos
+  this.awaitPos = oldAwaitPos
   return this.finishNode(node, "FunctionExpression")
 }
 
 // Parse arrow function expression with given parameters.
 
 pp.parseArrowExpression = function(node, params, isAsync) {
-  let oldInGen = this.inGenerator, oldInAsync = this.inAsync
+  let oldInGen = this.inGenerator, oldInAsync = this.inAsync, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+
   this.initFunction(node)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
+
   this.inGenerator = false
   this.inAsync = node.async
+  this.yieldPos = 0
+  this.awaitPos = 0
+
   node.params = this.toAssignableList(params, true)
   this.parseFunctionBody(node, true)
+
   this.inGenerator = oldInGen
   this.inAsync = oldInAsync
+  this.yieldPos = oldYieldPos
+  this.awaitPos = oldAwaitPos
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
@@ -743,6 +774,8 @@ pp.parseIdent = function(liberal) {
 // Parses yield expression inside generator.
 
 pp.parseYield = function() {
+  if (!this.yieldPos) this.yieldPos = this.start
+
   let node = this.startNode()
   this.next()
   if (this.type == tt.semi || this.canInsertSemicolon() || (this.type != tt.star && !this.type.startsExpr)) {
@@ -756,6 +789,8 @@ pp.parseYield = function() {
 }
 
 pp.parseAwait = function() {
+  if (!this.awaitPos) this.awaitPos = this.start
+
   let node = this.startNode()
   this.next()
   node.argument = this.parseMaybeUnary(null, true)

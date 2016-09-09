@@ -108,3 +108,10 @@ pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {
   if (!andThrow) return !!pos
   if (pos) this.raise(pos, "Shorthand property assignments are valid only in destructuring patterns")
 }
+
+pp.checkYieldAwaitInDefaultParams = function() {
+  if (this.yieldPos && (!this.awaitPos || this.yieldPos < this.awaitPos))
+    this.raise(this.yieldPos, "Yield expression cannot be a default value")
+  if (this.awaitPos)
+    this.raise(this.awaitPos, "Await expression cannot be a default value")
+}

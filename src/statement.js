@@ -450,23 +450,32 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
     node.generator = this.eat(tt.star)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
+
   if (isStatement)
     node.id = this.parseIdent()
-  var oldInGen = this.inGenerator, oldInAsync = this.inAsync
+
+  let oldInGen = this.inGenerator, oldInAsync = this.inAsync, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
   this.inGenerator = node.generator
   this.inAsync = node.async
+  this.yieldPos = 0
+  this.awaitPos = 0
+
   if (!isStatement && this.type === tt.name)
     node.id = this.parseIdent()
   this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
+
   this.inGenerator = oldInGen
   this.inAsync = oldInAsync
+  this.yieldPos = oldYieldPos
+  this.awaitPos = oldAwaitPos
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 
 pp.parseFunctionParams = function(node) {
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8, true)
+  this.checkYieldAwaitInDefaultParams()
 }
 
 // Parse a class declaration or literal (depending on the
