@@ -15069,7 +15069,6 @@ test("export { x as y } from './y.js';\nexport { x as z } from './z.js';",
 test("export { default as y } from './y.js';\nexport default 42;",
      {}, {sourceType: "module", ecmaVersion: 6})
 
-
 testFail("export { default} from './y.js';\nexport default 42;",
          "Duplicate export 'default' (2:7)",
          {sourceType: "module", ecmaVersion: 6})
