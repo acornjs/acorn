@@ -29129,3 +29129,41 @@ testFail("/[a-z]/y", "Invalid regular expression flag (1:1)");
 testFail("/[a-z]/s", "Invalid regular expression flag (1:1)");
 
 testFail("function(){}", "Unexpected token (1:8)");
+
+test("0123. in/foo/i", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "BinaryExpression",
+          "left": {
+            "type": "MemberExpression",
+            "object": {
+              "type": "Literal",
+              "value": 83,
+              "raw": "0123"
+            },
+            "property": {
+              "type": "Identifier",
+              "name": "in"
+            },
+            "computed": false
+          },
+          "operator": "/",
+          "right": {
+            "type": "Identifier",
+            "name": "foo"
+          }
+        },
+        "operator": "/",
+        "right": {
+          "type": "Identifier",
+          "name": "i"
+        }
+      }
+    }
+  ]
+})
