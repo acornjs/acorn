@@ -1,3 +1,12 @@
+## 4.0.2 (2016-08-11)
+
+### Bug fixes
+
+Don't ignore period or 'e' characters after octal numbers.
+
+Fix broken parsing for call expressions in default parameter values
+of arrow functions.
+
 ## 4.0.1 (2016-08-08)
 
 ### Bug fixes
