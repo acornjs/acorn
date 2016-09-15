@@ -5,6 +5,7 @@ export const reservedWords = {
   5: "class enum extends super const export import",
   6: "enum",
   7: "enum",
+  8: "enum",
   strict: "implements interface let package private protected public static yield",
   strictBind: "eval arguments"
 }
