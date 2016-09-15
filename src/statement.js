@@ -221,8 +221,9 @@ pp.parseFunctionStatement = function(node, isAsync) {
 pp.parseIfStatement = function(node) {
   this.next()
   node.test = this.parseParenExpression()
-  node.consequent = this.parseStatement(false)
-  node.alternate = this.eat(tt._else) ? this.parseStatement(false) : null
+  // allow function declarations in branches, but only in non-strict mode
+  node.consequent = this.parseStatement(!this.strict && (this.type === tt._function))
+  node.alternate = this.eat(tt._else) ? this.parseStatement(!this.strict && (this.type === tt._function)) : null
   return this.finishNode(node, "IfStatement")
 }
 
