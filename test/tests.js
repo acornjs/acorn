@@ -29167,3 +29167,5 @@ test("0123. in/foo/i", {
     }
   ]
 })
+
+test("undefined", {}, { ecmaVersion: 8 })
