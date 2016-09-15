@@ -368,7 +368,7 @@ lp.parseObj = function() {
     this.parsePropertyName(prop)
     if (!prop.computed &&
         prop.key.type === "Identifier" && prop.key.name === "async" && this.tok.type !== tt.parenL &&
-        !this.canInsertSemicolon()) {
+        this.tok.type !== tt.colon && !this.canInsertSemicolon()) {
       this.parsePropertyName(prop)
       isAsync = true
     } else {

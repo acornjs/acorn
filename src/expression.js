@@ -524,7 +524,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
     this.parsePropertyName(prop)
     if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && !prop.computed &&
         prop.key.type === "Identifier" && prop.key.name === "async" && this.type !== tt.parenL &&
-        !this.canInsertSemicolon()) {
+        this.type !== tt.colon && !this.canInsertSemicolon()) {
       isAsync = true
       this.parsePropertyName(prop, refDestructuringErrors)
     } else {
