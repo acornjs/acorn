@@ -725,7 +725,7 @@ pp.parseImportSpecifiers = function() {
     } else {
       node.local = node.imported
       if (this.isKeyword(node.local.name)) this.unexpected(node.local.start)
-      if (this.reservedWordsStrict.test(node.local.name)) this.raise(node.local.start, "The keyword '" + node.local.name + "' is reserved")
+      if (this.reservedWordsStrict.test(node.local.name)) this.raiseRecoverable(node.local.start, "The keyword '" + node.local.name + "' is reserved")
     }
     this.checkLVal(node.local, true)
     nodes.push(this.finishNode(node, "ImportSpecifier"))
