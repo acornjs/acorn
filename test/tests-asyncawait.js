@@ -3068,3 +3068,25 @@ test("f = ({ w = counter(), x = counter(), y = counter(), z = counter() } = { w:
   ],
   "sourceType": "script"
 }, {ecmaVersion: 8})
+
+test("({ async: true })", {
+  type: "Program",
+  body: [{
+      type: "ExpressionStatement",
+      expression: {
+        type: "ObjectExpression",
+        properties: [{
+            type: "Property",
+            key: {
+              type: "Identifier",
+              name: "async"
+            },
+            value: {
+              type: "Literal",
+              value: true
+            },
+            kind: "init"
+        }]
+      }
+  }]
+}, {ecmaVersion: 8});
