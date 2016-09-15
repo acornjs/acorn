@@ -14234,6 +14234,7 @@ testFail("var 𫠞_ = 12;", "Unexpected character '𫠞' (1:4)", {ecmaVersion: 6
 testFail("var 𫠝_ = 10;", "Unexpected character '𫠝' (1:4)", {ecmaVersion: 5});
 testFail("if (1) let x = 10;", "Unexpected token (1:7)", {ecmaVersion: 6});
 testFail("for (;;) const x = 10;", "Unexpected token (1:9)", {ecmaVersion: 6});
+testFail("while (1) function foo(){}", "Unexpected token (1:10)", {ecmaVersion: 6});
 testFail("if (1) ; else class Cls {}", "Unexpected token (1:14)", {ecmaVersion: 6});
 
 testFail("'use strict'; [...eval] = arr", "Assigning to eval in strict mode (1:18)", {ecmaVersion: 6});
@@ -14483,8 +14484,6 @@ test("(([,]) => 0)", {
     }
   }]
 }, {ecmaVersion: 6});
-
-test("if (1) function foo() {}", {})
 
 // 'eval' and 'arguments' are not reserved word, but those can not be a BindingIdentifier.
 
