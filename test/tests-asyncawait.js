@@ -3090,3 +3090,19 @@ test("({ async: true })", {
       }
   }]
 }, {ecmaVersion: 8});
+
+// Tests for B.3.4 FunctionDeclarations in IfStatement Statement Clauses
+test(
+  "if (x) async function f() {}",
+  {
+    type: "Program",
+    body: [{
+      type: "IfStatement",
+      consequent: {
+        type: "FunctionDeclaration"
+      },
+      alternate: null
+    }]
+  },
+  {ecmaVersion: 8}
+)

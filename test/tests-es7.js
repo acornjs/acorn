@@ -349,3 +349,42 @@ testFail("(a=2) => { 'use strict'; }", "Illegal 'use strict' directive in functi
 testFail("function foo({a}) { 'use strict'; }", "Illegal 'use strict' directive in function with non-simple parameter list (1:20)", { ecmaVersion: 7 })
 testFail("({a}) => { 'use strict'; }", "Illegal 'use strict' directive in function with non-simple parameter list (1:11)", { ecmaVersion: 7 })
 test("function foo(a) { 'use strict'; }", {}, { ecmaVersion: 7 });
+
+// Tests for B.3.4 FunctionDeclarations in IfStatement Statement Clauses
+test(
+  "if (x) function f() {}",
+  {
+    type: "Program",
+    body: [{
+      type: "IfStatement",
+      consequent: {
+        type: "FunctionDeclaration"
+      },
+      alternate: null
+    }]
+  },
+  { ecmaVersion: 7 }
+)
+
+test(
+  "if (x) function f() { return 23; } else function f() { return 42; }",
+  {
+    type: "Program",
+    body: [{
+      type: "IfStatement",
+      consequent: {
+        type: "FunctionDeclaration"
+      },
+      alternate: {
+        type: "FunctionDeclaration"
+      }
+    }]
+  },
+  { ecmaVersion: 7 }
+)
+
+testFail(
+  "'use strict'; if(x) function f() {}",
+  "Unexpected token (1:20)",
+  { ecmaVersion: 7 }
+)
