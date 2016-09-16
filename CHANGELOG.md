@@ -1,3 +1,14 @@
+## 4.0.3 (2016-08-16)
+
+### Bug fixes
+
+Allow regular function declarations inside single-statement `if`
+branches in loose mode. Forbid them entirely in strict mode.
+
+Properly parse properties named `async` in ES2017 mode.
+
+Fix bug where reserved words were broken in ES2017 mode.
+
 ## 4.0.2 (2016-08-11)
 
 ### Bug fixes

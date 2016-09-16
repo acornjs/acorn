@@ -4,7 +4,7 @@
   "homepage": "https://github.com/ternjs/acorn",
   "main": "dist/acorn.js",
   "jsnext:main": "dist/acorn.es.js",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "engines": {
     "node": ">=0.4.0"
   },
