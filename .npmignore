@@ -1,3 +1,9 @@
 /.tern-port
 /test
 /local
+/bin
+/rollup
+.editorconfig
+.gitattributes
+.tern-project
+.travis.yml
