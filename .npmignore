@@ -1,8 +1,9 @@
 /.tern-port
 /test
 /local
-/bin
 /rollup
+/bin/generate-identifier-regex.js
+/bin/update_authors.sh
 .editorconfig
 .gitattributes
 .tern-project
