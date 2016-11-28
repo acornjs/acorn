@@ -4116,6 +4116,9 @@ test("export class Class {}", {
   locations: true
 });
 
+testFail("export new Foo();", "Unexpected token (1:7)", {ecmaVersion: 6, sourceType: "module"});
+testFail("export typeof foo;", "Unexpected token (1:7)", {ecmaVersion: 6, sourceType: "module"});
+
 test("export default 42", {
   type: "Program",
   body: [{
