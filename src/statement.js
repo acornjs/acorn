@@ -599,8 +599,10 @@ pp.parseExport = function(node, exports) {
     node.declaration = this.parseStatement(true)
     if (node.declaration.type === "VariableDeclaration")
       this.checkVariableExport(exports, node.declaration.declarations)
-    else
+    else if (node.declaration.id)
       this.checkExport(exports, node.declaration.id.name, node.declaration.id.start)
+    else
+      this.unexpected(node.declaration.start);
     node.specifiers = []
     node.source = null
   } else { // export { x, y as z } [from '...']
