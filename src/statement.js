@@ -599,10 +599,8 @@ pp.parseExport = function(node, exports) {
     node.declaration = this.parseStatement(true)
     if (node.declaration.type === "VariableDeclaration")
       this.checkVariableExport(exports, node.declaration.declarations)
-    else if (node.declaration.id)
-      this.checkExport(exports, node.declaration.id.name, node.declaration.id.start)
     else
-      this.unexpected(node.declaration.start);
+      this.checkExport(exports, node.declaration.id.name, node.declaration.id.start)
     node.specifiers = []
     node.source = null
   } else { // export { x, y as z } [from '...']
@@ -657,7 +655,12 @@ pp.checkVariableExport = function(exports, decls) {
 }
 
 pp.shouldParseExportStatement = function() {
-  return this.type.keyword || this.isLet() || this.isAsyncFunction()
+  return this.type.keyword === "var"
+    || this.type.keyword === "const"
+    || this.type.keyword === "class"
+    || this.type.keyword === "function"
+    || this.isLet()
+    || this.isAsyncFunction()
 }
 
 // Parses a comma-separated list of module exports.
