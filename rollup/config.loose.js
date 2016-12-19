@@ -3,7 +3,7 @@ import {resolve} from 'path'
 
 var acorn = resolve('src/index.js')
 var paths = {}, globals = {}
-paths[acorn] = './acorn.js'
+paths[acorn] = './acorn'
 globals[acorn] = 'acorn'
 
 export default {
