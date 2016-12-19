@@ -1,3 +1,12 @@
+## 4.0.4 (2016-12-19)
+
+### Bug fixes
+
+Fix issue with loading acorn_loose.js with an AMD loader.
+
+Fix crash when `export` was followed by a keyword that can't be
+exported.
+
 ## 4.0.3 (2016-08-16)
 
 ### Bug fixes
