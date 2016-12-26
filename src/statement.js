@@ -676,7 +676,7 @@ pp.parseExportSpecifiers = function(exports) {
     } else first = false
 
     let node = this.startNode()
-    node.local = this.parseIdent(this.type === tt._default)
+    node.local = this.parseIdent(true)
     node.exported = this.eatContextual("as") ? this.parseIdent(true) : node.local
     this.checkExport(exports, node.exported.name, node.exported.start)
     nodes.push(this.finishNode(node, "ExportSpecifier"))
