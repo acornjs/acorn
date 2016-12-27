@@ -227,8 +227,9 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 }
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
+  let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
+      this.lastTokEnd == base.end && !this.canInsertSemicolon()
   for (;;) {
-    let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" && !this.canInsertSemicolon()
     if (this.eat(tt.dot)) {
       let node = this.startNodeAt(startPos, startLoc)
       node.object = base

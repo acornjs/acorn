@@ -3106,3 +3106,5 @@ test(
   },
   {ecmaVersion: 8}
 )
+
+testFail("(async)(a) => 12", "Unexpected token (1:11)", {ecmaVersion: 8})
