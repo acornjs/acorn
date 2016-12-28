@@ -251,6 +251,7 @@ lp.parseVar = function(noIn, kind) {
 lp.parseClass = function(isStatement) {
   let node = this.startNode()
   this.next()
+  if (isStatement == null) isStatement = this.tok.type === tt.name
   if (this.tok.type === tt.name) node.id = this.parseIdent()
   else if (isStatement) node.id = this.dummyIdent()
   else node.id = null
@@ -325,6 +326,7 @@ lp.parseFunction = function(node, isStatement, isAsync) {
   if (this.options.ecmaVersion >= 8) {
     node.async = !!isAsync
   }
+  if (isStatement == null) isStatement = this.tok.type === tt.name
   if (this.tok.type === tt.name) node.id = this.parseIdent()
   else if (isStatement) node.id = this.dummyIdent()
   this.inAsync = node.async
@@ -343,15 +345,17 @@ lp.parseExport = function() {
   }
   if (this.eat(tt._default)) {
     // export default (function foo() {}) // This is FunctionExpression.
-    let isParenL = this.tok.type === tt.parenL
-    let expr = this.parseMaybeAssign()
-    if (!isParenL && expr.id) {
-      switch (expr.type) {
-      case "FunctionExpression": expr.type = "FunctionDeclaration"; break
-      case "ClassExpression": expr.type = "ClassDeclaration"; break
-      }
+    let isAsync
+    if (this.tok.type === tt._function || (isAsync = this.toks.isAsyncFunction())) {
+      let fNode = this.startNode()
+      this.next()
+      if (isAsync) this.next()
+      node.declaration = this.parseFunction(fNode, null, isAsync)
+    } else if (this.tok.type === tt._class) {
+      node.declaration = this.parseClass(null)
+    } else {
+      node.declaration = this.parseMaybeAssign()
     }
-    node.declaration = expr
     this.semicolon()
     return this.finishNode(node, "ExportDefaultDeclaration")
   }

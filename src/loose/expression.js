@@ -280,7 +280,7 @@ lp.parseExprAtom = function() {
     return this.parseObj()
 
   case tt._class:
-    return this.parseClass()
+    return this.parseClass(false)
 
   case tt._function:
     node = this.startNode()

@@ -15496,6 +15496,41 @@ test("function* wrap() {\n({a = yield b} = obj)\n}", {
   ],
   "sourceType": "script"
 }, {ecmaVersion: 6})
+
+test("export default class Foo {}++x", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExportDefaultDeclaration",
+      "declaration": {
+        "type": "ClassDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "Foo"
+        },
+        "superClass": null,
+        "body": {
+          "type": "ClassBody",
+          "body": []
+        }
+      }
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "UpdateExpression",
+        "operator": "++",
+        "prefix": true,
+        "argument": {
+          "type": "Identifier",
+          "name": "x"
+        }
+      }
+    }
+  ],
+  "sourceType": "module"
+}, {ecmaVersion: 6, sourceType: "module"})
+
 testFail("function* wrap() {\n({a = yield b} = obj) => a\n}", "Yield expression cannot be a default value (2:6)", {ecmaVersion: 6})
 
 // invalid syntax '*foo: 1'

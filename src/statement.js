@@ -457,6 +457,8 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
 
+  if (isStatement == null)
+    isStatement = this.type == tt.name
   if (isStatement)
     node.id = this.parseIdent()
 
@@ -489,6 +491,7 @@ pp.parseFunctionParams = function(node) {
 
 pp.parseClass = function(node, isStatement) {
   this.next()
+  if (isStatement == null) isStatement = this.type === tt.name
   this.parseClassId(node, isStatement)
   this.parseClassSuper(node)
   let classBody = this.startNode()
@@ -578,20 +581,21 @@ pp.parseExport = function(node, exports) {
   }
   if (this.eat(tt._default)) { // export default ...
     this.checkExport(exports, "default", this.lastTokStart)
-    let parens = this.type == tt.parenL
-    let expr = this.parseMaybeAssign()
-    let needsSemi = true
-    if (!parens && (expr.type == "FunctionExpression" ||
-                    expr.type == "ClassExpression")) {
-      needsSemi = false
-      if (expr.id) {
-        expr.type = expr.type == "FunctionExpression"
-          ? "FunctionDeclaration"
-          : "ClassDeclaration"
-      }
+    let isAsync
+    if (this.type === tt._function || (isAsync = this.isAsyncFunction())) {
+      let fNode = this.startNode()
+      this.next()
+      if (isAsync) this.next()
+      node.declaration = this.parseFunction(fNode, null, false, isAsync)
+      if (fNode.type == "FunctionExpression") this.semicolon()
+    } else if (this.type === tt._class) {
+      let cNode = this.startNode()
+      node.declaration = this.parseClass(cNode, null)
+      if (cNode.type == "ClassExpression") this.semicolon()
+    } else {
+      node.declaration = this.parseMaybeAssign()
+      this.semicolon()
     }
-    node.declaration = expr
-    if (needsSemi) this.semicolon()
     return this.finishNode(node, "ExportDefaultDeclaration")
   }
   // export var|const|let|function|class ...
