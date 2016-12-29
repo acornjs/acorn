@@ -29169,3 +29169,5 @@ test("0123. in/foo/i", {
 })
 
 test("undefined", {}, { ecmaVersion: 8 })
+
+testFail("\\u{74}rue", "Escape sequence in keyword true (1:0)", {ecmaVersion: 6})

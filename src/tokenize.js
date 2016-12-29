@@ -691,7 +691,9 @@ pp.readWord1 = function() {
 pp.readWord = function() {
   let word = this.readWord1()
   let type = tt.name
-  if ((this.options.ecmaVersion >= 6 || !this.containsEsc) && this.keywords.test(word))
+  if (this.keywords.test(word)) {
+    if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword " + word)
     type = keywordTypes[word]
+  }
   return this.finishToken(type, word)
 }
