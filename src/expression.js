@@ -732,6 +732,9 @@ pp.checkParams = function(node) {
 pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructuringErrors) {
   let elts = [], first = true
   while (!this.eat(close)) {
+    if (refDestructuringErrors && this.type == tt.parenL && !refDestructuringErrors.parenthesized)
+      refDestructuringErrors.parenthesized = this.start
+
     if (!first) {
       this.expect(tt.comma)
       if (allowTrailingComma && this.afterTrailingComma(close)) break
@@ -742,11 +745,11 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructur
       elt = null
     else if (this.type === tt.ellipsis) {
       elt = this.parseSpread(refDestructuringErrors)
-      if (this.type === tt.comma && refDestructuringErrors && !refDestructuringErrors.trailingComma) {
+      if (refDestructuringErrors && this.type === tt.comma && !refDestructuringErrors.trailingComma)
         refDestructuringErrors.trailingComma = this.start
-      }
-    } else
+    } else {
       elt = this.parseMaybeAssign(false, refDestructuringErrors)
+    }
     elts.push(elt)
   }
   return elts

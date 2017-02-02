@@ -3108,3 +3108,5 @@ test(
 )
 
 testFail("(async)(a) => 12", "Unexpected token (1:11)", {ecmaVersion: 8})
+
+testFail("f = async ((x)) => x", "Parenthesized function parameter (1:11)", {ecmaVersion: 8})

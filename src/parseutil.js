@@ -96,8 +96,10 @@ export class DestructuringErrors {
 
 pp.checkPatternErrors = function(refDestructuringErrors, andThrow) {
   let trailing = refDestructuringErrors && refDestructuringErrors.trailingComma
-  if (!andThrow) return !!trailing
-  if (trailing) this.raise(trailing, "Comma is not permitted after the rest element")
+  let parens = refDestructuringErrors && refDestructuringErrors.parenthesized
+  if (!andThrow) return !trailing && !parens
+  if (trailing) this.raiseRecoverable(trailing, "Comma is not permitted after the rest element")
+  if (parens) this.raiseRecoverable(parens, "Parenthesized function parameter")
 }
 
 pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {
