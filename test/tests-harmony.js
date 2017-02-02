@@ -15545,3 +15545,7 @@ test("export { default as y } from './y.js';\nexport default 42;",
 testFail("export { default} from './y.js';\nexport default 42;",
          "Duplicate export 'default' (2:7)",
          {sourceType: "module", ecmaVersion: 6})
+
+testFail("foo: class X {}", "Invalid labeled declaration (1:5)", {ecmaVersion: 6})
+
+testFail("'use strict'; bar: function x() {}", "Invalid labeled declaration (1:19)", {ecmaVersion: 6})
