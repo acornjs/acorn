@@ -104,7 +104,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
-    this.checkPatternErrors(refDestructuringErrors, true)
+    this.checkPatternErrors(refDestructuringErrors)
     if (!ownDestructuringErrors) DestructuringErrors.call(refDestructuringErrors)
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
@@ -249,7 +249,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
       this.awaitPos = 0
       let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
       if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
-        this.checkPatternErrors(refDestructuringErrors, true)
+        this.checkPatternErrors(refDestructuringErrors)
         this.checkYieldAwaitInDefaultParams()
         this.yieldPos = oldYieldPos
         this.awaitPos = oldAwaitPos
@@ -403,7 +403,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
     this.expect(tt.parenR)
 
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
-      this.checkPatternErrors(refDestructuringErrors, true)
+      this.checkPatternErrors(refDestructuringErrors)
       this.checkYieldAwaitInDefaultParams()
       if (innerParenStart) this.unexpected(innerParenStart)
       this.yieldPos = oldYieldPos
