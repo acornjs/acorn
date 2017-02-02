@@ -1,3 +1,12 @@
+## 4.0.7 (2017-02-02)
+
+### Bug fixes
+
+Accept invalidly rejected code like `(x).y = 2` again.
+
+Don't raise an error when a function _inside_ strict code has a
+non-simple parameter list.
+
 ## 4.0.6 (2017-02-02)
 
 ### Bug fixes
