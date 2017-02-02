@@ -403,24 +403,24 @@ test("(1 + 2 ) * 3", {
   preserveParens: true
 });
 
-test("(x) = 23", {
+test("(x = 23)", {
   body: [
     {
       expression: {
-        operator: "=",
-        left: {
-          expression: {
+        type: "ParenthesizedExpression",
+        expression: {
+          type: "AssignmentExpression",
+          operator: "=",
+          left: {
             name: "x",
             type: "Identifier",
           },
-          type: "ParenthesizedExpression",
+          right: {
+            value: 23,
+            raw: "23",
+            type: "Literal",
+          },
         },
-        right: {
-          value: 23,
-          raw: "23",
-          type: "Literal",
-        },
-        type: "AssignmentExpression",
       },
       type: "ExpressionStatement",
     }
@@ -26988,7 +26988,7 @@ testFail("func() = 4",
          "Assigning to rvalue (1:0)");
 
 testFail("(1 + 1) = 10",
-         "Assigning to rvalue (1:1)");
+         "Parenthesized pattern (1:0)");
 
 testFail("1++",
          "Assigning to rvalue (1:0)");
@@ -29173,3 +29173,5 @@ test("0123. in/foo/i", {
 test("undefined", {}, { ecmaVersion: 8 })
 
 testFail("\\u{74}rue", "Escape sequence in keyword true (1:0)", {ecmaVersion: 6})
+
+testFail("(x=1)=2", "Parenthesized pattern (1:0)")

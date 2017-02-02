@@ -89,23 +89,21 @@ pp.unexpected = function(pos) {
 
 export class DestructuringErrors {
   constructor() {
-    this.shorthandAssign = 0
-    this.trailingComma = 0
+    this.shorthandAssign = this.trailingComma = this.parenthesized = -1
   }
 }
 
-pp.checkPatternErrors = function(refDestructuringErrors, andThrow) {
-  let trailing = refDestructuringErrors && refDestructuringErrors.trailingComma
-  let parens = refDestructuringErrors && refDestructuringErrors.parenthesized
-  if (!andThrow) return !trailing && !parens
-  if (trailing) this.raiseRecoverable(trailing, "Comma is not permitted after the rest element")
-  if (parens) this.raiseRecoverable(parens, "Parenthesized function parameter")
+pp.checkPatternErrors = function(refDestructuringErrors) {
+  let trailing = refDestructuringErrors ? refDestructuringErrors.trailingComma : -1
+  let parens = refDestructuringErrors ? refDestructuringErrors.parenthesized : -1
+  if (trailing > -1) this.raiseRecoverable(trailing, "Comma is not permitted after the rest element")
+  if (parens > -1) this.raiseRecoverable(parens, "Parenthesized pattern")
 }
 
 pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {
-  let pos = refDestructuringErrors && refDestructuringErrors.shorthandAssign
-  if (!andThrow) return !!pos
-  if (pos) this.raise(pos, "Shorthand property assignments are valid only in destructuring patterns")
+  let pos = refDestructuringErrors ? refDestructuringErrors.shorthandAssign : -1
+  if (!andThrow) return pos >= 0
+  if (pos > -1) this.raise(pos, "Shorthand property assignments are valid only in destructuring patterns")
 }
 
 pp.checkYieldAwaitInDefaultParams = function() {

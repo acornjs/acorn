@@ -109,7 +109,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
     node.left = this.type === tt.eq ? this.toAssignable(left) : left
-    refDestructuringErrors.shorthandAssign = 0 // reset because shorthand default was used correctly
+    refDestructuringErrors.shorthandAssign = -1 // reset because shorthand default was used correctly
     this.checkLVal(left)
     this.next()
     node.right = this.parseMaybeAssign(noIn)
@@ -325,6 +325,8 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     return this.finishNode(node, "Literal")
 
   case tt.parenL:
+    if (refDestructuringErrors && refDestructuringErrors.parenthesized < 0)
+      refDestructuringErrors.parenthesized = this.start
     return this.parseParenAndDistinguishExpression(canBeArrow)
 
   case tt.bracketL:
@@ -578,7 +580,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
     if (isPattern) {
       prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
     } else if (this.type === tt.eq && refDestructuringErrors) {
-      if (!refDestructuringErrors.shorthandAssign)
+      if (refDestructuringErrors.shorthandAssign < 0)
         refDestructuringErrors.shorthandAssign = this.start
       prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
     } else {
@@ -732,9 +734,6 @@ pp.checkParams = function(node) {
 pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructuringErrors) {
   let elts = [], first = true
   while (!this.eat(close)) {
-    if (refDestructuringErrors && this.type == tt.parenL && !refDestructuringErrors.parenthesized)
-      refDestructuringErrors.parenthesized = this.start
-
     if (!first) {
       this.expect(tt.comma)
       if (allowTrailingComma && this.afterTrailingComma(close)) break
@@ -745,7 +744,7 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructur
       elt = null
     else if (this.type === tt.ellipsis) {
       elt = this.parseSpread(refDestructuringErrors)
-      if (refDestructuringErrors && this.type === tt.comma && !refDestructuringErrors.trailingComma)
+      if (refDestructuringErrors && this.type === tt.comma && refDestructuringErrors.trailingComma < 0)
         refDestructuringErrors.trailingComma = this.start
     } else {
       elt = this.parseMaybeAssign(false, refDestructuringErrors)
