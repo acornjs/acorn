@@ -1,3 +1,11 @@
+## 4.0.6 (2017-02-02)
+
+### Bug fixes
+
+Fix exponential behavior (manifesting itself as a complete hang for
+even relatively small source files) introduced by the new 'use strict'
+check.
+
 ## 4.0.5 (2017-02-02)
 
 ### Bug fixes
