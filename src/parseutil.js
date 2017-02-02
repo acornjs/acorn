@@ -1,17 +1,14 @@
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
-import {lineBreak} from "./whitespace"
+import {lineBreak, skipWhiteSpace} from "./whitespace"
 
 const pp = Parser.prototype
 
 // ## Parser utilities
 
-// Test whether a statement node is the string literal `"use strict"`.
-
-pp.isUseStrict = function(stmt) {
-  return this.options.ecmaVersion >= 5 && stmt.type === "ExpressionStatement" &&
-    stmt.expression.type === "Literal" &&
-    stmt.expression.raw.slice(1, -1) === "use strict"
+const useStrictRE = new RegExp(`^(${skipWhiteSpace.source}('([^\']|\\.)*'|"([^\"]|\\.)*"|;))*${skipWhiteSpace.source}('use strict'|"use strict")`)
+pp.strictDirective = function(start) {
+  return useStrictRE.test(this.input.slice(start))
 }
 
 // Predicate that tests whether the next token is of the given

@@ -69,7 +69,8 @@ export class Parser {
     this.exprAllowed = true
 
     // Figure out if it's a module code.
-    this.strict = this.inModule = options.sourceType === "module"
+    this.inModule = options.sourceType === "module"
+    this.strict = this.inModule || this.strictDirective(this.pos)
 
     // Used to signify the start of a potential arrow function
     this.potentialArrowAt = -1

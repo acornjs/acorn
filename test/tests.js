@@ -27310,6 +27310,8 @@ testFail("x: while (true) { x: while (true) { } }",
 testFail("(function () { 'use strict'; delete i; }())",
          "Deleting local variable in strict mode (1:29)");
 
+testFail("function x() { '\\12'; 'use strict'; }", "Octal literal in strict mode (1:16)")
+
 testFail("(function () { 'use strict'; with (i); }())",
          "'with' in strict mode (1:29)");
 

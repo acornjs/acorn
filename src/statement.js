@@ -14,15 +14,11 @@ const pp = Parser.prototype
 // to its body instead of creating a new node.
 
 pp.parseTopLevel = function(node) {
-  let first = true, exports = {}
+  let exports = {}
   if (!node.body) node.body = []
   while (this.type !== tt.eof) {
     let stmt = this.parseStatement(true, true, exports)
     node.body.push(stmt)
-    if (first) {
-      if (this.isUseStrict(stmt)) this.setStrict(true)
-      first = false
-    }
   }
   this.next()
   if (this.options.ecmaVersion >= 6) {
@@ -372,20 +368,14 @@ pp.parseExpressionStatement = function(node, expr) {
 // strict"` declarations when `allowStrict` is true (used for
 // function bodies).
 
-pp.parseBlock = function(allowStrict) {
-  let node = this.startNode(), first = true, oldStrict
+pp.parseBlock = function() {
+  let node = this.startNode()
   node.body = []
   this.expect(tt.braceL)
   while (!this.eat(tt.braceR)) {
     let stmt = this.parseStatement(true)
     node.body.push(stmt)
-    if (first && allowStrict && this.isUseStrict(stmt)) {
-      oldStrict = this.strict
-      this.setStrict(this.strict = true)
-    }
-    first = false
   }
-  if (oldStrict === false) this.setStrict(false)
   return this.finishNode(node, "BlockStatement")
 }
 

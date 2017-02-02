@@ -62,19 +62,6 @@ if (typeof Symbol !== "undefined")
 // Toggle strict mode. Re-reads the next number or string to please
 // pedantic tests (`"use strict"; 010;` should fail).
 
-pp.setStrict = function(strict) {
-  this.strict = strict
-  if (this.type !== tt.num && this.type !== tt.string) return
-  this.pos = this.start
-  if (this.options.locations) {
-    while (this.pos < this.lineStart) {
-      this.lineStart = this.input.lastIndexOf("\n", this.lineStart - 2) + 1
-      --this.curLine
-    }
-  }
-  this.nextToken()
-}
-
 pp.curContext = function() {
   return this.context[this.context.length - 1]
 }

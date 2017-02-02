@@ -669,29 +669,29 @@ pp.parseArrowExpression = function(node, params, isAsync) {
 // Parse function body and check parameters.
 
 pp.parseFunctionBody = function(node, isArrowFunction) {
-  let isExpression = isArrowFunction && this.type !== tt.braceL
+  let isExpression = isArrowFunction && this.type !== tt.braceL, strict = this.strict
 
   if (isExpression) {
     node.body = this.parseMaybeAssign()
     node.expression = true
   } else {
+    strict = strict || this.strictDirective(this.end)
     // Start a new scope with regard to labels and the `inFunction`
     // flag (restore them to their old value afterwards).
-    let oldInFunc = this.inFunction, oldLabels = this.labels
-    this.inFunction = true; this.labels = []
+    let oldInFunc = this.inFunction, oldLabels = this.labels, oldStrict = this.strict
+    this.inFunction = true; this.labels = []; this.strict = strict
     node.body = this.parseBlock(true)
     node.expression = false
-    this.inFunction = oldInFunc; this.labels = oldLabels
+    this.inFunction = oldInFunc; this.labels = oldLabels; this.strict = oldStrict
   }
 
   // If this is a strict mode function, verify that argument names
   // are not repeated, and it does not try to bind the words `eval`
   // or `arguments`.
-  let useStrict = (!isExpression && node.body.body.length && this.isUseStrict(node.body.body[0])) ? node.body.body[0] : null
-  if (useStrict && this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params))
-    this.raiseRecoverable(useStrict.start, "Illegal 'use strict' directive in function with non-simple parameter list")
+  if (strict && this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params))
+    this.raiseRecoverable(node.start, "Illegal 'use strict' directive in function with non-simple parameter list")
 
-  if (this.strict || useStrict) {
+  if (this.strict || strict) {
     let oldStrict = this.strict
     this.strict = true
     if (node.id)
