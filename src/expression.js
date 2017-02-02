@@ -617,7 +617,8 @@ pp.initFunction = function(node) {
 // Parse object or class method.
 
 pp.parseMethod = function(isGenerator, isAsync) {
-  let node = this.startNode(), oldInGen = this.inGenerator, oldInAsync = this.inAsync, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+  let node = this.startNode(), oldInGen = this.inGenerator, oldInAsync = this.inAsync,
+      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
 
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
@@ -629,6 +630,7 @@ pp.parseMethod = function(isGenerator, isAsync) {
   this.inAsync = node.async
   this.yieldPos = 0
   this.awaitPos = 0
+  this.inFunction = true
 
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
@@ -639,13 +641,15 @@ pp.parseMethod = function(isGenerator, isAsync) {
   this.inAsync = oldInAsync
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
+  this.inFunction = oldInFunc
   return this.finishNode(node, "FunctionExpression")
 }
 
 // Parse arrow function expression with given parameters.
 
 pp.parseArrowExpression = function(node, params, isAsync) {
-  let oldInGen = this.inGenerator, oldInAsync = this.inAsync, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+  let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
+      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
 
   this.initFunction(node)
   if (this.options.ecmaVersion >= 8)
@@ -655,6 +659,7 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   this.inAsync = node.async
   this.yieldPos = 0
   this.awaitPos = 0
+  this.inFunction = true
 
   node.params = this.toAssignableList(params, true)
   this.parseFunctionBody(node, true)
@@ -663,6 +668,7 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   this.inAsync = oldInAsync
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
+  this.inFunction = oldInFunc
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
@@ -678,11 +684,11 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     strict = strict || this.strictDirective(this.end)
     // Start a new scope with regard to labels and the `inFunction`
     // flag (restore them to their old value afterwards).
-    let oldInFunc = this.inFunction, oldLabels = this.labels, oldStrict = this.strict
-    this.inFunction = true; this.labels = []; this.strict = strict
+    let oldLabels = this.labels, oldStrict = this.strict
+    this.labels = []; this.strict = strict
     node.body = this.parseBlock(true)
     node.expression = false
-    this.inFunction = oldInFunc; this.labels = oldLabels; this.strict = oldStrict
+    this.labels = oldLabels; this.strict = oldStrict
   }
 
   // If this is a strict mode function, verify that argument names

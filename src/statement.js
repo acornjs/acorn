@@ -456,11 +456,13 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   if (isStatement)
     node.id = this.parseIdent()
 
-  let oldInGen = this.inGenerator, oldInAsync = this.inAsync, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+  let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
+      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
   this.inGenerator = node.generator
   this.inAsync = node.async
   this.yieldPos = 0
   this.awaitPos = 0
+  this.inFunction = true
 
   if (!isStatement && this.type === tt.name)
     node.id = this.parseIdent()
@@ -471,6 +473,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.inAsync = oldInAsync
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
+  this.inFunction = oldInFunc
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 

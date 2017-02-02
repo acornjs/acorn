@@ -15531,6 +15531,8 @@ test("export default class Foo {}++x", {
   "sourceType": "module"
 }, {ecmaVersion: 6, sourceType: "module"})
 
+test("class B extends A { foo(a = super.foo()) { return a }}", {}, {ecmaVersion: 6})
+
 testFail("function* wrap() {\n({a = yield b} = obj) => a\n}", "Yield expression cannot be a default value (2:6)", {ecmaVersion: 6})
 
 // invalid syntax '*foo: 1'
