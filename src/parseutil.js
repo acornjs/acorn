@@ -6,9 +6,16 @@ const pp = Parser.prototype
 
 // ## Parser utilities
 
-const useStrictRE = new RegExp(`^(${skipWhiteSpace.source}('([^\']|\\.)*'|"([^\"]|\\.)*"|;))*${skipWhiteSpace.source}('use strict'|"use strict")`)
+const literal = /^(?:'((?:[^\']|\.)*)'|"((?:[^\"]|\.)*)"|;)/
 pp.strictDirective = function(start) {
-  return useStrictRE.test(this.input.slice(start))
+  for (;;) {
+    skipWhiteSpace.lastIndex = start
+    start += skipWhiteSpace.exec(this.input)[0].length
+    let match = literal.exec(this.input.slice(start))
+    if (!match) return false
+    if ((match[1] || match[2]) == "use strict") return true
+    start += match[0].length
+  }
 }
 
 // Predicate that tests whether the next token is of the given
