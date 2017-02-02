@@ -1,3 +1,19 @@
+## 4.0.5 (2017-02-02)
+
+### Bug fixes
+
+Disallow parenthesized pattern expressions.
+
+Allow keywords as export names.
+
+Don't allow the `async` keyword to be parenthesized.
+
+Properly raise an error when a keyword contains a character escape.
+
+Allow `"use strict"` to appear after other string literal expressions.
+
+Disallow labeled declarations.
+
 ## 4.0.4 (2016-12-19)
 
 ### Bug fixes
