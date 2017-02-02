@@ -201,7 +201,7 @@ pp.parseForStatement = function(node) {
   if (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
     this.toAssignable(init)
     this.checkLVal(init)
-    this.checkPatternErrors(refDestructuringErrors)
+    if (init.type != "MemberExpression") this.checkPatternErrors(refDestructuringErrors)
     return this.parseForIn(node, init)
   } else {
     this.checkExpressionErrors(refDestructuringErrors, true)

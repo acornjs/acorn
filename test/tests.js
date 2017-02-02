@@ -29175,3 +29175,7 @@ test("undefined", {}, { ecmaVersion: 8 })
 testFail("\\u{74}rue", "Escape sequence in keyword true (1:0)", {ecmaVersion: 6})
 
 testFail("(x=1)=2", "Parenthesized pattern (1:0)")
+
+test("(foo = [])[0] = 4;", {})
+
+test("for ((foo = []).bar in {}) {}", {})
