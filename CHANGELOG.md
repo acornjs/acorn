@@ -1,3 +1,11 @@
+## 4.0.8 (2017-02-03)
+
+### Bug fixes
+
+Solve spurious parenthesized pattern errors by temporarily erring on
+the side of accepting programs that our delayed errors don't handle
+correctly yet.
+
 ## 4.0.7 (2017-02-02)
 
 ### Bug fixes
