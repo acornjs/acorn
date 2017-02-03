@@ -104,7 +104,14 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
-    if (left.type != "MemberExpression") this.checkPatternErrors(refDestructuringErrors)
+    if (left.type != "MemberExpression") {
+      // FIXME this isn't correct, but is a workaround for the problem
+      // of refDestructuringErrors being shared between the potential
+      // arrow function arglist and an assignment inside that list.
+      // See #502
+      if (refDestructuringErrors.parenthesized < startPos) refDestructuringErrors.parenthesized = -1
+      this.checkPatternErrors(refDestructuringErrors)
+    }
     if (!ownDestructuringErrors) DestructuringErrors.call(refDestructuringErrors)
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value

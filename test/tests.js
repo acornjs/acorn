@@ -29179,3 +29179,5 @@ testFail("(x=1)=2", "Parenthesized pattern (1:0)")
 test("(foo = [])[0] = 4;", {})
 
 test("for ((foo = []).bar in {}) {}", {})
+
+test("((b), a=1)", {})
