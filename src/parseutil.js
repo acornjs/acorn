@@ -96,14 +96,15 @@ pp.unexpected = function(pos) {
 
 export class DestructuringErrors {
   constructor() {
-    this.shorthandAssign = this.trailingComma = this.parenthesized = -1
+    this.shorthandAssign = this.trailingComma = this.parenthesizedAssign = this.parenthesizedBind = -1
   }
 }
 
-pp.checkPatternErrors = function(refDestructuringErrors) {
-  let trailing = refDestructuringErrors ? refDestructuringErrors.trailingComma : -1
-  let parens = refDestructuringErrors ? refDestructuringErrors.parenthesized : -1
-  if (trailing > -1) this.raiseRecoverable(trailing, "Comma is not permitted after the rest element")
+pp.checkPatternErrors = function(refDestructuringErrors, isAssign) {
+  if (!refDestructuringErrors) return
+  if (refDestructuringErrors.trailingComma > -1)
+    this.raiseRecoverable(refDestructuringErrors.trailingComma, "Comma is not permitted after the rest element")
+  let parens = isAssign ? refDestructuringErrors.parenthesizedAssign : refDestructuringErrors.parenthesizedBind
   if (parens > -1) this.raiseRecoverable(parens, "Parenthesized pattern")
 }
 
@@ -118,4 +119,11 @@ pp.checkYieldAwaitInDefaultParams = function() {
     this.raise(this.yieldPos, "Yield expression cannot be a default value")
   if (this.awaitPos)
     this.raise(this.awaitPos, "Await expression cannot be a default value")
+}
+
+pp.isSimpleAssignTarget = function(expr) {
+  return expr.type === "Identifier" ||
+    (expr.type === "MemberExpression" && (expr.object.type === "MemberExpression" ||
+                                          expr.object.type === "CallExpression" ||
+                                          expr.object.type === "Super"))
 }

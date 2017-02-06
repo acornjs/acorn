@@ -93,25 +93,22 @@ pp.parseExpression = function(noIn, refDestructuringErrors) {
 pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   if (this.inGenerator && this.isContextual("yield")) return this.parseYield()
 
-  let ownDestructuringErrors = false
-  if (!refDestructuringErrors) {
+  let ownDestructuringErrors = false, oldParenAssign = -1
+  if (refDestructuringErrors) {
+    oldParenAssign = refDestructuringErrors.parenthesizedAssign
+    refDestructuringErrors.parenthesizedAssign = -1
+  } else {
     refDestructuringErrors = new DestructuringErrors
     ownDestructuringErrors = true
   }
+
   let startPos = this.start, startLoc = this.startLoc
   if (this.type == tt.parenL || this.type == tt.name)
     this.potentialArrowAt = this.start
   let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
-    if (left.type != "MemberExpression") {
-      // FIXME this isn't correct, but is a workaround for the problem
-      // of refDestructuringErrors being shared between the potential
-      // arrow function arglist and an assignment inside that list.
-      // See #502
-      if (refDestructuringErrors.parenthesized < startPos) refDestructuringErrors.parenthesized = -1
-      this.checkPatternErrors(refDestructuringErrors)
-    }
+    this.checkPatternErrors(refDestructuringErrors, true)
     if (!ownDestructuringErrors) DestructuringErrors.call(refDestructuringErrors)
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
@@ -124,6 +121,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   } else {
     if (ownDestructuringErrors) this.checkExpressionErrors(refDestructuringErrors, true)
   }
+  if (oldParenAssign > -1) refDestructuringErrors.parenthesizedAssign = oldParenAssign
   return left
 }
 
@@ -230,25 +228,24 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
   let expr = this.parseExprAtom(refDestructuringErrors)
   let skipArrowSubscripts = expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")"
   if (this.checkExpressionErrors(refDestructuringErrors) || skipArrowSubscripts) return expr
-  return this.parseSubscripts(expr, startPos, startLoc)
+  let result = this.parseSubscripts(expr, startPos, startLoc)
+  if (refDestructuringErrors && result.type === "MemberExpression") {
+    if (refDestructuringErrors.parenthesizedAssign >= result.start) refDestructuringErrors.parenthesizedAssign = -1
+    if (refDestructuringErrors.parenthesizedBind >= result.start) refDestructuringErrors.parenthesizedBind = -1
+  }
+  return result
 }
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
   let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
       this.lastTokEnd == base.end && !this.canInsertSemicolon()
-  for (;;) {
-    if (this.eat(tt.dot)) {
+  for (let computed;;) {
+    if ((computed = this.eat(tt.bracketL)) || this.eat(tt.dot)) {
       let node = this.startNodeAt(startPos, startLoc)
       node.object = base
-      node.property = this.parseIdent(true)
-      node.computed = false
-      base = this.finishNode(node, "MemberExpression")
-    } else if (this.eat(tt.bracketL)) {
-      let node = this.startNodeAt(startPos, startLoc)
-      node.object = base
-      node.property = this.parseExpression()
-      node.computed = true
-      this.expect(tt.bracketR)
+      node.property = computed ? this.parseExpression() : this.parseIdent(true)
+      node.computed = !!computed
+      if (computed) this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
     } else if (!noCalls && this.eat(tt.parenL)) {
       let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
@@ -256,7 +253,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
       this.awaitPos = 0
       let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
       if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
-        this.checkPatternErrors(refDestructuringErrors)
+        this.checkPatternErrors(refDestructuringErrors, false)
         this.checkYieldAwaitInDefaultParams()
         this.yieldPos = oldYieldPos
         this.awaitPos = oldAwaitPos
@@ -332,9 +329,14 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     return this.finishNode(node, "Literal")
 
   case tt.parenL:
-    if (refDestructuringErrors && refDestructuringErrors.parenthesized < 0)
-      refDestructuringErrors.parenthesized = this.start
-    return this.parseParenAndDistinguishExpression(canBeArrow)
+    let start = this.start, expr = this.parseParenAndDistinguishExpression(canBeArrow)
+    if (refDestructuringErrors) {
+      if (refDestructuringErrors.parenthesizedAssign < 0 && !this.isSimpleAssignTarget(expr))
+        refDestructuringErrors.parenthesizedAssign = start
+      if (refDestructuringErrors.parenthesizedBind < 0)
+        refDestructuringErrors.parenthesizedBind = start
+    }
+    return expr
 
   case tt.bracketL:
     node = this.startNode()
@@ -410,7 +412,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
     this.expect(tt.parenR)
 
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
-      this.checkPatternErrors(refDestructuringErrors)
+      this.checkPatternErrors(refDestructuringErrors, false)
       this.checkYieldAwaitInDefaultParams()
       if (innerParenStart) this.unexpected(innerParenStart)
       this.yieldPos = oldYieldPos

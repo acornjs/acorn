@@ -15553,3 +15553,5 @@ testFail("foo: class X {}", "Invalid labeled declaration (1:5)", {ecmaVersion: 6
 testFail("'use strict'; bar: function x() {}", "Invalid labeled declaration (1:19)", {ecmaVersion: 6})
 
 testFail("({x, y}) = {}", "Parenthesized pattern (1:0)", {ecmaVersion: 6})
+
+test("[x, (y), {z, u: (v)}] = foo", {}, {ecmaVersion: 6})
