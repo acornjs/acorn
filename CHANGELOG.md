@@ -1,3 +1,10 @@
+## 4.0.9 (2017-02-06)
+
+### Bug fixes
+
+Fix incorrect error raised for parenthesized simple assignment
+targets, so that `(x) = 1` parses again.
+
 ## 4.0.8 (2017-02-03)
 
 ### Bug fixes
