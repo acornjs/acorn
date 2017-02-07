@@ -15555,3 +15555,5 @@ testFail("'use strict'; bar: function x() {}", "Invalid labeled declaration (1:1
 testFail("({x, y}) = {}", "Parenthesized pattern (1:0)", {ecmaVersion: 6})
 
 test("[x, (y), {z, u: (v)}] = foo", {}, {ecmaVersion: 6})
+
+test("export default function(x) {};", {body: [{}, {}]}, {ecmaVersion: 6, sourceType: "module"})

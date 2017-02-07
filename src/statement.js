@@ -584,11 +584,9 @@ pp.parseExport = function(node, exports) {
       this.next()
       if (isAsync) this.next()
       node.declaration = this.parseFunction(fNode, null, false, isAsync)
-      if (fNode.type == "FunctionExpression") this.semicolon()
     } else if (this.type === tt._class) {
       let cNode = this.startNode()
       node.declaration = this.parseClass(cNode, null)
-      if (cNode.type == "ClassExpression") this.semicolon()
     } else {
       node.declaration = this.parseMaybeAssign()
       this.semicolon()

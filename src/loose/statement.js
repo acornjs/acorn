@@ -355,8 +355,8 @@ lp.parseExport = function() {
       node.declaration = this.parseClass(null)
     } else {
       node.declaration = this.parseMaybeAssign()
+      this.semicolon()
     }
-    this.semicolon()
     return this.finishNode(node, "ExportDefaultDeclaration")
   }
   if (this.tok.type.keyword || this.toks.isLet() || this.toks.isAsyncFunction()) {
