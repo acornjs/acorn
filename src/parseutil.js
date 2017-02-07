@@ -122,8 +122,7 @@ pp.checkYieldAwaitInDefaultParams = function() {
 }
 
 pp.isSimpleAssignTarget = function(expr) {
-  return expr.type === "Identifier" ||
-    (expr.type === "MemberExpression" && (expr.object.type === "MemberExpression" ||
-                                          expr.object.type === "CallExpression" ||
-                                          expr.object.type === "Super"))
+  if (expr.type === "ParenthesizedExpression")
+    return this.isSimpleAssignTarget(expr.expression)
+  return expr.type === "Identifier" || expr.type === "MemberExpression"
 }
