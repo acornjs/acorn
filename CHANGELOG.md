@@ -1,3 +1,9 @@
+## 4.0.11 (2017-02-07)
+
+### Bug fixes
+
+Allow all forms of member expressions to be parenthesized as lvalue.
+
 ## 4.0.10 (2017-02-07)
 
 ### Bug fixes
