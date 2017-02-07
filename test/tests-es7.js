@@ -388,3 +388,7 @@ testFail(
   "Unexpected token (1:20)",
   { ecmaVersion: 7 }
 )
+
+testFail("'use strict'; function y(x = 1) { 'use strict' }",
+         "Illegal 'use strict' directive in function with non-simple parameter list (1:14)",
+         {ecmaVersion: 7})
