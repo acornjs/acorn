@@ -1,3 +1,13 @@
+## 4.0.10 (2017-02-07)
+
+### Bug fixes
+
+Don't expect semicolons after default-exported functions or classes,
+even when they are expressions.
+
+Check for use of `'use strict'` directives in non-simple parameter
+functions, even when already in strict mode.
+
 ## 4.0.9 (2017-02-06)
 
 ### Bug fixes
