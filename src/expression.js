@@ -705,17 +705,24 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     // Start a new scope with regard to labels and the `inFunction`
     // flag (restore them to their old value afterwards).
     let oldLabels = this.labels
+    let oldVarDeclaredNames = this.varDeclaredNames
+    this.varDeclaredNames = new Set()
     this.labels = []
     if (useStrict) this.strict = true
-    node.body = this.parseBlock(true)
+
+    // Add the params to varDeclaredNames to ensure that an error is thrown
+    // if a let/const declaration in the function clashes with one of the params.
+    node.params.forEach(param => this.checkLVal(param, "var"))
+    node.body = this.parseBlock(this.varDeclaredNames)
     node.expression = false
     this.labels = oldLabels
+    this.varDeclaredNames = oldVarDeclaredNames
   }
 
   if (oldStrict || useStrict) {
     this.strict = true
     if (node.id)
-      this.checkLVal(node.id, true)
+      this.checkLVal(node.id, "var")
     this.checkParams(node)
     this.strict = oldStrict
   } else if (isArrowFunction || !this.isSimpleParamList(node.params)) {
@@ -734,7 +741,7 @@ pp.isSimpleParamList = function(params) {
 
 pp.checkParams = function(node) {
   let nameHash = {}
-  for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], true, nameHash)
+  for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], "var", nameHash)
 }
 
 // Parses a comma-separated list of expressions, and returns them as
