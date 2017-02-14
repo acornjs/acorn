@@ -14464,7 +14464,7 @@ testFail("/[a-z]/s", "Invalid regular expression flag (1:1)", {ecmaVersion: 6});
 
 testFail("[...x in y] = []", "Assigning to rvalue (1:4)", {ecmaVersion: 6});
 
-testFail("export let x = a; export function x() {}", "Duplicate export 'x' (1:34)", {ecmaVersion: 6, sourceType: "module"})
+testFail("export let x = a; export function x() {}", "Identifier 'x' has already been declared (1:34)", {ecmaVersion: 6, sourceType: "module"})
 testFail("export let [{x = 2}] = a; export {x}", "Duplicate export 'x' (1:34)", {ecmaVersion: 6, sourceType: "module"})
 testFail("export default 100; export default 3", "Duplicate export 'default' (1:27)", {ecmaVersion: 6, sourceType: "module"})
 
@@ -15557,3 +15557,101 @@ testFail("({x, y}) = {}", "Parenthesized pattern (1:0)", {ecmaVersion: 6})
 test("[x, (y), {z, u: (v)}] = foo", {}, {ecmaVersion: 6})
 
 test("export default function(x) {};", {body: [{}, {}]}, {ecmaVersion: 6, sourceType: "module"})
+
+testFail("var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:17)", {ecmaVersion: 6})
+
+testFail("{ var foo = 1; let foo = 1; }", "Identifier 'foo' has already been declared (1:19)", {ecmaVersion: 6})
+
+testFail("let foo = 1; var foo = 1;", "Identifier 'foo' has already been declared (1:17)", {ecmaVersion: 6})
+
+testFail("let foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:17)", {ecmaVersion: 6})
+
+testFail("var foo = 1; const foo = 1;", "Identifier 'foo' has already been declared (1:19)", {ecmaVersion: 6})
+
+testFail("const foo = 1; var foo = 1;", "Identifier 'foo' has already been declared (1:19)", {ecmaVersion: 6})
+
+testFail("var [foo] = [1]; let foo = 1;", "Identifier 'foo' has already been declared (1:21)", {ecmaVersion: 6})
+
+testFail("var [{ bar: [foo] }] = x; let {foo} = 1;", "Identifier 'foo' has already been declared (1:31)", {ecmaVersion: 6})
+
+testFail("if (x) var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:24)", {ecmaVersion: 6})
+
+testFail("if (x) {} else var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:32)", {ecmaVersion: 6})
+
+testFail("if (x) var foo = 1; else {} let foo = 1;", "Identifier 'foo' has already been declared (1:32)", {ecmaVersion: 6})
+
+testFail("if (x) {} else if (y) {} else var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:47)", {ecmaVersion: 6})
+
+testFail("while (x) var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:27)", {ecmaVersion: 6})
+
+testFail("do var foo = 1; while (x) let foo = 1;", "Identifier 'foo' has already been declared (1:30)", {ecmaVersion: 6})
+
+testFail("for (;;) var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:26)", {ecmaVersion: 6})
+
+testFail("for (const x of y) var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:36)", {ecmaVersion: 6})
+
+testFail("for (const x in y) var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:36)", {ecmaVersion: 6})
+
+testFail("label: var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:24)", {ecmaVersion: 6})
+
+testFail("switch (x) { case 0: var foo = 1 } let foo = 1;", "Identifier 'foo' has already been declared (1:39)", {ecmaVersion: 6})
+
+testFail("try { var foo = 1; } catch (e) {} let foo = 1;", "Identifier 'foo' has already been declared (1:38)", {ecmaVersion: 6})
+
+testFail("function foo() {} let foo = 1;", "Identifier 'foo' has already been declared (1:22)", {ecmaVersion: 6})
+
+testFail("{ var foo = 1; } let foo = 1;", "Identifier 'foo' has already been declared (1:21)", {ecmaVersion: 6})
+
+testFail("if (x) { if (y) var foo = 1; } let foo = 1;", "Identifier 'foo' has already been declared (1:35)", {ecmaVersion: 6})
+
+testFail("var foo = 1; function x() {} let foo = 1;", "Identifier 'foo' has already been declared (1:33)", {ecmaVersion: 6})
+
+testFail("{ let foo = 1; { let foo = 2; } let foo = 1; }", "Identifier 'foo' has already been declared (1:36)", {ecmaVersion: 6})
+
+testFail("for (var foo of y) {} let foo = 1;", "Identifier 'foo' has already been declared (1:26)", {ecmaVersion: 6})
+
+testFail("function x(foo) { let foo = 1; }", "Identifier 'foo' has already been declared (1:22)", {ecmaVersion: 6})
+
+testFail("var [...foo] = x; let foo = 1;", "Identifier 'foo' has already been declared (1:22)", {ecmaVersion: 6})
+
+testFail("foo => { let foo; }", "Identifier 'foo' has already been declared (1:13)", {ecmaVersion: 6})
+
+testFail("({ x(foo) { let foo; } })", "Identifier 'foo' has already been declared (1:16)", {ecmaVersion: 6})
+
+testFail("try {} catch (foo) { let foo = 1; }", "Identifier 'foo' has already been declared (1:25)", {ecmaVersion: 6})
+
+test("var foo = 1; var foo = 1;", {}, {ecmaVersion: 6})
+
+test("if (x) var foo = 1; var foo = 1;", {}, {ecmaVersion: 6})
+
+test("function x() { var foo = 1; } let foo = 1;", {}, {ecmaVersion: 6})
+
+test("function foo() { let foo = 1; }", {}, {ecmaVersion: 6})
+
+test("var foo = 1; { let foo = 1; }", {}, {ecmaVersion: 6})
+
+test("{ let foo = 1; { let foo = 2; } }", {}, {ecmaVersion: 6})
+
+test("try {} catch (foo) { var foo = 1; }", {}, {ecmaVersion: 6})
+
+test("let x = 1; function foo(x) {}", {}, {ecmaVersion: 6})
+
+test("for (let i = 0;;); for (let i = 0;;);", {}, {ecmaVersion: 6})
+
+test("for (const foo of bar); for (const foo of bar);", {}, {ecmaVersion: 6})
+
+test("for (const foo in bar); for (const foo in bar);", {}, {ecmaVersion: 6})
+
+test("for (let foo in bar) { let foo = 1; }", {}, {ecmaVersion: 6})
+
+test("for (let foo of bar) { let foo = 1; }", {}, {ecmaVersion: 6})
+
+test("class Foo { method(foo) {} method2() { let foo; } }", {}, {ecmaVersion: 6})
+
+test("() => { let foo; }; foo => {}", {}, {ecmaVersion: 6})
+
+test("() => { let foo; }; () => { let foo; }", {}, {ecmaVersion: 6})
+
+test("switch(x) { case 1: let foo = 1; } let foo = 1;", {}, {ecmaVersion: 6})
+
+test("'use strict'; function foo() { let foo = 1; }", {}, {ecmaVersion: 6})

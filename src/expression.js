@@ -642,6 +642,7 @@ pp.parseMethod = function(isGenerator, isAsync) {
   this.yieldPos = 0
   this.awaitPos = 0
   this.inFunction = true
+  this.enterFunctionScope()
 
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
@@ -662,6 +663,7 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
       oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
 
+  this.enterFunctionScope()
   this.initFunction(node)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
@@ -692,6 +694,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
   if (isExpression) {
     node.body = this.parseMaybeAssign()
     node.expression = true
+    this.checkParams(node, false)
   } else {
     let nonSimple = this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params)
     if (!oldStrict || nonSimple) {
@@ -707,20 +710,21 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     let oldLabels = this.labels
     this.labels = []
     if (useStrict) this.strict = true
-    node.body = this.parseBlock(true)
+
+    // Add the params to varDeclaredNames to ensure that an error is thrown
+    // if a let/const declaration in the function clashes with one of the params.
+    this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && this.isSimpleParamList(node.params))
+    node.body = this.parseBlock(false)
     node.expression = false
     this.labels = oldLabels
   }
+  this.exitFunctionScope()
 
-  if (oldStrict || useStrict) {
-    this.strict = true
-    if (node.id)
-      this.checkLVal(node.id, true)
-    this.checkParams(node)
-    this.strict = oldStrict
-  } else if (isArrowFunction || !this.isSimpleParamList(node.params)) {
-    this.checkParams(node)
+  if (this.strict && node.id) {
+    // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
+    this.checkLVal(node.id, "var")
   }
+  this.strict = oldStrict
 }
 
 pp.isSimpleParamList = function(params) {
@@ -732,9 +736,9 @@ pp.isSimpleParamList = function(params) {
 // Checks function params for various disallowed patterns such as using "eval"
 // or "arguments" and duplicate parameters.
 
-pp.checkParams = function(node) {
+pp.checkParams = function(node, allowDuplicates) {
   let nameHash = {}
-  for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], true, nameHash)
+  for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], "var", allowDuplicates ? null : nameHash)
 }
 
 // Parses a comma-separated list of expressions, and returns them as

@@ -2,6 +2,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {lineBreak, skipWhiteSpace} from "./whitespace"
 import {isIdentifierStart, isIdentifierChar} from "./identifier"
+import {has} from "./util"
 import {DestructuringErrors} from "./parseutil"
 
 const pp = Parser.prototype
@@ -183,6 +184,7 @@ pp.parseDoStatement = function(node) {
 pp.parseForStatement = function(node) {
   this.next()
   this.labels.push(loopLabel)
+  this.enterLexicalScope()
   this.expect(tt.parenL)
   if (this.type === tt.semi) return this.parseFor(node, null)
   let isLet = this.isLet()
@@ -247,6 +249,7 @@ pp.parseSwitchStatement = function(node) {
   node.cases = []
   this.expect(tt.braceL)
   this.labels.push(switchLabel)
+  this.enterLexicalScope()
 
   // Statements under must be grouped (by label) in SwitchCase
   // nodes. `cur` is used to keep the node that we are currently
@@ -272,6 +275,7 @@ pp.parseSwitchStatement = function(node) {
       cur.consequent.push(this.parseStatement(true))
     }
   }
+  this.exitLexicalScope()
   if (cur) this.finishNode(cur, "SwitchCase")
   this.next() // Closing brace
   this.labels.pop()
@@ -300,9 +304,9 @@ pp.parseTryStatement = function(node) {
     this.next()
     this.expect(tt.parenL)
     clause.param = this.parseBindingAtom()
-    this.checkLVal(clause.param, true)
+    this.checkLVal(clause.param, "var")
     this.expect(tt.parenR)
-    clause.body = this.parseBlock()
+    clause.body = this.parseBlock(false)
     node.handler = this.finishNode(clause, "CatchClause")
   }
   node.finalizer = this.eat(tt._finally) ? this.parseBlock() : null
@@ -368,17 +372,52 @@ pp.parseExpressionStatement = function(node, expr) {
   return this.finishNode(node, "ExpressionStatement")
 }
 
+pp.enterLexicalScope = function() {
+  this.lexicalScopeStack.push({})
+  this.varScopeStack.push({})
+}
+
+pp.exitLexicalScope = function() {
+  this.lexicalScopeStack.pop()
+  const varsDeclaredInBlock = this.varScopeStack.pop()
+
+  // Since var declarations are function-scoped, all of the varDeclaredNames of the block are retained outside the block.
+  // However, when parsing the statements of the block initially, only the var declarations in the block
+  // are considered. For example, `var foo = 1; { let foo = 1; }` is valid.
+  for (const varName in varsDeclaredInBlock) {
+    if (has(varsDeclaredInBlock, varName)) {
+      this.varScopeStack[this.varScopeStack.length - 1][varName] = true
+    }
+  }
+}
+
+pp.enterFunctionScope = function() {
+  this.lexicalScopeStack.push({})
+  this.varScopeStack.push({})
+}
+
+pp.exitFunctionScope = function() {
+  this.lexicalScopeStack.pop()
+  this.varScopeStack.pop()
+}
+
 // Parse a semicolon-enclosed block of statements, handling `"use
 // strict"` declarations when `allowStrict` is true (used for
 // function bodies).
 
-pp.parseBlock = function() {
+pp.parseBlock = function(createNewLexicalScope = true) {
   let node = this.startNode()
   node.body = []
   this.expect(tt.braceL)
+  if (createNewLexicalScope) {
+    this.enterLexicalScope()
+  }
   while (!this.eat(tt.braceR)) {
     let stmt = this.parseStatement(true)
     node.body.push(stmt)
+  }
+  if (createNewLexicalScope) {
+    this.exitLexicalScope()
   }
   return this.finishNode(node, "BlockStatement")
 }
@@ -394,6 +433,7 @@ pp.parseFor = function(node, init) {
   this.expect(tt.semi)
   node.update = this.type === tt.parenR ? null : this.parseExpression()
   this.expect(tt.parenR)
+  this.exitLexicalScope()
   node.body = this.parseStatement(false)
   this.labels.pop()
   return this.finishNode(node, "ForStatement")
@@ -408,6 +448,7 @@ pp.parseForIn = function(node, init) {
   node.left = init
   node.right = this.parseExpression()
   this.expect(tt.parenR)
+  this.exitLexicalScope()
   node.body = this.parseStatement(false)
   this.labels.pop()
   return this.finishNode(node, type)
@@ -420,7 +461,7 @@ pp.parseVar = function(node, isFor, kind) {
   node.kind = kind
   for (;;) {
     let decl = this.startNode()
-    this.parseVarId(decl)
+    this.parseVarId(decl, kind)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
     } else if (kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
@@ -436,9 +477,9 @@ pp.parseVar = function(node, isFor, kind) {
   return node
 }
 
-pp.parseVarId = function(decl) {
-  decl.id = this.parseBindingAtom()
-  this.checkLVal(decl.id, true)
+pp.parseVarId = function(decl, kind) {
+  decl.id = this.parseBindingAtom(kind)
+  this.checkLVal(decl.id, kind, false)
 }
 
 // Parse a function declaration or literal (depending on the
@@ -451,8 +492,12 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
 
-  if (isStatement)
+  if (isStatement) {
     node.id = isStatement === "nullableID" && this.type != tt.name ? null : this.parseIdent()
+    if (node.id) {
+      this.checkLVal(node.id, "var")
+    }
+  }
 
   let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
       oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
@@ -461,6 +506,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.yieldPos = 0
   this.awaitPos = 0
   this.inFunction = true
+  this.enterFunctionScope()
 
   if (!isStatement)
     node.id = this.type == tt.name ? this.parseIdent() : null
@@ -487,7 +533,7 @@ pp.parseFunctionParams = function(node) {
 
 pp.parseClass = function(node, isStatement) {
   this.next()
-  
+
   this.parseClassId(node, isStatement)
   this.parseClassSuper(node)
   let classBody = this.startNode()
@@ -707,7 +753,7 @@ pp.parseImportSpecifiers = function() {
     // import defaultObj, { x, y as z } from '...'
     let node = this.startNode()
     node.local = this.parseIdent()
-    this.checkLVal(node.local, true)
+    this.checkLVal(node.local, "let")
     nodes.push(this.finishNode(node, "ImportDefaultSpecifier"))
     if (!this.eat(tt.comma)) return nodes
   }
@@ -716,7 +762,7 @@ pp.parseImportSpecifiers = function() {
     this.next()
     this.expectContextual("as")
     node.local = this.parseIdent()
-    this.checkLVal(node.local, true)
+    this.checkLVal(node.local, "let")
     nodes.push(this.finishNode(node, "ImportNamespaceSpecifier"))
     return nodes
   }
@@ -736,7 +782,7 @@ pp.parseImportSpecifiers = function() {
       if (this.isKeyword(node.local.name)) this.unexpected(node.local.start)
       if (this.reservedWordsStrict.test(node.local.name)) this.raiseRecoverable(node.local.start, "The keyword '" + node.local.name + "' is reserved")
     }
-    this.checkLVal(node.local, true)
+    this.checkLVal(node.local, "let")
     nodes.push(this.finishNode(node, "ImportSpecifier"))
   }
   return nodes
