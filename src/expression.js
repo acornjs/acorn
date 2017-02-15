@@ -706,7 +706,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     // flag (restore them to their old value afterwards).
     let oldLabels = this.labels
     let oldVarDeclaredNames = this.varDeclaredNames
-    this.varDeclaredNames = new Set()
+    this.varDeclaredNames = {}
     this.labels = []
     if (useStrict) this.strict = true
 

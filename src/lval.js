@@ -185,15 +185,15 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
     }
     if (bindingType) {
       if (
-        this.lexicallyDeclaredNames.has(expr.name) ||
-        bindingType !== "var" && this.varDeclaredNames.has(expr.name)
+        Object.prototype.hasOwnProperty.call(this.lexicallyDeclaredNames, expr.name) ||
+        bindingType !== "var" && Object.prototype.hasOwnProperty.call(this.varDeclaredNames, expr.name)
       ) {
         this.raiseRecoverable(expr.start, `Identifier '${expr.name}' has already been declared`)
       }
       if (bindingType === "var") {
-        this.varDeclaredNames.add(expr.name)
+        this.varDeclaredNames[expr.name] = true
       } else {
-        this.lexicallyDeclaredNames.add(expr.name)
+        this.lexicallyDeclaredNames[expr.name] = true
       }
     }
     break

@@ -378,8 +378,13 @@ pp.parseBlock = function(externalVarDeclaredNames) {
   this.expect(tt.braceL)
   let upperLexicallyDeclaredNames = this.lexicallyDeclaredNames
   let upperVarDeclaredNames = this.varDeclaredNames
-  this.lexicallyDeclaredNames = new Set()
-  this.varDeclaredNames = new Set(externalVarDeclaredNames)
+  this.lexicallyDeclaredNames = {}
+  this.varDeclaredNames = {}
+  for (const varName in externalVarDeclaredNames) {
+    if (Object.prototype.hasOwnProperty.call(externalVarDeclaredNames, varName)) {
+      this.varDeclaredNames[varName] = true
+    }
+  }
   while (!this.eat(tt.braceR)) {
     let stmt = this.parseStatement(true)
     node.body.push(stmt)
@@ -390,7 +395,11 @@ pp.parseBlock = function(externalVarDeclaredNames) {
   // Since var declarations are function-scoped, all of the varDeclaredNames of the block are retained outside the block.
   // However, when parsing the statements of the block initially, only the var declarations in the block
   // are considered. For example, `var foo = 1; { let foo = 1; }` is valid.
-  this.varDeclaredNames.forEach(name => upperVarDeclaredNames.add(name))
+  for (const blockVarName in this.varDeclaredNames) {
+    if (Object.prototype.hasOwnProperty.call(this.varDeclaredNames, blockVarName)) {
+      upperVarDeclaredNames[blockVarName] = true
+    }
+  }
   this.varDeclaredNames = upperVarDeclaredNames
   return this.finishNode(node, "BlockStatement")
 }
