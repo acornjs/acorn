@@ -251,9 +251,8 @@ lp.parseVar = function(noIn, kind) {
 lp.parseClass = function(isStatement) {
   let node = this.startNode()
   this.next()
-  if (isStatement == null) isStatement = this.tok.type === tt.name
   if (this.tok.type === tt.name) node.id = this.parseIdent()
-  else if (isStatement) node.id = this.dummyIdent()
+  else if (isStatement === true) node.id = this.dummyIdent()
   else node.id = null
   node.superClass = this.eat(tt._extends) ? this.parseExpression() : null
   node.body = this.startNode()
@@ -326,9 +325,8 @@ lp.parseFunction = function(node, isStatement, isAsync) {
   if (this.options.ecmaVersion >= 8) {
     node.async = !!isAsync
   }
-  if (isStatement == null) isStatement = this.tok.type === tt.name
   if (this.tok.type === tt.name) node.id = this.parseIdent()
-  else if (isStatement) node.id = this.dummyIdent()
+  else if (isStatement === true) node.id = this.dummyIdent()
   this.inAsync = node.async
   node.params = this.parseFunctionParams()
   node.body = this.parseBlock()
@@ -350,9 +348,9 @@ lp.parseExport = function() {
       let fNode = this.startNode()
       this.next()
       if (isAsync) this.next()
-      node.declaration = this.parseFunction(fNode, null, isAsync)
+      node.declaration = this.parseFunction(fNode, "nullableID", isAsync)
     } else if (this.tok.type === tt._class) {
-      node.declaration = this.parseClass(null)
+      node.declaration = this.parseClass("nullableID")
     } else {
       node.declaration = this.parseMaybeAssign()
       this.semicolon()

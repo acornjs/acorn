@@ -4155,7 +4155,7 @@ test("export default function () {}", {
     type: "ExportDefaultDeclaration",
     range: [0, 29],
     declaration: {
-      type: "FunctionExpression",
+      type: "FunctionDeclaration",
       range: [15, 29],
       id: null,
       generator: false,
@@ -4203,7 +4203,7 @@ test("export default class {}", {
     type: "ExportDefaultDeclaration",
     range: [0, 23],
     declaration: {
-      type: "ClassExpression",
+      type: "ClassDeclaration",
       range: [15, 23],
       id: null,
       superClass: null,

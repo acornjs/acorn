@@ -161,7 +161,7 @@ test("export default async function() { }", {
             "start": 0,
             "end": 35,
             "declaration": {
-                "type": "FunctionExpression",
+                "type": "FunctionDeclaration",
                 "start": 15,
                 "end": 35,
                 "id": null,

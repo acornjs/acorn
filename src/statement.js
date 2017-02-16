@@ -451,10 +451,8 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
 
-  if (isStatement == null)
-    isStatement = this.type == tt.name
   if (isStatement)
-    node.id = this.parseIdent()
+    node.id = isStatement === "nullableID" && this.type != tt.name ? null : this.parseIdent()
 
   let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
       oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
@@ -464,8 +462,9 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.awaitPos = 0
   this.inFunction = true
 
-  if (!isStatement && this.type === tt.name)
-    node.id = this.parseIdent()
+  if (!isStatement)
+    node.id = this.type == tt.name ? this.parseIdent() : null
+
   this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
 
@@ -488,7 +487,7 @@ pp.parseFunctionParams = function(node) {
 
 pp.parseClass = function(node, isStatement) {
   this.next()
-  if (isStatement == null) isStatement = this.type === tt.name
+  
   this.parseClassId(node, isStatement)
   this.parseClassSuper(node)
   let classBody = this.startNode()
@@ -558,7 +557,7 @@ pp.parseClassMethod = function(classBody, method, isGenerator, isAsync) {
 }
 
 pp.parseClassId = function(node, isStatement) {
-  node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null
+  node.id = this.type === tt.name ? this.parseIdent() : isStatement === true ? this.unexpected() : null
 }
 
 pp.parseClassSuper = function(node) {
@@ -583,10 +582,10 @@ pp.parseExport = function(node, exports) {
       let fNode = this.startNode()
       this.next()
       if (isAsync) this.next()
-      node.declaration = this.parseFunction(fNode, null, false, isAsync)
+      node.declaration = this.parseFunction(fNode, "nullableID", false, isAsync)
     } else if (this.type === tt._class) {
       let cNode = this.startNode()
-      node.declaration = this.parseClass(cNode, null)
+      node.declaration = this.parseClass(cNode, "nullableID")
     } else {
       node.declaration = this.parseMaybeAssign()
       this.semicolon()
