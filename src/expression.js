@@ -692,6 +692,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
   if (isExpression) {
     node.body = this.parseMaybeAssign()
     node.expression = true
+    this.checkParams(node, false)
   } else {
     let nonSimple = this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params)
     if (!oldStrict || nonSimple) {
@@ -705,28 +706,18 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     // Start a new scope with regard to labels and the `inFunction`
     // flag (restore them to their old value afterwards).
     let oldLabels = this.labels
-    let oldVarDeclaredNames = this.varDeclaredNames
-    this.varDeclaredNames = {}
     this.labels = []
     if (useStrict) this.strict = true
 
     // Add the params to varDeclaredNames to ensure that an error is thrown
     // if a let/const declaration in the function clashes with one of the params.
-    node.params.forEach(param => this.checkLVal(param, "var"))
+    this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && this.isSimpleParamList(node.params))
     node.body = this.parseBlock(this.varDeclaredNames)
     node.expression = false
     this.labels = oldLabels
-    this.varDeclaredNames = oldVarDeclaredNames
   }
-
-  if (oldStrict || useStrict) {
-    this.strict = true
-    if (node.id)
-      this.checkLVal(node.id, "var")
-    this.checkParams(node)
-    this.strict = oldStrict
-  } else if (isArrowFunction || !this.isSimpleParamList(node.params)) {
-    this.checkParams(node)
+  if ((oldStrict || useStrict) && node.id) {
+    this.checkLVal(node.id, "var")
   }
 }
 
@@ -739,9 +730,9 @@ pp.isSimpleParamList = function(params) {
 // Checks function params for various disallowed patterns such as using "eval"
 // or "arguments" and duplicate parameters.
 
-pp.checkParams = function(node) {
+pp.checkParams = function(node, allowDuplicates) {
   let nameHash = {}
-  for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], "var", nameHash)
+  for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], "var", allowDuplicates ? null : nameHash)
 }
 
 // Parses a comma-separated list of expressions, and returns them as

@@ -480,12 +480,14 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   }
 
   let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
-      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
+      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction,
+      oldVarDeclaredNames = this.varDeclaredNames
   this.inGenerator = node.generator
   this.inAsync = node.async
   this.yieldPos = 0
   this.awaitPos = 0
   this.inFunction = true
+  this.varDeclaredNames = {}
 
   if (!isStatement)
     node.id = this.type == tt.name ? this.parseIdent() : null
@@ -498,6 +500,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.inFunction = oldInFunc
+  this.varDeclaredNames = oldVarDeclaredNames
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 
