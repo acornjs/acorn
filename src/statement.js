@@ -249,6 +249,7 @@ pp.parseSwitchStatement = function(node) {
   node.cases = []
   this.expect(tt.braceL)
   this.labels.push(switchLabel)
+  this.enterLexicalScope()
 
   // Statements under must be grouped (by label) in SwitchCase
   // nodes. `cur` is used to keep the node that we are currently
@@ -274,6 +275,7 @@ pp.parseSwitchStatement = function(node) {
       cur.consequent.push(this.parseStatement(true))
     }
   }
+  this.exitLexicalScope()
   if (cur) this.finishNode(cur, "SwitchCase")
   this.next() // Closing brace
   this.labels.pop()
@@ -304,7 +306,7 @@ pp.parseTryStatement = function(node) {
     clause.param = this.parseBindingAtom()
     this.checkLVal(clause.param, "var")
     this.expect(tt.parenR)
-    clause.body = this.parseBlock()
+    clause.body = this.parseBlock(false)
     node.handler = this.finishNode(clause, "CatchClause")
   }
   node.finalizer = this.eat(tt._finally) ? this.parseBlock() : null

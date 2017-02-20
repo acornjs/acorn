@@ -15618,6 +15618,8 @@ testFail("foo => { let foo; }", "Identifier 'foo' has already been declared (1:1
 
 testFail("({ x(foo) { let foo; } })", "Identifier 'foo' has already been declared (1:16)", {ecmaVersion: 6})
 
+testFail("try {} catch (foo) { let foo = 1; }", "Identifier 'foo' has already been declared (1:25)", {ecmaVersion: 6})
+
 test("var foo = 1; var foo = 1;", {}, {ecmaVersion: 6})
 
 test("if (x) var foo = 1; var foo = 1;", {}, {ecmaVersion: 6})
@@ -15649,3 +15651,5 @@ test("class Foo { method(foo) {} method2() { let foo; } }", {}, {ecmaVersion: 6}
 test("() => { let foo; }; foo => {}", {}, {ecmaVersion: 6})
 
 test("() => { let foo; }; () => { let foo; }", {}, {ecmaVersion: 6})
+
+test("switch(x) { case 1: let foo = 1; } let foo = 1;", {}, {ecmaVersion: 6})
