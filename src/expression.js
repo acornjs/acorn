@@ -642,6 +642,7 @@ pp.parseMethod = function(isGenerator, isAsync) {
   this.yieldPos = 0
   this.awaitPos = 0
   this.inFunction = true
+  this.enterFunctionScope()
 
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
@@ -653,6 +654,7 @@ pp.parseMethod = function(isGenerator, isAsync) {
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.inFunction = oldInFunc
+  this.exitFunctionScope()
   return this.finishNode(node, "FunctionExpression")
 }
 
@@ -662,6 +664,7 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
       oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
 
+  this.enterFunctionScope()
   this.initFunction(node)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
@@ -680,6 +683,7 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.inFunction = oldInFunc
+  this.exitFunctionScope()
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
@@ -712,7 +716,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     // Add the params to varDeclaredNames to ensure that an error is thrown
     // if a let/const declaration in the function clashes with one of the params.
     this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && this.isSimpleParamList(node.params))
-    node.body = this.parseBlock(this.varDeclaredNames)
+    node.body = this.parseBlock(false)
     node.expression = false
     this.labels = oldLabels
   }

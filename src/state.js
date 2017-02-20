@@ -87,8 +87,8 @@ export class Parser {
       this.skipLineComment(2)
 
     // Lists of declared identifier names to check for duplicate variable declarations
-    this.varDeclaredNames = {}
-    this.lexicallyDeclaredNames = {}
+    this.varScopeStack = [{}]
+    this.lexicalScopeStack = [{}]
   }
 
   // DEPRECATED Kept for backwards compatibility until 3.0 in case a plugin uses them

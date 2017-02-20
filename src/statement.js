@@ -2,6 +2,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {lineBreak, skipWhiteSpace} from "./whitespace"
 import {isIdentifierStart, isIdentifierChar} from "./identifier"
+import {has} from "./util"
 import {DestructuringErrors} from "./parseutil"
 
 const pp = Parser.prototype
@@ -183,6 +184,7 @@ pp.parseDoStatement = function(node) {
 pp.parseForStatement = function(node) {
   this.next()
   this.labels.push(loopLabel)
+  this.enterLexicalScope()
   this.expect(tt.parenL)
   if (this.type === tt.semi) return this.parseFor(node, null)
   let isLet = this.isLet()
@@ -368,39 +370,53 @@ pp.parseExpressionStatement = function(node, expr) {
   return this.finishNode(node, "ExpressionStatement")
 }
 
+pp.enterLexicalScope = function() {
+  this.lexicalScopeStack.push({})
+  this.varScopeStack.push({})
+}
+
+pp.exitLexicalScope = function() {
+  this.lexicalScopeStack.pop()
+  const varsDeclaredInBlock = this.varScopeStack.pop()
+
+  // Since var declarations are function-scoped, all of the varDeclaredNames of the block are retained outside the block.
+  // However, when parsing the statements of the block initially, only the var declarations in the block
+  // are considered. For example, `var foo = 1; { let foo = 1; }` is valid.
+  for (const varName in varsDeclaredInBlock) {
+    if (has(varsDeclaredInBlock, varName)) {
+      this.varScopeStack[this.varScopeStack.length - 1][varName] = true
+    }
+  }
+}
+
+pp.enterFunctionScope = function() {
+  this.lexicalScopeStack.push({})
+  this.varScopeStack.push({})
+}
+
+pp.exitFunctionScope = function() {
+  this.lexicalScopeStack.pop()
+  this.varScopeStack.pop()
+}
+
 // Parse a semicolon-enclosed block of statements, handling `"use
 // strict"` declarations when `allowStrict` is true (used for
 // function bodies).
 
-pp.parseBlock = function(externalVarDeclaredNames) {
+pp.parseBlock = function(createNewLexicalScope = true) {
   let node = this.startNode()
   node.body = []
   this.expect(tt.braceL)
-  let upperLexicallyDeclaredNames = this.lexicallyDeclaredNames
-  let upperVarDeclaredNames = this.varDeclaredNames
-  this.lexicallyDeclaredNames = {}
-  this.varDeclaredNames = {}
-  for (const varName in externalVarDeclaredNames) {
-    if (Object.prototype.hasOwnProperty.call(externalVarDeclaredNames, varName)) {
-      this.varDeclaredNames[varName] = true
-    }
+  if (createNewLexicalScope) {
+    this.enterLexicalScope()
   }
   while (!this.eat(tt.braceR)) {
     let stmt = this.parseStatement(true)
     node.body.push(stmt)
   }
-
-  this.lexicallyDeclaredNames = upperLexicallyDeclaredNames
-
-  // Since var declarations are function-scoped, all of the varDeclaredNames of the block are retained outside the block.
-  // However, when parsing the statements of the block initially, only the var declarations in the block
-  // are considered. For example, `var foo = 1; { let foo = 1; }` is valid.
-  for (const blockVarName in this.varDeclaredNames) {
-    if (Object.prototype.hasOwnProperty.call(this.varDeclaredNames, blockVarName)) {
-      upperVarDeclaredNames[blockVarName] = true
-    }
+  if (createNewLexicalScope) {
+    this.exitLexicalScope()
   }
-  this.varDeclaredNames = upperVarDeclaredNames
   return this.finishNode(node, "BlockStatement")
 }
 
@@ -415,6 +431,7 @@ pp.parseFor = function(node, init) {
   this.expect(tt.semi)
   node.update = this.type === tt.parenR ? null : this.parseExpression()
   this.expect(tt.parenR)
+  this.exitLexicalScope()
   node.body = this.parseStatement(false)
   this.labels.pop()
   return this.finishNode(node, "ForStatement")
@@ -429,6 +446,7 @@ pp.parseForIn = function(node, init) {
   node.left = init
   node.right = this.parseExpression()
   this.expect(tt.parenR)
+  this.exitLexicalScope()
   node.body = this.parseStatement(false)
   this.labels.pop()
   return this.finishNode(node, type)
@@ -480,14 +498,13 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   }
 
   let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
-      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction,
-      oldVarDeclaredNames = this.varDeclaredNames
+      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
   this.inGenerator = node.generator
   this.inAsync = node.async
   this.yieldPos = 0
   this.awaitPos = 0
   this.inFunction = true
-  this.varDeclaredNames = {}
+  this.enterFunctionScope()
 
   if (!isStatement)
     node.id = this.type == tt.name ? this.parseIdent() : null
@@ -500,7 +517,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.inFunction = oldInFunc
-  this.varDeclaredNames = oldVarDeclaredNames
+  this.exitFunctionScope()
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 

@@ -15614,6 +15614,10 @@ testFail("function x(foo) { let foo = 1; }", "Identifier 'foo' has already been 
 
 testFail("var [...foo] = x; let foo = 1;", "Identifier 'foo' has already been declared (1:22)", {ecmaVersion: 6})
 
+testFail("foo => { let foo; }", "Identifier 'foo' has already been declared (1:13)", {ecmaVersion: 6})
+
+testFail("({ x(foo) { let foo; } })", "Identifier 'foo' has already been declared (1:16)", {ecmaVersion: 6})
+
 test("var foo = 1; var foo = 1;", {}, {ecmaVersion: 6})
 
 test("if (x) var foo = 1; var foo = 1;", {}, {ecmaVersion: 6})
@@ -15627,3 +15631,21 @@ test("var foo = 1; { let foo = 1; }", {}, {ecmaVersion: 6})
 test("{ let foo = 1; { let foo = 2; } }", {}, {ecmaVersion: 6})
 
 test("try {} catch (foo) { var foo = 1; }", {}, {ecmaVersion: 6})
+
+test("let x = 1; function foo(x) {}", {}, {ecmaVersion: 6})
+
+test("for (let i = 0;;); for (let i = 0;;);", {}, {ecmaVersion: 6})
+
+test("for (const foo of bar); for (const foo of bar);", {}, {ecmaVersion: 6})
+
+test("for (const foo in bar); for (const foo in bar);", {}, {ecmaVersion: 6})
+
+test("for (let foo in bar) { let foo = 1; }", {}, {ecmaVersion: 6})
+
+test("for (let foo of bar) { let foo = 1; }", {}, {ecmaVersion: 6})
+
+test("class Foo { method(foo) {} method2() { let foo; } }", {}, {ecmaVersion: 6})
+
+test("() => { let foo; }; foo => {}", {}, {ecmaVersion: 6})
+
+test("() => { let foo; }; () => { let foo; }", {}, {ecmaVersion: 6})
