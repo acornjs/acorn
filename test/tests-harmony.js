@@ -15653,3 +15653,5 @@ test("() => { let foo; }; foo => {}", {}, {ecmaVersion: 6})
 test("() => { let foo; }; () => { let foo; }", {}, {ecmaVersion: 6})
 
 test("switch(x) { case 1: let foo = 1; } let foo = 1;", {}, {ecmaVersion: 6})
+
+test("'use strict'; function foo() { let foo = 1; }", {}, {ecmaVersion: 6})

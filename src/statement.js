@@ -519,7 +519,6 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.inFunction = oldInFunc
-  this.exitFunctionScope()
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 

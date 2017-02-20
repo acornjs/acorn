@@ -654,7 +654,6 @@ pp.parseMethod = function(isGenerator, isAsync) {
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.inFunction = oldInFunc
-  this.exitFunctionScope()
   return this.finishNode(node, "FunctionExpression")
 }
 
@@ -683,7 +682,6 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.inFunction = oldInFunc
-  this.exitFunctionScope()
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
@@ -720,9 +718,13 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     node.expression = false
     this.labels = oldLabels
   }
-  if ((oldStrict || useStrict) && node.id) {
+  this.exitFunctionScope()
+
+  if (this.strict && node.id) {
+    // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
     this.checkLVal(node.id, "var")
   }
+  this.strict = oldStrict
 }
 
 pp.isSimpleParamList = function(params) {
