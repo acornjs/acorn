@@ -185,15 +185,15 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
     }
     if (bindingType) {
       if (
-        has(this.lexicalScopeStack[this.lexicalScopeStack.length - 1], expr.name) ||
-        bindingType !== "var" && has(this.varScopeStack[this.varScopeStack.length - 1], expr.name)
+        bindingType === "var" && !this.canDeclareVarName(expr.name) ||
+        bindingType !== "var" && !this.canDeclareLexicalName(expr.name)
       ) {
         this.raiseRecoverable(expr.start, `Identifier '${expr.name}' has already been declared`)
       }
       if (bindingType === "var") {
-        this.varScopeStack[this.varScopeStack.length - 1][expr.name] = true
+        this.declareVarName(expr.name)
       } else {
-        this.lexicalScopeStack[this.lexicalScopeStack.length - 1][expr.name] = true
+        this.declareLexicalName(expr.name)
       }
     }
     break
