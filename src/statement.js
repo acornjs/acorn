@@ -374,35 +374,6 @@ pp.parseExpressionStatement = function(node, expr) {
   return this.finishNode(node, "ExpressionStatement")
 }
 
-pp.enterLexicalScope = function() {
-  this.lexicalScopeStack.push({})
-  this.varScopeStack.push({})
-}
-
-pp.exitLexicalScope = function() {
-  this.lexicalScopeStack.pop()
-  const varsDeclaredInBlock = this.varScopeStack.pop()
-
-  // Since var declarations are function-scoped, all of the varDeclaredNames of the block are retained outside the block.
-  // However, when parsing the statements of the block initially, only the var declarations in the block
-  // are considered. For example, `var foo = 1; { let foo = 1; }` is valid.
-  for (const varName in varsDeclaredInBlock) {
-    if (has(varsDeclaredInBlock, varName)) {
-      this.varScopeStack[this.varScopeStack.length - 1][varName] = true
-    }
-  }
-}
-
-pp.enterFunctionScope = function() {
-  this.lexicalScopeStack.push({})
-  this.varScopeStack.push({})
-}
-
-pp.exitFunctionScope = function() {
-  this.lexicalScopeStack.pop()
-  this.varScopeStack.pop()
-}
-
 // Parse a semicolon-enclosed block of statements, handling `"use
 // strict"` declarations when `allowStrict` is true (used for
 // function bodies).

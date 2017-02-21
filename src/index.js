@@ -25,6 +25,7 @@ import "./statement"
 import "./lval"
 import "./expression"
 import "./location"
+import "./scope"
 
 export {Parser, plugins} from "./state"
 export {defaultOptions} from "./options"

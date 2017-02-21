@@ -86,9 +86,9 @@ export class Parser {
     if (this.pos === 0 && options.allowHashBang && this.input.slice(0, 2) === '#!')
       this.skipLineComment(2)
 
-    // Lists of declared identifier names to check for duplicate variable declarations
-    this.varScopeStack = [{}]
-    this.lexicalScopeStack = [{}]
+    // Scope tracking for duplicate variable names (see scope.js)
+    this.scopeStack = []
+    this.enterFunctionScope()
   }
 
   // DEPRECATED Kept for backwards compatibility until 3.0 in case a plugin uses them

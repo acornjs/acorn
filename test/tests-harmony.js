@@ -15602,6 +15602,10 @@ testFail("function foo() {} let foo = 1;", "Identifier 'foo' has already been de
 
 testFail("{ var foo = 1; } let foo = 1;", "Identifier 'foo' has already been declared (1:21)", {ecmaVersion: 6})
 
+testFail("let foo = 1; { var foo = 1; }", "Identifier 'foo' has already been declared (1:19)", {ecmaVersion: 6})
+
+testFail("let foo = 1; function x(foo) {} { var foo = 1; }", "Identifier 'foo' has already been declared (1:38)", {ecmaVersion: 6})
+
 testFail("if (x) { if (y) var foo = 1; } let foo = 1;", "Identifier 'foo' has already been declared (1:35)", {ecmaVersion: 6})
 
 testFail("var foo = 1; function x() {} let foo = 1;", "Identifier 'foo' has already been declared (1:33)", {ecmaVersion: 6})
@@ -15632,7 +15636,7 @@ test("var foo = 1; { let foo = 1; }", {}, {ecmaVersion: 6})
 
 test("{ let foo = 1; { let foo = 2; } }", {}, {ecmaVersion: 6})
 
-test("try {} catch (foo) { var foo = 1; }", {}, {ecmaVersion: 6})
+test("var foo; try {} catch (_) { let foo; }", {}, {ecmaVersion: 6})
 
 test("let x = 1; function foo(x) {}", {}, {ecmaVersion: 6})
 
@@ -15655,3 +15659,5 @@ test("() => { let foo; }; () => { let foo; }", {}, {ecmaVersion: 6})
 test("switch(x) { case 1: let foo = 1; } let foo = 1;", {}, {ecmaVersion: 6})
 
 test("'use strict'; function foo() { let foo = 1; }", {}, {ecmaVersion: 6})
+
+test("let foo = 1; function x() { var foo = 1; }", {}, {ecmaVersion: 6})
