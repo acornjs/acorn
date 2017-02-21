@@ -4,7 +4,7 @@ import {has} from "./util"
 const pp = Parser.prototype
 
 // Object.assign polyfill
-function assign(target, ...sources) {
+const assign = Object.assign || function(target, ...sources) {
   for (let i = 0; i < sources.length; i++) {
     const source = sources[i]
     for (const key in source) {
