@@ -304,9 +304,11 @@ pp.parseTryStatement = function(node) {
     this.next()
     this.expect(tt.parenL)
     clause.param = this.parseBindingAtom()
-    this.checkLVal(clause.param, "var")
+    this.enterLexicalScope()
+    this.checkLVal(clause.param, "let")
     this.expect(tt.parenR)
     clause.body = this.parseBlock(false)
+    this.exitLexicalScope()
     node.handler = this.finishNode(clause, "CatchClause")
   }
   node.finalizer = this.eat(tt._finally) ? this.parseBlock() : null
