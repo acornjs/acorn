@@ -35,7 +35,7 @@ export {TokenType, types as tokTypes, keywords as keywordTypes} from "./tokentyp
 export {TokContext, types as tokContexts} from "./tokencontext"
 export {isIdentifierChar, isIdentifierStart} from "./identifier"
 export {Token} from "./tokenize"
-export {isNewLine, lineBreak, lineBreakG} from "./whitespace"
+export {isNewLine, lineBreak, lineBreakG, nonASCIIwhitespace} from "./whitespace"
 
 export const version = "4.0.11"
 
