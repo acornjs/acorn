@@ -197,8 +197,13 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     this.checkExpressionErrors(refDestructuringErrors, true)
     if (update) this.checkLVal(node.argument)
     else if (this.strict && node.operator === "delete" &&
-             node.argument.type === "Identifier")
-      this.raiseRecoverable(node.start, "Deleting local variable in strict mode")
+             node.argument.type === "Identifier") {
+      if (node.loc && node.loc.start && node.loc.start.line) {
+        this.raiseRecoverable(node.start, "Deleting local variable in strict mode at line: " + node.loc.start.line)
+      } else {
+        this.raiseRecoverable(node.start, "Deleting local variable in strict mode")
+      }
+    }
     else sawUnary = true
     expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
   } else {
