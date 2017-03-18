@@ -10,7 +10,7 @@ export const reservedWords = {
 
 // And the keywords
 
-var ecma5AndLessKeywords = "break case catch continue debugger default do else finally for function if return switch throw try var while with null true false instanceof typeof void delete new in this"
+const ecma5AndLessKeywords = "break case catch continue debugger default do else finally for function if return switch throw try var while with null true false instanceof typeof void delete new in this"
 
 export const keywords = {
   5: ecma5AndLessKeywords,

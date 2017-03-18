@@ -384,7 +384,7 @@ function tryCreateRegexp(src, flags, throwErrorAt, parser) {
   }
 }
 
-var regexpUnicodeSupport = !!tryCreateRegexp("\uffff", "u")
+const regexpUnicodeSupport = !!tryCreateRegexp("\uffff", "u")
 
 pp.readRegexp = function() {
   let escaped, inClass, start = this.pos

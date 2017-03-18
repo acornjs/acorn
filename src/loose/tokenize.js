@@ -45,7 +45,7 @@ lp.readToken = function() {
           replace = {start: e.pos, end: pos, type: tt.string, value: this.input.slice(e.pos + 1, pos)}
         } else if (/regular expr/i.test(msg)) {
           let re = this.input.slice(e.pos, pos)
-          try { re = new RegExp(re) } catch (e) {}
+          try { re = new RegExp(re) } catch (e) { /* ignore compilation error due to new syntax */ }
           replace = {start: e.pos, end: pos, type: tt.regexp, value: re}
         } else if (/template/.test(msg)) {
           replace = {
