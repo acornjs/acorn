@@ -10,7 +10,7 @@ const pp = Parser.prototype
 pp.toAssignable = function(node, isBinding) {
   if (this.options.ecmaVersion >= 6 && node) {
     switch (node.type) {
-      case "Identifier":
+    case "Identifier":
       if (this.inAsync && node.name === "await")
         this.raise(node.start, "Can not use 'await' as identifier inside an async function")
       break

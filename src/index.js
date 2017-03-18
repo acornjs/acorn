@@ -70,9 +70,9 @@ export function tokenizer(input, options) {
 // This is a terrible kludge to support the existing, pre-ES6
 // interface where the loose parser module retroactively adds exports
 // to this module.
-export let parse_dammit, LooseParser, pluginsLoose
+export let parse_dammit, LooseParser, pluginsLoose // eslint-disable-line camelcase
 export function addLooseExports(parse, Parser, plugins) {
-  parse_dammit = parse
+  parse_dammit = parse // eslint-disable-line camelcase
   LooseParser = Parser
   pluginsLoose = plugins
 }

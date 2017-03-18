@@ -37,7 +37,8 @@ pp.isLet = function() {
   let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
   if (nextCh === 91 || nextCh == 123) return true // '{' and '['
   if (isIdentifierStart(nextCh, true)) {
-    for (var pos = next + 1; isIdentifierChar(this.input.charCodeAt(pos), true); ++pos) {}
+    let pos = next + 1
+    while (isIdentifierChar(this.input.charCodeAt(pos), true)) ++pos
     let ident = this.input.slice(next, pos)
     if (!this.isKeyword(ident)) return true
   }
@@ -142,7 +143,8 @@ pp.parseBreakContinueStatement = function(node, keyword) {
 
   // Verify that there is an actual destination to break or
   // continue to.
-  for (var i = 0; i < this.labels.length; ++i) {
+  let i = 0
+  for (; i < this.labels.length; ++i) {
     let lab = this.labels[i]
     if (node.label == null || lab.name === node.label.name) {
       if (lab.kind != null && (isBreak || lab.kind === "loop")) break
@@ -255,7 +257,8 @@ pp.parseSwitchStatement = function(node) {
   // nodes. `cur` is used to keep the node that we are currently
   // adding statements to.
 
-  for (var cur, sawDefault = false; this.type != tt.braceR;) {
+  let cur
+  for (let sawDefault = false; this.type != tt.braceR;) {
     if (this.type === tt._case || this.type === tt._default) {
       let isCase = this.type === tt._case
       if (cur) this.finishNode(cur, "SwitchCase")
@@ -672,12 +675,12 @@ pp.checkVariableExport = function(exports, decls) {
 }
 
 pp.shouldParseExportStatement = function() {
-  return this.type.keyword === "var"
-    || this.type.keyword === "const"
-    || this.type.keyword === "class"
-    || this.type.keyword === "function"
-    || this.isLet()
-    || this.isAsyncFunction()
+  return this.type.keyword === "var" ||
+    this.type.keyword === "const" ||
+    this.type.keyword === "class" ||
+    this.type.keyword === "function" ||
+    this.isLet() ||
+    this.isAsyncFunction()
 }
 
 // Parses a comma-separated list of module exports.

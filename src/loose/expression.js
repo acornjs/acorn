@@ -319,7 +319,7 @@ lp.parseNew = function() {
 lp.parseTemplateElement = function() {
   let elem = this.startNode()
   elem.value = {
-    raw: this.input.slice(this.tok.start, this.tok.end).replace(/\r\n?/g, '\n'),
+    raw: this.input.slice(this.tok.start, this.tok.end).replace(/\r\n?/g, "\n"),
     cooked: this.tok.value
   }
   this.next()
@@ -340,7 +340,7 @@ lp.parseTemplate = function() {
       curElt = this.parseTemplateElement()
     } else {
       curElt = this.startNode()
-      curElt.value = {cooked: '', raw: ''}
+      curElt.value = {cooked: "", raw: ""}
       curElt.tail = true
       this.finishNode(curElt, "TemplateElement")
     }

@@ -19,12 +19,11 @@ const assign = Object.assign || function(target, ...sources) {
 // The functions in this module keep track of declared variables in the current scope in order to detect duplicate variable names.
 
 pp.enterFunctionScope = function() {
-
   // var: a hash of var-declared names in the current lexical scope
   // lexical: a hash of lexically-declared names in the current lexical scope
   // childVar: a hash of var-declared names in all child lexical scopes of the current lexical scope (within the current function scope)
   // parentLexical: a hash of lexically-declared names in all parent lexical scopes of the current lexical scope (within the current function scope)
-  this.scopeStack.push({ var: {}, lexical: {}, childVar: {}, parentLexical: {} })
+  this.scopeStack.push({var: {}, lexical: {}, childVar: {}, parentLexical: {}})
 }
 
 pp.exitFunctionScope = function() {
@@ -33,7 +32,7 @@ pp.exitFunctionScope = function() {
 
 pp.enterLexicalScope = function() {
   const parentScope = this.scopeStack[this.scopeStack.length - 1]
-  const childScope = { var: {}, lexical: {}, childVar: {}, parentLexical: {} }
+  const childScope = {var: {}, lexical: {}, childVar: {}, parentLexical: {}}
 
   this.scopeStack.push(childScope)
   assign(childScope.parentLexical, parentScope.lexical, parentScope.parentLexical)

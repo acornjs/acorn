@@ -6,7 +6,7 @@ const pp = Parser.prototype
 
 // ## Parser utilities
 
-const literal = /^(?:'((?:[^\']|\.)*)'|"((?:[^\"]|\.)*)"|;)/
+const literal = /^(?:'((?:[^']|\.)*)'|"((?:[^"]|\.)*)"|;)/
 pp.strictDirective = function(start) {
   for (;;) {
     skipWhiteSpace.lastIndex = start

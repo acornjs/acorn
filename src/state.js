@@ -83,7 +83,7 @@ export class Parser {
     this.labels = []
 
     // If enabled, skip leading hashbang line.
-    if (this.pos === 0 && options.allowHashBang && this.input.slice(0, 2) === '#!')
+    if (this.pos === 0 && options.allowHashBang && this.input.slice(0, 2) === "#!")
       this.skipLineComment(2)
 
     // Scope tracking for duplicate variable names (see scope.js)

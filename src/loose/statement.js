@@ -298,7 +298,7 @@ lp.parseClass = function(isStatement) {
           method.key.type === "Literal" && method.key.value === "constructor")) {
         method.kind = "constructor"
       } else {
-        method.kind =  "method"
+        method.kind = "method"
       }
       method.value = this.parseMethod(isGenerator, isAsync)
     }
@@ -376,7 +376,7 @@ lp.parseImport = function() {
   if (this.tok.type === tt.string) {
     node.specifiers = []
     node.source = this.parseExprAtom()
-    node.kind = ''
+    node.kind = ""
   } else {
     let elt
     if (this.tok.type === tt.name && this.tok.value !== "from") {
