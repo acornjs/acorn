@@ -257,7 +257,7 @@ base.Pattern = (node, st, c) => {
 base.VariablePattern = ignore
 base.MemberPattern = skipThrough
 base.RestElement = (node, st, c) => c(node.argument, st, "Pattern")
-base.ArrayPattern =  (node, st, c) => {
+base.ArrayPattern = (node, st, c) => {
   for (let i = 0; i < node.elements.length; ++i) {
     let elt = node.elements[i]
     if (elt) c(elt, st, "Pattern")
