@@ -93,10 +93,11 @@ pp.parseExpression = function(noIn, refDestructuringErrors) {
 pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   if (this.inGenerator && this.isContextual("yield")) return this.parseYield()
 
-  let ownDestructuringErrors = false, oldParenAssign = -1
+  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1
   if (refDestructuringErrors) {
     oldParenAssign = refDestructuringErrors.parenthesizedAssign
-    refDestructuringErrors.parenthesizedAssign = -1
+    oldTrailingComma = refDestructuringErrors.trailingComma
+    refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = -1
   } else {
     refDestructuringErrors = new DestructuringErrors
     ownDestructuringErrors = true
@@ -122,6 +123,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     if (ownDestructuringErrors) this.checkExpressionErrors(refDestructuringErrors, true)
   }
   if (oldParenAssign > -1) refDestructuringErrors.parenthesizedAssign = oldParenAssign
+  if (oldTrailingComma > -1) refDestructuringErrors.trailingComma = oldTrailingComma
   return left
 }
 
