@@ -363,7 +363,7 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
   this.labels.push({name: maybeName, kind: kind, statementStart: this.start})
   node.body = this.parseStatement(true)
   if (node.body.type == "ClassDeclaration" ||
-      node.body.type == "VariableDeclaration" && (this.strict || node.body.kind != "var") ||
+      node.body.type == "VariableDeclaration" && node.body.kind != "var" ||
       node.body.type == "FunctionDeclaration" && (this.strict || node.body.generator))
     this.raiseRecoverable(node.body.start, "Invalid labeled declaration")
   this.labels.pop()
