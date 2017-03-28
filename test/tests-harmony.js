@@ -15663,3 +15663,7 @@ test("'use strict'; function foo() { let foo = 1; }", {}, {ecmaVersion: 6})
 test("let foo = 1; function x() { var foo = 1; }", {}, {ecmaVersion: 6})
 
 test("[...foo, bar = 1]", {}, {ecmaVersion: 6})
+
+test("for (var a of /b/) {}", {}, {ecmaVersion: 6})
+
+test("function* bar() { yield /re/ }", {}, {ecmaVersion: 6})
