@@ -1,8 +1,6 @@
-## 4.0.12 (2017-03-28)
+## 5.0.0 (2017-03-28)
 
 ### Bug fixes
-
-Parse declarations following `export default` as declaration nodes, not expressions.
 
 Raise an error for duplicated lexical bindings.
 
@@ -11,6 +9,10 @@ Fix spurious error when an assignement expression occurred after a spread expres
 Accept regular expressions after `of` (in `for`/`of`), `yield` (in a generator), and braced arrow functions.
 
 Allow labels in front or `var` declarations, even in strict mode.
+
+### Breaking changes
+
+Parse declarations following `export default` as declaration nodes, not expressions. This means that class and function declarations nodes can now have `null` as their `id`.
 
 ## 4.0.11 (2017-02-07)
 
