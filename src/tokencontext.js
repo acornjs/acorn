@@ -42,7 +42,7 @@ pp.braceIsBlock = function(prevType) {
   }
   if (prevType === tt._return)
     return lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
-  if (prevType === tt._else || prevType === tt.semi || prevType === tt.eof || prevType === tt.parenR)
+  if (prevType === tt._else || prevType === tt.semi || prevType === tt.eof || prevType === tt.parenR || prevType == tt.arrow)
     return true
   if (prevType == tt.braceL)
     return this.curContext() === types.b_stat
