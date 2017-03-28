@@ -27,13 +27,14 @@
   "license": "MIT",
   "scripts": {
     "prepublish": "npm test",
-    "test": "node test/run.js",
+    "test": "node test/run.js && npm run lint",
     "pretest": "npm run build",
     "build": "npm run build:main && npm run build:walk && npm run build:loose && npm run build:bin",
     "build:main": "rollup -c rollup/config.main.js",
     "build:walk": "rollup -c rollup/config.walk.js",
     "build:loose": "rollup -c rollup/config.loose.js",
-    "build:bin": "rollup -c rollup/config.bin.js"
+    "build:bin": "rollup -c rollup/config.bin.js",
+    "lint": "eslint src/"
   },
   "bin": {
     "acorn": "./bin/acorn"
