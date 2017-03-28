@@ -1,3 +1,17 @@
+## 4.0.12 (2017-03-28)
+
+### Bug fixes
+
+Parse declarations following `export default` as declaration nodes, not expressions.
+
+Raise an error for duplicated lexical bindings.
+
+Fix spurious error when an assignement expression occurred after a spread expression.
+
+Accept regular expressions after `of` (in `for`/`of`), `yield` (in a generator), and braced arrow functions.
+
+Allow labels in front or `var` declarations, even in strict mode.
+
 ## 4.0.11 (2017-02-07)
 
 ### Bug fixes
