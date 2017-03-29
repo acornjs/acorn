@@ -47,8 +47,13 @@ pp.checkPropClash = function(prop, propHash) {
   name = "$" + name
   let other = propHash[name]
   if (other) {
-    let isGetSet = kind !== "init"
-    if ((this.strict || isGetSet) && other[kind] || !(isGetSet ^ other.init))
+    let redefinition
+    if (kind === "init") {
+      redefinition = this.strict && other.init || other.get || other.set
+    } else {
+      redefinition = other.init || other[kind]
+    }
+    if (redefinition)
       this.raiseRecoverable(key.start, "Redefinition of property")
   } else {
     other = propHash[name] = {
