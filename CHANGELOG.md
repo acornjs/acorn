@@ -1,3 +1,9 @@
+## 5.0.1 (2017-03-30)
+
+### Bug fixes
+
+A binary operator after a parenthesized arrow expression is no longer incorrectly treated as an error.
+
 ## 5.0.0 (2017-03-28)
 
 ### Bug fixes
