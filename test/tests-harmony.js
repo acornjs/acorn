@@ -15671,3 +15671,5 @@ test("function* bar() { yield /re/ }", {}, {ecmaVersion: 6})
 test("() => {}\n/re/", {}, {ecmaVersion: 6})
 
 test("(() => {}) + 2", {}, {ecmaVersion: 6})
+
+testFail("(x) => {} + 2", "Unexpected token (1:10)", {ecmaVersion: 6})
