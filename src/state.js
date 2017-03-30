@@ -7,7 +7,7 @@ import {getOptions} from "./options"
 export const plugins = {}
 
 function keywordRegexp(words) {
-  return new RegExp("^(" + words.replace(/ /g, "|") + ")$")
+  return new RegExp("^(?:" + words.replace(/ /g, "|") + ")$")
 }
 
 export class Parser {
