@@ -158,4 +158,9 @@ export class LooseParser {
       plugin(this, pluginConfigs[name])
     }
   }
+
+  parse() {
+    this.next()
+    return this.parseTopLevel()
+  }
 }

@@ -41,9 +41,7 @@ defaultOptions.tabSize = 4
 
 // eslint-disable-next-line camelcase
 export function parse_dammit(input, options) {
-  let p = new LooseParser(input, options)
-  p.next()
-  return p.parseTopLevel()
+  return new LooseParser(input, options).parse()
 }
 
 addLooseExports(parse_dammit, LooseParser, pluginsLoose)
