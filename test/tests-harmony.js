@@ -15673,3 +15673,19 @@ test("() => {}\n/re/", {}, {ecmaVersion: 6})
 test("(() => {}) + 2", {}, {ecmaVersion: 6})
 
 testFail("(x) => {} + 2", "Unexpected token (1:10)", {ecmaVersion: 6})
+
+testFail("let undefined", "Identifier 'undefined' has already been declared (1:4)", {ecmaVersion: 6})
+
+testFail("let Infinity", "Identifier 'Infinity' has already been declared (1:4)", {ecmaVersion: 6})
+
+testFail("let NaN", "Identifier 'NaN' has already been declared (1:4)", {ecmaVersion: 6})
+
+testFail(
+  "let undefined",
+  "Identifier 'undefined' has already been declared (1:4)",
+  {ecmaVersion: 6, allowReturnOutsideFunction: true, sourceType: 'module'}
+)
+
+test("var undefined", {}, {ecmaVersion: 6})
+
+test("let undefined", {}, {ecmaVersion: 6, allowReturnOutsideFunction: true})

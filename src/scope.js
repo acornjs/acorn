@@ -16,6 +16,17 @@ const assign = Object.assign || function(target, ...sources) {
   return target
 }
 
+pp.initScopeStack = function() {
+  this.scopeStack = []
+  this.enterFunctionScope()
+  if (this.options.sourceType === "module" || !this.options.allowReturnOutsideFunction) {
+    // Disallow non-configurable properties of the global object from being shadowed at the top level
+    this.declareVarName("Infinity")
+    this.declareVarName("NaN")
+    this.declareVarName("undefined")
+  }
+}
+
 // The functions in this module keep track of declared variables in the current scope in order to detect duplicate variable names.
 
 pp.enterFunctionScope = function() {
