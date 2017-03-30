@@ -147,11 +147,10 @@ pp.parseMaybeConditional = function(noIn, refDestructuringErrors) {
 // Start the precedence parser.
 
 pp.parseExprOps = function(noIn, refDestructuringErrors) {
-  let paren = this.type == tt.parenL
   let startPos = this.start, startLoc = this.startLoc
   let expr = this.parseMaybeUnary(refDestructuringErrors, false)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
-  return !paren && expr.type === "ArrowFunctionExpression" ? expr : this.parseExprOp(expr, startPos, startLoc, -1, noIn)
+  return expr.start == startPos && expr.type === "ArrowFunctionExpression" ? expr : this.parseExprOp(expr, startPos, startLoc, -1, noIn)
 }
 
 // Parse binary operators with the operator precedence parsing
