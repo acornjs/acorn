@@ -729,7 +729,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
 
   if (this.strict && node.id) {
     // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
-    this.checkLVal(node.id, "var")
+    this.checkLVal(node.id, "none")
   }
   this.strict = oldStrict
 }

@@ -172,6 +172,10 @@ pp.parseMaybeDefault = function(startPos, startLoc, left) {
 
 // Verify that a node is an lval — something that can be assigned
 // to.
+// bindingType can be either:
+// 'var' indicating that the lval creates a 'var' binding
+// 'let' indicating that the lval creates a lexical ('let' or 'const') binding
+// 'none' indicating that the binding should be checked for illegal identifiers, but not for duplicate references
 
 pp.checkLVal = function(expr, bindingType, checkClashes) {
   switch (expr.type) {
@@ -183,7 +187,7 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
         this.raiseRecoverable(expr.start, "Argument name clash")
       checkClashes[expr.name] = true
     }
-    if (bindingType) {
+    if (bindingType && bindingType !== "none") {
       if (
         bindingType === "var" && !this.canDeclareVarName(expr.name) ||
         bindingType !== "var" && !this.canDeclareLexicalName(expr.name)
