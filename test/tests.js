@@ -29199,3 +29199,5 @@ test("try {} catch (foo) {} let foo;", {}, {ecmaVersion: 6})
 test("try {} catch (foo) { { let foo; } }", {}, {ecmaVersion: 6})
 test("try {} catch (foo) { function x() { var foo; } }", {}, {ecmaVersion: 6})
 test("try {} catch (foo) { function x(foo) {} }", {}, {ecmaVersion: 6})
+
+test("'use strict'; let foo = function foo() {}", {}, {ecmaVersion: 6})
