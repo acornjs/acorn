@@ -1,3 +1,9 @@
+## 5.0.3 (2017-04-01)
+
+### Bug fixes
+
+Fix spurious duplicate variable definition errors for named functions.
+
 ## 5.0.2 (2017-03-30)
 
 ### Bug fixes
