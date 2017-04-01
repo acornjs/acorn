@@ -22,7 +22,7 @@ export const types = {
   b_tmpl: new TokContext("${", true),
   p_stat: new TokContext("(", false),
   p_expr: new TokContext("(", true),
-  q_tmpl: new TokContext("`", true, true, p => p.readTmplToken()),
+  q_tmpl: new TokContext("`", true, true, p => p.tryReadTemplateToken()),
   f_expr: new TokContext("function", true),
   f_expr_gen: new TokContext("function", true, false, null, true),
   f_gen: new TokContext("function", false, false, null, true)
