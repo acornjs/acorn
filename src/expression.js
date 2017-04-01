@@ -276,7 +276,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
     } else if (this.type === tt.backQuote) {
       let node = this.startNodeAt(startPos, startLoc)
       node.tag = base
-      node.quasi = this.parseTemplate()
+      node.quasi = this.parseTemplate({isTagged: true})
       base = this.finishNode(node, "TaggedTemplateExpression")
     } else {
       return base
@@ -490,28 +490,38 @@ pp.parseNew = function() {
 
 // Parse template expression.
 
-pp.parseTemplateElement = function() {
+pp.parseTemplateElement = function({isTagged}) {
   let elem = this.startNode()
-  elem.value = {
-    raw: this.input.slice(this.start, this.end).replace(/\r\n?/g, "\n"),
-    cooked: this.value
+  if (this.type === tt.invalidTemplate) {
+    if (!isTagged) {
+      this.raiseRecoverable(this.start, "Bad escape sequence in untagged template literal")
+    }
+    elem.value = {
+      raw: this.value,
+      cooked: null
+    }
+  } else {
+    elem.value = {
+      raw: this.input.slice(this.start, this.end).replace(/\r\n?/g, "\n"),
+      cooked: this.value
+    }
   }
   this.next()
   elem.tail = this.type === tt.backQuote
   return this.finishNode(elem, "TemplateElement")
 }
 
-pp.parseTemplate = function() {
+pp.parseTemplate = function({isTagged = false} = {}) {
   let node = this.startNode()
   this.next()
   node.expressions = []
-  let curElt = this.parseTemplateElement()
+  let curElt = this.parseTemplateElement({isTagged})
   node.quasis = [curElt]
   while (!curElt.tail) {
     this.expect(tt.dollarBraceL)
     node.expressions.push(this.parseExpression())
     this.expect(tt.braceR)
-    node.quasis.push(curElt = this.parseTemplateElement())
+    node.quasis.push(curElt = this.parseTemplateElement({isTagged}))
   }
   this.next()
   return this.finishNode(node, "TemplateLiteral")

@@ -508,12 +508,12 @@ pp.readNumber = function(startsWithDot) {
 pp.readCodePoint = function() {
   let ch = this.input.charCodeAt(this.pos), code
 
-  if (ch === 123) {
+  if (ch === 123) { // '{'
     if (this.options.ecmaVersion < 6) this.unexpected()
     let codePos = ++this.pos
     code = this.readHexChar(this.input.indexOf("}", this.pos) - this.pos)
     ++this.pos
-    if (code > 0x10FFFF) this.raise(codePos, "Code point out of bounds")
+    if (code > 0x10FFFF) this.invalidStringToken(codePos, "Code point out of bounds")
   } else {
     code = this.readHexChar(4)
   }
@@ -548,13 +548,38 @@ pp.readString = function(quote) {
 
 // Reads template string tokens.
 
+const INVALID_TEMPLATE_ESCAPE_ERROR = {}
+
+pp.tryReadTemplateToken = function() {
+  this.inTemplateElement = true
+  try {
+    this.readTmplToken()
+  } catch (err) {
+    if (err === INVALID_TEMPLATE_ESCAPE_ERROR) {
+      this.readInvalidTemplateToken()
+    } else {
+      throw err
+    }
+  }
+
+  this.inTemplateElement = false
+}
+
+pp.invalidStringToken = function(position, message) {
+  if (this.inTemplateElement && this.options.ecmaVersion >= 9) {
+    throw INVALID_TEMPLATE_ESCAPE_ERROR
+  } else {
+    this.raise(position, message)
+  }
+}
+
 pp.readTmplToken = function() {
   let out = "", chunkStart = this.pos
   for (;;) {
     if (this.pos >= this.input.length) this.raise(this.start, "Unterminated template")
     let ch = this.input.charCodeAt(this.pos)
     if (ch === 96 || ch === 36 && this.input.charCodeAt(this.pos + 1) === 123) { // '`', '${'
-      if (this.pos === this.start && this.type === tt.template) {
+      if (this.pos === this.start && (this.type === tt.template || this.type === tt.invalidTemplate)) {
         if (ch === 36) {
           this.pos += 2
           return this.finishToken(tt.dollarBraceL)
@@ -594,6 +619,29 @@ pp.readTmplToken = function() {
   }
 }
 
+// Reads a template token to search for the end, without validating any escape sequences
+pp.readInvalidTemplateToken = function() {
+  for (; this.pos < this.input.length; this.pos++) {
+    switch (this.input[this.pos]) {
+    case "\\":
+      ++this.pos
+      break
+
+    case "$":
+      if (this.input[this.pos + 1] !== "{") {
+        break
+      }
+    // falls through
+
+    case "`":
+      return this.finishToken(tt.invalidTemplate, this.input.slice(this.start, this.pos))
+
+    // no default
+    }
+  }
+  this.raise(this.start, "Unterminated template")
+}
+
 // Used to read escaped characters
 
 pp.readEscapedChar = function(inTemplate) {
@@ -621,7 +669,7 @@ pp.readEscapedChar = function(inTemplate) {
         octal = parseInt(octalStr, 8)
       }
       if (octalStr !== "0" && (this.strict || inTemplate)) {
-        this.raise(this.pos - 2, "Octal literal in strict mode")
+        this.invalidStringToken(this.pos - 2, "Octal literal in strict mode")
       }
       this.pos += octalStr.length - 1
       return String.fromCharCode(octal)
@@ -635,7 +683,7 @@ pp.readEscapedChar = function(inTemplate) {
 pp.readHexChar = function(len) {
   let codePos = this.pos
   let n = this.readInt(16, len)
-  if (n === null) this.raise(codePos, "Bad character escape sequence")
+  if (n === null) this.invalidStringToken(codePos, "Bad character escape sequence")
   return n
 }
 
@@ -658,11 +706,11 @@ pp.readWord1 = function() {
       word += this.input.slice(chunkStart, this.pos)
       let escStart = this.pos
       if (this.input.charCodeAt(++this.pos) != 117) // "u"
-        this.raise(this.pos, "Expecting Unicode escape sequence \\uXXXX")
+        this.invalidStringToken(this.pos, "Expecting Unicode escape sequence \\uXXXX")
       ++this.pos
       let esc = this.readCodePoint()
       if (!(first ? isIdentifierStart : isIdentifierChar)(esc, astral))
-        this.raise(escStart, "Invalid Unicode escape")
+        this.invalidStringToken(escStart, "Invalid Unicode escape")
       word += codePointToString(esc)
       chunkStart = this.pos
     } else {

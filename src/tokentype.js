@@ -72,6 +72,7 @@ export const types = {
   question: new TokenType("?", beforeExpr),
   arrow: new TokenType("=>", beforeExpr),
   template: new TokenType("template"),
+  invalidTemplate: new TokenType("invalidTemplate"),
   ellipsis: new TokenType("...", beforeExpr),
   backQuote: new TokenType("`", startsExpr),
   dollarBraceL: new TokenType("${", {beforeExpr: true, startsExpr: true}),

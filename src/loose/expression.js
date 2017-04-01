@@ -318,9 +318,18 @@ lp.parseNew = function() {
 
 lp.parseTemplateElement = function() {
   let elem = this.startNode()
-  elem.value = {
-    raw: this.input.slice(this.tok.start, this.tok.end).replace(/\r\n?/g, "\n"),
-    cooked: this.tok.value
+
+  // The loose parser accepts invalid unicode escapes even in untagged templates.
+  if (this.tok.type === tt.invalidTemplate) {
+    elem.value = {
+      raw: this.tok.value,
+      cooked: null
+    }
+  } else {
+    elem.value = {
+      raw: this.input.slice(this.tok.start, this.tok.end).replace(/\r\n?/g, "\n"),
+      cooked: this.tok.value
+    }
   }
   this.next()
   elem.tail = this.tok.type === tt.backQuote
