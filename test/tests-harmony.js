@@ -15666,6 +15666,10 @@ test("[...foo, bar = 1]", {}, {ecmaVersion: 6})
 
 test("for (var a of /b/) {}", {}, {ecmaVersion: 6})
 
+test("for (var {a} of /b/) {}", {}, {ecmaVersion: 6})
+
+test("for (let {a} of /b/) {}", {}, {ecmaVersion: 6})
+
 test("function* bar() { yield /re/ }", {}, {ecmaVersion: 6})
 
 test("() => {}\n/re/", {}, {ecmaVersion: 6})
