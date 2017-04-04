@@ -8,3 +8,4 @@
 .gitattributes
 .tern-project
 .travis.yml
+/src
