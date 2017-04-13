@@ -140,7 +140,7 @@ export function findNodeBefore(node, pos, test, base, state) {
 }
 
 // Fallback to an Object.create polyfill for older environments.
-const create = Object.create || function(proto) {
+export const create = Object.create || function(proto) {
   function Ctor() {}
   Ctor.prototype = proto
   return new Ctor
