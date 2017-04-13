@@ -37,6 +37,9 @@ export const defaultOptions = {
   // When enabled, hashbang directive in the beginning of file
   // is allowed and treated as a line comment.
   allowHashBang: false,
+  // When true, `export * as ns from "..."` and `export def from "..."`
+  // export extensions will be enabled.
+  exportExtensions: false,
   // When `locations` is on, `loc` properties holding objects with
   // `start` and `end` properties in `{line, column}` form (with
   // line being 1-based and column 0-based) will be attached to the
