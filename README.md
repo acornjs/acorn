@@ -1,4 +1,5 @@
 # Acorn
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/marijnh/acorn?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Build Status](https://travis-ci.org/ternjs/acorn.svg?branch=master)](https://travis-ci.org/ternjs/acorn)
 [![NPM version](https://img.shields.io/npm/v/acorn.svg)](https://www.npmjs.com/package/acorn)
