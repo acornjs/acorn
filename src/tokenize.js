@@ -498,7 +498,8 @@ pp.readNumber = function(startsWithDot) {
   let str = this.input.slice(start, this.pos), val
   if (isFloat) val = parseFloat(str)
   else if (!octal || str.length === 1) val = parseInt(str, 10)
-  else if (/[89]/.test(str) || this.strict) this.raise(start, "Invalid number")
+  else if (this.strict) this.raise(start, "Invalid number")
+  else if (/[89]/.test(str)) val = parseInt(str, 10)
   else val = parseInt(str, 8)
   return this.finishToken(tt.num, val)
 }
