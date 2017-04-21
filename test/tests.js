@@ -26945,11 +26945,11 @@ testFail("3x0",
 testFail("0x",
          "Expected number in radix 16 (1:2)");
 
-testFail("09",
-         "Invalid number (1:0)");
+testFail("'use strict'; 09",
+         "Invalid number (1:14)");
 
-testFail("018",
-         "Invalid number (1:0)");
+testFail("'use strict'; 018",
+         "Invalid number (1:14)");
 
 testFail("01a",
          "Identifier directly after number (1:2)");
@@ -29165,6 +29165,20 @@ test("0123. in/foo/i", {
           "type": "Identifier",
           "name": "i"
         }
+      }
+    }
+  ]
+})
+
+test("0128", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "Literal",
+        "value": 128,
+        "raw": "0128"
       }
     }
   ]
