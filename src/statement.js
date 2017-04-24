@@ -596,7 +596,7 @@ pp.parseExport = function(node, exports) {
     if (this.options.exportExtensions &&
         this.eatContextual("as")) {
       // export * as ns from '...'
-      specifier.exported = this.parseIdent()
+      specifier.exported = this.parseIdent(true)
       node.specifiers = [
         this.finishNode(specifier, "ExportNamespaceSpecifier")
       ]
@@ -622,7 +622,7 @@ pp.parseExport = function(node, exports) {
       const specifier = this.startNode()
       this.expect(tt.star)
       this.expectContextual("as")
-      specifier.exported = this.parseIdent()
+      specifier.exported = this.parseIdent(true)
       node.specifiers.push(
         this.finishNode(specifier, "ExportNamespaceSpecifier")
       )

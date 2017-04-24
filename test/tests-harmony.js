@@ -5024,6 +5024,146 @@ test('export * as ns, { a, b as c } from "module"', {
   locations: true
 });
 
+test('export * as default from "module"', {
+  type: "Program",
+  start: 0,
+  end: 33,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 33}
+  },
+  range: [0, 33],
+  body: [{
+    type: "ExportNamedDeclaration",
+    start: 0,
+    end: 33,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 33}
+    },
+    range: [0, 33],
+    specifiers: [{
+      type: "ExportNamespaceSpecifier",
+      start: 7,
+      end: 19,
+      loc: {
+        start: {line: 1, column: 7},
+        end: {line: 1, column: 19}
+      },
+      range: [7, 19],
+      exported: {
+        type: "Identifier",
+        start: 12,
+        end: 19,
+        loc: {
+          start: {line: 1, column: 12},
+          end: {line: 1, column: 19}
+        },
+        range: [12, 19],
+        name: "default"
+      }
+    }],
+    source: {
+      type: "Literal",
+      start: 25,
+      end: 33,
+      loc: {
+        start: {line: 1, column: 25},
+        end: {line: 1, column: 33}
+      },
+      range: [25, 33],
+      value: "module",
+      raw: '"module"'
+    }
+  }]
+}, {
+  ecmaVersion: 6,
+  sourceType: "module",
+  exportExtensions: true,
+  ranges: true,
+  locations: true
+});
+
+test('export def, * as default from "module"', {
+  type: "Program",
+  start: 0,
+  end: 38,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 38}
+  },
+  range: [0, 38],
+  body: [{
+    type: "ExportNamedDeclaration",
+    start: 0,
+    end: 38,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 38}
+    },
+    range: [0, 38],
+    specifiers: [{
+      type: "ExportDefaultSpecifier",
+      start: 7,
+      end: 10,
+      loc: {
+        start: {line: 1, column: 7},
+        end: {line: 1, column: 10}
+      },
+      range: [7, 10],
+      exported: {
+        type: "Identifier",
+        start: 7,
+        end: 10,
+        loc: {
+          start: {line: 1, column: 7},
+          end: {line: 1, column: 10}
+        },
+        range: [7, 10],
+        name: "def"
+      }
+    }, {
+      type: "ExportNamespaceSpecifier",
+      start: 12,
+      end: 24,
+      loc: {
+        start: {line: 1, column: 12},
+        end: {line: 1, column: 24}
+      },
+      range: [12, 24],
+      exported: {
+        type: "Identifier",
+        start: 17,
+        end: 24,
+        loc: {
+          start: {line: 1, column: 17},
+          end: {line: 1, column: 24}
+        },
+        range: [17, 24],
+        name: "default"
+      }
+    }],
+    source: {
+      type: "Literal",
+      start: 30,
+      end: 38,
+      loc: {
+        start: {line: 1, column: 30},
+        end: {line: 1, column: 38}
+      },
+      range: [30, 38],
+      value: "module",
+      raw: '"module"'
+    }
+  }]
+}, {
+  ecmaVersion: 6,
+  sourceType: "module",
+  exportExtensions: true,
+  ranges: true,
+  locations: true
+});
+
 test('export { default, a, b as c } from "module"', {
   type: "Program",
   start: 0,
