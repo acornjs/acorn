@@ -168,7 +168,7 @@ lp.parseStatement = function() {
     return this.parseImport()
 
   case tt._export:
-    return this.parseExport()
+    return this.parseExport(node)
 
   default:
     if (this.toks.isAsyncFunction()) {
@@ -334,14 +334,51 @@ lp.parseFunction = function(node, isStatement, isAsync) {
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 
-lp.parseExport = function() {
-  let node = this.startNode()
+lp.parseExport = function(node) {
   this.next()
-  if (this.eat(tt.star)) {
-    node.source = this.eatContextual("from") ? this.parseExprAtom() : this.dummyString()
-    return this.finishNode(node, "ExportAllDeclaration")
-  }
-  if (this.eat(tt._default)) {
+  if (this.tok.type === tt.star) {
+    const specifier = this.startNode()
+    this.next()
+    if (this.options.exportExtensions &&
+        this.eatContextual("as")) {
+      // export * as ns from '...'
+      specifier.exported = this.parseIdent()
+      node.specifiers = [
+        this.finishNode(specifier, "ExportNamespaceSpecifier")
+      ]
+      this.parseExportSpecifiersMaybe(node)
+      this.parseExportFrom(node)
+    } else {
+      // export * from '...'
+      this.parseExportFrom(node)
+      return this.finishNode(node, "ExportAllDeclaration")
+    }
+  } else if (this.options.exportExtensions &&
+             this.isExportDefaultSpecifier()) {
+    // export def from '...'
+    const specifier = this.startNode()
+    specifier.exported = this.parseIdent(true)
+    node.specifiers = [
+      this.finishNode(specifier, "ExportDefaultSpecifier")
+    ]
+    if (this.tok.type === tt.comma &&
+        this.lookAhead(1).type === tt.star) {
+      // export def, * as ns from '...'
+      this.expect(tt.comma)
+      const specifier = this.startNode()
+      this.expect(tt.star)
+      specifier.exported = this.eatContextual("as")
+        ? this.parseIdent()
+        : this.dummyIdent()
+      node.specifiers.push(
+        this.finishNode(specifier, "ExportNamespaceSpecifier")
+      )
+    } else {
+      // export def, { x, y as z } from '...'
+      this.parseExportSpecifiersMaybe(node)
+    }
+    this.parseExportFrom(node)
+  } else if (this.eat(tt._default)) {
     // export default (function foo() {}) // This is FunctionExpression.
     let isAsync
     if (this.tok.type === tt._function || (isAsync = this.toks.isAsyncFunction())) {
@@ -356,8 +393,9 @@ lp.parseExport = function() {
       this.semicolon()
     }
     return this.finishNode(node, "ExportDefaultDeclaration")
-  }
-  if (this.tok.type.keyword || this.toks.isLet() || this.toks.isAsyncFunction()) {
+  } else if (this.tok.type.keyword ||
+             this.toks.isLet() ||
+             this.toks.isAsyncFunction()) {
     node.declaration = this.parseStatement()
     node.specifiers = []
     node.source = null
@@ -368,6 +406,31 @@ lp.parseExport = function() {
     this.semicolon()
   }
   return this.finishNode(node, "ExportNamedDeclaration")
+}
+
+lp.isExportDefaultSpecifier = function() {
+  if (this.tok.type !== tt.name) {
+    return false
+  }
+
+  const lookAhead = this.lookAhead(1)
+  return lookAhead.type === tt.comma ||
+    (lookAhead.type === tt.name &&
+     lookAhead.value === "from")
+}
+
+lp.parseExportSpecifiersMaybe = function(node) {
+  if (this.eat(tt.comma)) {
+    node.specifiers.push.apply(
+      node.specifiers,
+      this.parseExportSpecifierList()
+    )
+  }
+}
+
+lp.parseExportFrom = function(node) {
+  const hasSource = this.eatContextual("from") && this.tok.type === tt.string
+  node.source = hasSource ? this.parseExprAtom() : this.dummyString()
 }
 
 lp.parseImport = function() {
