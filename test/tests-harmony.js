@@ -4580,6 +4580,583 @@ test("export { default } from \"other\"", {
   locations: true
 });
 
+test('export * as ns from "module"', {
+  type: "Program",
+  start: 0,
+  end: 28,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 28}
+  },
+  range: [0, 28],
+  body: [{
+    type: "ExportNamedDeclaration",
+    start: 0,
+    end: 28,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 28}
+    },
+    range: [0, 28],
+    specifiers: [{
+      type: "ExportNamespaceSpecifier",
+      start: 7,
+      end: 14,
+      loc: {
+        start: {line: 1, column: 7},
+        end: {line: 1, column: 14}
+      },
+      range: [7, 14],
+      exported: {
+        type: "Identifier",
+        start: 12,
+        end: 14,
+        loc: {
+          start: {line: 1, column: 12},
+          end: {line: 1, column: 14}
+        },
+        range: [12, 14],
+        name: "ns"
+      }
+    }],
+    source: {
+      type: "Literal",
+      start: 20,
+      end: 28,
+      loc: {
+        start: {line: 1, column: 20},
+        end: {line: 1, column: 28}
+      },
+      range: [20, 28],
+      value: "module",
+      raw: '"module"'
+    }
+  }]
+}, {
+  ecmaVersion: 6,
+  sourceType: "module",
+  exportExtensions: true,
+  ranges: true,
+  locations: true
+});
+
+test('export def from "module"', {
+  type: "Program",
+  start: 0,
+  end: 24,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 24}
+  },
+  range: [0, 24],
+  body: [{
+    type: "ExportNamedDeclaration",
+    start: 0,
+    end: 24,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 24}
+    },
+    range: [0, 24],
+    specifiers: [{
+      type: "ExportDefaultSpecifier",
+      start: 7,
+      end: 10,
+      loc: {
+        start: {line: 1, column: 7},
+        end: {line: 1, column: 10}
+      },
+      range: [7, 10],
+      exported: {
+        type: "Identifier",
+        start: 7,
+        end: 10,
+        loc: {
+          start: {line: 1, column: 7},
+          end: {line: 1, column: 10}
+        },
+        range: [7, 10],
+        name: "def"
+      }
+    }],
+    source: {
+      type: "Literal",
+      start: 16,
+      end: 24,
+      loc: {
+        start: {line: 1, column: 16},
+        end: {line: 1, column: 24}
+      },
+      range: [16, 24],
+      value: "module",
+      raw: '"module"'
+    }
+  }]
+}, {
+  ecmaVersion: 6,
+  sourceType: "module",
+  exportExtensions: true,
+  ranges: true,
+  locations: true
+});
+
+test('export def, * as ns from "module"', {
+  type: "Program",
+  start: 0,
+  end: 33,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 33}
+  },
+  range: [0, 33],
+  body: [{
+    type: "ExportNamedDeclaration",
+    start: 0,
+    end: 33,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 33}
+    },
+    range: [0, 33],
+    specifiers: [{
+      type: "ExportDefaultSpecifier",
+      start: 7,
+      end: 10,
+      loc: {
+        start: {line: 1, column: 7},
+        end: {line: 1, column: 10}
+      },
+      range: [7, 10],
+      exported: {
+        type: "Identifier",
+        start: 7,
+        end: 10,
+        loc: {
+          start: {line: 1, column: 7},
+          end: {line: 1, column: 10}
+        },
+        range: [7, 10],
+        name: "def"
+      }
+    }, {
+      type: "ExportNamespaceSpecifier",
+      start: 12,
+      end: 19,
+      loc: {
+        start: { column: 12},
+        end: {line: 1, column: 19}
+      },
+      range: [12, 19],
+      exported: {
+        type: "Identifier",
+        start: 17,
+        end: 19,
+        loc: {
+          start: {line: 1, column: 17},
+          end: {line: 1, column: 19}
+        },
+        range: [17, 19],
+        name: "ns"
+      }
+    }],
+    source: {
+      type: "Literal",
+      start: 25,
+      end: 33,
+      loc: {
+        start: {line: 1, column: 25},
+        end: {line: 1, column: 33}
+      },
+      range: [25, 33],
+      value: "module",
+      raw: '"module"'
+    }
+  }]
+}, {
+  ecmaVersion: 6,
+  sourceType: "module",
+  exportExtensions: true,
+  ranges: true,
+  locations: true
+});
+
+test('export def, { a, b as c } from "module"', {
+  type: "Program",
+  start: 0,
+  end: 39,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 39}
+  },
+  range: [0, 39],
+  body: [{
+    type: "ExportNamedDeclaration",
+    start: 0,
+    end: 39,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 39}
+    },
+    range: [0, 39],
+    specifiers: [{
+      type: "ExportDefaultSpecifier",
+      start: 7,
+      end: 10,
+      loc: {
+        start: {line: 1, column: 7},
+        end: {line: 1, column: 10}
+      },
+      range: [7, 10],
+      exported: {
+        type: "Identifier",
+        start: 7,
+        end: 10,
+        loc: {
+          start: {line: 1, column: 7},
+          end: {line: 1, column: 10}
+        },
+        range: [7, 10],
+        name: "def"
+      }
+    }, {
+      type: "ExportSpecifier",
+      start: 14,
+      end: 15,
+      loc: {
+        start: {line: 1, column: 14},
+        end: {line: 1, column: 15}
+      },
+      range: [14, 15],
+      local: {
+        type: "Identifier",
+        start: 14,
+        end: 15,
+        loc: {
+          start: {line: 1, column: 14},
+          end: {line: 1, column: 15}
+        },
+        range: [14, 15],
+        name: "a"
+      },
+      exported: {
+        type: "Identifier",
+        start: 14,
+        end: 15,
+        loc: {
+          start: {line: 1, column: 14},
+          end: {line: 1, column: 15}
+        },
+        range: [14, 15],
+        name: "a"
+      }
+    }, {
+      type: "ExportSpecifier",
+      start: 17,
+      end: 23,
+      loc: {
+        start: {line: 1, column: 17},
+        end: {line: 1, column: 23}
+      },
+      range: [17, 23],
+      local: {
+        type: "Identifier",
+        start: 17,
+        end: 18,
+        loc: {
+          start: {line: 1, column: 17},
+          end: {line: 1, column: 18}
+        },
+        range: [17, 18],
+        name: "b"
+      },
+      exported: {
+        type: "Identifier",
+        start: 22,
+        end: 23,
+        loc: {
+          start: {line: 1, column: 22},
+          end: {line: 1, column: 23}
+        },
+        range: [22, 23],
+        name: "c"
+      }
+    }],
+    source: {
+      type: "Literal",
+      start: 31,
+      end: 39,
+      loc: {
+        start: {line: 1, column: 31},
+        end: {line: 1, column: 39}
+      },
+      range: [31, 39],
+      value: "module",
+      raw: '"module"'
+    }
+  }]
+}, {
+  ecmaVersion: 6,
+  sourceType: "module",
+  exportExtensions: true,
+  ranges: true,
+  locations: true
+});
+
+test('export * as ns, { a, b as c } from "module"', {
+  type: "Program",
+  start: 0,
+  end: 43,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 43}
+  },
+  range: [0, 43],
+  body: [{
+    type: "ExportNamedDeclaration",
+    start: 0,
+    end: 43,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 43}
+    },
+    range: [0, 43],
+    specifiers: [{
+      type: "ExportNamespaceSpecifier",
+      start: 7,
+      end: 14,
+      loc: {
+        start: {line: 1, column: 7},
+        end: {line: 1, column: 14}
+      },
+      range: [7, 14],
+      exported: {
+        type: "Identifier",
+        start: 12,
+        end: 14,
+        loc: {
+          start: {line: 1, column: 12},
+          end: {line: 1, column: 14}
+        },
+        range: [12, 14],
+        name: "ns"
+      }
+    }, {
+      type: "ExportSpecifier",
+      start: 18,
+      end: 19,
+      loc: {
+        start: {line: 1, column: 18},
+        end: {line: 1, column: 19}
+      },
+      range: [18, 19],
+      local: {
+        type: "Identifier",
+        start: 18,
+        end: 19,
+        loc: {
+          start: {line: 1, column: 18},
+          end: {line: 1, column: 19}
+        },
+        range: [18, 19],
+        name: "a"
+      },
+      exported: {
+        type: "Identifier",
+        start: 18,
+        end: 19,
+        loc: {
+          start: {line: 1, column: 18},
+          end: {line: 1, column: 19}
+        },
+        range: [18, 19],
+        name: "a"
+      }
+    }, {
+      type: "ExportSpecifier",
+      start: 21,
+      end: 27,
+      loc: {
+        start: {line: 1, column: 21},
+        end: {line: 1, column: 27}
+      },
+      range: [21, 27],
+      local: {
+        type: "Identifier",
+        start: 21,
+        end: 22,
+        loc: {
+          start: {line: 1, column: 21},
+          end: {line: 1, column: 22}
+        },
+        range: [21, 22],
+        name: "b"
+      },
+      exported: {
+        type: "Identifier",
+        start: 26,
+        end: 27,
+        loc: {
+          start: {line: 1, column: 26},
+          end: {line: 1, column: 27}
+        },
+        range: [26, 27],
+        name: "c"
+      }
+    }],
+    source: {
+      type: "Literal",
+      start: 35,
+      end: 43,
+      loc: {
+        start: {line: 1, column: 35},
+        end: {line: 1, column: 43}
+      },
+      range: [35, 43],
+      value: "module",
+      raw: '"module"'
+    }
+  }]
+}, {
+  ecmaVersion: 6,
+  sourceType: "module",
+  exportExtensions: true,
+  ranges: true,
+  locations: true
+});
+
+test('export { default, a, b as c } from "module"', {
+  type: "Program",
+  start: 0,
+  end: 43,
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 1, column: 43}
+  },
+  range: [0, 43],
+  body: [{
+    type: "ExportNamedDeclaration",
+    start: 0,
+    end: 43,
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 43}
+    },
+    range: [0, 43],
+    declaration: null,
+    specifiers: [{
+      type: "ExportSpecifier",
+      start: 9,
+      end: 16,
+      loc: {
+        start: {line: 1, column: 9},
+        end: {line: 1, column: 16}
+      },
+      range: [9, 16],
+      local: {
+        type: "Identifier",
+        start: 9,
+        end: 16,
+        loc: {
+          start: {line: 1, column: 9},
+          end: {line: 1, column: 16}
+        },
+        range: [9, 16],
+        name: "default"
+      },
+      exported: {
+        type: "Identifier",
+        start: 9,
+        end: 16,
+        loc: {
+          start: {line: 1, column: 9},
+          end: {line: 1, column: 16}
+        },
+        range: [9, 16],
+        name: "default"
+      }
+    }, {
+      type: "ExportSpecifier",
+      start: 18,
+      end: 19,
+      loc: {
+        start: {line: 1, column: 18},
+        end: {line: 1, column: 19}
+      },
+      range: [18, 19],
+      local: {
+        type: "Identifier",
+        start: 18,
+        end: 19,
+        loc: {
+          start: {line: 1, column: 18},
+          end: {line: 1, column: 19}
+        },
+        range: [18, 19],
+        name: "a"
+      },
+      exported: {
+        type: "Identifier",
+        start: 18,
+        end: 19,
+        loc: {
+          start: {line: 1, column: 18},
+          end: {line: 1, column: 19}
+        },
+        range: [18, 19],
+        name: "a"
+      }
+    }, {
+      type: "ExportSpecifier",
+      start: 21,
+      end: 27,
+      loc: {
+        start: {line: 1, column: 21},
+        end: {line: 1, column: 27}
+      },
+      range: [21, 27],
+      local: {
+        type: "Identifier",
+        start: 21,
+        end: 22,
+        loc: {
+          start: {line: 1, column: 21},
+          end: {line: 1, column: 22}
+        },
+        range: [21, 22],
+        name: "b"
+      },
+      exported: {
+        type: "Identifier",
+        start: 26,
+        end: 27,
+        loc: {
+          start: {line: 1, column: 26},
+          end: {line: 1, column: 27}
+        },
+        range: [26, 27],
+        name: "c"
+      }
+    }],
+    source: {
+      type: "Literal",
+      start: 35,
+      end: 43,
+      loc: {
+        start: {line: 1, column: 35},
+        end: {line: 1, column: 43}
+      },
+      range: [35, 43],
+      value: "module",
+      raw: '"module"'
+    }
+  }]
+}, {
+  ecmaVersion: 6,
+  sourceType: "module",
+  ranges: true,
+  locations: true
+});
+
 testFail("export { default }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
 testFail("export { if }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
 testFail("export { default as foo }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
