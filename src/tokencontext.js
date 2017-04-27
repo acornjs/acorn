@@ -40,7 +40,7 @@ pp.braceIsBlock = function(prevType) {
     if (parent === types.b_stat || parent === types.b_expr)
       return !parent.isExpr
   }
-  if (prevType === tt._return)
+  if (prevType === tt._return || prevType == tt.name && this.exprAllowed)
     return lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
   if (prevType === tt._else || prevType === tt.semi || prevType === tt.eof || prevType === tt.parenR || prevType == tt.arrow)
     return true

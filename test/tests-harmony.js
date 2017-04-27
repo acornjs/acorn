@@ -15531,6 +15531,47 @@ test("export default class Foo {}++x", {
   "sourceType": "module"
 }, {ecmaVersion: 6, sourceType: "module"})
 
+
+test("function *f() { yield\n{}/1/g\n}", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "id": {
+        "type": "Identifier",
+        "name": "f"
+      },
+      "body": {
+        "type": "BlockStatement",
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "expression": {
+              "type": "YieldExpression",
+              "argument": null
+            }
+          },
+          {
+            "type": "BlockStatement",
+            "body": []
+          },
+          {
+            "type": "ExpressionStatement",
+            "expression": {
+              "type": "Literal",
+              "raw": "/1/g",
+              "regex": {
+                "pattern": "1",
+                "flags": "g"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}, {ecmaVersion: 6})
+
 test("class B extends A { foo(a = super.foo()) { return a }}", {}, {ecmaVersion: 6})
 
 testFail("function* wrap() {\n({a = yield b} = obj) => a\n}", "Yield expression cannot be a default value (2:6)", {ecmaVersion: 6})
