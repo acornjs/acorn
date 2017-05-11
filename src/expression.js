@@ -246,15 +246,30 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
   let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
       this.lastTokEnd == base.end && !this.canInsertSemicolon()
-  for (let computed;;) {
-    if ((computed = this.eat(tt.bracketL)) || this.eat(tt.dot)) {
+  while (true) {
+    switch (this.type) {
+    case tt.bracketL: {
+      this.next()
       let node = this.startNodeAt(startPos, startLoc)
       node.object = base
-      node.property = computed ? this.parseExpression() : this.parseIdent(true)
-      node.computed = !!computed
-      if (computed) this.expect(tt.bracketR)
+      node.property = this.parseExpression()
+      node.computed = true
+      this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
-    } else if (!noCalls && this.eat(tt.parenL)) {
+      break
+    }
+    case tt.dot: {
+      this.next()
+      let node = this.startNodeAt(startPos, startLoc)
+      node.object = base
+      node.property = this.parseIdent(true)
+      node.computed = false
+      base = this.finishNode(node, "MemberExpression")
+      break
+    }
+    case tt.parenL: {
+      if (noCalls) return base
+      this.next()
       let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
       this.yieldPos = 0
       this.awaitPos = 0
@@ -273,13 +288,16 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
       node.callee = base
       node.arguments = exprList
       base = this.finishNode(node, "CallExpression")
-    } else if (this.type === tt.backQuote) {
+      break
+    }
+    case tt.backQuote: {
       let node = this.startNodeAt(startPos, startLoc)
       node.tag = base
       node.quasi = this.parseTemplate({isTagged: true})
       base = this.finishNode(node, "TaggedTemplateExpression")
-    } else {
-      return base
+      break
+    }
+    default: return base
     }
   }
 }
