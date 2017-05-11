@@ -695,7 +695,20 @@ pp.readHexChar = function(len) {
 
 pp.readWord1 = function() {
   this.containsEsc = false
-  let word = "", first = true, chunkStart = this.pos
+  let chunkStart = this.pos
+  while (this.pos < this.input.length) {
+    let ch = this.input.charCodeAt(this.pos)
+    if (ch === 92 || ch >= 0xaa) {
+      return this.readSlowWord1(chunkStart)
+    }
+    if (!isIdentifierChar(ch, false)) break
+    this.pos++
+  }
+  return this.input.slice(chunkStart, this.pos)
+}
+
+pp.readSlowWord1 = function(chunkStart) {
+  let word = ""
   let astral = this.options.ecmaVersion >= 6
   while (this.pos < this.input.length) {
     let ch = this.fullCharCodeAtPos()
@@ -709,14 +722,13 @@ pp.readWord1 = function() {
         this.invalidStringToken(this.pos, "Expecting Unicode escape sequence \\uXXXX")
       ++this.pos
       let esc = this.readCodePoint()
-      if (!(first ? isIdentifierStart : isIdentifierChar)(esc, astral))
+      if (!(this.pos === chunkStart ? isIdentifierStart : isIdentifierChar)(esc, astral))
         this.invalidStringToken(escStart, "Invalid Unicode escape")
       word += codePointToString(esc)
       chunkStart = this.pos
     } else {
       break
     }
-    first = false
   }
   return word + this.input.slice(chunkStart, this.pos)
 }

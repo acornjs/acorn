@@ -61,9 +61,10 @@ function isInAstralSet(code, set) {
 // Test whether a given character code starts an identifier.
 
 export function isIdentifierStart(code, astral) {
-  if (code < 65) return code === 36
+  if (code === 36 || code === 95) return true
+  if (code < 65) return false
   if (code < 91) return true
-  if (code < 97) return code === 95
+  if (code < 97) return false
   if (code < 123) return true
   if (code <= 0xffff) return code >= 0xaa && nonASCIIidentifierStart.test(String.fromCharCode(code))
   if (astral === false) return false
@@ -73,11 +74,12 @@ export function isIdentifierStart(code, astral) {
 // Test whether a given character is part of an identifier.
 
 export function isIdentifierChar(code, astral) {
-  if (code < 48) return code === 36
+  if (code === 36 || code === 95) return true
+  if (code < 48) return false
   if (code < 58) return true
   if (code < 65) return false
   if (code < 91) return true
-  if (code < 97) return code === 95
+  if (code < 97) return false
   if (code < 123) return true
   if (code <= 0xffff) return code >= 0xaa && nonASCIIidentifier.test(String.fromCharCode(code))
   if (astral === false) return false
