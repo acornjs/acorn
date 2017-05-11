@@ -120,9 +120,8 @@ pp.skipLineComment = function(startSkip) {
   let start = this.pos
   let startLoc = this.options.onComment && this.curPosition()
   let ch = this.input.charCodeAt(this.pos += startSkip)
-  while (this.pos < this.input.length && ch !== 10 && ch !== 13 && ch !== 8232 && ch !== 8233) {
-    ++this.pos
-    ch = this.input.charCodeAt(this.pos)
+  while (this.pos < this.input.length && !isNewLine(ch)) {
+    ch = this.input.charCodeAt(++this.pos)
   }
   if (this.options.onComment)
     this.options.onComment(false, this.input.slice(start + startSkip, this.pos), start, this.pos,
