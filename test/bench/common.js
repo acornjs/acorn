@@ -2,6 +2,8 @@
 
 const isWorker = typeof importScripts !== 'undefined';
 
+var flowName = 'Flow';
+
 if (isWorker) {
   importScripts('https://unpkg.com/esprima');
   importScripts('../../dist/acorn.js');
@@ -10,6 +12,7 @@ if (isWorker) {
   importScripts('https://unpkg.com/acorn');
   importScripts('https://unpkg.com/traceur/bin/traceur.js');
   importScripts('https://unpkg.com/typescript');
+  importScripts('https://unpkg.com/flow-parser');
 } else {
   var fs = require('fs');
   var esprima = require('esprima');
@@ -17,6 +20,8 @@ if (isWorker) {
   var acorn = require('acorn');
   require('traceur'); // yeah, it creates a global...
   var ts = require('typescript');
+  var flow = require('flow-parser');
+  flowName += ' ' + require('flow-parser/package.json').version;
 }
 
 var parsers = {
@@ -37,6 +42,9 @@ var parsers = {
     var parser = new traceur.syntax.Parser(file);
     parser.parseScript();
   },
+  [flowName](s) {
+    flow.parse(s);
+  }
 };
 
 var parserNames = Object.keys(parsers);

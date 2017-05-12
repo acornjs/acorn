@@ -24,6 +24,7 @@
     "acorn": "*",
     "benchtable": "^0.1.0",
     "esprima": "*",
+    "flow-parser": "*",
     "traceur": "*",
     "typescript": "*"
   }
