@@ -2,8 +2,6 @@
 
 const isWorker = typeof importScripts !== 'undefined';
 
-var flowName = 'Flow';
-
 if (isWorker) {
   importScripts('https://unpkg.com/esprima');
   importScripts('../../dist/acorn.js');
@@ -13,6 +11,9 @@ if (isWorker) {
   importScripts('https://unpkg.com/traceur/bin/traceur.js');
   importScripts('https://unpkg.com/typescript');
   importScripts('https://unpkg.com/flow-parser');
+  var flowVersion = '';
+  importScripts('https://packd.now.sh/babylon'); // doesn't have own bundle
+  var babylonVersion = '';
 } else {
   var fs = require('fs');
   var esprima = require('esprima');
@@ -21,7 +22,9 @@ if (isWorker) {
   require('traceur'); // yeah, it creates a global...
   var ts = require('typescript');
   var flow = require('flow-parser');
-  flowName += ' ' + require('flow-parser/package.json').version;
+  var flowVersion = require('flow-parser/package.json').version;
+  var babylon = require('babylon');
+  var babylonVersion = require('babylon/package.json').version;
 }
 
 var parsers = {
@@ -42,9 +45,12 @@ var parsers = {
     var parser = new traceur.syntax.Parser(file);
     parser.parseScript();
   },
-  [flowName](s) {
+  [`Flow ${flowVersion}`](s) {
     flow.parse(s);
-  }
+  },
+  [`Babylon ${babylonVersion}`](s) {
+    babylon.parse(s);
+  },
 };
 
 var parserNames = Object.keys(parsers);

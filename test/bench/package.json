@@ -22,6 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "acorn": "*",
+    "babylon": "*",
     "benchtable": "^0.1.0",
     "esprima": "*",
     "flow-parser": "*",
