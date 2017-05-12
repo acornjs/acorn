@@ -21,6 +21,14 @@ onmessage = () => inputs.then(inputs => {
       });
     });
 
+    let cell = 0;
+
+    postMessage({
+      type: 'start',
+      row,
+      cell
+    });
+
     suite
     .on('cycle', ({ target: bench }) => {
       console.log(bench.toString());
@@ -28,6 +36,7 @@ onmessage = () => inputs.then(inputs => {
       postMessage({
         type: 'cycle',
         row,
+        cell: cell++,
         text: `${bench.hz.toFixed(2)} ops/sec`
       });
     })
@@ -37,6 +46,7 @@ onmessage = () => inputs.then(inputs => {
       postMessage({
         type: 'error',
         row,
+        cell: cell++,
         text: bench.error.name
       });
     })

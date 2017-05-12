@@ -12,7 +12,11 @@
 
     table, th, td {
       border: 1px solid black;
-      padding: 3pt;
+    }
+
+    th, td {
+      border: 1px solid black;
+      height: 20pt;
     }
 
     .error {
@@ -43,12 +47,10 @@ numbers.</p>
 
 <button id="run" disabled>Run benchmarks</button>
 
-<pre><code id="log"></code></pre>
-
 <table>
   <thead>
     <tr id="parsers">
-      <th>⌛</th>
+      <th id="init">⌛</th>
     </tr>
   </thead>
   <tbody id="inputs"></tbody>
@@ -78,9 +80,11 @@ numbers.</p>
       let trElem = document.createElement('tr');
       trElem.appendChild(thElem);
 
+      let cells = parserNames.map(() => trElem.insertCell());
+
       inputsElem.appendChild(trElem);
 
-      return trElem;
+      return cells;
     });
 
     runElem.addEventListener('click', () => {
@@ -88,30 +92,39 @@ numbers.</p>
       worker.postMessage('');
     });
 
+    document.getElementById('init').textContent = '';
     runElem.disabled = false;
 
     worker.onmessage = ({ data }) => {
       let row = rows[data.row];
+
+      if (data.type === 'complete') {
+        ['slowest', 'fastest'].forEach(type => {
+          data[type].forEach(i => {
+            row[i].className = type;
+          });
+        });
+        return;
+      }
+
+      let cell = row[data.cell];
+
       switch (data.type) {
+        case 'start': {
+          cell.textContent = '⌛';
+          break;
+        }
         case 'cycle': {
-          let tdElem = document.createElement('td');
-          tdElem.textContent = data.text;
-          row.appendChild(tdElem);
+          cell.textContent = data.text;
+          let nextCell = row[data.cell + 1];
+          if (nextCell) {
+            nextCell.textContent = '⌛';
+          }
           break;
         }
         case 'error': {
-          let tdElem = document.createElement('td');
-          tdElem.className = 'error';
-          tdElem.textContent = data.text;
-          row.appendChild(tdElem);
-          break;
-        }
-        case 'complete': {
-          ['slowest', 'fastest'].forEach(type => {
-            data[type].forEach(i => {
-              row.cells[i + 1].className = type;
-            });
-          });
+          cell.className = 'error';
+          cell.textContent = data.text;
           break;
         }
       }
