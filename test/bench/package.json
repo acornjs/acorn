@@ -1,0 +1,30 @@
+{
+  "name": "acorn-benchmarks",
+  "description": "Acorn benchmarks meta-package",
+  "version": "0.0.0",
+  "private": true,
+  "maintainers": [
+    {
+      "name": "Marijn Haverbeke",
+      "email": "marijnh@gmail.com",
+      "web": "http://marijnhaverbeke.nl"
+    },
+    {
+      "name": "Ingvar Stepanyan",
+      "email": "me@rreverser.com",
+      "web": "http://rreverser.com/"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ternjs/acorn.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "acorn": "*",
+    "benchtable": "^0.1.0",
+    "esprima": "*",
+    "traceur": "*",
+    "typescript": "*"
+  }
+}
