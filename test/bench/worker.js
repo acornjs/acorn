@@ -28,7 +28,7 @@ onmessage = () => inputs.then(inputs => {
       postMessage({
         type: 'cycle',
         row,
-        text: `${bench.hz.toFixed(2)} ops/sec ±${bench.stats.rme.toFixed(2)}%`
+        text: `${bench.hz.toFixed(2)} ops/sec`
       });
     })
     .on('error', ({ target: bench }) => {
