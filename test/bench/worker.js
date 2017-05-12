@@ -26,6 +26,8 @@ onmessage = ({ data: indices }) => inputs.then(inputs => {
 
     let indicesIter = indices[Symbol.iterator]();
 
+    console.group(`Parsing ${inputNames[row]}`);
+
     postMessage({
       type: 'start',
       row,
@@ -59,6 +61,8 @@ onmessage = ({ data: indices }) => inputs.then(inputs => {
         fastest: suite.filter('fastest').map(getCell)
       });
     })
-    .run()
+    .run();
+
+    console.groupEnd();
   });
 }).catch(console.error);
