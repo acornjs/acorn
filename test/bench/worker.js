@@ -9,61 +9,54 @@ postMessage({
   inputNames
 });
 
-onmessage = () => inputs.then(inputs => {
+function getCell(bench) {
+  return parserNames.indexOf(bench.name);
+}
+
+onmessage = ({ data: indices }) => inputs.then(inputs => {
+  let chosenParsers = parserNames.filter((_, i) => indices.includes(i));
+
   inputs.forEach((input, row) => {
     let suite = new Benchmark.Suite();
 
-    parserNames.forEach(parserName => {
+    chosenParsers.forEach(parserName => {
       let parse = parsers[parserName];
-
-      suite.add(parserName, function () {
-        parse(input);
-      });
+      suite.add(parserName, () => parse(input));
     });
 
-    let cell = 0;
+    let indicesIter = indices[Symbol.iterator]();
 
     postMessage({
       type: 'start',
       row,
-      cell
+      cell: indicesIter.next().value
     });
+
+    function reportCell(bench, type, text) {
+      postMessage({
+        type,
+        row,
+        cell: getCell(bench),
+        nextCell: indicesIter.next().value,
+        text
+      });
+    }
 
     suite
     .on('cycle', ({ target: bench }) => {
       console.log(bench.toString());
-
-      postMessage({
-        type: 'cycle',
-        row,
-        cell: cell++,
-        text: `${bench.hz.toFixed(2)} ops/sec`
-      });
+      reportCell(bench, 'cycle', `${bench.hz.toFixed(2)} ops/sec`);
     })
     .on('error', ({ target: bench }) => {
       console.error(bench.error);
-
-      postMessage({
-        type: 'error',
-        row,
-        cell: cell++,
-        text: bench.error.name
-      });
+      reportCell(bench, 'error', bench.error.name);
     })
     .on('complete', ({ target }) => {
-      let [slowest, fastest] =
-        ['slowest', 'fastest']
-        .map(type => (
-          suite.filter(type)
-          .map('name')
-          .map(name => parserNames.indexOf(name))
-        ));
-
       postMessage({
         type: 'complete',
         row,
-        slowest,
-        fastest
+        slowest: suite.filter('slowest').map(getCell),
+        fastest: suite.filter('fastest').map(getCell)
       });
     })
     .run()

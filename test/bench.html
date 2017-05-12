@@ -67,10 +67,21 @@ numbers.</p>
   let worker = new Worker('bench/worker.js');
 
   worker.onmessage = ({ data: { parserNames, inputNames } }) => {
-    parserNames.forEach(parserName => {
+    let checkBoxes = parserNames.map(parserName => {
+      let cbElem = document.createElement('input');
+      cbElem.type = 'checkbox';
+      cbElem.checked = parserName.startsWith('Acorn');
+
+      let labelElem = document.createElement('label');
+      labelElem.appendChild(cbElem);
+      labelElem.appendChild(document.createTextNode(parserName));
+
       let thElem = document.createElement('th');
-      thElem.textContent = parserName;
+      thElem.appendChild(labelElem);
+
       parsersElem.appendChild(thElem);
+
+      return cbElem;
     });
 
     let rows = inputNames.map(name => {
@@ -88,8 +99,26 @@ numbers.</p>
     });
 
     runElem.addEventListener('click', () => {
+      let indices = [];
+
+      checkBoxes.forEach((cbElem, i) => {
+        if (cbElem.checked) {
+          indices.push(i);
+        }
+      });
+
+      if (!indices.length) {
+        alert('Choose at least one parser');
+        return;
+      }
+
+      checkBoxes.forEach(cbElem => {
+        cbElem.disabled = true;
+      });
+
       runElem.disabled = true;
-      worker.postMessage('');
+
+      worker.postMessage(indices);
     });
 
     document.getElementById('init').textContent = '';
@@ -116,9 +145,8 @@ numbers.</p>
         }
         case 'cycle': {
           cell.textContent = data.text;
-          let nextCell = row[data.cell + 1];
-          if (nextCell) {
-            nextCell.textContent = '⌛';
+          if (data.nextCell !== undefined) {
+            row[data.nextCell].textContent = '⌛';
           }
           break;
         }
