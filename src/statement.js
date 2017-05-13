@@ -125,9 +125,11 @@ pp.parseStatement = function(declaration, topLevel, exports) {
     }
 
     let maybeName = this.value, expr = this.parseExpression()
-    if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon))
+    if (starttype === tt.name && this.type === tt.colon && expr.type === "Identifier") {
+      this.next()
       return this.parseLabeledStatement(node, maybeName, expr)
-    else return this.parseExpressionStatement(node, expr)
+    }
+    return this.parseExpressionStatement(node, expr)
   }
 }
 
