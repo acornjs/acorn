@@ -24,14 +24,14 @@
 export class TokenType {
   constructor(label, conf = {}) {
     this.label = label
-    this.keyword = conf.keyword
+    this.keyword = conf.keyword || ""
     this.beforeExpr = !!conf.beforeExpr
     this.startsExpr = !!conf.startsExpr
     this.isLoop = !!conf.isLoop
     this.isAssign = !!conf.isAssign
     this.prefix = !!conf.prefix
     this.postfix = !!conf.postfix
-    this.binop = conf.binop || null
+    this.binop = conf.binop || -1
     this.updateContext = null
   }
 }

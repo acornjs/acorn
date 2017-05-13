@@ -167,16 +167,14 @@ pp.parseExprOps = function(noIn, refDestructuringErrors) {
 
 pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
   let prec = this.type.binop
-  if (prec != null && (!noIn || this.type !== tt._in)) {
-    if (prec > minPrec) {
-      let logical = this.type === tt.logicalOR || this.type === tt.logicalAND
-      let op = this.value
-      this.next()
-      let startPos = this.start, startLoc = this.startLoc
-      let right = this.parseExprOp(this.parseMaybeUnary(null, false), startPos, startLoc, prec, noIn)
-      let node = this.buildBinary(leftStartPos, leftStartLoc, left, right, op, logical)
-      return this.parseExprOp(node, leftStartPos, leftStartLoc, minPrec, noIn)
-    }
+  if (prec > minPrec && (!noIn || this.type !== tt._in)) {
+    let logical = this.type === tt.logicalOR || this.type === tt.logicalAND
+    let op = this.value
+    this.next()
+    let startPos = this.start, startLoc = this.startLoc
+    let right = this.parseExprOp(this.parseMaybeUnary(null, false), startPos, startLoc, prec, noIn)
+    let node = this.buildBinary(leftStartPos, leftStartLoc, left, right, op, logical)
+    return this.parseExprOp(node, leftStartPos, leftStartLoc, minPrec, noIn)
   }
   return left
 }
