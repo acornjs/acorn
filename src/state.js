@@ -2,6 +2,7 @@ import {reservedWords, keywords} from "./identifier"
 import {types as tt} from "./tokentype"
 import {lineBreak} from "./whitespace"
 import {getOptions} from "./options"
+import {Position} from "./locutil"
 
 // Registered plugins
 export const plugins = {}
@@ -51,12 +52,12 @@ export class Parser {
     // Its type
     this.type = tt.eof
     // For tokens that include more information than their type, the value
-    this.value = null
+    this.value = undefined
     // Its start and end offset
     this.start = this.end = this.pos
     // And, if locations are used, the {line, column} object
     // corresponding to those offsets
-    this.startLoc = this.endLoc = this.curPosition()
+    this.startLoc = this.endLoc = null
 
     // Position information for the previous token
     this.lastTokEndLoc = this.lastTokStartLoc = null
@@ -82,13 +83,15 @@ export class Parser {
     // Labels in scope.
     this.labels = []
 
-    // If enabled, skip leading hashbang line.
-    if (this.pos === 0 && options.allowHashBang && this.input.slice(0, 2) === "#!")
-      this.skipLineComment(2)
-
     // Scope tracking for duplicate variable names (see scope.js)
     this.scopeStack = []
     this.enterFunctionScope()
+
+    this.startLoc = this.endLoc = this.curPosition()
+
+    // If enabled, skip leading hashbang line.
+    if (this.pos === 0 && options.allowHashBang && this.input.slice(0, 2) === "#!")
+      this.skipLineComment(2)
   }
 
   // DEPRECATED Kept for backwards compatibility until 3.0 in case a plugin uses them

@@ -75,7 +75,7 @@ pp.nextToken = function() {
   if (!curContext || !curContext.preserveSpace) this.skipSpace()
 
   this.start = this.pos
-  if (this.options.locations) this.startLoc = this.curPosition()
+  this.startLoc = this.curPosition()
   if (this.pos >= this.input.length) return this.finishToken(tt.eof)
 
   if (curContext.override) return curContext.override(this)
@@ -178,7 +178,7 @@ pp.skipSpace = function() {
 
 pp.finishToken = function(type, val) {
   this.end = this.pos
-  if (this.options.locations) this.endLoc = this.curPosition()
+  this.endLoc = this.curPosition()
   let prevType = this.type
   this.type = type
   this.value = val
