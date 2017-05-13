@@ -65,7 +65,7 @@ numbers.</p>
   let inputsElem = document.getElementById('inputs');
   let initElem = document.getElementById('init');
 
-  let worker = new Worker('bench/worker.js');
+  let worker = new Worker('worker.js');
 
   worker.onmessage = ({ data: { parserNames, inputNames } }) => {
     let checkBoxes = parserNames.map(parserName => {
