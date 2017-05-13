@@ -2,7 +2,6 @@ import {reservedWords, keywords} from "./identifier"
 import {types as tt} from "./tokentype"
 import {lineBreak} from "./whitespace"
 import {getOptions} from "./options"
-import {Position} from "./locutil"
 
 // Registered plugins
 export const plugins = {}
