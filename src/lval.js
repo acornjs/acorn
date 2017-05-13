@@ -188,17 +188,16 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
       checkClashes[expr.name] = true
     }
     if (bindingType && bindingType !== "none") {
-      if (
-        bindingType === "var" && !this.canDeclareVarName(expr.name) ||
-        bindingType !== "var" && !this.canDeclareLexicalName(expr.name)
-      ) {
-        this.raiseRecoverable(expr.start, `Identifier '${expr.name}' has already been declared`)
-      }
+      let canDeclare
       if (bindingType === "var") {
-        this.declareVarName(expr.name)
+        if (canDeclare = this.canDeclareVarName(expr.name))
+          this.declareVarName(expr.name)
       } else {
-        this.declareLexicalName(expr.name)
+        if (canDeclare = this.canDeclareLexicalName(expr.name))
+          this.declareLexicalName(expr.name)
       }
+      if (!canDeclare)
+        this.raiseRecoverable(expr.start, `Identifier '${expr.name}' has already been declared`)
     }
     break
 
@@ -219,18 +218,15 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
     break
 
   case "AssignmentPattern":
-    this.checkLVal(expr.left, bindingType, checkClashes)
-    break
+    return this.checkLVal(expr.left, bindingType, checkClashes)
 
   case "RestElement":
-    this.checkLVal(expr.argument, bindingType, checkClashes)
-    break
+    return this.checkLVal(expr.argument, bindingType, checkClashes)
 
   case "ParenthesizedExpression":
-    this.checkLVal(expr.expression, bindingType, checkClashes)
-    break
+    return this.checkLVal(expr.expression, bindingType, checkClashes)
 
   default:
-    this.raise(expr.start, (bindingType ? "Binding" : "Assigning to") + " rvalue")
+    return this.raise(expr.start, (bindingType ? "Binding" : "Assigning to") + " rvalue")
   }
 }

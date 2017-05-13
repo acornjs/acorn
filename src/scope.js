@@ -1,5 +1,5 @@
 import {Parser} from "./state"
-import {has} from "./util"
+import {has, map} from "./util"
 
 const pp = Parser.prototype
 
@@ -21,9 +21,13 @@ const assign = Object.assign || function(target, ...sources) {
 pp.enterFunctionScope = function() {
   // var: a hash of var-declared names in the current lexical scope
   // lexical: a hash of lexically-declared names in the current lexical scope
-  // childVar: a hash of var-declared names in all child lexical scopes of the current lexical scope (within the current function scope)
   // parentLexical: a hash of lexically-declared names in all parent lexical scopes of the current lexical scope (within the current function scope)
-  this.scopeStack.push({var: {}, lexical: {}, childVar: {}, parentLexical: {}})
+  this.scopeStack.push({
+    var: map(),
+    lexical: map(),
+    childVar: map(),
+    parentLexical: map()
+  })
 }
 
 pp.exitFunctionScope = function() {
@@ -32,7 +36,12 @@ pp.exitFunctionScope = function() {
 
 pp.enterLexicalScope = function() {
   const parentScope = this.scopeStack[this.scopeStack.length - 1]
-  const childScope = {var: {}, lexical: {}, childVar: {}, parentLexical: {}}
+  const childScope = {
+    var: map(),
+    lexical: map(),
+    childVar: map(),
+    parentLexical: map()
+  }
 
   this.scopeStack.push(childScope)
   assign(childScope.parentLexical, parentScope.lexical, parentScope.parentLexical)

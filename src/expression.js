@@ -19,6 +19,7 @@
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {DestructuringErrors} from "./parseutil"
+import {map} from "./util"
 
 const pp = Parser.prototype
 
@@ -548,7 +549,7 @@ pp.parseTemplate = function({isTagged = false} = {}) {
 // Parse an object literal or binding pattern.
 
 pp.parseObj = function(isPattern, refDestructuringErrors) {
-  let node = this.startNode(), first = true, propHash = {}
+  let node = this.startNode(), first = true, propHash = map()
   node.properties = []
   this.next()
   while (!this.eat(tt.braceR)) {
@@ -768,7 +769,7 @@ pp.isSimpleParamList = function(params) {
 // or "arguments" and duplicate parameters.
 
 pp.checkParams = function(node, allowDuplicates) {
-  let nameHash = {}
+  let nameHash = map()
   for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], "var", allowDuplicates ? null : nameHash)
 }
 

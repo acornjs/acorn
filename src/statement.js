@@ -2,7 +2,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {lineBreak, skipWhiteSpace} from "./whitespace"
 import {isIdentifierStart, isIdentifierChar} from "./identifier"
-import {has} from "./util"
+import {has, map} from "./util"
 import {DestructuringErrors} from "./parseutil"
 
 const pp = Parser.prototype
@@ -15,7 +15,7 @@ const pp = Parser.prototype
 // to its body instead of creating a new node.
 
 pp.parseTopLevel = function(node) {
-  let exports = {}
+  let exports = map()
   if (!node.body) node.body = []
   while (this.type !== tt.eof) {
     let stmt = this.parseStatement(true, true, exports)
