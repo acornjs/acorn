@@ -10,8 +10,8 @@
       table-layout: fixed;
     }
 
-    table, th, td {
-      border: 1px solid black;
+    thead>tr>th:first-child {
+      border: none;
     }
 
     th, td {
@@ -63,6 +63,7 @@ numbers.</p>
   let runElem = document.getElementById('run');
   let parsersElem = document.getElementById('parsers');
   let inputsElem = document.getElementById('inputs');
+  let initElem = document.getElementById('init');
 
   let worker = new Worker('bench/worker.js');
 
@@ -118,45 +119,58 @@ numbers.</p>
 
       runElem.disabled = true;
 
+      worker.onmessage = ({ data }) => {
+        if (data.type === 'versions') {
+          for (let i = 0; i < data.versions.length; i++) {
+            let version = data.versions[i];
+            if (version) {
+              parsersElem.cells[indices[i] + 1].appendChild(document.createTextNode(` ${version}`));
+            }
+          }
+          return;
+        }
+
+        let row = rows[data.row];
+
+        if (data.type === 'complete') {
+          ['slowest', 'fastest'].forEach(type => {
+            data[type].forEach(i => {
+              row[i].className = type;
+            });
+          });
+          return;
+        }
+
+        let cell = row[data.cell];
+
+        switch (data.type) {
+          case 'start': {
+            cell.textContent = '⌛';
+            initElem.style.visibility = 'hidden';
+            break;
+          }
+          case 'cycle': {
+            cell.textContent = data.text;
+            if (data.nextCell !== undefined) {
+              row[data.nextCell].textContent = '⌛';
+            }
+            break;
+          }
+          case 'error': {
+            cell.className = 'error';
+            cell.textContent = data.text;
+            break;
+          }
+        }
+      };
+
+      initElem.style.visibility = 'visible';
+
       worker.postMessage(indices);
     });
 
-    document.getElementById('init').textContent = '';
+    initElem.style.visibility = 'hidden';
     runElem.disabled = false;
-
-    worker.onmessage = ({ data }) => {
-      let row = rows[data.row];
-
-      if (data.type === 'complete') {
-        ['slowest', 'fastest'].forEach(type => {
-          data[type].forEach(i => {
-            row[i].className = type;
-          });
-        });
-        return;
-      }
-
-      let cell = row[data.cell];
-
-      switch (data.type) {
-        case 'start': {
-          cell.textContent = '⌛';
-          break;
-        }
-        case 'cycle': {
-          cell.textContent = data.text;
-          if (data.nextCell !== undefined) {
-            row[data.nextCell].textContent = '⌛';
-          }
-          break;
-        }
-        case 'error': {
-          cell.className = 'error';
-          cell.textContent = data.text;
-          break;
-        }
-      }
-    };
   };
 })();
 </script>

@@ -27,6 +27,7 @@
     "esprima": "*",
     "flow-parser": "*",
     "traceur": "*",
-    "typescript": "*"
+    "typescript": "*",
+    "yargs": "^8.0.1"
   }
 }

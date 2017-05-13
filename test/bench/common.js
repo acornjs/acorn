@@ -2,60 +2,89 @@
 
 const isWorker = typeof importScripts !== 'undefined';
 
+// var because must leak into globals
+var module, exports, req;
+
+// CommonJS shim for Web Worker
 if (isWorker) {
-  importScripts('https://unpkg.com/esprima');
-  importScripts('../../dist/acorn.js');
-  var acornDev = acorn;
-  var acorn = undefined;
-  importScripts('https://unpkg.com/acorn');
-  importScripts('https://unpkg.com/traceur/bin/traceur.js');
-  importScripts('https://unpkg.com/typescript');
-  importScripts('https://unpkg.com/flow-parser');
-  var flowVersion = '';
-  importScripts('https://packd.now.sh/babylon'); // doesn't have own bundle
-  var babylonVersion = '';
+  exports = self;
+
+  req = (name, urlPrefix = 'https://unpkg.com/') => {
+    let oldModule = module, oldExports = exports;
+    exports = {};
+    module = { exports };
+    importScripts(urlPrefix + name);
+    let exported = module.exports;
+    module = oldModule;
+    exports = oldExports;
+    return exported;
+  };
 } else {
-  var fs = require('fs');
-  var esprima = require('esprima');
-  var acornDev = require('../../dist/acorn');
-  var acorn = require('acorn');
-  require('traceur'); // yeah, it creates a global...
-  var ts = require('typescript');
-  var flow = require('flow-parser');
-  var flowVersion = require('flow-parser/package.json').version;
-  var babylon = require('babylon');
-  var babylonVersion = require('babylon/package.json').version;
+  req = require;
 }
 
-var parsers = {
-  [`Acorn (dev)`](s) {
-    acornDev.parse(s, { locations: true });
+exports.parsers = {
+  'Acorn (dev)'() {
+    const { parse } = req('../../dist/acorn.js', '');
+    return {
+      version: '',
+      parse: s => parse(s, { locations: true })
+    };
   },
-  [`Acorn ${acorn.version}`](s) {
-    acorn.parse(s, { locations: true });
+
+  'Acorn'() {
+    const { version, parse } = req('acorn');
+    return {
+      version,
+      parse: s => parse(s, { locations: true })
+    };
   },
-  [`Esprima ${esprima.version}`](s) {
-    esprima.parse(s, { loc: true });
+
+  'Esprima'() {
+    const { version, parse } = req('esprima');
+    return {
+      version,
+      parse: s => parse(s, { loc: true })
+    }
   },
-  [`TypeScript ${ts.version}`](s) {
-    ts.createSourceFile('source.js', s, ts.ScriptTarget.ES6);
+
+  'TypeScript'() {
+    const { version, createSourceFile, ScriptTarget: { ES6 } } = req('typescript');
+    return {
+      version,
+      parse: s => createSourceFile('source.js', s, ES6)
+    };
   },
-  [`Traceur ${traceur.loader.TraceurLoader.prototype.version}`](s) {
-    var file = new traceur.syntax.SourceFile('source.js', s);
-    var parser = new traceur.syntax.Parser(file);
-    parser.parseScript();
+
+  'Traceur'() {
+    req('traceur/bin/traceur.js'); // it creates a global :(
+    const { SourceFile, Parser } = traceur.syntax;
+    return {
+      version: traceur.loader.TraceurLoader.prototype.version,
+      parse: s => new Parser(new SourceFile('source.js', s)).parseScript()
+    }
   },
-  [`Flow ${flowVersion}`](s) {
-    flow.parse(s);
+
+  'Flow'() {
+    const { parse } = req('flow-parser');
+    return {
+      version: isWorker ? '' : require('flow-parser/package.json').version,
+      parse
+    };
   },
-  [`Babylon ${babylonVersion}`](s) {
-    babylon.parse(s);
+
+  'Babylon'() {
+    const { parse } = req('babylon');
+    return {
+      version: isWorker ? '' : require('babylon/package.json').version,
+      parse
+    };
   },
 };
 
-var parserNames = Object.keys(parsers);
+exports.parserNames = Object.keys(exports.parsers);
 
-var inputNames = [
+exports.inputNames = [
   'angular.js',
   'backbone.js',
   'ember.js',
@@ -64,25 +93,21 @@ var inputNames = [
   'react.js'
 ];
 
-var inputs = Promise.all(inputNames.map(name => {
-  name = `fixtures/${name}`;
+let read;
 
-  if (isWorker) {
-    return fetch(name).then(response => response.text());
-  } else {
-    return new Promise((resolve, reject) => {
-      fs.readFile(`${__dirname}/${name}`, 'utf-8', (err, data) => {
-        err ? reject(err) : resolve(data);
-      });
+if (isWorker) {
+  read = name => fetch(name).then(response => response.text());
+} else {
+  const { readFile } = require('fs');
+
+  read = name => new Promise((resolve, reject) => {
+    readFile(`${__dirname}/${name}`, 'utf-8', (err, data) => {
+      err ? reject(err) : resolve(data);
     });
-  }
-}));
-
-if (!isWorker) {
-  module.exports = {
-    parsers,
-    parserNames,
-    inputs,
-    inputNames
-  };
+  });
 }
+
+exports.inputs = Promise.all(
+  exports.inputNames
+  .map(name => read(`fixtures/${name}`))
+);

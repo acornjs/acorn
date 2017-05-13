@@ -3,11 +3,45 @@
 const BenchTable = require('benchtable');
 const { parsers, parserNames, inputs, inputNames } = require('./common');
 
+const yargs = require('yargs')
+  .help()
+  .alias('?', 'help');
+
+const optionNames = new Map(parserNames.map(name => [
+  name,
+
+  name
+  .toLowerCase()
+  .replace(/[^a-z]+/g, '-')
+  .replace(/(^-|-$)/g, '')
+]));
+
+parserNames.forEach(name => {
+  yargs.option(optionNames.get(name), {
+    group: 'Benchmark parsers:',
+    describe: name,
+    type: 'boolean',
+    default: name.startsWith('Acorn') || undefined
+  });
+});
+
+const { argv } = yargs;
+
 let suite = new BenchTable('parsers', { isTransposed: true });
 
-parserNames.forEach(parserName => {
-  suite.addFunction(parserName, parsers[parserName]);
+parserNames.forEach(name => {
+  if (!argv[optionNames.get(name)]) {
+    return;
+  }
+  const { version, parse } = parsers[name]();
+  if (version) {
+    name += ` ${version}`;
+  }
+  console.log(`Enabled ${name}`);
+  suite.addFunction(name, parse);
 });
+
+console.log('Running benchmarks...');
 
 inputs.then(inputs => {
   inputNames.forEach((inputName, i) => {

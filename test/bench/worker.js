@@ -1,8 +1,10 @@
 'use strict';
 
 importScripts('common.js');
-importScripts(`https://unpkg.com/lodash`);
-importScripts(`https://unpkg.com/benchmark`);
+
+const Benchmark = req('benchmark').runInContext({
+  _: req('lodash')
+});
 
 postMessage({
   parserNames,
@@ -14,14 +16,21 @@ function getCell(bench) {
 }
 
 onmessage = ({ data: indices }) => inputs.then(inputs => {
-  let chosenParsers = parserNames.filter((_, i) => indices.includes(i));
+  let chosenParsers =
+    parserNames
+    .filter((_, i) => indices.includes(i))
+    .map(name => Object.assign(parsers[name](), { name }));
+
+  postMessage({
+    type: 'versions',
+    versions: chosenParsers.map(parser => parser.version)
+  });
 
   inputs.forEach((input, row) => {
     let suite = new Benchmark.Suite();
 
-    chosenParsers.forEach(parserName => {
-      let parse = parsers[parserName];
-      suite.add(parserName, () => parse(input));
+    chosenParsers.forEach(({ name, parse }) => {
+      suite.add(name, () => parse(input));
     });
 
     let indicesIter = indices[Symbol.iterator]();
