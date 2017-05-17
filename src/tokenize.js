@@ -424,7 +424,7 @@ pp.readRegexp = function() {
         // be replaced by `[x-b]` which throws an error.
         tmp = tmp.replace(/\\u\{([0-9a-fA-F]+)\}/g, (_match, code, offset) => {
           code = Number("0x" + code)
-          if (code > 0x10FFFF) this.invalidStringToken(start + offset + 3, "Code point out of bounds")
+          if (code > 0x10FFFF) this.raise(start + offset + 3, "Code point out of bounds")
           return "x"
         })
         tmp = tmp.replace(/\\u([a-fA-F0-9]{4})|[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "x")
