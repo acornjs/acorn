@@ -1,5 +1,5 @@
 (function() {
-  var driver, acorn;
+  var driver, acorn, snapshot;
 
   if (typeof require !== "undefined") {
     driver = require("./driver.js");
@@ -9,11 +9,13 @@
     require("./tests-asyncawait.js");
     require("./tests-trailing-commas-in-func.js");
     require("./tests-template-literal-revision.js");
-    acorn = require("../dist/acorn")
-    require("../dist/acorn_loose")
+    acorn = require("../dist/acorn");
+    require("../dist/acorn_loose");
+    snapshot = require("./snapshot.js");
   } else {
     driver = window;
     acorn = window.acorn;
+    snapshot = window.snapshot;
   }
 
   var htmlLog = typeof document === "object" && document.getElementById('log');
@@ -81,7 +83,7 @@
     var mode = modes[name];
     stats = mode.stats = {testsRun: 0, failed: 0};
     var t0 = +new Date;
-    driver.runTests(mode.config, report);
+    driver.runTests(mode.config, snapshot, report);
     mode.stats.duration = +new Date - t0;
     groupEnd();
   }
@@ -107,9 +109,24 @@
 
   groupEnd();
 
-  if (total.failed && typeof process === "object") {
-    process.stdout.write("", function() {
-      process.exit(1);
-    });
+  if (typeof process === "object") {
+    if (total.failed) {
+      process.stdout.write("", function() {
+        process.exit(1);
+      });
+    } else {
+      require("fs").writeFileSync(
+        __dirname + "/snapshot.js",
+
+        "var snapshot = " +
+        JSON.stringify(snapshot, null, 2)
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029')
+        .replace(/^(      \s*)"(.*?)":/igm, '$1$2:') +
+        ";\n" +
+        "\n" +
+        "if (typeof module !== 'undefined') module.exports = snapshot;"
+      );
+    }
   }
 })();

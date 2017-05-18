@@ -11,7 +11,7 @@
     tests.push({code: code, assert: assert, options: options});
   };
 
-  exports.runTests = function(config, callback) {
+  exports.runTests = function(config, snapshot, callback) {
     var parse = config.parse;
 
     for (var i = 0; i < tests.length; ++i) {
@@ -25,14 +25,42 @@
       if (expected.onToken = testOpts.onToken)
         testOpts.onToken = [];
 
+      var subCategory = "es" + testOpts.ecmaVersion;
+      if (testOpts.sourceType === 'module') {
+        subCategory += '-module';
+      }
+      if (testOpts.preserveParens) {
+        subCategory += '-parens';
+      }
+      if (config.loose) {
+        subCategory += "-loose";
+      }
+
+      var snapshotCategory = snapshot[subCategory] || (snapshot[subCategory] = {});
+      var testSnapshot = snapshotCategory[test.code];
+
+      if (testSnapshot) {
+        delete test.ast;
+        delete test.error;
+        if (testSnapshot.type === "Error") {
+          test.error = testSnapshot.message;
+        } else {
+          test.ast = testSnapshot;
+        }
+      }
+
       try {
         var ast = parse(test.code, testOpts);
       } catch(e) {
         if (!(e instanceof SyntaxError)) { console.log(e.stack); throw e; }
         if (test.error) {
-          if (test.error.charAt(0) == "~" ? e.message.indexOf(test.error.slice(1)) > -1 : e.message == test.error)
+          if (test.error.charAt(0) == "~" ? e.message.indexOf(test.error.slice(1)) > -1 : e.message == test.error) {
+            snapshotCategory[test.code] = {
+              type: "Error",
+              message: e.message
+            };
             callback("ok", test.code);
-          else
+          } else
             callback("fail", test.code, "Expected error message: " + test.error + "\nGot error message: " + e.message);
         } else {
           callback("error", test.code, e.message || e.toString());
@@ -57,12 +85,24 @@
           }
         }
         if (mis) callback("fail", test.code, mis);
-        else callback("ok", test.code);
+        else {
+          // if (ast.body.length && ast.start === ast.body[0].start && ast.end === ast.body[ast.body.length - 1].end) {
+          //   ast = ast.body;
+          //   if (ast.length === 1) {
+          //     ast = ast[0];
+          //     if (ast.type === 'ExpressionStatement' && ast.start === ast.expression.start && ast.end === ast.expression.end) {
+          //       ast = ast.expression;
+          //     }
+          //   }
+          // }
+          snapshotCategory[test.code] = ast;
+          callback("ok", test.code);
+        }
       }
     }
   };
 
-  function ppJSON(v) { return v instanceof RegExp ? v.toString() : JSON.stringify(v, null, 2); }
+  function ppJSON(v) { return v instanceof RegExp ? "{}" : JSON.stringify(v, null, 2); }
   function addPath(str, pt) {
     if (str.charAt(str.length-1) == ")")
       return str.slice(0, str.length-1) + "/" + pt + ")";
