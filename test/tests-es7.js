@@ -220,8 +220,6 @@ test("3 % 5 ** 1", {
   ecmaVersion: 7,
 });
 
-testFail("x ** y", "Unexpected token (1:3)", { ecmaVersion: 6 });
-
 // Disallowed unary ops
 testFail("delete o.p ** 2;", "Unexpected token (1:11)", { ecmaVersion: 7 });
 testFail("void 2 ** 2;", "Unexpected token (1:7)", { ecmaVersion: 7 });
