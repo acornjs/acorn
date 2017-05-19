@@ -590,14 +590,49 @@ pp.parseClassSuper = function(node) {
 
 pp.parseExport = function(node, exports) {
   this.next()
-  // export * from '...'
-  if (this.eat(tt.star)) {
-    this.expectContextual("from")
-    node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected()
-    this.semicolon()
-    return this.finishNode(node, "ExportAllDeclaration")
-  }
-  if (this.eat(tt._default)) { // export default ...
+  if (this.type === tt.star) {
+    const specifier = this.startNode()
+    this.next()
+    if (this.options.exportExtensions &&
+        this.eatContextual("as")) {
+      // export * as ns from '...'
+      specifier.exported = this.parseIdent(true)
+      node.specifiers = [
+        this.finishNode(specifier, "ExportNamespaceSpecifier")
+      ]
+      this.parseExportSpecifiersMaybe(node)
+      this.parseExportFromWithCheck(node, exports, true)
+    } else {
+      // export * from '...'
+      this.parseExportFromWithCheck(node, exports, true)
+      return this.finishNode(node, "ExportAllDeclaration")
+    }
+  } else if (this.options.exportExtensions &&
+             this.isExportDefaultSpecifier()) {
+    // export def from '...'
+    const specifier = this.startNode()
+    specifier.exported = this.parseIdent(true)
+    node.specifiers = [
+      this.finishNode(specifier, "ExportDefaultSpecifier")
+    ]
+    if (this.type === tt.comma &&
+        this.lookAhead(1).type === tt.star) {
+      // export def, * as ns from '...'
+      this.expect(tt.comma)
+      const specifier = this.startNode()
+      this.expect(tt.star)
+      this.expectContextual("as")
+      specifier.exported = this.parseIdent(true)
+      node.specifiers.push(
+        this.finishNode(specifier, "ExportNamespaceSpecifier")
+      )
+    } else {
+      // export def, { x, y as z } from '...'
+      this.parseExportSpecifiersMaybe(node)
+    }
+    this.parseExportFromWithCheck(node, exports, true)
+  } else if (this.eat(tt._default)) {
+    // export default ...
     this.checkExport(exports, "default", this.lastTokStart)
     let isAsync
     if (this.type === tt._function || (isAsync = this.isAsyncFunction())) {
@@ -613,9 +648,8 @@ pp.parseExport = function(node, exports) {
       this.semicolon()
     }
     return this.finishNode(node, "ExportDefaultDeclaration")
-  }
-  // export var|const|let|function|class ...
-  if (this.shouldParseExportStatement()) {
+  } else if (this.shouldParseExportDeclaration()) {
+    // export var|const|let|function|class ...
     node.declaration = this.parseStatement(true)
     if (node.declaration.type === "VariableDeclaration")
       this.checkVariableExport(exports, node.declaration.declarations)
@@ -623,24 +657,72 @@ pp.parseExport = function(node, exports) {
       this.checkExport(exports, node.declaration.id.name, node.declaration.id.start)
     node.specifiers = []
     node.source = null
-  } else { // export { x, y as z } [from '...']
+  } else {
+    // export { x, y as z } [from '...']
     node.declaration = null
     node.specifiers = this.parseExportSpecifiers(exports)
-    if (this.eatContextual("from")) {
-      node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected()
-    } else {
-      // check for keywords used as local names
-      for (let i = 0; i < node.specifiers.length; i++) {
-        if (this.keywords.test(node.specifiers[i].local.name) || this.reservedWords.test(node.specifiers[i].local.name)) {
-          this.unexpected(node.specifiers[i].local.start)
-        }
-      }
-
-      node.source = null
-    }
-    this.semicolon()
+    this.parseExportFrom(node, false)
   }
   return this.finishNode(node, "ExportNamedDeclaration")
+}
+
+pp.isExportDefaultSpecifier = function() {
+  if (this.type !== tt.name) {
+    return false
+  }
+
+  const lookAhead = this.lookAhead(1)
+  return lookAhead.type === tt.comma ||
+    (lookAhead.type === tt.name &&
+     lookAhead.value === "from")
+}
+
+pp.parseExportSpecifiersMaybe = function(node) {
+  if (this.eat(tt.comma)) {
+    node.specifiers.push.apply(
+      node.specifiers,
+      this.parseExportSpecifiers()
+    )
+  }
+}
+
+pp.parseExportFromWithCheck = function(node, exports, expect) {
+  this.parseExportFrom(node, expect)
+
+  if (node.specifiers) {
+    for (let i = 0; i < node.specifiers.length; i++) {
+      const s = node.specifiers[i]
+      const exported = s.exported
+      this.checkExport(exports, exported.name, exported.start)
+    }
+  }
+}
+
+pp.parseExportFrom = function(node, expect) {
+  if (this.eatContextual("from")) {
+    node.source = this.type === tt.string
+      ? this.parseExprAtom()
+      : this.unexpected()
+  } else {
+    if (node.specifiers) {
+      // check for keywords used as local names
+      for (let i = 0; i < node.specifiers.length; i++) {
+        const local = node.specifiers[i].local
+        if (local && (this.keywords.test(local.name) ||
+                      this.reservedWords.test(local.name))) {
+          this.unexpected(local.start)
+        }
+      }
+    }
+
+    if (expect) {
+      this.unexpected()
+    } else {
+      node.source = null
+    }
+  }
+
+  this.semicolon()
 }
 
 pp.checkExport = function(exports, name, pos) {
@@ -674,7 +756,7 @@ pp.checkVariableExport = function(exports, decls) {
     this.checkPatternExport(exports, decls[i].id)
 }
 
-pp.shouldParseExportStatement = function() {
+pp.shouldParseExportDeclaration = function() {
   return this.type.keyword === "var" ||
     this.type.keyword === "const" ||
     this.type.keyword === "class" ||

@@ -3,6 +3,8 @@ import {types as tt, keywords as keywordTypes} from "./tokentype"
 import {Parser} from "./state"
 import {SourceLocation} from "./locutil"
 import {lineBreak, lineBreakG, isNewLine, nonASCIIwhitespace} from "./whitespace"
+import {assign} from "./scope"
+import {create} from "./walk/index"
 
 // Object type used to represent tokens. Note that normally, tokens
 // simply exist as properties on the parser object. This is only
@@ -31,8 +33,9 @@ const isRhino = typeof Packages == "object" && Object.prototype.toString.call(Pa
 // Move to the next token
 
 pp.next = function() {
-  if (this.options.onToken)
+  if (!this.isLookAhead && this.options.onToken) {
     this.options.onToken(new Token(this))
+  }
 
   this.lastTokEnd = this.end
   this.lastTokStart = this.start
@@ -65,6 +68,20 @@ if (typeof Symbol !== "undefined")
 
 pp.curContext = function() {
   return this.context[this.context.length - 1]
+}
+
+// Return a snapshot of the parser after calling this.nextToken(), without
+// permanently updating the parser's state.
+
+pp.lookAhead = function(n = 1) {
+  const old = assign(create(null), this)
+  const oldIsLookAhead = this.isLookAhead
+  this.isLookAhead = true
+  while (n-- > 0) this.nextToken()
+  this.isLookAhead = oldIsLookAhead
+  const copy = assign(create(null), this)
+  assign(this, old)
+  return copy
 }
 
 // Read a single token, updating the parser object's token-related
@@ -111,9 +128,10 @@ pp.skipBlockComment = function() {
       this.lineStart = match.index + match[0].length
     }
   }
-  if (this.options.onComment)
+  if (!this.isLookAhead && this.options.onComment) {
     this.options.onComment(true, this.input.slice(start + 2, end), start, this.pos,
                            startLoc, this.curPosition())
+  }
 }
 
 pp.skipLineComment = function(startSkip) {
@@ -123,9 +141,10 @@ pp.skipLineComment = function(startSkip) {
   while (this.pos < this.input.length && !isNewLine(ch)) {
     ch = this.input.charCodeAt(++this.pos)
   }
-  if (this.options.onComment)
+  if (!this.isLookAhead && this.options.onComment) {
     this.options.onComment(false, this.input.slice(start + startSkip, this.pos), start, this.pos,
                            startLoc, this.curPosition())
+  }
 }
 
 // Called at the start of the parse and after every token. Skips

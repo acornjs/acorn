@@ -72,6 +72,9 @@ export class Parser {
     this.inModule = options.sourceType === "module"
     this.strict = this.inModule || this.strictDirective(this.pos)
 
+    // Temporarily true while Parser#lookAhead calls this.next().
+    this.isLookAhead = false
+
     // Used to signify the start of a potential arrow function
     this.potentialArrowAt = -1
 
