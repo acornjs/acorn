@@ -95,12 +95,12 @@ pp.parseSpread = function(refDestructuringErrors) {
   return this.finishNode(node, "SpreadElement")
 }
 
-pp.parseRest = function(isBinding) {
+pp.parseRestBinding = function() {
   let node = this.startNode()
   this.next()
 
   // RestElement inside of a function parameter must be an identifier
-  if (this.options.ecmaVersion === 6 && isBinding && this.type !== tt.name)
+  if (this.options.ecmaVersion === 6 && this.type !== tt.name)
     this.unexpected()
 
   node.argument = this.parseBindingAtom()
@@ -140,7 +140,7 @@ pp.parseBindingList = function(close, allowEmpty, allowTrailingComma) {
     } else if (allowTrailingComma && this.afterTrailingComma(close)) {
       break
     } else if (this.type === tt.ellipsis) {
-      let rest = this.parseRest(true)
+      let rest = this.parseRestBinding()
       this.parseBindingListItem(rest)
       elts.push(rest)
       if (this.type === tt.comma) this.raise(this.start, "Comma is not permitted after the rest element")
