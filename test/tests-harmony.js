@@ -13053,7 +13053,7 @@ testFail("({ 5 }) => {}", "Unexpected token (1:5)", {ecmaVersion: 6});
 
 testFail("(...[ 5 ]) => {}", "Unexpected token (1:6)", {ecmaVersion: 6});
 
-testFail("[...{ a }] = b", "Unexpected token (1:4)", {ecmaVersion: 6});
+test("[...{ a }] = b", {}, {ecmaVersion: 6});
 
 testFail("[...a, b] = c", "Comma is not permitted after the rest element (1:5)", {ecmaVersion: 6});
 
