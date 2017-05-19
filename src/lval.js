@@ -73,8 +73,6 @@ pp.toAssignableList = function(exprList, isBinding) {
       last.type = "RestElement"
       let arg = last.argument
       this.toAssignable(arg, isBinding)
-      if (arg.type !== "Identifier" && arg.type !== "MemberExpression" && arg.type !== "ArrayPattern")
-        this.unexpected(arg.start)
       --end
     }
 
