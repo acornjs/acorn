@@ -500,7 +500,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
 
 pp.parseFunctionParams = function(node) {
   this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8, true)
+  node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
   this.checkYieldAwaitInDefaultParams()
 }
 

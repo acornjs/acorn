@@ -405,7 +405,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
         break
       } else if (this.type === tt.ellipsis) {
         spreadStart = this.start
-        exprList.push(this.parseParenItem(this.parseRest()))
+        exprList.push(this.parseParenItem(this.parseRest(true)))
         if (this.type === tt.comma) this.raise(this.start, "Comma is not permitted after the rest element")
         break
       } else {

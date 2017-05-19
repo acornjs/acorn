@@ -76,7 +76,7 @@ pp.toAssignableList = function(exprList, isBinding) {
       --end
     }
 
-    if (isBinding && last && last.type === "RestElement" && last.argument.type !== "Identifier")
+    if (this.options.ecmaVersion === 6 && isBinding && last && last.type === "RestElement" && last.argument.type !== "Identifier")
       this.unexpected(last.argument.start)
   }
   for (let i = 0; i < end; i++) {
@@ -95,13 +95,15 @@ pp.parseSpread = function(refDestructuringErrors) {
   return this.finishNode(node, "SpreadElement")
 }
 
-pp.parseRest = function(allowNonIdent) {
+pp.parseRest = function(isBinding) {
   let node = this.startNode()
   this.next()
 
   // RestElement inside of a function parameter must be an identifier
-  if (allowNonIdent) node.argument = this.type === tt.name ? this.parseIdent() : this.unexpected()
-  else node.argument = this.type === tt.name || this.type === tt.bracketL ? this.parseBindingAtom() : this.unexpected()
+  if (this.options.ecmaVersion === 6 && isBinding && this.type !== tt.name)
+    this.unexpected()
+
+  node.argument = this.parseBindingAtom()
 
   return this.finishNode(node, "RestElement")
 }
@@ -128,7 +130,7 @@ pp.parseBindingAtom = function() {
   }
 }
 
-pp.parseBindingList = function(close, allowEmpty, allowTrailingComma, allowNonIdent) {
+pp.parseBindingList = function(close, allowEmpty, allowTrailingComma) {
   let elts = [], first = true
   while (!this.eat(close)) {
     if (first) first = false
@@ -138,7 +140,7 @@ pp.parseBindingList = function(close, allowEmpty, allowTrailingComma, allowNonId
     } else if (allowTrailingComma && this.afterTrailingComma(close)) {
       break
     } else if (this.type === tt.ellipsis) {
-      let rest = this.parseRest(allowNonIdent)
+      let rest = this.parseRest(true)
       this.parseBindingListItem(rest)
       elts.push(rest)
       if (this.type === tt.comma) this.raise(this.start, "Comma is not permitted after the rest element")

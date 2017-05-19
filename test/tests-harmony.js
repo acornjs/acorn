@@ -10951,7 +10951,7 @@ test("({ x(...[ a, b ]){} })", {
     end: {line: 1, column: 22}
   }
 }, {
-  ecmaVersion: 6,
+  ecmaVersion: 7,
   ranges: true,
   locations: true
 });
@@ -11187,7 +11187,7 @@ test("({ x({ a: { w, x }, b: [y, z] }, ...[a, b, c]){} })", {
     end: {line: 1, column: 51}
   }
 }, {
-  ecmaVersion: 6,
+  ecmaVersion: 7,
   ranges: true,
   locations: true
 });
@@ -12353,7 +12353,7 @@ test("var [a, ...[b, c]] = d", {
     end: {line: 1, column: 22}
   }
 }, {
-  ecmaVersion: 6,
+  ecmaVersion: 7,
   ranges: true,
   locations: true
 });
@@ -13051,7 +13051,7 @@ testFail("([ 5 ]) => {}", "Assigning to rvalue (1:3)", {ecmaVersion: 6});
 
 testFail("({ 5 }) => {}", "Unexpected token (1:5)", {ecmaVersion: 6});
 
-testFail("(...[ 5 ]) => {}", "Unexpected token (1:6)", {ecmaVersion: 6});
+testFail("(...[ 5 ]) => {}", "Unexpected token (1:6)", {ecmaVersion: 7});
 
 test("[...{ a }] = b", {}, {ecmaVersion: 6});
 
