@@ -597,11 +597,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
         this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
     }
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
-    if (this.keywords.test(prop.key.name) ||
-        (this.strict ? this.reservedWordsStrict : this.reservedWords).test(prop.key.name) ||
-        (this.inGenerator && prop.key.name == "yield") ||
-        (this.inAsync && prop.key.name == "await"))
-      this.raiseRecoverable(prop.key.start, "'" + prop.key.name + "' can not be used as shorthand property")
+    this.checkUnreserved(prop.key)
     prop.kind = "init"
     if (isPattern) {
       prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
@@ -791,26 +787,34 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructur
 // when parsing properties), it will also convert keywords into
 // identifiers.
 
-pp.parseIdent = function(liberal) {
+pp.checkUnreserved = function({start, end, name}) {
+  if (this.inGenerator && name === "yield")
+    this.raiseRecoverable(start, "Can not use 'yield' as identifier inside a generator")
+  if (this.inAsync && name === "await")
+    this.raiseRecoverable(start, "Can not use 'await' as identifier inside an async function")
+  if (this.isKeyword(name))
+    this.raise(start, `Unexpected keyword '${name}'`)
+  if (this.options.ecmaVersion < 6 &&
+    this.input.slice(start, end).indexOf("\\") != -1) return
+  const re = this.strict ? this.reservedWordsStrict : this.reservedWords
+  if (re.test(name))
+    this.raiseRecoverable(start, `The keyword '${name}' is reserved`)
+}
+
+pp.parseIdent = function(liberal, isBinding) {
   let node = this.startNode()
   if (liberal && this.options.allowReserved == "never") liberal = false
   if (this.type === tt.name) {
-    if (!liberal && (this.strict ? this.reservedWordsStrict : this.reservedWords).test(this.value) &&
-        (this.options.ecmaVersion >= 6 ||
-         this.input.slice(this.start, this.end).indexOf("\\") == -1))
-      this.raiseRecoverable(this.start, "The keyword '" + this.value + "' is reserved")
-    if (this.inGenerator && this.value === "yield")
-      this.raiseRecoverable(this.start, "Can not use 'yield' as identifier inside a generator")
-    if (this.inAsync && this.value === "await")
-      this.raiseRecoverable(this.start, "Can not use 'await' as identifier inside an async function")
     node.name = this.value
-  } else if (liberal && this.type.keyword) {
+  } else if (this.type.keyword) {
     node.name = this.type.keyword
   } else {
     this.unexpected()
   }
   this.next()
-  return this.finishNode(node, "Identifier")
+  this.finishNode(node, "Identifier")
+  if (!liberal) this.checkUnreserved(node)
+  return node
 }
 
 // Parses yield expression inside generator.

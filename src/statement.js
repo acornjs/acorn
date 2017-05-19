@@ -631,9 +631,7 @@ pp.parseExport = function(node, exports) {
     } else {
       // check for keywords used as local names
       for (let i = 0; i < node.specifiers.length; i++) {
-        if (this.keywords.test(node.specifiers[i].local.name) || this.reservedWords.test(node.specifiers[i].local.name)) {
-          this.unexpected(node.specifiers[i].local.start)
-        }
+        this.checkUnreserved(node.specifiers[i].local)
       }
 
       node.source = null
@@ -754,9 +752,8 @@ pp.parseImportSpecifiers = function() {
     if (this.eatContextual("as")) {
       node.local = this.parseIdent()
     } else {
+      this.checkUnreserved(node.imported)
       node.local = node.imported
-      if (this.isKeyword(node.local.name)) this.unexpected(node.local.start)
-      if (this.reservedWordsStrict.test(node.local.name)) this.raiseRecoverable(node.local.start, "The keyword '" + node.local.name + "' is reserved")
     }
     this.checkLVal(node.local, "let")
     nodes.push(this.finishNode(node, "ImportSpecifier"))

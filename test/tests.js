@@ -27027,7 +27027,7 @@ testFail("var x = \"\n",
          "Unterminated string constant (1:8)");
 
 testFail("var if = 42",
-         "Unexpected token (1:4)");
+         "Unexpected keyword 'if' (1:4)");
 
 testFail("i + 2 = 42",
          "Assigning to rvalue (1:0)");
@@ -27098,28 +27098,28 @@ testFail("function t(...rest, b) { }",
          { ecmaVersion: 6 });
 
 testFail("function t(if) { }",
-         "Unexpected token (1:11)");
+         "Unexpected keyword 'if' (1:11)");
 
 testFail("function t(true) { }",
-         "Unexpected token (1:11)");
+         "Unexpected keyword 'true' (1:11)");
 
 testFail("function t(false) { }",
-         "Unexpected token (1:11)");
+         "Unexpected keyword 'false' (1:11)");
 
 testFail("function t(null) { }",
-         "Unexpected token (1:11)");
+         "Unexpected keyword 'null' (1:11)");
 
 testFail("function null() { }",
-         "Unexpected token (1:9)");
+         "Unexpected keyword 'null' (1:9)");
 
 testFail("function true() { }",
-         "Unexpected token (1:9)");
+         "Unexpected keyword 'true' (1:9)");
 
 testFail("function false() { }",
-         "Unexpected token (1:9)");
+         "Unexpected keyword 'false' (1:9)");
 
 testFail("function if() { }",
-         "Unexpected token (1:9)");
+         "Unexpected keyword 'if' (1:9)");
 
 testFail("a b;",
          "Unexpected token (1:2)");
@@ -27492,7 +27492,7 @@ testFail("(function a(package) { \"use strict\"; })",
 testFail("\"use strict\";function foo(){\"use strict\";}function bar(){var v = 015}",
          "Invalid number (1:65)");
 
-testFail("var this = 10;", "Unexpected token (1:4)");
+testFail("var this = 10;", "Unexpected keyword 'this' (1:4)");
 
 testFail("throw\n10;", "Illegal newline after throw (1:5)");
 

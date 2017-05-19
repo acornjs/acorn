@@ -4580,10 +4580,10 @@ test("export { default } from \"other\"", {
   locations: true
 });
 
-testFail("export { default }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
-testFail("export { if }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
-testFail("export { default as foo }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
-testFail("export { if as foo }", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("export { default }", "Unexpected keyword 'default' (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("export { if }", "Unexpected keyword 'if' (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("export { default as foo }", "Unexpected keyword 'default' (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("export { if as foo }", "Unexpected keyword 'if' (1:9)", {ecmaVersion: 6, sourceType: "module" });
 
 test("import \"jquery\"", {
   type: "Program",
@@ -4978,10 +4978,10 @@ test("import * as crypto from \"crypto\"", {
   locations: true
 });
 
-testFail("import { class } from 'foo'", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
-testFail("import { class, var } from 'foo'", "Unexpected token (1:9)", {ecmaVersion: 6, sourceType: "module" });
-testFail("import { a as class } from 'foo'", "Unexpected token (1:14)", {ecmaVersion: 6, sourceType: "module" });
-testFail("import * as class from 'foo'", "Unexpected token (1:12)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import { class } from 'foo'", "Unexpected keyword 'class' (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import { class, var } from 'foo'", "Unexpected keyword 'class' (1:9)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import { a as class } from 'foo'", "Unexpected keyword 'class' (1:14)", {ecmaVersion: 6, sourceType: "module" });
+testFail("import * as class from 'foo'", "Unexpected keyword 'class' (1:12)", {ecmaVersion: 6, sourceType: "module" });
 testFail("import { enum } from 'foo'", "The keyword 'enum' is reserved (1:9)", {ecmaVersion: 6, sourceType: "module" });
 testFail("import { a as enum } from 'foo'", "The keyword 'enum' is reserved (1:14)", {ecmaVersion: 6, sourceType: "module" });
 testFail("import * as enum from 'foo'", "The keyword 'enum' is reserved (1:12)", {ecmaVersion: 6, sourceType: "module" });
@@ -12686,7 +12686,7 @@ testFail("x \n is y", "Unexpected token (2:4)", {ecmaVersion: 6});
 
 testFail("x \n isnt y", "Unexpected token (2:6)", {ecmaVersion: 6});
 
-testFail("function default() {}", "Unexpected token (1:9)", {ecmaVersion: 6});
+testFail("function default() {}", "Unexpected keyword 'default' (1:9)", {ecmaVersion: 6});
 
 testFail("function hello() {'use strict'; ({ i: 10, s(eval) { } }); }", "Binding eval in strict mode (1:44)", {ecmaVersion: 6});
 
@@ -12751,13 +12751,13 @@ testFail("yield 10", "Unexpected token (1:6)", {ecmaVersion: 6});
 testFail("void { [1, 2]: 3 };", "Unexpected token (1:9)", {ecmaVersion: 6});
 
 testFail("let [this] = [10]", "Unexpected token (1:5)", {ecmaVersion: 6});
-testFail("let {this} = x", "'this' can not be used as shorthand property (1:5)", {ecmaVersion: 6});
+testFail("let {this} = x", "Unexpected keyword 'this' (1:5)", {ecmaVersion: 6});
 testFail("let [function] = [10]", "Unexpected token (1:5)", {ecmaVersion: 6});
 testFail("let [function] = x", "Unexpected token (1:5)", {ecmaVersion: 6});
 testFail("([function] = [10])", "Unexpected token (1:10)", {ecmaVersion: 6});
 testFail("([this] = [10])", "Assigning to rvalue (1:2)", {ecmaVersion: 6});
-testFail("({this} = x)", "'this' can not be used as shorthand property (1:2)", {ecmaVersion: 6});
-testFail("var x = {this}", "'this' can not be used as shorthand property (1:9)", {ecmaVersion: 6});
+testFail("({this} = x)", "Unexpected keyword 'this' (1:2)", {ecmaVersion: 6});
+testFail("var x = {this}", "Unexpected keyword 'this' (1:9)", {ecmaVersion: 6});
 
 test("yield* 10", {
   type: "Program",
@@ -14824,7 +14824,8 @@ test("function foo() { return {yield} }", {
     ],
     "sourceType": "script"
 }, {ecmaVersion: 6})
-testFail("function foo() { 'use strict'; return {yield} }", "'yield' can not be used as shorthand property (1:39)", {ecmaVersion: 6});
+
+testFail("function foo() { 'use strict'; return {yield} }", "The keyword 'yield' is reserved (1:39)", {ecmaVersion: 6});
 
 testFail("function foo() { 'use strict'; var {arguments} = {} }", "Binding arguments in strict mode (1:36)", {ecmaVersion: 6});
 testFail("function foo() { 'use strict'; var {eval} = {} }", "Binding eval in strict mode (1:36)", {ecmaVersion: 6});
@@ -15058,8 +15059,8 @@ test("class A {*yield() {}}", {
 
 testFail("(function* yield() {})", "Can not use 'yield' as identifier inside a generator (1:11)", {ecmaVersion: 6})
 testFail("function* wrap() {\nfunction* yield() {}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
-testFail("function* wrap() {\n({*yield() {}})\n}", "Can not use 'yield' as identifier inside a generator (2:3)", {ecmaVersion: 6})
-testFail("function* wrap() {\nclass A {*yield() {}}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
+test("function* wrap() {\n({*yield() {}})\n}", {}, {ecmaVersion: 6})
+test("function* wrap() {\nclass A {*yield() {}}\n}", {}, {ecmaVersion: 6})
 
 // Forbid yield expressions in default parameters:
 testFail("function* foo(a = yield b) {}", "Yield expression cannot be a default value (1:18)", {ecmaVersion: 6})
