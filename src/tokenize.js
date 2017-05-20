@@ -248,7 +248,7 @@ pp.readToken_plus_min = function(code) { // '+-'
   let next = this.input.charCodeAt(this.pos + 1)
   if (next === code) {
     if (next == 45 && this.input.charCodeAt(this.pos + 2) == 62 &&
-        lineBreak.test(this.input.slice(this.lastTokEnd, this.pos))) {
+        (this.lastTokEnd === 0 || lineBreak.test(this.input.slice(this.lastTokEnd, this.pos)))) {
       // A `-->` line comment
       this.skipLineComment(3)
       this.skipSpace()
