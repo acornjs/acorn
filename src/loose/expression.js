@@ -473,20 +473,20 @@ lp.toAssignable = function(node, binding) {
   if (!node || node.type == "Identifier" || (node.type == "MemberExpression" && !binding)) {
     // Okay
   } else if (node.type == "ParenthesizedExpression") {
-    node.expression = this.toAssignable(node.expression, binding)
+    this.toAssignable(node.expression, binding)
   } else if (this.options.ecmaVersion < 6) {
     return this.dummyIdent()
   } else if (node.type == "ObjectExpression") {
     node.type = "ObjectPattern"
     let props = node.properties
-    for (let i = 0; i < props.length; i++)
-      props[i].value = this.toAssignable(props[i].value, binding)
+    for (let prop of props)
+      this.toAssignable(prop.value, binding)
   } else if (node.type == "ArrayExpression") {
     node.type = "ArrayPattern"
     this.toAssignableList(node.elements, binding)
   } else if (node.type == "SpreadElement") {
     node.type = "RestElement"
-    node.argument = this.toAssignable(node.argument, binding)
+    this.toAssignable(node.argument, binding)
   } else if (node.type == "AssignmentExpression") {
     node.type = "AssignmentPattern"
     delete node.operator
@@ -497,8 +497,8 @@ lp.toAssignable = function(node, binding) {
 }
 
 lp.toAssignableList = function(exprList, binding) {
-  for (let i = 0; i < exprList.length; i++)
-    exprList[i] = this.toAssignable(exprList[i], binding)
+  for (let expr of exprList)
+    this.toAssignable(expr, binding)
   return exprList
 }
 

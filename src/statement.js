@@ -350,8 +350,9 @@ pp.parseEmptyStatement = function(node) {
 }
 
 pp.parseLabeledStatement = function(node, maybeName, expr) {
-  for (let i = 0; i < this.labels.length; ++i)
-    if (this.labels[i].name === maybeName) this.raise(expr.start, "Label '" + maybeName + "' is already declared")
+  for (let label of this.labels)
+    if (label.name === maybeName)
+      this.raise(expr.start, "Label '" + maybeName + "' is already declared")
   let kind = this.type.isLoop ? "loop" : this.type === tt._switch ? "switch" : null
   for (let i = this.labels.length - 1; i >= 0; i--) {
     let label = this.labels[i]
@@ -630,8 +631,8 @@ pp.parseExport = function(node, exports) {
       node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected()
     } else {
       // check for keywords used as local names
-      for (let i = 0; i < node.specifiers.length; i++) {
-        this.checkUnreserved(node.specifiers[i].local)
+      for (let spec of node.specifiers) {
+        this.checkUnreserved(spec.local)
       }
 
       node.source = null
@@ -653,11 +654,10 @@ pp.checkPatternExport = function(exports, pat) {
   if (type == "Identifier")
     this.checkExport(exports, pat.name, pat.start)
   else if (type == "ObjectPattern")
-    for (let i = 0; i < pat.properties.length; ++i)
-      this.checkPatternExport(exports, pat.properties[i].value)
+    for (let prop of pat.properties)
+      this.checkPatternExport(exports, prop.value)
   else if (type == "ArrayPattern")
-    for (let i = 0; i < pat.elements.length; ++i) {
-      let elt = pat.elements[i]
+    for (let elt of pat.elements) {
       if (elt) this.checkPatternExport(exports, elt)
     }
   else if (type == "AssignmentPattern")
@@ -668,8 +668,8 @@ pp.checkPatternExport = function(exports, pat) {
 
 pp.checkVariableExport = function(exports, decls) {
   if (!exports) return
-  for (let i = 0; i < decls.length; i++)
-    this.checkPatternExport(exports, decls[i].id)
+  for (let decl of decls)
+    this.checkPatternExport(exports, decl.id)
 }
 
 pp.shouldParseExportStatement = function() {

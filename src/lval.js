@@ -21,8 +21,7 @@ pp.toAssignable = function(node, isBinding) {
 
     case "ObjectExpression":
       node.type = "ObjectPattern"
-      for (let i = 0; i < node.properties.length; i++) {
-        let prop = node.properties[i]
+      for (let prop of node.properties) {
         if (prop.kind !== "init") this.raise(prop.key.start, "Object pattern can't contain getter or setter")
         this.toAssignable(prop.value, isBinding)
       }
@@ -48,7 +47,7 @@ pp.toAssignable = function(node, isBinding) {
       break
 
     case "ParenthesizedExpression":
-      node.expression = this.toAssignable(node.expression, isBinding)
+      this.toAssignable(node.expression, isBinding)
       break
 
     case "MemberExpression":
@@ -207,13 +206,12 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
     break
 
   case "ObjectPattern":
-    for (let i = 0; i < expr.properties.length; i++)
-      this.checkLVal(expr.properties[i].value, bindingType, checkClashes)
+    for (let prop of expr.properties)
+      this.checkLVal(prop.value, bindingType, checkClashes)
     break
 
   case "ArrayPattern":
-    for (let i = 0; i < expr.elements.length; i++) {
-      let elem = expr.elements[i]
+    for (let elem of expr.elements) {
       if (elem) this.checkLVal(elem, bindingType, checkClashes)
     }
     break

@@ -741,8 +741,8 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
 }
 
 pp.isSimpleParamList = function(params) {
-  for (let i = 0; i < params.length; i++)
-    if (params[i].type !== "Identifier") return false
+  for (let param of params)
+    if (param.type !== "Identifier") return false
   return true
 }
 
@@ -751,7 +751,8 @@ pp.isSimpleParamList = function(params) {
 
 pp.checkParams = function(node, allowDuplicates) {
   let nameHash = {}
-  for (let i = 0; i < node.params.length; i++) this.checkLVal(node.params[i], "var", allowDuplicates ? null : nameHash)
+  for (let param of node.params)
+    this.checkLVal(param, "var", allowDuplicates ? null : nameHash)
 }
 
 // Parses a comma-separated list of expressions, and returns them as

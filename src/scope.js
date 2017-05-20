@@ -5,8 +5,7 @@ const pp = Parser.prototype
 
 // Object.assign polyfill
 const assign = Object.assign || function(target, ...sources) {
-  for (let i = 0; i < sources.length; i++) {
-    const source = sources[i]
+  for (let source of sources) {
     for (const key in source) {
       if (has(source, key)) {
         target[key] = source[key]

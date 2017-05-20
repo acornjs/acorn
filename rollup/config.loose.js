@@ -16,7 +16,11 @@ export default {
     { dest: 'dist/acorn_loose.js', format: 'umd' },
     { dest: 'dist/acorn_loose.es.js', format: 'es' }
   ],
-  plugins: [
-    buble()
-  ]
+	plugins: [
+		buble({
+			transforms: {
+				dangerousForOf: true
+			}
+		})
+	]
 }
