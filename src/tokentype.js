@@ -133,7 +133,7 @@ export const types = {
   _new: kw("new", {beforeExpr: true, startsExpr: true}),
   _this: kw("this", startsExpr),
   _super: kw("super", startsExpr),
-  _class: kw("class"),
+  _class: kw("class", startsExpr),
   _extends: kw("extends", beforeExpr),
   _export: kw("export"),
   _import: kw("import"),
