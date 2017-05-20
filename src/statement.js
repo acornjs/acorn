@@ -33,16 +33,9 @@ const loopLabel = {kind: "loop"}, switchLabel = {kind: "switch"}
 pp.isLet = function() {
   if (this.type !== tt.name || this.options.ecmaVersion < 6 || this.value != "let") return false
   skipWhiteSpace.lastIndex = this.pos
-  let skip = skipWhiteSpace.exec(this.input)
-  let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
-  if (nextCh === 91 || nextCh == 123) return true // '{' and '['
-  if (isIdentifierStart(nextCh, true)) {
-    let pos = next + 1
-    while (isIdentifierChar(this.input.charCodeAt(pos), true)) ++pos
-    let ident = this.input.slice(next, pos)
-    if (!this.isKeyword(ident)) return true
-  }
-  return false
+  let skip = skipWhiteSpace.exec(this.input)[0].length
+  let nextCh = this.input.charCodeAt(this.pos + skip)
+  return nextCh === 91 /* '{' */ || nextCh == 123 /* '[' */ || isIdentifierStart(nextCh, true)
 }
 
 // check 'async [no LineTerminator here] function'
