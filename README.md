@@ -407,3 +407,4 @@ looseParser.extend("readToken", function(nextMethod) {
  - [`acorn-object-spread`](https://github.com/UXtemple/acorn-object-spread): Parse [object spread syntax proposal](https://github.com/sebmarkbage/ecmascript-rest-spread)
  - [`acorn-es7`](https://www.npmjs.com/package/acorn-es7): Parse [decorator syntax proposal](https://github.com/wycats/javascript-decorators)
  - [`acorn-objj`](https://www.npmjs.com/package/acorn-objj): [Objective-J](http://www.cappuccino-project.org/learn/objective-j.html) language parser built as Acorn plugin
+ - [`acorn-object-rest-spread`](https://github.com/victor-homyakov/acorn-object-rest-spread) Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread), works with latest Acorn version (5.0.3)
