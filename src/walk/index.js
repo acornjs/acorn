@@ -330,14 +330,28 @@ base.ConditionalExpression = (node, st, c) => {
   c(node.consequent, st, "Expression")
   c(node.alternate, st, "Expression")
 }
-base.NewExpression = base.CallExpression = (node, st, c) => {
+base.NewExpression = (node, st, c) => {
   c(node.callee, st, "Expression")
   if (node.arguments)
     for (let arg of node.arguments)
       c(arg, st, "Expression")
 }
+base.CallExpression = (node, st, c) => {
+  if (node.callee.type === "Super") {
+    c(node.callee, st)
+  } else {
+    c(node.callee, st, "Expression")
+  }
+  if (node.arguments)
+    for (let arg of node.arguments)
+      c(arg, st, "Expression")
+}
 base.MemberExpression = (node, st, c) => {
-  c(node.object, st, "Expression")
+  if (node.object.type === "Super") {
+    c(node.object, st)
+  } else {
+    c(node.object, st, "Expression")
+  }
   if (node.computed) c(node.property, st, "Expression")
 }
 base.ModuleDeclaration = skipThrough
