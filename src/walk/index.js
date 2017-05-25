@@ -281,7 +281,14 @@ base.ObjectExpression = (node, st, c) => {
     c(prop, st)
 }
 base.FunctionExpression = base.ArrowFunctionExpression = base.FunctionDeclaration
-base.SequenceExpression = base.TemplateLiteral = (node, st, c) => {
+base.TemplateLiteral = (node, st, c) => {
+  for (let quasi of node.quasis)
+    c(quasi, st)
+  for (let expr of node.expressions)
+    c(expr, st, "Expression")
+}
+base.TemplateElement = ignore
+base.SequenceExpression = (node, st, c) => {
   for (let expr of node.expressions)
     c(expr, st, "Expression")
 }
