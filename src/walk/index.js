@@ -253,7 +253,6 @@ base.ForInit = (node, st, c) => {
 base.DebuggerStatement = ignore
 
 base.Declaration = skipThrough
-base.FunctionDeclaration = (node, st, c) => c(node, st, "Function")
 base.VariableDeclaration = (node, st, c) => {
   for (let decl of node.declarations)
     c(decl, st)
@@ -263,6 +262,7 @@ base.VariableDeclarator = (node, st, c) => {
   if (node.init) c(node.init, st, "Expression")
 }
 
+base.FunctionExpression = base.ArrowFunctionExpression = base.FunctionDeclaration = (node, st, c) => c(node, st, "Function")
 base.Function = (node, st, c) => {
   for (let param of node.params)
     c(param, st, "Pattern")
@@ -301,7 +301,6 @@ base.ObjectExpression = (node, st, c) => {
   for (let prop of node.properties)
     c(prop, st)
 }
-base.FunctionExpression = base.ArrowFunctionExpression = base.FunctionDeclaration
 base.TemplateLiteral = (node, st, c) => {
   for (let quasi of node.quasis)
     c(quasi, st)
