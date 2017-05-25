@@ -217,8 +217,11 @@ base.SwitchCase = (node, st, c) => {
   for (let cons of node.consequent)
     c(cons, st, "Statement")
 }
-base.ReturnStatement = base.YieldExpression = base.AwaitExpression = (node, st, c) => {
+base.ReturnStatement = base.YieldExpression = (node, st, c) => {
   if (node.argument) c(node.argument, st, "Expression")
+}
+base.AwaitExpression = (node, st, c) => {
+  c(node.argument, st, "Expression")
 }
 base.ThrowStatement = base.SpreadElement =
   (node, st, c) => c(node.argument, st, "Expression")
