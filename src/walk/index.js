@@ -346,9 +346,10 @@ base.ExportAllDeclaration = (node, st, c) => {
 }
 base.ImportDeclaration = (node, st, c) => {
   for (let spec of node.specifiers)
-    c(spec, st)
+    c(spec, st, "ModuleSpecifier")
   c(node.source, st, "Expression")
 }
+base.ModuleSpecifier = skipThrough
 base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.Literal = ignore
 
 base.TaggedTemplateExpression = (node, st, c) => {
