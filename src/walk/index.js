@@ -318,9 +318,12 @@ base.MemberExpression = (node, st, c) => {
   c(node.object, st, "Expression")
   if (node.computed) c(node.property, st, "Expression")
 }
-base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
+base.ExportDefaultDeclaration = (node, st, c) => {
+  c(node.declaration, st, node.declaration.id ? "Statement" : "Expression")
+}
+base.ExportNamedDeclaration = (node, st, c) => {
   if (node.declaration)
-    c(node.declaration, st, node.type == "ExportNamedDeclaration" || node.declaration.id ? "Statement" : "Expression")
+    c(node.declaration, st, "Statement")
   if (node.source) c(node.source, st, "Expression")
 }
 base.ExportAllDeclaration = (node, st, c) => {
