@@ -275,15 +275,11 @@ base.ScopeBody = (node, st, c) => c(node, st, "Statement")
 base.ScopeExpression = (node, st, c) => c(node, st, "Expression")
 
 base.Pattern = (node, st, c) => {
-  if (node.type == "Identifier")
-    c(node, st, "VariablePattern")
-  else if (node.type == "MemberExpression")
-    c(node, st, "MemberPattern")
+  if (node.type == "Identifier" || node.type === "MemberExpression")
+    c(node, st, "Expression")
   else
     c(node, st)
 }
-base.VariablePattern = ignore
-base.MemberPattern = skipThrough
 base.RestElement = (node, st, c) => c(node.argument, st, "Pattern")
 base.ArrayPattern = (node, st, c) => {
   for (let elt of node.elements) {
