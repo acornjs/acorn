@@ -264,7 +264,6 @@ base.VariableDeclarator = (node, st, c) => {
 }
 
 base.Function = (node, st, c) => {
-  if (node.id) c(node.id, st, "Pattern")
   for (let param of node.params)
     c(param, st, "Pattern")
   c(node.body, st, node.expression ? "ScopeExpression" : "ScopeBody")
