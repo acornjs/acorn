@@ -162,9 +162,23 @@ function ignore(_node, _st, _c) {}
 
 export const base = {}
 
-base.Program = base.BlockStatement = (node, st, c) => {
-  for (let stmt of node.body)
-    c(stmt, st, "Statement")
+const moduleDeclarationTypes = [
+  "ImportDeclaration",
+  "ExportNamedDeclaration",
+  "ExportDefaultDeclaration",
+  "ExportAllDeclaration"
+]
+base.Program = (node, st, c) => {
+  for (let child of node.body)
+    if (moduleDeclarationTypes.includes(child.type)) {
+      c(child, st, "ModuleDeclaration")
+    } else {
+      c(child, st, "Statement")
+    }
+}
+base.BlockStatement = (node, st, c) => {
+  for (let child of node.body)
+    c(child, st, "Statement")
 }
 base.Statement = skipThrough
 base.EmptyStatement = ignore
@@ -318,6 +332,7 @@ base.MemberExpression = (node, st, c) => {
   c(node.object, st, "Expression")
   if (node.computed) c(node.property, st, "Expression")
 }
+base.ModuleDeclaration = skipThrough
 base.ExportDefaultDeclaration = (node, st, c) => {
   c(node.declaration, st, node.declaration.id ? "Statement" : "Expression")
 }
