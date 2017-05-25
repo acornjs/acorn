@@ -339,6 +339,8 @@ base.ExportDefaultDeclaration = (node, st, c) => {
 base.ExportNamedDeclaration = (node, st, c) => {
   if (node.declaration)
     c(node.declaration, st, "Statement")
+  for (let spec of node.specifiers)
+    c(spec, st, "ModuleSpecifier")
   if (node.source) c(node.source, st, "Expression")
 }
 base.ExportAllDeclaration = (node, st, c) => {
@@ -350,7 +352,7 @@ base.ImportDeclaration = (node, st, c) => {
   c(node.source, st, "Expression")
 }
 base.ModuleSpecifier = skipThrough
-base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.Literal = ignore
+base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.ExportSpecifier = base.Identifier = base.Literal = ignore
 
 base.TaggedTemplateExpression = (node, st, c) => {
   c(node.tag, st, "Expression")
