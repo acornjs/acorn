@@ -296,7 +296,10 @@ base.ArrayPattern = (node, st, c) => {
 }
 base.ObjectPattern = (node, st, c) => {
   for (let prop of node.properties)
-    c(prop.value, st, "Property")
+    c(prop, st, "AssignmentProperty")
+}
+base.AssignmentProperty = (node, st, c) => {
+  c(node, st, "Property")
 }
 
 base.Expression = skipThrough
