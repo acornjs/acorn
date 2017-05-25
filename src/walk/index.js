@@ -239,19 +239,25 @@ base.WhileStatement = base.DoWhileStatement = (node, st, c) => {
   c(node.body, st, "Statement")
 }
 base.ForStatement = (node, st, c) => {
-  if (node.init) c(node.init, st, "ForInit")
+  if (node.init) {
+    if (node.init.type == "VariableDeclaration")
+      c(node.init, st, "Statement")
+    else
+      c(node.init, st, "Expression")
+  }
   if (node.test) c(node.test, st, "Expression")
   if (node.update) c(node.update, st, "Expression")
   c(node.body, st, "Statement")
 }
 base.ForInStatement = base.ForOfStatement = (node, st, c) => {
-  c(node.left, st, "ForInit")
+  if (node.left) {
+    if (node.left.type == "VariableDeclaration")
+      c(node.left, st, "Statement")
+    else
+      c(node.left, st, "Pattern")
+  }
   c(node.right, st, "Expression")
   c(node.body, st, "Statement")
-}
-base.ForInit = (node, st, c) => {
-  if (node.type == "VariableDeclaration") c(node, st)
-  else c(node, st, "Expression")
 }
 base.DebuggerStatement = ignore
 
