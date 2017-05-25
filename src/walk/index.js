@@ -180,7 +180,18 @@ base.BlockStatement = (node, st, c) => {
   for (let child of node.body)
     c(child, st, "Statement")
 }
-base.Statement = skipThrough
+const declarationTypes = [
+  "VariableDeclaration",
+  "FunctionDeclaration",
+  "ClassDeclaration"
+]
+base.Statement = (node, st, c) => {
+  if (declarationTypes.includes(node.type)) {
+    c(node, st, "Declaration")
+  } else {
+    c(node, st)
+  }
+}
 base.EmptyStatement = ignore
 base.ExpressionStatement = base.ParenthesizedExpression =
   (node, st, c) => c(node.expression, st, "Expression")
@@ -241,6 +252,7 @@ base.ForInit = (node, st, c) => {
 }
 base.DebuggerStatement = ignore
 
+base.Declaration = skipThrough
 base.FunctionDeclaration = (node, st, c) => c(node, st, "Function")
 base.VariableDeclaration = (node, st, c) => {
   for (let decl of node.declarations)
@@ -334,11 +346,15 @@ base.MemberExpression = (node, st, c) => {
 }
 base.ModuleDeclaration = skipThrough
 base.ExportDefaultDeclaration = (node, st, c) => {
-  c(node.declaration, st, node.declaration.id ? "Statement" : "Expression")
+  if (declarationTypes.includes(node.declaration.type)) {
+    c(node.declaration, st, "Declaration")
+  } else {
+    c(node.declaration, st, "Expression")
+  }
 }
 base.ExportNamedDeclaration = (node, st, c) => {
   if (node.declaration)
-    c(node.declaration, st, "Statement")
+    c(node.declaration, st, "Declaration")
   for (let spec of node.specifiers)
     c(spec, st, "ModuleSpecifier")
   if (node.source) c(node.source, st, "Expression")
