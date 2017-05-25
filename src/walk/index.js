@@ -193,7 +193,7 @@ base.Statement = (node, st, c) => {
   }
 }
 base.EmptyStatement = ignore
-base.ExpressionStatement = base.ParenthesizedExpression =
+base.ExpressionStatement = base.ParenthesizedExpression = base.Decorator =
   (node, st, c) => c(node.expression, st, "Expression")
 base.IfStatement = (node, st, c) => {
   c(node.test, st, "Expression")
@@ -404,6 +404,10 @@ base.Class = (node, st, c) => {
   if (node.id) c(node.id, st, "Pattern")
   if (node.superClass) c(node.superClass, st, "Expression")
   c(node.body, st, "ClassBody")
+  if (node.decorators) {
+    for (let decorator of node.decorators)
+      c(decorator, st)
+  }
 }
 base.ClassBody = (node, st, c) => {
   for (let item of node.body)
@@ -412,4 +416,8 @@ base.ClassBody = (node, st, c) => {
 base.MethodDefinition = base.Property = (node, st, c) => {
   if (node.computed) c(node.key, st, "Expression")
   c(node.value, st, "Expression")
+  if (node.decorators) {
+    for (let decorator of node.decorators)
+      c(decorator, st)
+  }
 }
