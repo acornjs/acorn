@@ -297,7 +297,13 @@ base.Expression = skipThrough
 base.ThisExpression = base.Super = base.MetaProperty = ignore
 base.ArrayExpression = (node, st, c) => {
   for (let elt of node.elements) {
-    if (elt) c(elt, st, "Expression")
+    if (elt) {
+      if (elt.type === "SpreadElement") {
+        c(elt, st)
+      } else {
+        c(elt, st, "Expression")
+      }
+    }
   }
 }
 base.ObjectExpression = (node, st, c) => {
@@ -335,7 +341,11 @@ base.NewExpression = (node, st, c) => {
   c(node.callee, st, "Expression")
   if (node.arguments)
     for (let arg of node.arguments)
-      c(arg, st, "Expression")
+      if (arg.type === "SpreadElement") {
+        c(arg, st)
+      } else {
+        c(arg, st, "Expression")
+      }
 }
 base.CallExpression = (node, st, c) => {
   if (node.callee.type === "Super") {
@@ -345,7 +355,11 @@ base.CallExpression = (node, st, c) => {
   }
   if (node.arguments)
     for (let arg of node.arguments)
-      c(arg, st, "Expression")
+      if (arg.type === "SpreadElement") {
+        c(arg, st)
+      } else {
+        c(arg, st, "Expression")
+      }
 }
 base.MemberExpression = (node, st, c) => {
   if (node.object.type === "Super") {
