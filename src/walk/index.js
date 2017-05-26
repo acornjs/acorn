@@ -162,15 +162,14 @@ function ignore(_node, _st, _c) {}
 
 export const base = {}
 
-const moduleDeclarationTypes = [
-  "ImportDeclaration",
-  "ExportNamedDeclaration",
-  "ExportDefaultDeclaration",
-  "ExportAllDeclaration"
-]
 base.Program = (node, st, c) => {
   for (let child of node.body)
-    if (moduleDeclarationTypes.includes(child.type)) {
+    if (
+      child.type === "ImportDeclaration" ||
+      child.type === "ExportNamedDeclaration" ||
+      child.type === "ExportDefaultDeclaration" ||
+      child.type === "ExportAllDeclaration"
+    ) {
       c(child, st, "ModuleDeclaration")
     } else {
       c(child, st, "Statement")
@@ -180,13 +179,12 @@ base.BlockStatement = (node, st, c) => {
   for (let child of node.body)
     c(child, st, "Statement")
 }
-const declarationTypes = [
-  "VariableDeclaration",
-  "FunctionDeclaration",
-  "ClassDeclaration"
-]
 base.Statement = (node, st, c) => {
-  if (declarationTypes.includes(node.type)) {
+  if (
+    node.type === "VariableDeclaration" ||
+    node.type === "FunctionDeclaration" ||
+    node.type === "ClassDeclaration"
+  ) {
     c(node, st, "Declaration")
   } else {
     c(node, st)
@@ -380,7 +378,11 @@ base.MemberExpression = (node, st, c) => {
 }
 base.ModuleDeclaration = skipThrough
 base.ExportDefaultDeclaration = (node, st, c) => {
-  if (declarationTypes.includes(node.declaration.type)) {
+  if (
+    node.declaration.type === "VariableDeclaration" ||
+    node.declaration.type === "FunctionDeclaration" ||
+    node.declaration.type === "ClassDeclaration"
+  ) {
     c(node.declaration, st, "Declaration")
   } else {
     c(node.declaration, st, "Expression")
