@@ -288,7 +288,7 @@ walker functions in `functions` and filling in the missing ones by
 taking defaults from `base`.
 
 **full**`(node, callback, base, state)` does a 'full'
-walk over a tree, calling the callback with the arguments (node, state)
+walk over a tree, calling the callback with the arguments (type, node, state)
 for each node
 
 **fullAncestor**`(node, callback, base, state)` does a 'full' walk over
