@@ -291,6 +291,10 @@ taking defaults from `base`.
 walk over a tree, calling the callback with the arguments (node, state)
 for each node
 
+**fullAncestor**`(node, callback, base, state)` does a 'full' walk over
+a tree, building up an array of ancestor nodes (including the current node)
+and passing the array to the callbacks as a third parameter.
+
 ```js
 const acorn = require('acorn');
 const walk = require('acorn/dist/walk');
