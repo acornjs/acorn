@@ -72,7 +72,7 @@ export function full(node, callback, base, state, override) {
   ;(function c(node, st, override) {
     let type = override || node.type
     base[type](node, st, c)
-    callback(type, node, st)
+    callback(node, st, type)
   })(node, state, override)
 }
 
@@ -86,7 +86,7 @@ export function fullAncestor(node, callback, base, state) {
     let isNew = node != ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
     base[type](node, st, c)
-    callback(type, node, st || ancestors, ancestors)
+    callback(node, st || ancestors, ancestors, type)
     if (isNew) ancestors.pop()
   })(node, state)
 }
