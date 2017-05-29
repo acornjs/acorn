@@ -287,6 +287,26 @@ default walkers will be used.
 walker functions in `functions` and filling in the missing ones by
 taking defaults from `base`.
 
+**full**`(node, callback, base, state)` does a 'full'
+walk over a tree, calling the callback with the arguments (node, state, type)
+for each node
+
+**fullAncestor**`(node, callback, base, state)` does a 'full' walk over
+a tree, building up an array of ancestor nodes (including the current node)
+and passing the array to the callbacks as a third parameter.
+
+```js
+const acorn = require('acorn');
+const walk = require('acorn/dist/walk');
+
+const jsText = '1+1';
+const jsNode = acorn.parse(jsText);
+const callback = function (node) {
+  console.log(node);
+};
+walk.full(jsNode, callback);
+```
+
 **findNodeAt**`(node, start, end, test, base, state)` tries to
 locate a node in a tree at the given start and/or end offsets, which
 satisfies the predicate `test`. `start` and `end` can be either `null`

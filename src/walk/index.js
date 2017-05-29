@@ -66,6 +66,31 @@ class Found {
   constructor(node, state) { this.node = node; this.state = state }
 }
 
+// A full walk triggers the callback on each node
+export function full(node, callback, base, state, override) {
+  if (!base) base = exports.base
+  ;(function c(node, st, override) {
+    let type = override || node.type
+    base[type](node, st, c)
+    callback(node, st, type)
+  })(node, state, override)
+}
+
+// An fullAncestor walk is like an ancestor walk, but triggers
+// the callback on each node
+export function fullAncestor(node, callback, base, state) {
+  if (!base) base = exports.base
+  let ancestors = []
+  ;(function c(node, st, override) {
+    let type = override || node.type
+    let isNew = node != ancestors[ancestors.length - 1]
+    if (isNew) ancestors.push(node)
+    base[type](node, st, c)
+    callback(node, st || ancestors, ancestors, type)
+    if (isNew) ancestors.pop()
+  })(node, state)
+}
+
 // Find a node with a given start, end, and type (all are optional,
 // null can be used as wildcard). Returns a {node, state} object, or
 // undefined when it doesn't find a matching node.
