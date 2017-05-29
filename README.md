@@ -269,17 +269,14 @@ meaningful state. (An example of a use of state is to track scope at
 each point in the tree.)
 
 ```js
-const acorn = require('acorn');
-const walk = require('acorn/dist/walk');
+const acorn = require("acorn")
+const walk = require("acorn/dist/walk")
 
-const jsText = '1+1';
-const jsNode = acorn.parse(jsText);
-const visitors = {
-  BinaryExpression(node) {
-    console.log(node);
-  },
-};
-walk.simple(jsNode, visitors);
+walk.simple(acorn.parse("let x = 10"), {
+  Literal(node) {
+    console.log(`Found a literal: ${node.value}`)
+  }
+})
 ```
 
 **ancestor**`(node, visitors, base, state)` does a 'simple' walk over
@@ -287,17 +284,15 @@ a tree, building up an array of ancestor nodes (including the current node)
 and passing the array to the callbacks as a third parameter.
 
 ```js
-const acorn = require('acorn');
-const walk = require('acorn/dist/walk');
+const acorn = require("acorn")
+const walk = require("acorn/dist/walk")
 
-const jsText = '1+1';
-const jsNode = acorn.parse(jsText);
-const visitors = {
-  BinaryExpression(node, ancestors) {
-    console.log(node, ancestors);
-  },
-};
-walk.ancestor(jsNode, visitors);
+walk.ancestor(acorn.parse("foo('hi')"), {
+  Literal(_, ancestors) {
+    console.log("This literal's ancestors are:",
+                ancestors.map(n => n.type))
+  }
+})
 ```
 
 **recursive**`(node, state, functions, base)` does a 'recursive'
