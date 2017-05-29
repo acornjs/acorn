@@ -296,15 +296,12 @@ a tree, building up an array of ancestor nodes (including the current node)
 and passing the array to the callbacks as a third parameter.
 
 ```js
-const acorn = require('acorn');
-const walk = require('acorn/dist/walk');
+const acorn = require("acorn")
+const walk = require("acorn/dist/walk")
 
-const jsText = '1+1';
-const jsNode = acorn.parse(jsText);
-const callback = function (node) {
-  console.log(node);
-};
-walk.full(jsNode, callback);
+walk.full(acorn.parse("1 + 1"), node => {
+  console.log(`There's a ${node.type} node at ${node.ch}`)
+})
 ```
 
 **findNodeAt**`(node, start, end, test, base, state)` tries to
