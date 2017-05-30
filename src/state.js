@@ -87,8 +87,7 @@ export class Parser {
       this.skipLineComment(2)
 
     // Scope tracking for duplicate variable names (see scope.js)
-    this.scopeStack = []
-    this.enterFunctionScope()
+    this.initScopeStack()
   }
 
   // DEPRECATED Kept for backwards compatibility until 3.0 in case a plugin uses them
