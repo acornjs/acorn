@@ -257,6 +257,8 @@ tokenizer.
 Implements an abstract syntax tree walker. Will store its interface in
 `acorn.walk` when loaded without a module system.
 
+JSX is supported providing you use the [plugin](https://github.com/RReverser/acorn-jsx).
+
 **simple**`(node, visitors, base, state)` does a 'simple' walk over
 a tree. `node` should be the AST node to walk, and `visitors` an
 object with properties whose names correspond to node types in the

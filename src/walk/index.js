@@ -363,3 +363,62 @@ base.MethodDefinition = base.Property = (node, st, c) => {
   if (node.computed) c(node.key, st, "Expression")
   c(node.value, st, "Expression")
 }
+
+base.JSXElement = (node, st, c) => {
+  c(node.openingElement, st)
+  if (node.closingElement) c(node.closingElement, st)
+  for (let child of node.children)
+    if (child.type === "JSXElement")
+      c(child, st, "Expression")
+    else
+      c(child, st)
+}
+base.JSXOpeningElement = (node, st, c) => {
+  if (node.name.type === "JSXIdentifier")
+    c(node.name, st)
+  else
+    c(node.name, st, "Expression")
+  for (let attribute of node.attributes)
+    c(attribute, st)
+}
+base.JSXClosingElement = (node, st, c) => {
+  if (node.name.type === "JSXIdentifier")
+    c(node.name, st)
+  else
+    c(node.name, st, "Expression")
+}
+base.JSXIdentifier = (node, st, c) => {
+  c(node, st, "Identifier")
+}
+base.JSXMemberExpression = (node, st, c) => {
+  if (node.object.type === "JSXIdentifier")
+    c(node.object, st)
+  else
+    c(node.object, st, "Expression")
+  c(node.property, st)
+}
+base.JSXNamespacedName = (node, st, c) => {
+  c(node.name, st)
+  c(node.namespace, st)
+}
+base.JSXAttribute = (node, st, c) => {
+  if (node.name.type === "JSXIdentifier")
+    c(node.name, st)
+  else
+    c(node.name, st, "Expression")
+  if (node.value)
+    if (node.value.type === "JSXExpressionContainer")
+      c(node.value, st)
+    else
+      c(node.value, st, "Expression")
+}
+base.JSXSpreadAttribute = (node, st, c) => {
+  c(node, st, "SpreadElement")
+}
+base.JSXExpressionContainer = (node, st, c) => {
+  if (node.expression.type === "JSXEmptyExpression")
+    c(node.expression, st)
+  else
+    c(node.expression, st, "Expression")
+}
+base.JSXEmptyExpression = base.JSXSpreadChild = base.JSXText = ignore
