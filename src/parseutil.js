@@ -94,10 +94,12 @@ pp.unexpected = function(pos) {
   this.raise(pos != null ? pos : this.start, "Unexpected token")
 }
 
-export class DestructuringErrors {
-  constructor() {
-    this.shorthandAssign = this.trailingComma = this.parenthesizedAssign = this.parenthesizedBind = -1
-  }
+export function DestructuringErrors() {
+  this.shorthandAssign =
+  this.trailingComma =
+  this.parenthesizedAssign =
+  this.parenthesizedBind =
+    -1
 }
 
 pp.checkPatternErrors = function(refDestructuringErrors, isAssign) {
