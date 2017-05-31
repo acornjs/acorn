@@ -182,8 +182,13 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
     if (this.strict && this.reservedWordsStrictBind.test(expr.name))
       this.raiseRecoverable(expr.start, (bindingType ? "Binding " : "Assigning to ") + expr.name + " in strict mode")
     if (checkClashes) {
-      if (has(checkClashes, expr.name))
-        this.raiseRecoverable(expr.start, "Argument name clash")
+      if (has(checkClashes, expr.name)) {
+        if (expr.loc && expr.loc.start && expr.loc.start.line) {
+          this.raiseRecoverable(expr.start, "Argument name clash with '" + expr.name + "' at line: " + expr.loc.start.line)
+        } else {
+          this.raiseRecoverable(expr.start, "Argument name clash with '" + expr.name + "' ")
+        }
+      }
       checkClashes[expr.name] = true
     }
     if (bindingType && bindingType !== "none") {
