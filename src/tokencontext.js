@@ -19,7 +19,7 @@ export class TokContext {
 export const types = {
   b_stat: new TokContext("{", false),
   b_expr: new TokContext("{", true),
-  b_tmpl: new TokContext("${", true),
+  b_tmpl: new TokContext("${", false),
   p_stat: new TokContext("(", false),
   p_expr: new TokContext("(", true),
   q_tmpl: new TokContext("`", true, true, p => p.tryReadTemplateToken()),
@@ -81,15 +81,11 @@ tt.parenR.updateContext = tt.braceR.updateContext = function() {
     this.exprAllowed = true
     return
   }
-  let out = this.context.pop(), cur
-  if (out === types.b_stat && (cur = this.curContext()) && cur.token === "function") {
-    this.context.pop()
-    this.exprAllowed = !cur.isExpr
-  } else if (out === types.b_tmpl) {
-    this.exprAllowed = true
-  } else {
-    this.exprAllowed = !out.isExpr
+  let out = this.context.pop()
+  if (out === types.b_stat && this.curContext().token === "function") {
+    out = this.context.pop()
   }
+  this.exprAllowed = !out.isExpr
 }
 
 tt.braceL.updateContext = function(prevType) {
