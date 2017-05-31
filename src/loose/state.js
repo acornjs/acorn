@@ -152,11 +152,13 @@ export class LooseParser {
   }
 
   loadPlugins(pluginConfigs) {
-    for (let name in pluginConfigs) {
-      let plugin = pluginsLoose[name]
-      if (!plugin) throw new Error("Plugin '" + name + "' not found")
-      plugin(this, pluginConfigs[name])
-    }
+    Object.keys(pluginConfigs)
+      .sort((a, b) => b.priority - a.priority) // undefined is in the end, as with 0 priority
+      .forEach(name => {
+        let plugin = pluginsLoose[name]
+        if (!plugin) throw new Error("Plugin '" + name + "' not found")
+        plugin(this, pluginConfigs[name])
+      })
   }
 
   parse() {
