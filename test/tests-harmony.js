@@ -15721,3 +15721,5 @@ test("() => {}\n/re/", {}, {ecmaVersion: 6})
 test("(() => {}) + 2", {}, {ecmaVersion: 6})
 
 testFail("(x) => {} + 2", "Unexpected token (1:10)", {ecmaVersion: 6})
+
+testFail("let default", "Unexpected token (1:4)", {ecmaVersion: 6, sourceType: "module"})
