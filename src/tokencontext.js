@@ -23,6 +23,7 @@ export const types = {
   p_stat: new TokContext("(", false),
   p_expr: new TokContext("(", true),
   q_tmpl: new TokContext("`", true, true, p => p.tryReadTemplateToken()),
+  f_stat: new TokContext("function", false),
   f_expr: new TokContext("function", true),
   f_expr_gen: new TokContext("function", true, false, null, true),
   f_gen: new TokContext("function", false, false, null, true)
@@ -55,8 +56,11 @@ pp.braceIsBlock = function(prevType) {
 }
 
 pp.inGeneratorContext = function() {
-  for (let i = this.context.length - 1; i >= 0; i--)
-    if (this.context[i].generator) return true
+  for (let i = this.context.length - 1; i >= 1; i--) {
+    let context = this.context[i]
+    if (context.token === "function")
+      return context.generator
+  }
   return false
 }
 
@@ -80,7 +84,7 @@ tt.parenR.updateContext = tt.braceR.updateContext = function() {
   let out = this.context.pop(), cur
   if (out === types.b_stat && (cur = this.curContext()) && cur.token === "function") {
     this.context.pop()
-    this.exprAllowed = false
+    this.exprAllowed = !cur.isExpr
   } else if (out === types.b_tmpl) {
     this.exprAllowed = true
   } else {
@@ -112,6 +116,8 @@ tt._function.updateContext = function(prevType) {
   if (prevType.beforeExpr && prevType !== tt.semi && prevType !== tt._else &&
       !((prevType === tt.colon || prevType === tt.braceL) && this.curContext() === types.b_stat))
     this.context.push(types.f_expr)
+  else
+    this.context.push(types.f_stat)
   this.exprAllowed = false
 }
 
@@ -125,10 +131,11 @@ tt.backQuote.updateContext = function() {
 
 tt.star.updateContext = function(prevType) {
   if (prevType == tt._function) {
-    if (this.curContext() === types.f_expr)
-      this.context[this.context.length - 1] = types.f_expr_gen
+    let index = this.context.length - 1
+    if (this.context[index] === types.f_expr)
+      this.context[index] = types.f_expr_gen
     else
-      this.context.push(types.f_gen)
+      this.context[index] = types.f_gen
   }
   this.exprAllowed = true
 }
