@@ -3110,3 +3110,116 @@ test(
 testFail("(async)(a) => 12", "Unexpected token (1:11)", {ecmaVersion: 8})
 
 testFail("f = async ((x)) => x", "Parenthesized pattern (1:11)", {ecmaVersion: 8})
+
+// allow 'async' as a shorthand property in script.
+test(
+  "({async})",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 9,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 9,
+        "expression": {
+          "type": "ObjectExpression",
+          "start": 1,
+          "end": 8,
+          "properties": [
+            {
+              "type": "Property",
+              "start": 2,
+              "end": 7,
+              "method": false,
+              "shorthand": true,
+              "computed": false,
+              "key": {
+                "type": "Identifier",
+                "start": 2,
+                "end": 7,
+                "name": "async"
+              },
+              "kind": "init",
+              "value": {
+                "type": "Identifier",
+                "start": 2,
+                "end": 7,
+                "name": "async"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  {ecmaVersion: 8}
+)
+test(
+  "({async, foo})",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 14,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 14,
+        "expression": {
+          "type": "ObjectExpression",
+          "start": 1,
+          "end": 13,
+          "properties": [
+            {
+              "type": "Property",
+              "start": 2,
+              "end": 7,
+              "method": false,
+              "shorthand": true,
+              "computed": false,
+              "key": {
+                "type": "Identifier",
+                "start": 2,
+                "end": 7,
+                "name": "async"
+              },
+              "kind": "init",
+              "value": {
+                "type": "Identifier",
+                "start": 2,
+                "end": 7,
+                "name": "async"
+              }
+            },
+            {
+              "type": "Property",
+              "start": 9,
+              "end": 12,
+              "method": false,
+              "shorthand": true,
+              "computed": false,
+              "key": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+              },
+              "kind": "init",
+              "value": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  {ecmaVersion: 8}
+)
