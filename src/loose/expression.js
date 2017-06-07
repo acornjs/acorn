@@ -1,6 +1,6 @@
 import {LooseParser} from "./state"
 import {isDummy} from "./parseutil"
-import {tokTypes as tt} from "../index"
+import {tokTypes as tt, lineBreak} from "../index"
 
 const lp = LooseParser.prototype
 
@@ -377,7 +377,8 @@ lp.parseObj = function() {
     this.parsePropertyName(prop)
     if (!prop.computed &&
         prop.key.type === "Identifier" && prop.key.name === "async" && this.tok.type !== tt.parenL &&
-        this.tok.type !== tt.colon && !this.canInsertSemicolon()) {
+        this.tok.type !== tt.colon && this.tok.type !== tt.comma && this.tok.type !== tt.braceR &&
+        !lineBreak.test(this.input.slice(this.last.end, this.tok.start))) {
       this.parsePropertyName(prop)
       isAsync = true
     } else {
