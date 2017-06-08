@@ -19,6 +19,7 @@
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {DestructuringErrors} from "./parseutil"
+import {lineBreak} from "./whitespace"
 
 const pp = Parser.prototype
 
@@ -552,8 +553,9 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
     }
     this.parsePropertyName(prop)
     if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && !prop.computed &&
-        prop.key.type === "Identifier" && prop.key.name === "async" && this.type !== tt.parenL &&
-        this.type !== tt.colon && !this.canInsertSemicolon()) {
+        prop.key.type === "Identifier" && prop.key.name === "async" &&
+        (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL) &&
+        !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) {
       isAsync = true
       this.parsePropertyName(prop, refDestructuringErrors)
     } else {
