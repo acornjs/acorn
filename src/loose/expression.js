@@ -376,8 +376,8 @@ lp.parseObj = function() {
     }
     this.parsePropertyName(prop)
     if (!prop.computed &&
-        prop.key.type === "Identifier" && prop.key.name === "async" && this.tok.type !== tt.parenL &&
-        this.tok.type !== tt.colon && this.tok.type !== tt.comma && this.tok.type !== tt.braceR &&
+        prop.key.type === "Identifier" && prop.key.name === "async" &&
+        (this.tok.type === tt.name || this.tok.type === tt.num || this.tok.type === tt.string || this.tok.type === tt.bracketL) &&
         !lineBreak.test(this.input.slice(this.last.end, this.tok.start))) {
       this.parsePropertyName(prop)
       isAsync = true
