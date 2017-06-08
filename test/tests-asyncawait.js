@@ -3223,3 +3223,297 @@ test(
   },
   {ecmaVersion: 8}
 )
+test(
+  "({async = 0} = {})",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 18,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 18,
+        "expression": {
+          "type": "AssignmentExpression",
+          "start": 1,
+          "end": 17,
+          "operator": "=",
+          "left": {
+            "type": "ObjectPattern",
+            "start": 1,
+            "end": 12,
+            "properties": [
+              {
+                "type": "Property",
+                "start": 2,
+                "end": 11,
+                "method": false,
+                "shorthand": true,
+                "computed": false,
+                "key": {
+                  "type": "Identifier",
+                  "start": 2,
+                  "end": 7,
+                  "name": "async"
+                },
+                "kind": "init",
+                "value": {
+                  "type": "AssignmentPattern",
+                  "start": 2,
+                  "end": 11,
+                  "left": {
+                    "type": "Identifier",
+                    "start": 2,
+                    "end": 7,
+                    "name": "async"
+                  },
+                  "right": {
+                    "type": "Literal",
+                    "start": 10,
+                    "end": 11,
+                    "value": 0,
+                    "raw": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "right": {
+            "type": "ObjectExpression",
+            "start": 15,
+            "end": 17,
+            "properties": []
+          }
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  {ecmaVersion: 8}
+)
+
+// async functions with vary names.
+test(
+  "({async \"foo\"(){}})",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 19,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 19,
+        "expression": {
+          "type": "ObjectExpression",
+          "start": 1,
+          "end": 18,
+          "properties": [
+            {
+              "type": "Property",
+              "start": 2,
+              "end": 17,
+              "method": true,
+              "shorthand": false,
+              "computed": false,
+              "key": {
+                "type": "Literal",
+                "start": 8,
+                "end": 13,
+                "value": "foo",
+                "raw": "\"foo\""
+              },
+              "kind": "init",
+              "value": {
+                "type": "FunctionExpression",
+                "start": 13,
+                "end": 17,
+                "id": null,
+                "generator": false,
+                "expression": false,
+                "async": true,
+                "params": [],
+                "body": {
+                  "type": "BlockStatement",
+                  "start": 15,
+                  "end": 17,
+                  "body": []
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  {ecmaVersion: 8}
+)
+test(
+  "({async 'foo'(){}})",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 19,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 19,
+        "expression": {
+          "type": "ObjectExpression",
+          "start": 1,
+          "end": 18,
+          "properties": [
+            {
+              "type": "Property",
+              "start": 2,
+              "end": 17,
+              "method": true,
+              "shorthand": false,
+              "computed": false,
+              "key": {
+                "type": "Literal",
+                "start": 8,
+                "end": 13,
+                "value": "foo",
+                "raw": "'foo'"
+              },
+              "kind": "init",
+              "value": {
+                "type": "FunctionExpression",
+                "start": 13,
+                "end": 17,
+                "id": null,
+                "generator": false,
+                "expression": false,
+                "async": true,
+                "params": [],
+                "body": {
+                  "type": "BlockStatement",
+                  "start": 15,
+                  "end": 17,
+                  "body": []
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  {ecmaVersion: 8}
+)
+test(
+  "({async 100(){}})",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 17,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 17,
+        "expression": {
+          "type": "ObjectExpression",
+          "start": 1,
+          "end": 16,
+          "properties": [
+            {
+              "type": "Property",
+              "start": 2,
+              "end": 15,
+              "method": true,
+              "shorthand": false,
+              "computed": false,
+              "key": {
+                "type": "Literal",
+                "start": 8,
+                "end": 11,
+                "value": 100,
+                "raw": "100"
+              },
+              "kind": "init",
+              "value": {
+                "type": "FunctionExpression",
+                "start": 11,
+                "end": 15,
+                "id": null,
+                "generator": false,
+                "expression": false,
+                "async": true,
+                "params": [],
+                "body": {
+                  "type": "BlockStatement",
+                  "start": 13,
+                  "end": 15,
+                  "body": []
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  {ecmaVersion: 8}
+)
+test(
+  "({async [foo](){}})",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 19,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 19,
+        "expression": {
+          "type": "ObjectExpression",
+          "start": 1,
+          "end": 18,
+          "properties": [
+            {
+              "type": "Property",
+              "start": 2,
+              "end": 17,
+              "method": true,
+              "shorthand": false,
+              "computed": true,
+              "key": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+              },
+              "kind": "init",
+              "value": {
+                "type": "FunctionExpression",
+                "start": 13,
+                "end": 17,
+                "id": null,
+                "generator": false,
+                "expression": false,
+                "async": true,
+                "params": [],
+                "body": {
+                  "type": "BlockStatement",
+                  "start": 15,
+                  "end": 17,
+                  "body": []
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  {ecmaVersion: 8}
+)
