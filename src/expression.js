@@ -530,6 +530,12 @@ pp.parseTemplate = function({isTagged = false} = {}) {
 
 // Parse an object literal or binding pattern.
 
+pp.isAsyncProp = function(prop) {
+  return !prop.computed && prop.key.type === "Identifier" && prop.key.name === "async" &&
+    (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL) &&
+    !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
+}
+
 pp.parseObj = function(isPattern, refDestructuringErrors) {
   let node = this.startNode(), first = true, propHash = {}
   node.properties = []
@@ -552,10 +558,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
         isGenerator = this.eat(tt.star)
     }
     this.parsePropertyName(prop)
-    if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && !prop.computed &&
-        prop.key.type === "Identifier" && prop.key.name === "async" &&
-        (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL) &&
-        !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) {
+    if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
       isAsync = true
       this.parsePropertyName(prop, refDestructuringErrors)
     } else {

@@ -1,6 +1,6 @@
 import {LooseParser} from "./state"
 import {isDummy} from "./parseutil"
-import {tokTypes as tt, lineBreak} from "../index"
+import {tokTypes as tt} from "../index"
 
 const lp = LooseParser.prototype
 
@@ -375,10 +375,7 @@ lp.parseObj = function() {
       isGenerator = this.eat(tt.star)
     }
     this.parsePropertyName(prop)
-    if (!prop.computed &&
-        prop.key.type === "Identifier" && prop.key.name === "async" &&
-        (this.tok.type === tt.name || this.tok.type === tt.num || this.tok.type === tt.string || this.tok.type === tt.bracketL) &&
-        !lineBreak.test(this.input.slice(this.last.end, this.tok.start))) {
+    if (this.toks.isAsyncProp(prop)) {
       this.parsePropertyName(prop)
       isAsync = true
     } else {
