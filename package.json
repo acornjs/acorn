@@ -26,7 +26,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "prepublish": "npm test",
+    "prepare": "npm test",
     "test": "node test/run.js && node test/lint.js",
     "pretest": "npm run build:main && npm run build:loose",
     "build": "npm run build:main && npm run build:walk && npm run build:loose && npm run build:bin",
