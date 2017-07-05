@@ -1,3 +1,25 @@
+## 5.1.0 (2017-07-05)
+
+### Bug fixes
+
+Fix tokenizing of regexps in an object-desctructuring `for`/`of` loop and after `yield`.
+
+Parse zero-prefixed numbers with non-octal digits as decimal.
+
+Allow object/array patterns in rest parameters.
+
+Don't error when `yield` is used as a property name.
+
+Allow `async` as a shorthand object property.
+
+Make the ES module version of the loose parser actually work.
+
+### New features
+
+Implement the [template literal revision proposal](https://github.com/tc39/proposal-template-literal-revision) for ES9.
+
+New walker functions `full` and `fullAncestor`.
+
 ## 5.0.3 (2017-04-01)
 
 ### Bug fixes
