@@ -32,7 +32,7 @@
     "build": "npm run build:main && npm run build:walk && npm run build:loose && npm run build:bin",
     "build:main": "rollup -c rollup/config.main.js",
     "build:walk": "rollup -c rollup/config.walk.js",
-    "build:loose": "rollup -c rollup/config.loose.js",
+    "build:loose": "rollup -c rollup/config.loose.js && rollup -c rollup/config.loose_es.js",
     "build:bin": "rollup -c rollup/config.bin.js",
     "lint": "eslint src/"
   },

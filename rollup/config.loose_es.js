@@ -3,7 +3,7 @@ import {resolve} from 'path'
 
 var acorn = resolve('src/index.js')
 var paths = {}, globals = {}
-paths[acorn] = './acorn'
+paths[acorn] = './acorn.es'
 globals[acorn] = 'acorn'
 
 export default {
@@ -13,7 +13,7 @@ export default {
   paths: paths,
   globals: globals,
   targets: [
-    { dest: 'dist/acorn_loose.js', format: 'umd' }
+    { dest: 'dist/acorn_loose.es.js', format: 'es' }
   ],
   plugins: [
     buble({
