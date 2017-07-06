@@ -1,14 +1,21 @@
 (function(exports) {
   var tests = [];
 
-  exports.test = function(code, ast, options) {
-    tests.push({code: code, ast: ast, options: options});
+  function pushTest(test) {
+    if (!test.options || !test.options.ecmaVersion) {
+      throw new Error("Tests must specify options with ecmaVersion")
+    }
+    tests.push(test);
+  }
+
+  exports.test = function(code, options) {
+    pushTest({code: code, options: options});
   };
-  exports.testFail = function(code, message, options) {
-    tests.push({code: code, error: message, options: options});
+  exports.testFail = function(code, options) {
+    pushTest({code: code, options: options});
   };
   exports.testAssert = function(code, assert, options) {
-    tests.push({code: code, assert: assert, options: options});
+    pushTest({code: code, assert: assert, options: options});
   };
 
   exports.runTests = function(config, snapshot, callback) {
@@ -17,9 +24,8 @@
     for (var i = 0; i < tests.length; ++i) {
       var test = tests[i];
       if (config.filter && !config.filter(test)) continue;
-      var testOpts = test.options || {locations: true};
-      if (!testOpts.ecmaVersion) testOpts.ecmaVersion = 5;
       var expected = {};
+      var testOpts = test.options;
       if (expected.onComment = testOpts.onComment)
         testOpts.onComment = []
       if (expected.onToken = testOpts.onToken)
@@ -39,86 +45,73 @@
       var snapshotCategory = snapshot[subCategory] || (snapshot[subCategory] = {});
       var testSnapshot = snapshotCategory[test.code];
 
-      if (testSnapshot) {
-        delete test.ast;
-        delete test.error;
-        if (testSnapshot.type === "Error") {
-          test.error = testSnapshot.message;
-        } else {
-          test.ast = testSnapshot;
-        }
-      }
-
       try {
         var ast = parse(test.code, testOpts);
       } catch(e) {
-        if (!(e instanceof SyntaxError)) { console.log(e.stack); throw e; }
-        if (test.error) {
-          if (test.error.charAt(0) == "~" ? e.message.indexOf(test.error.slice(1)) > -1 : e.message == test.error) {
-            snapshotCategory[test.code] = {
-              type: "Error",
-              message: e.message
-            };
-            callback("ok", test.code);
-          } else
-            callback("fail", test.code, "Expected error message: " + test.error + "\nGot error message: " + e.message);
-        } else {
-          callback("error", test.code, e.message || e.toString());
-        }
+        if (!(e instanceof SyntaxError)) { console.error(e.stack); throw e; }
+        ast = {
+          type: "Error",
+          message: e.message
+        };
         continue
       }
 
-      if (test.error) {
-        if (config.loose) callback("ok", test.code);
-        else callback("fail", test.code, "Expected error message: " + test.error + "\nBut parsing succeeded.");
-      } else if (test.assert) {
+      if (test.assert) {
         var error = test.assert(ast);
-        if (error) callback("fail", test.code, "\n  Assertion failed:\n " + error);
-        else callback("ok", test.code);
-      } else {
-        var mis = misMatch(test.ast, ast);
-        for (var name in expected) {
-          if (mis) break;
-          if (expected[name]) {
-            mis = misMatch(expected[name], testOpts[name]);
-            testOpts[name] = expected[name];
-          }
-        }
-        if (mis) callback("fail", test.code, mis);
-        else {
-          // if (ast.body.length && ast.start === ast.body[0].start && ast.end === ast.body[ast.body.length - 1].end) {
-          //   ast = ast.body;
-          //   if (ast.length === 1) {
-          //     ast = ast[0];
-          //     if (ast.type === 'ExpressionStatement' && ast.start === ast.expression.start && ast.end === ast.expression.end) {
-          //       ast = ast.expression;
-          //     }
-          //   }
-          // }
-          snapshotCategory[test.code] = ast;
+        if (error) {
+          callback("fail", test.code, "\n  Assertion failed:\n " + error);
+        } else {
           callback("ok", test.code);
         }
+      } else {
+        if (testSnapshot) {
+          var mis = misMatch(testSnapshot, ast);
+          for (var name in expected) {
+            if (mis) break;
+            mis = misMatch(expected[name], testOpts[name]);
+          }
+          if (mis) {
+            mis = mis.msg + " (ast" + mis.path + ")";
+            callback("fail", test.code, mis);
+          } else {
+            callback("ok", test.code);
+          }
+        } else {
+          console.log(subCategory, test.code)
+          callback("new", test.code)
+        }
+        snapshotCategory[test.code] = ast
       }
     }
   };
 
   function ppJSON(v) { return v instanceof RegExp ? "{}" : JSON.stringify(v, null, 2); }
-  function addPath(str, pt) {
-    if (str.charAt(str.length-1) == ")")
-      return str.slice(0, str.length-1) + "/" + pt + ")";
-    return str + " (" + pt + ")";
+  function addPath(mis, part) {
+    if ((part | 0) == part) {
+      mis.path += "[" + part + "]";
+    } else {
+      mis.path += "." + part;
+    }
+    return mis;
   }
 
   var misMatch = exports.misMatch = function(exp, act) {
+    if (act instanceof RegExp) return;
     if (!exp || !act || (typeof exp != "object") || (typeof act != "object")) {
       if (exp !== act && typeof exp != "function")
-        return ppJSON(exp) + " !== " + ppJSON(act);
-    } else if (exp instanceof RegExp || act instanceof RegExp) {
-      var left = ppJSON(exp), right = ppJSON(act);
-      if (left !== right) return left + " !== " + right;
+        return {
+          msg: ppJSON(exp) + " !== " + ppJSON(act),
+          path: ""
+        };
     } else if (exp.splice) {
-      if (!act.slice) return ppJSON(exp) + " != " + ppJSON(act);
-      if (act.length != exp.length) return "array length mismatch " + exp.length + " != " + act.length;
+      if (!act.slice) return {
+        msg: ppJSON(exp) + " != " + ppJSON(act),
+        path: ""
+      };
+      if (act.length != exp.length) return {
+        msg: "array length mismatch " + exp.length + " != " + act.length,
+        path: ""
+      };
       for (var i = 0; i < act.length; ++i) {
         var mis = misMatch(exp[i], act[i]);
         if (mis) return addPath(mis, i);

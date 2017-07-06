@@ -72,7 +72,13 @@
   };
 
   function report(state, code, message) {
-    if (state != "ok") {++stats.failed; log(code, message);}
+    if (state == "new") {
+      ++stats.added;
+      log(code, "new test");
+    } else if (state != "ok") {
+      ++stats.failed;
+      log(code, message);
+    }
     ++stats.testsRun;
   }
 
@@ -81,7 +87,7 @@
   for (var name in modes) {
     group(name);
     var mode = modes[name];
-    stats = mode.stats = {testsRun: 0, failed: 0};
+    stats = mode.stats = {testsRun: 0, failed: 0, added: 0};
     var t0 = +new Date;
     driver.runTests(mode.config, snapshot, report);
     mode.stats.duration = +new Date - t0;
@@ -90,12 +96,17 @@
 
   groupEnd();
 
+  var needsUpdate = false;
+
   function outputStats(name, stats) {
-    log(name + ":", stats.testsRun + " tests run in " + stats.duration + "ms; " +
-      (stats.failed ? stats.failed + " failures." : "all passed."));
+    log(name + ":", stats.testsRun + " tests run in " + stats.duration + "ms" +
+      (stats.failed ? "; " + stats.failed + " failures" : "") +
+      (stats.added ? "; " + stats.added + " new tests" : "") +
+      (stats.failed || stats.added ? "" : "; all passed") +
+      ".");
   }
 
-  var total = {testsRun: 0, failed: 0, duration: 0};
+  var total = {testsRun: 0, failed: 0, duration: 0, added: 0};
 
   group("Stats");
 
@@ -109,17 +120,18 @@
 
   groupEnd();
 
-  if (typeof process === "object") {
-    if (total.failed) {
-      process.stdout.write("", function() {
-        process.exit(1);
-      });
-    } else {
+  if (typeof process === "object" && (total.failed || total.added)) {
+    if (process.argv.indexOf('--update') >= 0) {
       require("fs").writeFileSync(
         __dirname + "/snapshot.js",
 
         "var snapshot = " +
-        JSON.stringify(snapshot, null, 2)
+        JSON.stringify(snapshot, function (key, value) {
+          if (value instanceof RegExp) {
+            return;
+          }
+          return value;
+        }, 2)
         .replace(/\u2028/g, '\\u2028')
         .replace(/\u2029/g, '\\u2029')
         .replace(/^(      \s*)"(.*?)":/igm, '$1$2:') +
@@ -127,6 +139,15 @@
         "\n" +
         "if (typeof module !== 'undefined') module.exports = snapshot;"
       );
+      console.log("Updated snapshot.")
+    } else {
+      console.log(
+        "New or failed test found. " +
+        "Run with --update to update snapshot if these changes are intentional."
+      )
+      process.stdout.write("", function() {
+        process.exit(1);
+      });
     }
   }
 })();
