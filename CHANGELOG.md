@@ -1,3 +1,9 @@
+## 5.1.1 (2017-07-06)
+
+### Bug fixes
+
+Fix problem with disambiguating regexp and division after a class.
+
 ## 5.1.0 (2017-07-05)
 
 ### Bug fixes
