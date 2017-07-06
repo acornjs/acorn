@@ -36,11 +36,12 @@ pp.initialContext = function() {
 }
 
 pp.braceIsBlock = function(prevType) {
-  if (prevType === tt.colon) {
-    let parent = this.curContext()
-    if (parent === types.b_stat || parent === types.b_expr)
-      return !parent.isExpr
-  }
+  let parent = this.curContext()
+  if (parent === types.f_expr || parent === types.f_stat)
+    return true
+  if (prevType === tt.colon && (parent === types.b_stat || parent === types.b_expr))
+    return !parent.isExpr
+
   // The check for `tt.name && exprAllowed` detects whether we are
   // after a `yield` or `of` construct. See the `updateContext` for
   // `tt.name`.
@@ -49,7 +50,7 @@ pp.braceIsBlock = function(prevType) {
   if (prevType === tt._else || prevType === tt.semi || prevType === tt.eof || prevType === tt.parenR || prevType == tt.arrow)
     return true
   if (prevType == tt.braceL)
-    return this.curContext() === types.b_stat
+    return parent === types.b_stat
   if (prevType == tt._var || prevType == tt.name)
     return false
   return !this.exprAllowed
@@ -108,7 +109,7 @@ tt.incDec.updateContext = function() {
   // tokExprAllowed stays unchanged
 }
 
-tt._function.updateContext = function(prevType) {
+tt._function.updateContext = tt._class.updateContext = function(prevType) {
   if (prevType.beforeExpr && prevType !== tt.semi && prevType !== tt._else &&
       !((prevType === tt.colon || prevType === tt.braceL) && this.curContext() === types.b_stat))
     this.context.push(types.f_expr)

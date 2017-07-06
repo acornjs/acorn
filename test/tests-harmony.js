@@ -15723,3 +15723,7 @@ test("(() => {}) + 2", {}, {ecmaVersion: 6})
 testFail("(x) => {} + 2", "Unexpected token (1:10)", {ecmaVersion: 6})
 
 test("function *f1() { function g() { return yield / 1 } }", {}, {ecmaVersion: 6})
+
+test("class Foo {} /regexp/", {}, {ecmaVersion: 6})
+
+test("(class Foo {} / 2)", {}, {ecmaVersion: 6})
