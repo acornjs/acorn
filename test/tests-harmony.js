@@ -15727,3 +15727,14 @@ test("function *f1() { function g() { return yield / 1 } }", {}, {ecmaVersion: 6
 test("class Foo {} /regexp/", {}, {ecmaVersion: 6})
 
 test("(class Foo {} / 2)", {}, {ecmaVersion: 6})
+
+test("1 <!--b", {
+  type: "Program",
+  body: [{
+    type: "ExpressionStatement",
+    expression: {
+      type: "BinaryExpression",
+      operator: "<"
+    }
+  }]
+}, {ecmaVersion: 6, sourceType: "module"})
