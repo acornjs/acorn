@@ -214,6 +214,12 @@ base.SwitchStatement = (node, st, c) => {
       c(cons, st, "Statement")
   }
 }
+base.SwitchCase = function(node, st, c) {
+  c(node.test, st, "Expression")
+  for (let cons of node.consequent)
+    c(cons, st, "Statement")
+  }
+}
 base.ReturnStatement = base.YieldExpression = base.AwaitExpression = (node, st, c) => {
   if (node.argument) c(node.argument, st, "Expression")
 }
