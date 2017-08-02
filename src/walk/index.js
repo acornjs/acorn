@@ -214,7 +214,7 @@ base.SwitchStatement = (node, st, c) => {
       c(cons, st, "Statement")
   }
 }
-base.SwitchCase = function(node, st, c) {
+base.SwitchCase = (node, st, c) => {
   c(node.test, st, "Expression")
   for (let cons of node.consequent)
     c(cons, st, "Statement")
