@@ -803,8 +803,11 @@ pp.checkUnreserved = function({start, end, name}) {
   if (this.options.ecmaVersion < 6 &&
     this.input.slice(start, end).indexOf("\\") != -1) return
   const re = this.strict ? this.reservedWordsStrict : this.reservedWords
-  if (re.test(name))
+  if (re.test(name)) {
+    if (!this.inAsync && name === "await")
+      this.raiseRecoverable(start, "Can not use keyword 'await' outside an async function")
     this.raiseRecoverable(start, `The keyword '${name}' is reserved`)
+  }
 }
 
 pp.parseIdent = function(liberal, isBinding) {

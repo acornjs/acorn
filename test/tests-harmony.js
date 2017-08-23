@@ -3868,7 +3868,7 @@ test("export var document = { }", {
   locations: true
 });
 
-testFail("export var await", "The keyword 'await' is reserved (1:11)", { ecmaVersion: 6, sourceType: "module" })
+testFail("export var await", "Can not use keyword 'await' outside an async function (1:11)", { ecmaVersion: 6, sourceType: "module" })
 
 test("export let document", {
   type: "Program",
@@ -14436,7 +14436,7 @@ test("var await = 0", {
   allowReserved: false,
   locations: true
 })
-testFail("var await = 0", "The keyword 'await' is reserved (1:4)", {
+testFail("var await = 0", "Can not use keyword 'await' outside an async function (1:4)", {
   ecmaVersion: 6,
   sourceType: "module",
   allowReserved: false,
