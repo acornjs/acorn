@@ -3517,3 +3517,5 @@ test(
   },
   {ecmaVersion: 8}
 )
+
+test("({ async delete() {} })", {}, {ecmaVersion: 8})

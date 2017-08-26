@@ -532,7 +532,7 @@ pp.parseTemplate = function({isTagged = false} = {}) {
 
 pp.isAsyncProp = function(prop) {
   return !prop.computed && prop.key.type === "Identifier" && prop.key.name === "async" &&
-    (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL) &&
+    (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL || this.type.keyword) &&
     !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
 }
 
