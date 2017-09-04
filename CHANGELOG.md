@@ -1,3 +1,11 @@
+## 5.1.2 (2017-09-04)
+
+### Bug fixes
+
+Disable parsing of legacy HTML-style comments in modules.
+
+Fix parsing of async methods whose names are keywords.
+
 ## 5.1.1 (2017-07-06)
 
 ### Bug fixes
