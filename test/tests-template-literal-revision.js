@@ -549,3 +549,8 @@ test("foo`\\unicode\\\\`", {
   ],
   sourceType: "script"
 }, {ecmaVersion: 9})
+
+test("`${ {class: 1} }`", {}, { ecmaVersion: 9 })
+test("`${ {delete: 1} }`", {}, { ecmaVersion: 9 })
+test("`${ {enum: 1} }`", {}, { ecmaVersion: 9 })
+test("`${ {function: 1} }`", {}, { ecmaVersion: 9 })

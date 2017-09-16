@@ -814,6 +814,13 @@ pp.parseIdent = function(liberal, isBinding) {
     node.name = this.value
   } else if (this.type.keyword) {
     node.name = this.type.keyword
+
+    // To fix https://github.com/ternjs/acorn/issues/575
+    // `class` and `function` keywords push new context into this.context.
+    // But there is no chance to pop the context if the keyword is consumed as an identifier such as a property name.
+    if (node.name === "class" || node.name === "function") {
+      this.context.pop()
+    }
   } else {
     this.unexpected()
   }
