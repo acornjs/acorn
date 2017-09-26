@@ -342,6 +342,10 @@ test("a-- ** 2", {
   "sourceType": "script"
 }, {ecmaVersion: 7})
 
+testFail("x %* y", "Unexpected token (1:3)", { ecmaVersion: 7 });
+
+testFail("x %*= y", "Unexpected token (1:3)", { ecmaVersion: 7 });
+
 testFail("function foo(a=2) { 'use strict'; }", "Illegal 'use strict' directive in function with non-simple parameter list (1:0)", { ecmaVersion: 7 })
 testFail("(a=2) => { 'use strict'; }", "Illegal 'use strict' directive in function with non-simple parameter list (1:0)", { ecmaVersion: 7 })
 testFail("function foo({a}) { 'use strict'; }", "Illegal 'use strict' directive in function with non-simple parameter list (1:0)", { ecmaVersion: 7 })

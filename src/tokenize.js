@@ -221,7 +221,7 @@ pp.readToken_mult_modulo_exp = function(code) { // '%*'
   let tokentype = code === 42 ? tt.star : tt.modulo
 
   // exponentiation operator ** and **=
-  if (this.options.ecmaVersion >= 7 && next === 42) {
+  if (this.options.ecmaVersion >= 7 && code == 42 && next === 42) {
     ++size
     tokentype = tt.starstar
     next = this.input.charCodeAt(this.pos + 2)
