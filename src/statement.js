@@ -21,6 +21,7 @@ pp.parseTopLevel = function(node) {
     let stmt = this.parseStatement(true, true, exports)
     node.body.push(stmt)
   }
+  this.adaptDirectivePrologue(node.body)
   this.next()
   if (this.options.ecmaVersion >= 6) {
     node.sourceType = this.options.sourceType
@@ -759,4 +760,20 @@ pp.parseImportSpecifiers = function() {
     nodes.push(this.finishNode(node, "ImportSpecifier"))
   }
   return nodes
+}
+
+// Set `ExpressionStatement#directive` property for directive prologues.
+pp.adaptDirectivePrologue = function(statements) {
+  for (let i = 0; i < statements.length && this.isDirectiveCandidate(statements[i]); ++i) {
+    statements[i].directive = statements[i].expression.raw.slice(1, -1)
+  }
+}
+pp.isDirectiveCandidate = function(statement) {
+  return (
+    statement.type === "ExpressionStatement" &&
+    statement.expression.type === "Literal" &&
+    typeof statement.expression.value === "string" &&
+    // Reject parenthesized strings.
+    (this.input[statement.start] === "\"" || this.input[statement.start] === "'")
+  )
 }

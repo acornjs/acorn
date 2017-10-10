@@ -9,6 +9,7 @@
     require("./tests-asyncawait.js");
     require("./tests-trailing-commas-in-func.js");
     require("./tests-template-literal-revision.js");
+    require("./tests-directive.js");
     acorn = require("../dist/acorn")
     require("../dist/acorn_loose")
   } else {

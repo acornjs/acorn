@@ -8,6 +8,7 @@ lp.parseTopLevel = function() {
   let node = this.startNodeAt(this.options.locations ? [0, getLineInfo(this.input, 0)] : 0)
   node.body = []
   while (this.tok.type !== tt.eof) node.body.push(this.parseStatement())
+  this.toks.adaptDirectivePrologue(node.body)
   this.last = this.tok
   if (this.options.ecmaVersion >= 6) {
     node.sourceType = this.options.sourceType
@@ -330,6 +331,7 @@ lp.parseFunction = function(node, isStatement, isAsync) {
   this.inAsync = node.async
   node.params = this.parseFunctionParams()
   node.body = this.parseBlock()
+  this.toks.adaptDirectivePrologue(node.body.body)
   this.inAsync = oldInAsync
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
