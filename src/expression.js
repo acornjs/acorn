@@ -734,6 +734,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && this.isSimpleParamList(node.params))
     node.body = this.parseBlock(false)
     node.expression = false
+    this.adaptDirectivePrologue(node.body.body)
     this.labels = oldLabels
   }
   this.exitFunctionScope()

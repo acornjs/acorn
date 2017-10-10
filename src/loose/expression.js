@@ -514,8 +514,8 @@ lp.parseMethod = function(isGenerator, isAsync) {
     node.async = !!isAsync
   this.inAsync = node.async
   node.params = this.parseFunctionParams()
-  node.expression = this.options.ecmaVersion >= 6 && this.tok.type !== tt.braceL
-  node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock()
+  node.body = this.parseBlock()
+  this.toks.adaptDirectivePrologue(node.body.body)
   this.inAsync = oldInAsync
   return this.finishNode(node, "FunctionExpression")
 }
@@ -528,7 +528,12 @@ lp.parseArrowExpression = function(node, params, isAsync) {
   this.inAsync = node.async
   node.params = this.toAssignableList(params, true)
   node.expression = this.tok.type !== tt.braceL
-  node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock()
+  if (node.expression) {
+    node.body = this.parseMaybeAssign()
+  } else {
+    node.body = this.parseBlock()
+    this.toks.adaptDirectivePrologue(node.body.body)
+  }
   this.inAsync = oldInAsync
   return this.finishNode(node, "ArrowFunctionExpression")
 }
