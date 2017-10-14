@@ -13402,6 +13402,60 @@ test("var {propName = defaultValue} = obj", {
   locations: true
 });
 
+test("var {get = defaultValue} = obj", {
+  type: "Program",
+  range: [0, 30],
+  body: [{
+    type: "VariableDeclaration",
+    range: [0, 30],
+    declarations: [{
+      type: "VariableDeclarator",
+      range: [4, 30],
+      id: {
+        type: "ObjectPattern",
+        range: [4, 24],
+        properties: [{
+          type: "Property",
+          range: [5, 23],
+          method: false,
+          shorthand: true,
+          computed: false,
+          key: {
+            type: "Identifier",
+            range: [5, 8],
+            name: "get"
+          },
+          kind: "init",
+          value: {
+            type: "AssignmentPattern",
+            range: [5, 23],
+            left: {
+              type: "Identifier",
+              range: [5, 8],
+              name: "get"
+            },
+            right: {
+              type: "Identifier",
+              range: [11, 23],
+              name: "defaultValue"
+            }
+          }
+        }]
+      },
+      init: {
+        type: "Identifier",
+        range: [27, 30],
+        name: "obj"
+      }
+    }],
+    kind: "var"
+  }]
+}, {
+  ecmaVersion: 6,
+  ranges: true,
+  locations: true
+});
+
 test("var [localVar = defaultValue] = obj", {
   type: "Program",
   range: [0, 35],

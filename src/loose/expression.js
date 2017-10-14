@@ -391,7 +391,7 @@ lp.parseObj = function() {
       prop.value = this.parseMethod(isGenerator, isAsync)
     } else if (this.options.ecmaVersion >= 5 && prop.key.type === "Identifier" &&
                !prop.computed && (prop.key.name === "get" || prop.key.name === "set") &&
-               (this.tok.type != tt.comma && this.tok.type != tt.braceR)) {
+               (this.tok.type != tt.comma && this.tok.type != tt.braceR && this.tok.type != tt.eq)) {
       prop.kind = prop.key.name
       this.parsePropertyName(prop)
       prop.value = this.parseMethod(false)
