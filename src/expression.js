@@ -296,12 +296,22 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   case tt._super:
     if (!this.inFunction)
       this.raise(this.start, "'super' outside of function or class")
-
-  case tt._this:
-    let type = this.type === tt._this ? "ThisExpression" : "Super"
     node = this.startNode()
     this.next()
-    return this.finishNode(node, type)
+    // The `super` keyword can appear at below:
+    // SuperProperty:
+    //     super [ Expression ]
+    //     super . IdentifierName
+    // SuperCall:
+    //     super Arguments
+    if (this.type !== tt.dot && this.type !== tt.bracketL && this.type !== tt.parenL)
+      this.unexpected()
+    return this.finishNode(node, "Super")
+
+  case tt._this:
+    node = this.startNode()
+    this.next()
+    return this.finishNode(node, "ThisExpression")
 
   case tt.name:
     let startPos = this.start, startLoc = this.startLoc
