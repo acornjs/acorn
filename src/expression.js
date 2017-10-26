@@ -556,29 +556,34 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
       if (this.afterTrailingComma(tt.braceR)) break
     } else first = false
 
-    let prop = this.startNode(), isGenerator, isAsync, startPos, startLoc
-    if (this.options.ecmaVersion >= 6) {
-      prop.method = false
-      prop.shorthand = false
-      if (isPattern || refDestructuringErrors) {
-        startPos = this.start
-        startLoc = this.startLoc
-      }
-      if (!isPattern)
-        isGenerator = this.eat(tt.star)
-    }
-    this.parsePropertyName(prop)
-    if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
-      isAsync = true
-      this.parsePropertyName(prop, refDestructuringErrors)
-    } else {
-      isAsync = false
-    }
-    this.parsePropertyValue(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
+    const prop = this.parseProperty(isPattern, refDestructuringErrors)
     this.checkPropClash(prop, propHash)
-    node.properties.push(this.finishNode(prop, "Property"))
+    node.properties.push(prop)
   }
   return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression")
+}
+
+pp.parseProperty = function(isPattern, refDestructuringErrors) {
+  let prop = this.startNode(), isGenerator, isAsync, startPos, startLoc
+  if (this.options.ecmaVersion >= 6) {
+    prop.method = false
+    prop.shorthand = false
+    if (isPattern || refDestructuringErrors) {
+      startPos = this.start
+      startLoc = this.startLoc
+    }
+    if (!isPattern)
+      isGenerator = this.eat(tt.star)
+  }
+  this.parsePropertyName(prop)
+  if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
+    isAsync = true
+    this.parsePropertyName(prop, refDestructuringErrors)
+  } else {
+    isAsync = false
+  }
+  this.parsePropertyValue(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
+  return this.finishNode(prop, "Property")
 }
 
 pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors) {
