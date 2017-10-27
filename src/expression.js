@@ -194,7 +194,7 @@ pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
 pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
   let startPos = this.start, startLoc = this.startLoc, expr
   if (this.inAsync && this.isContextual("await")) {
-    expr = this.parseAwait(refDestructuringErrors)
+    expr = this.parseAwait()
     sawUnary = true
   } else if (this.type.prefix) {
     let node = this.startNode(), update = this.type === tt.incDec
