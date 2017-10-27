@@ -15800,3 +15800,34 @@ testFail("class A extends B { foo() { (super).foo } }", "Unexpected token (1:34)
 test("({super: 1})", {}, { ecmaVersion: 6 })
 test("import {super as a} from 'a'", {}, { ecmaVersion: 6, sourceType: "module" })
 test("export {a as super}", {}, { ecmaVersion: 6, sourceType: "module" })
+test("let instanceof Foo", {
+  "type": "Program",
+  "start": 0,
+  "end": 18,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 18,
+      "expression": {
+        "type": "BinaryExpression",
+        "start": 0,
+        "end": 18,
+        "left": {
+          "type": "Identifier",
+          "start": 0,
+          "end": 3,
+          "name": "let"
+        },
+        "operator": "instanceof",
+        "right": {
+          "type": "Identifier",
+          "start": 15,
+          "end": 18,
+          "name": "Foo"
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
