@@ -7,7 +7,7 @@ const pp = Parser.prototype
 // Convert existing expression atom to assignable pattern
 // if possible.
 
-pp.toAssignable = function(node, isBinding) {
+pp.toAssignable = function(node, isBinding, refDestructuringErrors) {
   if (this.options.ecmaVersion >= 6 && node) {
     switch (node.type) {
     case "Identifier":
@@ -22,6 +22,7 @@ pp.toAssignable = function(node, isBinding) {
 
     case "ObjectExpression":
       node.type = "ObjectPattern"
+      if (refDestructuringErrors) this.checkPatternErrors(refDestructuringErrors, true)
       for (let prop of node.properties)
         this.toAssignable(prop, isBinding)
       break
@@ -34,6 +35,7 @@ pp.toAssignable = function(node, isBinding) {
 
     case "ArrayExpression":
       node.type = "ArrayPattern"
+      if (refDestructuringErrors) this.checkPatternErrors(refDestructuringErrors, true)
       this.toAssignableList(node.elements, isBinding)
       break
 
@@ -64,7 +66,7 @@ pp.toAssignable = function(node, isBinding) {
     default:
       this.raise(node.start, "Assigning to rvalue")
     }
-  }
+  } else if (refDestructuringErrors) this.checkPatternErrors(refDestructuringErrors, true)
   return node
 }
 
