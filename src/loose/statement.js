@@ -378,7 +378,6 @@ lp.parseImport = function() {
   if (this.tok.type === tt.string) {
     node.specifiers = []
     node.source = this.parseExprAtom()
-    node.kind = ""
   } else {
     let elt
     if (this.tok.type === tt.name && this.tok.value !== "from") {
