@@ -110,23 +110,19 @@ pp.parseRestBinding = function() {
 // Parses lvalue (assignable) atom.
 
 pp.parseBindingAtom = function() {
-  if (this.options.ecmaVersion < 6) return this.parseIdent()
-  switch (this.type) {
-  case tt.name:
-    return this.parseIdent()
+  if (this.options.ecmaVersion >= 6) {
+    switch (this.type) {
+    case tt.bracketL:
+      let node = this.startNode()
+      this.next()
+      node.elements = this.parseBindingList(tt.bracketR, true, true)
+      return this.finishNode(node, "ArrayPattern")
 
-  case tt.bracketL:
-    let node = this.startNode()
-    this.next()
-    node.elements = this.parseBindingList(tt.bracketR, true, true)
-    return this.finishNode(node, "ArrayPattern")
-
-  case tt.braceL:
-    return this.parseObj(true)
-
-  default:
-    this.unexpected()
+    case tt.braceL:
+      return this.parseObj(true)
+    }
   }
+  return this.parseIdent()
 }
 
 pp.parseBindingList = function(close, allowEmpty, allowTrailingComma) {

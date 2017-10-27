@@ -12692,13 +12692,13 @@ testFail("function hello() {'use strict'; ({ i: 10, s(eval) { } }); }", "Binding
 
 testFail("function a() { \"use strict\"; ({ b(t, t) { } }); }", "Argument name clash (1:37)", {ecmaVersion: 6});
 
-testFail("var super", "Unexpected token (1:4)", {ecmaVersion: 6});
+testFail("var super", "Unexpected keyword 'super' (1:4)", {ecmaVersion: 6});
 
-testFail("var default", "Unexpected token (1:4)", {ecmaVersion: 6});
+testFail("var default", "Unexpected keyword 'default' (1:4)", {ecmaVersion: 6});
 
 testFail("let default", "Unexpected token (1:4)", {ecmaVersion: 6});
 
-testFail("const default", "Unexpected token (1:6)", {ecmaVersion: 6});
+testFail("const default", "Unexpected keyword 'default' (1:6)", {ecmaVersion: 6});
 
 testFail("\"use strict\"; ({ v: eval } = obj)", "Assigning to eval in strict mode (1:20)", {ecmaVersion: 6});
 
@@ -12750,10 +12750,10 @@ testFail("yield 10", "Unexpected token (1:6)", {ecmaVersion: 6});
 
 testFail("void { [1, 2]: 3 };", "Unexpected token (1:9)", {ecmaVersion: 6});
 
-testFail("let [this] = [10]", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("let [this] = [10]", "Unexpected keyword 'this' (1:5)", {ecmaVersion: 6});
 testFail("let {this} = x", "Unexpected keyword 'this' (1:5)", {ecmaVersion: 6});
-testFail("let [function] = [10]", "Unexpected token (1:5)", {ecmaVersion: 6});
-testFail("let [function] = x", "Unexpected token (1:5)", {ecmaVersion: 6});
+testFail("let [function] = [10]", "Unexpected keyword 'function' (1:5)", {ecmaVersion: 6});
+testFail("let [function] = x", "Unexpected keyword 'function' (1:5)", {ecmaVersion: 6});
 testFail("([function] = [10])", "Unexpected token (1:10)", {ecmaVersion: 6});
 testFail("([this] = [10])", "Assigning to rvalue (1:2)", {ecmaVersion: 6});
 testFail("({this} = x)", "Unexpected keyword 'this' (1:2)", {ecmaVersion: 6});
