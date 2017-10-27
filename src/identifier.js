@@ -17,6 +17,8 @@ export const keywords = {
   6: ecma5AndLessKeywords + " const class extends export import super"
 }
 
+export const keywordRelationalOperator = /^in(stanceof)?$/
+
 // ## Character categories
 
 // Big ugly regular expressions that match characters in the

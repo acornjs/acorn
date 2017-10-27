@@ -1,7 +1,7 @@
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {lineBreak, skipWhiteSpace} from "./whitespace"
-import {isIdentifierStart, isIdentifierChar} from "./identifier"
+import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier"
 import {has} from "./util"
 import {DestructuringErrors} from "./parseutil"
 
@@ -41,7 +41,7 @@ pp.isLet = function() {
     let pos = next + 1
     while (isIdentifierChar(this.input.charCodeAt(pos), true)) ++pos
     let ident = this.input.slice(next, pos)
-    if (!this.isKeyword(ident)) return true
+    if (!keywordRelationalOperator.test(ident)) return true
   }
   return false
 }

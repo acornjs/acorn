@@ -12696,7 +12696,7 @@ testFail("var super", "Unexpected keyword 'super' (1:4)", {ecmaVersion: 6});
 
 testFail("var default", "Unexpected keyword 'default' (1:4)", {ecmaVersion: 6});
 
-testFail("let default", "Unexpected token (1:4)", {ecmaVersion: 6});
+testFail("let default", "Unexpected keyword 'default' (1:4)", {ecmaVersion: 6});
 
 testFail("const default", "Unexpected keyword 'default' (1:6)", {ecmaVersion: 6});
 
