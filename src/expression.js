@@ -538,13 +538,13 @@ pp.parseTemplate = function({isTagged = false} = {}) {
   return this.finishNode(node, "TemplateLiteral")
 }
 
-// Parse an object literal or binding pattern.
-
 pp.isAsyncProp = function(prop) {
   return !prop.computed && prop.key.type === "Identifier" && prop.key.name === "async" &&
     (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL || this.type.keyword) &&
     !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
 }
+
+// Parse an object literal or binding pattern.
 
 pp.parseObj = function(isPattern, refDestructuringErrors) {
   let node = this.startNode(), first = true, propHash = {}
@@ -801,10 +801,6 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructur
   return elts
 }
 
-// Parse the next token as an identifier. If `liberal` is true (used
-// when parsing properties), it will also convert keywords into
-// identifiers.
-
 pp.checkUnreserved = function({start, end, name}) {
   if (this.inGenerator && name === "yield")
     this.raiseRecoverable(start, "Can not use 'yield' as identifier inside a generator")
@@ -818,6 +814,10 @@ pp.checkUnreserved = function({start, end, name}) {
   if (re.test(name))
     this.raiseRecoverable(start, `The keyword '${name}' is reserved`)
 }
+
+// Parse the next token as an identifier. If `liberal` is true (used
+// when parsing properties), it will also convert keywords into
+// identifiers.
 
 pp.parseIdent = function(liberal, isBinding) {
   let node = this.startNode()
