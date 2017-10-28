@@ -28966,7 +28966,7 @@ test('var x = (1 + 2)', {}, {
       }
     },
     {
-      type: {binop: 9, prefix: true, beforeExpr: true},
+      type: tokTypes.plusMin,
       value: "+",
       loc: {
         start: {line: 1, column: 11},

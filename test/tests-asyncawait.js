@@ -3099,7 +3099,8 @@ test(
     body: [{
       type: "IfStatement",
       consequent: {
-        type: "FunctionDeclaration"
+        type: "FunctionDeclaration",
+        async: true
       },
       alternate: null
     }]

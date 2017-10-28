@@ -13183,7 +13183,8 @@ test("() => 42", {
   body: [{
     type: "ExpressionStatement",
     expression: {
-      type: "ArrowFunctionExpression"
+      type: "ArrowFunctionExpression",
+      expression: true
     }
   }]
 }, {ecmaVersion: 6, preserveParens: true});
@@ -14536,7 +14537,8 @@ test("(([,]) => 0)", {
         type: "Literal",
         value: 0,
         raw: "0"
-      }
+      },
+      expression: true
     }
   }]
 }, {ecmaVersion: 6});
@@ -15603,7 +15605,8 @@ test("function *f() { yield\n{}/1/g\n}", {
             "type": "ExpressionStatement",
             "expression": {
               "type": "YieldExpression",
-              "argument": null
+              "argument": null,
+              delegate: false
             }
           },
           {
@@ -15622,7 +15625,8 @@ test("function *f() { yield\n{}/1/g\n}", {
             }
           }
         ]
-      }
+      },
+      generator: true
     }
   ]
 }, {ecmaVersion: 6})
