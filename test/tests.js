@@ -29217,3 +29217,4 @@ test("try {} catch (foo) { function x(foo) {} }", {}, {ecmaVersion: 6})
 test("'use strict'; let foo = function foo() {}", {}, {ecmaVersion: 6})
 
 test("/**/ --> comment\n", {})
+test("x.class++", {})
