@@ -1,3 +1,9 @@
+## 5.2.1 (2017-10-30)
+
+### Bug fixes
+
+Fix a token context corruption bug.
+
 ## 5.2.0 (2017-10-30)
 
 ### Bug fixes
