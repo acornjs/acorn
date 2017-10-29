@@ -1,3 +1,21 @@
+## 5.2.0 (2017-10-30)
+
+### Bug fixes
+
+Fix token context tracking for `class` and `function` in property-name position.
+
+Make sure `%*` isn't parsed as a valid operator.
+
+The `full` and `fullAncestor` walkers no longer visit nodes multiple times.
+
+Allow shorthand properties `get` and `set` to be followed by default values.
+
+Disallow `super` when not in callee or object position.
+
+### New features
+
+Support [`directive` property](https://github.com/estree/estree/compare/b3de58c9997504d6fba04b72f76e6dd1619ee4eb...1da8e603237144f44710360f8feb7a9977e905e0) on directive expression statements.
+
 ## 5.1.2 (2017-09-04)
 
 ### Bug fixes
