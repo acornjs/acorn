@@ -29184,6 +29184,22 @@ test("0128", {
   ]
 })
 
+testFail("07.5", "Unexpected token (1:2)")
+
+test("08.5", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "Literal",
+        "value": 8.5,
+        "raw": "08.5"
+      }
+    }
+  ]
+})
+
 test("undefined", {}, { ecmaVersion: 8 })
 
 testFail("\\u{74}rue", "Escape sequence in keyword true (1:0)", {ecmaVersion: 6})

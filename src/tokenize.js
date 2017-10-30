@@ -475,30 +475,26 @@ pp.readRadixNumber = function(radix) {
 // Read an integer, octal integer, or floating-point number.
 
 pp.readNumber = function(startsWithDot) {
-  let start = this.pos, isFloat = false, octal = this.input.charCodeAt(this.pos) === 48
+  let start = this.pos
   if (!startsWithDot && this.readInt(10) === null) this.raise(start, "Invalid number")
-  if (octal && this.pos == start + 1) octal = false
+  let octal = this.pos - start >= 2 && this.input.charCodeAt(start) === 48
+  if (octal && this.strict) this.raise(start, "Invalid number")
+  if (octal && /[89]/.test(this.input.slice(start, this.pos))) octal = false
   let next = this.input.charCodeAt(this.pos)
   if (next === 46 && !octal) { // '.'
     ++this.pos
     this.readInt(10)
-    isFloat = true
     next = this.input.charCodeAt(this.pos)
   }
   if ((next === 69 || next === 101) && !octal) { // 'eE'
     next = this.input.charCodeAt(++this.pos)
     if (next === 43 || next === 45) ++this.pos // '+-'
     if (this.readInt(10) === null) this.raise(start, "Invalid number")
-    isFloat = true
   }
   if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
 
-  let str = this.input.slice(start, this.pos), val
-  if (isFloat) val = parseFloat(str)
-  else if (!octal || str.length === 1) val = parseInt(str, 10)
-  else if (this.strict) this.raise(start, "Invalid number")
-  else if (/[89]/.test(str)) val = parseInt(str, 10)
-  else val = parseInt(str, 8)
+  let str = this.input.slice(start, this.pos)
+  let val = octal ? parseInt(str, 8) : parseFloat(str)
   return this.finishToken(tt.num, val)
 }
 
