@@ -557,7 +557,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
     } else first = false
 
     const prop = this.parseProperty(isPattern, refDestructuringErrors)
-    this.checkPropClash(prop, propHash)
+    if (!isPattern) this.checkPropClash(prop, propHash)
     node.properties.push(prop)
   }
   return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression")

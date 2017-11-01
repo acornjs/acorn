@@ -15835,3 +15835,5 @@ test("let instanceof Foo", {
   ],
   "sourceType": "script"
 }, {ecmaVersion: 6})
+
+test("function fn({__proto__: a, __proto__: b}) {}", {}, {ecmaVersion: 6})
