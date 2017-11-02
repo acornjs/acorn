@@ -198,7 +198,7 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
     break
 
   case "MemberExpression":
-    if (bindingType) this.raiseRecoverable(expr.start, (bindingType ? "Binding" : "Assigning to") + " member expression")
+    if (bindingType) this.raiseRecoverable(expr.start, "Binding member expression")
     break
 
   case "ObjectPattern":
