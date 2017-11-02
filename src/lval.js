@@ -22,10 +22,14 @@ pp.toAssignable = function(node, isBinding) {
 
     case "ObjectExpression":
       node.type = "ObjectPattern"
-      for (let prop of node.properties) {
-        if (prop.kind !== "init") this.raise(prop.key.start, "Object pattern can't contain getter or setter")
-        this.toAssignable(prop.value, isBinding)
-      }
+      for (let prop of node.properties)
+        this.toAssignable(prop, isBinding)
+      break
+
+    case "Property":
+      // AssignmentProperty has type == "Property"
+      if (node.kind !== "init") this.raise(node.key.start, "Object pattern can't contain getter or setter")
+      this.toAssignable(node.value, isBinding)
       break
 
     case "ArrayExpression":
@@ -200,7 +204,12 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
 
   case "ObjectPattern":
     for (let prop of expr.properties)
-      this.checkLVal(prop.value, bindingType, checkClashes)
+      this.checkLVal(prop, bindingType, checkClashes)
+    break
+
+  case "Property":
+    // AssignmentProperty has type == "Property"
+    this.checkLVal(expr.value, bindingType, checkClashes)
     break
 
   case "ArrayPattern":
