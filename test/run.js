@@ -5,6 +5,7 @@
     driver = require("./driver.js");
     require("./tests.js");
     require("./tests-harmony.js");
+    require("./tests-es5.js");
     require("./tests-es7.js");
     require("./tests-asyncawait.js");
     require("./tests-trailing-commas-in-func.js");

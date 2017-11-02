@@ -27065,30 +27065,6 @@ testFail("({ set: s(a, b) { } })",
 testFail("({ get: g(d) { } })",
          "Unexpected token (1:13)");
 
-testFail("({ get i() { }, i: 42 })",
-         "Redefinition of property (1:16)");
-
-testFail("({ i: 42, get i() { } })",
-         "Redefinition of property (1:14)");
-
-testFail("({ set i(x) { }, i: 42 })",
-         "Redefinition of property (1:17)");
-
-testFail("({ i: 42, set i(x) { } })",
-         "Redefinition of property (1:14)");
-
-testFail("({ get i() { }, get i() { } })",
-         "Redefinition of property (1:20)");
-
-testFail("({ set i(x) { }, set i(x) { } })",
-         "Redefinition of property (1:21)");
-
-testFail("'use strict'; ({ __proto__: 1, __proto__: 2 })",
-         "Redefinition of property (1:31)");
-
-testFail("function t(...) { }",
-         "Unexpected token (1:11)");
-
 testFail("function t(...) { }",
          "Unexpected token (1:14)",
          { ecmaVersion: 6 });
@@ -27186,9 +27162,6 @@ testFail("try { }",
 
 testFail("‿ = 10",
          "Unexpected character '‿' (1:0)");
-
-testFail("if(true) let a = 1;",
-         "Unexpected token (1:13)");
 
 testFail("switch (c) { default: default: }",
          "Multiple default clauses (1:22)");
@@ -27314,12 +27287,6 @@ testFail("function x() { '\\12'; 'use strict'; }", "Octal literal in strict mode
 
 testFail("(function () { 'use strict'; with (i); }())",
          "'with' in strict mode (1:29)");
-
-testFail("function hello() {'use strict'; ({ i: 42, i: 42 }) }",
-         "Redefinition of property (1:42)");
-
-testFail("function hello() {'use strict'; ({ hasOwnProperty: 42, hasOwnProperty: 42 }) }",
-         "Redefinition of property (1:55)");
 
 testFail("function hello() {'use strict'; var eval = 10; }",
          "Binding eval in strict mode (1:36)");
@@ -27495,81 +27462,6 @@ testFail("\"use strict\";function foo(){\"use strict\";}function bar(){var v = 0
 testFail("var this = 10;", "Unexpected keyword 'this' (1:4)");
 
 testFail("throw\n10;", "Illegal newline after throw (1:5)");
-
-
-// ECMA < 6 mode should work as before
-
-testFail("const a;", "The keyword 'const' is reserved (1:0)");
-
-testFail("let x;", "Unexpected token (1:4)");
-
-testFail("const a = 1;", "The keyword 'const' is reserved (1:0)");
-
-testFail("let a = 1;", "Unexpected token (1:4)");
-
-testFail("for(const x = 0;;);", "The keyword 'const' is reserved (1:4)");
-
-testFail("for(let x = 0;;);", "Unexpected token (1:8)");
-
-testFail("function a(b = c) {}", "Unexpected token (1:13)")
-
-test("let++", {
-  type: "Program",
-  loc: {
-    start: {
-      line: 1,
-      column: 0
-    },
-    end: {
-      line: 1,
-      column: 5
-    }
-  },
-  body: [
-    {
-      type: "ExpressionStatement",
-      loc: {
-        start: {
-          line: 1,
-          column: 0
-        },
-        end: {
-          line: 1,
-          column: 5
-        }
-      },
-      expression: {
-        type: "UpdateExpression",
-        loc: {
-          start: {
-            line: 1,
-            column: 0
-          },
-          end: {
-            line: 1,
-            column: 5
-          }
-        },
-        operator: "++",
-        prefix: false,
-        argument: {
-          type: "Identifier",
-          loc: {
-            start: {
-              line: 1,
-              column: 0
-            },
-            end: {
-              line: 1,
-              column: 3
-            }
-          },
-          name: "let"
-        }
-      }
-    }
-  ]
-});
 
 // ECMA 6 support
 
@@ -28827,10 +28719,6 @@ test("for(const x = 0;;);", {
   range: [0, 19]
 }, {ecmaVersion: 6, ranges: true});
 
-testFail("for(x of a);", "Unexpected token (1:6)");
-
-testFail("for(var x of a);", "Unexpected token (1:10)");
-
 // Assertion Tests
 test(function TestComments() {
     // Bear class
@@ -29126,8 +29014,6 @@ test("/[a-z]/gim", {
     }
   ]
 });
-testFail("/[a-z]/u", "Invalid regular expression flag (1:1)");
-testFail("/[a-z]/y", "Invalid regular expression flag (1:1)");
 testFail("/[a-z]/s", "Invalid regular expression flag (1:1)");
 
 testFail("function(){}", "Unexpected token (1:8)");
