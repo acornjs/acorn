@@ -17,6 +17,7 @@ pp.toAssignable = function(node, isBinding) {
 
     case "ObjectPattern":
     case "ArrayPattern":
+    case "RestElement":
       break
 
     case "ObjectExpression":
@@ -30,6 +31,11 @@ pp.toAssignable = function(node, isBinding) {
     case "ArrayExpression":
       node.type = "ArrayPattern"
       this.toAssignableList(node.elements, isBinding)
+      break
+
+    case "SpreadElement":
+      node.type = "RestElement"
+      this.toAssignable(node.argument, isBinding)
       break
 
     case "AssignmentExpression":
@@ -64,23 +70,14 @@ pp.toAssignable = function(node, isBinding) {
 
 pp.toAssignableList = function(exprList, isBinding) {
   let end = exprList.length
-  if (end) {
-    let last = exprList[end - 1]
-    if (last && last.type == "RestElement") {
-      --end
-    } else if (last && last.type == "SpreadElement") {
-      last.type = "RestElement"
-      let arg = last.argument
-      this.toAssignable(arg, isBinding)
-      --end
-    }
-
-    if (this.options.ecmaVersion === 6 && isBinding && last && last.type === "RestElement" && last.argument.type !== "Identifier")
-      this.unexpected(last.argument.start)
-  }
   for (let i = 0; i < end; i++) {
     let elt = exprList[i]
     if (elt) this.toAssignable(elt, isBinding)
+  }
+  if (end) {
+    let last = exprList[end - 1]
+    if (this.options.ecmaVersion === 6 && isBinding && last && last.type === "RestElement" && last.argument.type !== "Identifier")
+      this.unexpected(last.argument.start)
   }
   return exprList
 }

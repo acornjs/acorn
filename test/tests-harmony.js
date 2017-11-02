@@ -10592,6 +10592,7 @@ test("function x({ a, b }){}", {
 });
 
 testFail("function x(...[ a, b ]){}", "Unexpected token (1:14)", {ecmaVersion: 6});
+testFail("(([...[ a, b ]]) => {})", "Unexpected token (1:6)", {ecmaVersion: 6});
 
 testFail("function x({ a: { w, x }, b: [y, z] }, ...[a, b, c]){}", "Unexpected token (1:42)", {ecmaVersion: 6});
 
