@@ -443,10 +443,12 @@ looseParser.extend("readToken", function(nextMethod) {
 ### Existing plugins
 
  - [`acorn-jsx`](https://github.com/RReverser/acorn-jsx): Parse [Facebook JSX syntax extensions](https://github.com/facebook/jsx)
- - [`acorn-es7-plugin`](https://github.com/MatAtBread/acorn-es7-plugin/): Parse [async/await syntax proposal](https://github.com/tc39/ecmascript-asyncawait)
- - [`acorn-object-spread`](https://github.com/UXtemple/acorn-object-spread): Parse [object spread syntax proposal](https://github.com/sebmarkbage/ecmascript-rest-spread)
- - [`acorn-es7`](https://www.npmjs.com/package/acorn-es7): Parse [decorator syntax proposal](https://github.com/wycats/javascript-decorators)
- - [`acorn-objj`](https://www.npmjs.com/package/acorn-objj): [Objective-J](http://www.cappuccino-project.org/learn/objective-j.html) language parser built as Acorn plugin
- - [`acorn-object-rest-spread`](https://github.com/victor-homyakov/acorn-object-rest-spread) Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread), works with latest Acorn version (5.0.3)
- - [`acorn-static-class-property-initializer`](https://github.com/victor-homyakov/acorn-static-class-property-initializer) Partial support for static class properties from [ES Class Fields & Static Properties Proposal](https://github.com/tc39/proposal-class-public-fields) to support static property initializers in [React components written as ES6+ classes](https://babeljs.io/blog/2015/06/07/react-on-es6-plus)
+ - [`acorn-objj`](https://github.com/cappuccino/acorn-objj): [Objective-J](http://www.cappuccino-project.org/learn/objective-j.html) language parser built as Acorn plugin
  
+ Plugins for ECMAScript proposals:
+ 
+ - [`acorn-object-rest-spread`](https://github.com/victor-homyakov/acorn-object-rest-spread): Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread)
+ - [`acorn5-object-spread`](https://github.com/adrianheine/acorn5-object-spread`): Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread)
+ - [`acorn-es7`](https://github.com/angelozerr/acorn-es7): Parse [decorator syntax proposal](https://github.com/wycats/javascript-decorators)
+ - [`acorn-static-class-property-initializer`](https://github.com/victor-homyakov/acorn-static-class-property-initializer): Partial support for static class properties from [ES Class Fields & Static Properties Proposal](https://github.com/tc39/proposal-class-public-fields) to support static property initializers in [React components written as ES6+ classes](https://babeljs.io/blog/2015/06/07/react-on-es6-plus)
+ - [`acorn-dynamic-import`](https://github.com/kesne/acorn-dynamic-import): Parse [import() proposal](https://github.com/tc39/proposal-dynamic-import)
