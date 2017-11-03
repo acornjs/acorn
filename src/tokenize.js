@@ -291,12 +291,12 @@ pp.readToken_eq_excl = function(code) { // '=!'
 
 pp.getTokenFromCode = function(code) {
   switch (code) {
-    // The interpretation of a dot depends on whether it is followed
-    // by a digit or another two dots.
+  // The interpretation of a dot depends on whether it is followed
+  // by a digit or another two dots.
   case 46: // '.'
     return this.readToken_dot()
 
-    // Punctuation tokens.
+  // Punctuation tokens.
   case 40: ++this.pos; return this.finishToken(tt.parenL)
   case 41: ++this.pos; return this.finishToken(tt.parenR)
   case 59: ++this.pos; return this.finishToken(tt.semi)
@@ -320,19 +320,20 @@ pp.getTokenFromCode = function(code) {
       if (next === 111 || next === 79) return this.readRadixNumber(8) // '0o', '0O' - octal number
       if (next === 98 || next === 66) return this.readRadixNumber(2) // '0b', '0B' - binary number
     }
-    // Anything else beginning with a digit is an integer, octal
-    // number, or float.
+
+  // Anything else beginning with a digit is an integer, octal
+  // number, or float.
   case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: // 1-9
     return this.readNumber(false)
 
-    // Quotes produce strings.
+  // Quotes produce strings.
   case 34: case 39: // '"', "'"
     return this.readString(code)
 
-    // Operators are parsed inline in tiny state machines. '=' (61) is
-    // often referred to. `finishOp` simply skips the amount of
-    // characters it is given as second argument, and returns a token
-    // of the type given by its first argument.
+  // Operators are parsed inline in tiny state machines. '=' (61) is
+  // often referred to. `finishOp` simply skips the amount of
+  // characters it is given as second argument, and returns a token
+  // of the type given by its first argument.
 
   case 47: // '/'
     return this.readToken_slash()
