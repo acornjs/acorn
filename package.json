@@ -46,8 +46,8 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
-    "rollup": "^0.43.0",
-    "rollup-plugin-buble": "^0.15.0",
+    "rollup": "^0.45.0",
+    "rollup-plugin-buble": "^0.16.0",
     "unicode-9.0.0": "^0.7.0"
   }
 }
