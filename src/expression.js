@@ -406,7 +406,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
 
     let innerStartPos = this.start, innerStartLoc = this.startLoc
     let exprList = [], first = true, lastIsComma = false
-    let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, spreadStart, innerParenStart
+    let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, spreadStart
     this.yieldPos = 0
     this.awaitPos = 0
     while (this.type !== tt.parenR) {
@@ -420,9 +420,6 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
         if (this.type === tt.comma) this.raise(this.start, "Comma is not permitted after the rest element")
         break
       } else {
-        if (this.type === tt.parenL && !innerParenStart) {
-          innerParenStart = this.start
-        }
         exprList.push(this.parseMaybeAssign(false, refDestructuringErrors, this.parseParenItem))
       }
     }
@@ -432,7 +429,6 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
       this.checkPatternErrors(refDestructuringErrors, false)
       this.checkYieldAwaitInDefaultParams()
-      if (innerParenStart) this.unexpected(innerParenStart)
       this.yieldPos = oldYieldPos
       this.awaitPos = oldAwaitPos
       return this.parseParenArrowList(startPos, startLoc, exprList)
