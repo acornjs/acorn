@@ -43,15 +43,11 @@ pp.toAssignable = function(node, isBinding) {
       break
 
     case "AssignmentExpression":
-      if (node.operator === "=") {
-        node.type = "AssignmentPattern"
-        delete node.operator
-        this.toAssignable(node.left, isBinding)
-        // falls through to AssignmentPattern
-      } else {
-        this.raise(node.left.end, "Only '=' operator can be used for specifying default value.")
-        break
-      }
+      if (node.operator !== "=") this.raise(node.left.end, "Only '=' operator can be used for specifying default value.")
+      node.type = "AssignmentPattern"
+      delete node.operator
+      this.toAssignable(node.left, isBinding)
+      // falls through to AssignmentPattern
 
     case "AssignmentPattern":
       break

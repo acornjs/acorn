@@ -358,11 +358,12 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
   for (let i = this.labels.length - 1; i >= 0; i--) {
     let label = this.labels[i]
     if (label.statementStart == node.start) {
+      // Update information about previous labels on this node
       label.statementStart = this.start
       label.kind = kind
     } else break
   }
-  this.labels.push({name: maybeName, kind: kind, statementStart: this.start})
+  this.labels.push({name: maybeName, kind, statementStart: this.start})
   node.body = this.parseStatement(true)
   if (node.body.type == "ClassDeclaration" ||
       node.body.type == "VariableDeclaration" && node.body.kind != "var" ||
@@ -595,7 +596,8 @@ pp.parseExport = function(node, exports) {
   // export * from '...'
   if (this.eat(tt.star)) {
     this.expectContextual("from")
-    node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected()
+    if (this.type !== tt.string) this.unexpected()
+    node.source = this.parseExprAtom()
     this.semicolon()
     return this.finishNode(node, "ExportAllDeclaration")
   }
@@ -629,7 +631,8 @@ pp.parseExport = function(node, exports) {
     node.declaration = null
     node.specifiers = this.parseExportSpecifiers(exports)
     if (this.eatContextual("from")) {
-      node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected()
+      if (this.type !== tt.string) this.unexpected()
+      node.source = this.parseExprAtom()
     } else {
       // check for keywords used as local names
       for (let spec of node.specifiers) {
