@@ -3132,6 +3132,105 @@ test("[a, b] = [b, a]", {
   locations: true
 });
 
+test("[a.r] = b", {
+  "type": "Program",
+  "start": 0,
+  "end": 9,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 9,
+      "expression": {
+        "type": "AssignmentExpression",
+        "start": 0,
+        "end": 9,
+        "operator": "=",
+        "left": {
+          "type": "ArrayPattern",
+          "start": 0,
+          "end": 5,
+          "elements": [
+            {
+              "type": "MemberExpression",
+              "start": 1,
+              "end": 4,
+              "object": {
+                "type": "Identifier",
+                "start": 1,
+                "end": 2,
+                "name": "a"
+              },
+              "property": {
+                "type": "Identifier",
+                "start": 3,
+                "end": 4,
+                "name": "r"
+              },
+              "computed": false
+            }
+          ]
+        },
+        "right": {
+          "type": "Identifier",
+          "start": 8,
+          "end": 9,
+          "name": "b"
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
+
+test("let [a,,b] = c", {
+  "type": "Program",
+  "start": 0,
+  "end": 14,
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "start": 0,
+      "end": 14,
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 4,
+          "end": 14,
+          "id": {
+            "type": "ArrayPattern",
+            "start": 4,
+            "end": 10,
+            "elements": [
+              {
+                "type": "Identifier",
+                "start": 5,
+                "end": 6,
+                "name": "a"
+              },
+              null,
+              {
+                "type": "Identifier",
+                "start": 8,
+                "end": 9,
+                "name": "b"
+              }
+            ]
+          },
+          "init": {
+            "type": "Identifier",
+            "start": 13,
+            "end": 14,
+            "name": "c"
+          }
+        }
+      ],
+      "kind": "let"
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
+
 test("({ responseText: text } = res)", {
   type: "Program",
   body: [{
@@ -6762,6 +6861,64 @@ test("class A { static *gen(v) { yield v; }}", {
   ranges: true,
   locations: true
 });
+
+testFail("(class { *static x() {} })", "Unexpected token (1:17)", {ecmaVersion: 6});
+test("(class { *static() {} })", {
+  "type": "Program",
+  "start": 0,
+  "end": 24,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 24,
+      "expression": {
+        "type": "ClassExpression",
+        "start": 1,
+        "end": 23,
+        "id": null,
+        "superClass": null,
+        "body": {
+          "type": "ClassBody",
+          "start": 7,
+          "end": 23,
+          "body": [
+            {
+              "type": "MethodDefinition",
+              "start": 9,
+              "end": 21,
+              "computed": false,
+              "key": {
+                "type": "Identifier",
+                "start": 10,
+                "end": 16,
+                "name": "static"
+              },
+              "static": false,
+              "kind": "method",
+              "value": {
+                "type": "FunctionExpression",
+                "start": 16,
+                "end": 21,
+                "id": null,
+                "generator": true,
+                "expression": false,
+                "params": [],
+                "body": {
+                  "type": "BlockStatement",
+                  "start": 19,
+                  "end": 21,
+                  "body": []
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6});
 
 test("\"use strict\"; (class A {constructor() { super() }})", {
   type: "Program",
@@ -10595,6 +10752,7 @@ testFail("function x(...[ a, b ]){}", "Unexpected token (1:14)", {ecmaVersion: 6
 testFail("(([...[ a, b ]]) => {})", "Unexpected token (1:6)", {ecmaVersion: 6});
 
 testFail("function x({ a: { w, x }, b: [y, z] }, ...[a, b, c]){}", "Unexpected token (1:42)", {ecmaVersion: 6});
+testFail("(function ({ a(){} }) {})", "Unexpected token (1:14)", {ecmaVersion: 6});
 
 test("(function x([ a, b ]){})", {
   type: "Program",
@@ -13744,6 +13902,8 @@ testFail("obj = {x = 0}", "Shorthand property assignments are valid only in dest
 
 testFail("f({x = 0})", "Shorthand property assignments are valid only in destructuring patterns (1:5)", {ecmaVersion: 6});
 
+testFail("(localVar |= defaultValue) => {}", "Only '=' operator can be used for specifying default value. (1:9)", {loose: false, ecmaVersion: 6});
+
 // https://github.com/ternjs/acorn/issues/191
 
 test("try {} catch ({message}) {}", {
@@ -15648,6 +15808,8 @@ test("export { default as y } from './y.js';\nexport default 42;",
 testFail("export { default} from './y.js';\nexport default 42;",
          "Duplicate export 'default' (2:7)",
          {sourceType: "module", ecmaVersion: 6})
+testFail("export * from foo", "Unexpected token (1:14)", {sourceType: "module", ecmaVersion: 6, loose: false});
+testFail("export { bar } from foo", "Unexpected token (1:20)", {sourceType: "module", ecmaVersion: 6, loose: false});
 
 testFail("foo: class X {}", "Invalid labeled declaration (1:5)", {ecmaVersion: 6})
 

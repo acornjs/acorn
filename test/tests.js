@@ -20720,6 +20720,57 @@ test("done: while (true) { break done; }", {
   }
 });
 
+test("done: switch (a) { default: break done }", {
+  "type": "Program",
+  "start": 0,
+  "end": 40,
+  "body": [
+    {
+      "type": "LabeledStatement",
+      "start": 0,
+      "end": 40,
+      "body": {
+        "type": "SwitchStatement",
+        "start": 6,
+        "end": 40,
+        "discriminant": {
+          "type": "Identifier",
+          "start": 14,
+          "end": 15,
+          "name": "a"
+        },
+        "cases": [
+          {
+            "type": "SwitchCase",
+            "start": 19,
+            "end": 38,
+            "consequent": [
+              {
+                "type": "BreakStatement",
+                "start": 28,
+                "end": 38,
+                "label": {
+                  "type": "Identifier",
+                  "start": 34,
+                  "end": 38,
+                  "name": "done"
+                }
+              }
+            ],
+            "test": null
+          }
+        ]
+      },
+      "label": {
+        "type": "Identifier",
+        "start": 0,
+        "end": 4,
+        "name": "done"
+      }
+    }
+  ]
+});
+
 test("target1: target2: while (true) { continue target1; }", {});
 test("target1: target2: target3: while (true) { continue target1; }", {});
 
@@ -26387,6 +26438,55 @@ test("foo: if (true) break foo;", {
   ]
 });
 
+test("a: { b: switch(x) {} }", {
+  "type": "Program",
+  "start": 0,
+  "end": 22,
+  "body": [
+    {
+      "type": "LabeledStatement",
+      "start": 0,
+      "end": 22,
+      "body": {
+        "type": "BlockStatement",
+        "start": 3,
+        "end": 22,
+        "body": [
+          {
+            "type": "LabeledStatement",
+            "start": 5,
+            "end": 20,
+            "body": {
+              "type": "SwitchStatement",
+              "start": 8,
+              "end": 20,
+              "discriminant": {
+                "type": "Identifier",
+                "start": 15,
+                "end": 16,
+                "name": "x"
+              },
+              "cases": []
+            },
+            "label": {
+              "type": "Identifier",
+              "start": 5,
+              "end": 6,
+              "name": "b"
+            }
+          }
+        ]
+      },
+      "label": {
+        "type": "Identifier",
+        "start": 0,
+        "end": 1,
+        "name": "a"
+      }
+    }
+  ]
+});
+
 test("(function () {\n 'use strict';\n '\0';\n}())", {
   type: "Program",
   loc: {
@@ -27511,7 +27611,11 @@ testFail("for(const x = 0;;);", "The keyword 'const' is reserved (1:4)");
 
 testFail("for(let x = 0;;);", "Unexpected token (1:8)");
 
-testFail("function a(b = c) {}", "Unexpected token (1:13)")
+testFail("function a(b = c) {}", "Unexpected token (1:13)");
+
+testFail("switch (x) { something }", "Unexpected token (1:13)");
+
+testFail("`abc`", "Unexpected character '`' (1:0)", {ecmaVersion: 5});
 
 test("let++", {
   type: "Program",
