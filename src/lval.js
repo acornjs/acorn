@@ -169,7 +169,7 @@ pp.parseMaybeDefault = function(startPos, startLoc, left) {
 // 'let' indicating that the lval creates a lexical ('let' or 'const') binding
 // 'none' indicating that the binding should be checked for illegal identifiers, but not for duplicate references
 
-pp.checkLVal = function(expr, bindingType, checkClashes) {
+pp.checkLVal = function(expr, bindingType, checkClashes, allowCatchParamNameRedeclaration) {
   switch (expr.type) {
   case "Identifier":
     if (this.strict && this.reservedWordsStrictBind.test(expr.name))
@@ -181,7 +181,7 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
     }
     if (bindingType && bindingType !== "none") {
       if (
-        bindingType === "var" && !this.canDeclareVarName(expr.name) ||
+        bindingType === "var" && !this.canDeclareVarName(expr.name, allowCatchParamNameRedeclaration) ||
         bindingType !== "var" && !this.canDeclareLexicalName(expr.name)
       ) {
         this.raiseRecoverable(expr.start, `Identifier '${expr.name}' has already been declared`)
@@ -200,30 +200,30 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
 
   case "ObjectPattern":
     for (let prop of expr.properties)
-      this.checkLVal(prop, bindingType, checkClashes)
+      this.checkLVal(prop, bindingType, checkClashes, allowCatchParamNameRedeclaration)
     break
 
   case "Property":
     // AssignmentProperty has type == "Property"
-    this.checkLVal(expr.value, bindingType, checkClashes)
+    this.checkLVal(expr.value, bindingType, checkClashes, allowCatchParamNameRedeclaration)
     break
 
   case "ArrayPattern":
     for (let elem of expr.elements) {
-      if (elem) this.checkLVal(elem, bindingType, checkClashes)
+      if (elem) this.checkLVal(elem, bindingType, checkClashes, allowCatchParamNameRedeclaration)
     }
     break
 
   case "AssignmentPattern":
-    this.checkLVal(expr.left, bindingType, checkClashes)
+    this.checkLVal(expr.left, bindingType, checkClashes, allowCatchParamNameRedeclaration)
     break
 
   case "RestElement":
-    this.checkLVal(expr.argument, bindingType, checkClashes)
+    this.checkLVal(expr.argument, bindingType, checkClashes, allowCatchParamNameRedeclaration)
     break
 
   case "ParenthesizedExpression":
-    this.checkLVal(expr.expression, bindingType, checkClashes)
+    this.checkLVal(expr.expression, bindingType, checkClashes, allowCatchParamNameRedeclaration)
     break
 
   default:
