@@ -50,7 +50,7 @@
     "results-interpreter": "^1.0.0",
     "rollup": "^0.45.0",
     "rollup-plugin-buble": "^0.16.0",
-    "test262": "git://github.com:tc39/test262.git#c4e3d12",
+    "test262": "git+https://git@github.com/tc39/test262.git#c4e3d12",
     "test262-stream": "^1.0.0",
     "unicode-9.0.0": "^0.7.0"
   }
