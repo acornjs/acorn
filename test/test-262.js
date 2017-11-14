@@ -9,12 +9,33 @@ const parse = require("..").parse
 
 const TestStream = require("test262-stream")
 const Interpreter = require("results-interpreter")
+const skippedFeatures = [
+  "object-spread",
+  "object-rest",
+  "regexp-named-groups",
+  "BigInt",
+  "async-iteration",
+  "class-fields",
+  "regexp-unicode-property-escapes",
+  "regexp-lookbehind",
+  "regexp-dotall",
+  "optional-catch-binding"
+]
 
 const stream = new TestStream(testDir)
 const {Transform} = require("stream")
 const results = new Transform({
   objectMode: true,
   transform(test, encoding, done) {
+    const features = test.attrs.features;
+    const skip = features &&
+      features.some((feature) => skippedFeatures.indexOf(feature) > -1);
+
+    if (skip) {
+      done();
+      return;
+    }
+
     const result = {
       id: test.file + "(" + test.scenario + ")",
       expected: test.attrs.negative && test.attrs.negative.phase === "early"
@@ -40,6 +61,7 @@ const interpreter = new Interpreter(whitelistFile, {
 })
 
 console.log("Now running tests...")
+console.log(`(skipping the following features: ${skippedFeatures.join(", ")})`);
 if (shouldUpdate) {
   console.log(
     "The whitelist file will be updated according to the results of this " +
