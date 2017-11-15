@@ -555,6 +555,8 @@ pp.parseClass = function(node, isStatement) {
         if (isAsync) this.raise(key.start, "Constructor can't be an async method")
         method.kind = "constructor"
         hadConstructor = true
+      } else if (method.static && key.type === "Identifier" && key.name === "prototype") {
+        this.raise(key.start, "Classes may not have a static property named prototype")
       }
     }
     this.parseClassMethod(classBody, method, isGenerator, isAsync)

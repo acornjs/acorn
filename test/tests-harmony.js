@@ -5084,6 +5084,10 @@ testFail("import * as class from 'foo'", "Unexpected keyword 'class' (1:12)", {e
 testFail("import { enum } from 'foo'", "The keyword 'enum' is reserved (1:9)", {ecmaVersion: 6, sourceType: "module" });
 testFail("import { a as enum } from 'foo'", "The keyword 'enum' is reserved (1:14)", {ecmaVersion: 6, sourceType: "module" });
 testFail("import * as enum from 'foo'", "The keyword 'enum' is reserved (1:12)", {ecmaVersion: 6, sourceType: "module" });
+testFail("() => { class a extends b { static get prototype(){} } }", "Classes may not have a static property named prototype (1:39)", {ecmaVersion: 6});
+testFail("class a extends b { static set prototype(){} }", "Classes may not have a static property named prototype (1:31)", {ecmaVersion: 6});
+testFail("class a { static prototype(){} }", "Classes may not have a static property named prototype (1:17)", {ecmaVersion: 6});
+
 
 // Harmony: Yield Expression
 
