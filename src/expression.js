@@ -115,11 +115,10 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
-    this.checkPatternErrors(refDestructuringErrors, true)
-    if (!ownDestructuringErrors) DestructuringErrors.call(refDestructuringErrors)
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
-    node.left = this.type === tt.eq ? this.toAssignable(left) : left
+    node.left = this.type === tt.eq ? this.toAssignable(left, false, refDestructuringErrors) : left
+    if (!ownDestructuringErrors) DestructuringErrors.call(refDestructuringErrors)
     refDestructuringErrors.shorthandAssign = -1 // reset because shorthand default was used correctly
     this.checkLVal(left)
     this.next()

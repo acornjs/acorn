@@ -16004,3 +16004,129 @@ test("let instanceof Foo", {
 }, {ecmaVersion: 6})
 
 test("function fn({__proto__: a, __proto__: b}) {}", {}, {ecmaVersion: 6})
+
+testFail('[...foo, bar] = b', "Comma is not permitted after the rest element (1:7)", { ecmaVersion: 6 })
+test('[...a, x][1] = b', {
+  "type": "Program",
+  "start": 0,
+  "end": 16,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 16,
+      "expression": {
+        "type": "AssignmentExpression",
+        "start": 0,
+        "end": 16,
+        "operator": "=",
+        "left": {
+          "type": "MemberExpression",
+          "start": 0,
+          "end": 12,
+          "object": {
+            "type": "ArrayExpression",
+            "start": 0,
+            "end": 9,
+            "elements": [
+              {
+                "type": "SpreadElement",
+                "start": 1,
+                "end": 5,
+                "argument": {
+                  "type": "Identifier",
+                  "start": 4,
+                  "end": 5,
+                  "name": "a"
+                }
+              },
+              {
+                "type": "Identifier",
+                "start": 7,
+                "end": 8,
+                "name": "x"
+              }
+            ]
+          },
+          "property": {
+            "type": "Literal",
+            "start": 10,
+            "end": 11,
+            "value": 1,
+            "raw": "1"
+          },
+          "computed": true
+        },
+        "right": {
+          "type": "Identifier",
+          "start": 15,
+          "end": 16,
+          "name": "b"
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})
+
+testFail('for (let [...foo, bar] in qux);', "Comma is not permitted after the rest element (1:16)", { ecmaVersion: 6 })
+test('for ([...foo, bar].baz in qux);', {
+  "type": "Program",
+  "start": 0,
+  "end": 31,
+  "body": [
+    {
+      "type": "ForInStatement",
+      "start": 0,
+      "end": 31,
+      "left": {
+        "type": "MemberExpression",
+        "start": 5,
+        "end": 22,
+        "object": {
+          "type": "ArrayExpression",
+          "start": 5,
+          "end": 18,
+          "elements": [
+            {
+              "type": "SpreadElement",
+              "start": 6,
+              "end": 12,
+              "argument": {
+                "type": "Identifier",
+                "start": 9,
+                "end": 12,
+                "name": "foo"
+              }
+            },
+            {
+              "type": "Identifier",
+              "start": 14,
+              "end": 17,
+              "name": "bar"
+            }
+          ]
+        },
+        "property": {
+          "type": "Identifier",
+          "start": 19,
+          "end": 22,
+          "name": "baz"
+        },
+        "computed": false
+      },
+      "right": {
+        "type": "Identifier",
+        "start": 26,
+        "end": 29,
+        "name": "qux"
+      },
+      "body": {
+        "type": "EmptyStatement",
+        "start": 30,
+        "end": 31
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6})

@@ -27103,7 +27103,7 @@ testFail("--1",
          "Assigning to rvalue (1:2)");
 
 testFail("for((1 + 1) in list) process(x);",
-         "Assigning to rvalue (1:5)");
+         "Parenthesized pattern (1:4)");
 
 testFail("[",
          "Unexpected token (1:1)");
