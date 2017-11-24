@@ -448,7 +448,7 @@ looseParser.extend("readToken", function(nextMethod) {
  Plugins for ECMAScript proposals:
  
  - [`acorn-object-rest-spread`](https://github.com/victor-homyakov/acorn-object-rest-spread): Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread)
- - [`acorn5-object-spread`](https://github.com/adrianheine/acorn5-object-spread`): Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread)
+ - [`acorn5-object-spread`](https://github.com/adrianheine/acorn5-object-spread): Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread)
  - [`acorn-es7`](https://github.com/angelozerr/acorn-es7): Parse [decorator syntax proposal](https://github.com/wycats/javascript-decorators)
  - [`acorn-static-class-property-initializer`](https://github.com/victor-homyakov/acorn-static-class-property-initializer): Partial support for static class properties from [ES Class Fields & Static Properties Proposal](https://github.com/tc39/proposal-class-public-fields) to support static property initializers in [React components written as ES6+ classes](https://babeljs.io/blog/2015/06/07/react-on-es6-plus)
  - [`acorn-dynamic-import`](https://github.com/kesne/acorn-dynamic-import): Parse [import() proposal](https://github.com/tc39/proposal-dynamic-import)
