@@ -7075,6 +7075,63 @@ test("class A {'constructor'() {}}", {
 testFail("class A { constructor() {} 'constructor'() }", "Duplicate constructor in the same class (1:27)", {ecmaVersion: 6});
 
 testFail("class A { get constructor() {} }", "Constructor can't have get/set modifier (1:14)", {ecmaVersion: 6});
+test("class A { get ['constructor']() {} }", {
+  "type": "Program",
+  "start": 0,
+  "end": 36,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 36,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "A"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 36,
+        "body": [
+          {
+            "type": "MethodDefinition",
+            "start": 10,
+            "end": 34,
+            "static": false,
+            "computed": true,
+            "key": {
+              "type": "Literal",
+              "start": 15,
+              "end": 28,
+              "value": "constructor",
+              "raw": "'constructor'"
+            },
+            "kind": "get",
+            "value": {
+              "type": "FunctionExpression",
+              "start": 29,
+              "end": 34,
+              "id": null,
+              "params": [],
+              "generator": false,
+              "expression": false,
+              "body": {
+                "type": "BlockStatement",
+                "start": 32,
+                "end": 34,
+                "body": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 6});
 
 testFail("class A { *constructor() {} }", "Constructor can't be a generator (1:11)", {ecmaVersion: 6});
 
