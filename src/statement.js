@@ -41,7 +41,10 @@ pp.isLet = function() {
     let pos = next + 1
     while (isIdentifierChar(this.input.charCodeAt(pos), true)) ++pos
     let ident = this.input.slice(next, pos)
-    if (!keywordRelationalOperator.test(ident)) return true
+    if (!keywordRelationalOperator.test(ident)) {
+      this.checkKeywordWithoutUnicodeEscape("let")
+      return true
+    }
   }
   return false
 }
@@ -121,6 +124,7 @@ pp.parseStatement = function(declaration, topLevel, exports) {
     // Identifier node, we switch to interpreting it as a label.
   default:
     if (this.isAsyncFunction()) {
+      this.checkKeywordWithoutUnicodeEscape("async")
       if (!declaration) this.unexpected()
       this.next()
       return this.parseFunctionStatement(node, true)
@@ -522,16 +526,20 @@ pp.parseClass = function(node, isStatement) {
     let isGenerator = this.eat(tt.star)
     let isAsync = false
     let isMaybeStatic = this.type === tt.name && this.value === "static"
+    let didContainEsc = this.containsEsc
     this.parsePropertyName(method)
     method.static = isMaybeStatic && this.type !== tt.parenL
     if (method.static) {
+      if (didContainEsc) this.raiseRecoverable(method.start, "Escape sequence in keyword static")
       if (isGenerator) this.unexpected()
       isGenerator = this.eat(tt.star)
+      didContainEsc = this.containsEsc
       this.parsePropertyName(method)
     }
     if (this.options.ecmaVersion >= 8 && !isGenerator && !method.computed &&
         method.key.type === "Identifier" && method.key.name === "async" && this.type !== tt.parenL &&
         !this.canInsertSemicolon()) {
+      if (didContainEsc) this.raiseRecoverable(method.key.start, "Escape sequence in keyword async")
       isAsync = true
       this.parsePropertyName(method)
     }
@@ -604,6 +612,7 @@ pp.parseExport = function(node, exports) {
     this.checkExport(exports, "default", this.lastTokStart)
     let isAsync
     if (this.type === tt._function || (isAsync = this.isAsyncFunction())) {
+      this.checkKeywordWithoutUnicodeEscape("async")
       let fNode = this.startNode()
       this.next()
       if (isAsync) this.next()

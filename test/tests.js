@@ -29307,6 +29307,48 @@ test("08.5", {
 test("undefined", {}, { ecmaVersion: 8 })
 
 testFail("\\u{74}rue", "Escape sequence in keyword true (1:0)", {ecmaVersion: 6})
+testFail("export { X \\u0061s Y }", "Escape sequence in keyword as (1:11)", {ecmaVersion: 7, sourceType: "module"})
+testFail("import X fro\\u006d 'x'", "Escape sequence in keyword from (1:9)", {ecmaVersion: 7, sourceType: "module"})
+testFail("le\\u0074 x = 5", "Escape sequence in keyword let (1:0)", {ecmaVersion: 6})
+testFail("(function* () { y\\u0069eld 10 })", "Escape sequence in keyword yield (1:16)", {ecmaVersion: 6})
+testFail("(async function() { aw\\u0061it x })", "Escape sequence in keyword await (1:20)", {ecmaVersion: 8})
+testFail("(\\u0061sync function() { await x })", "Escape sequence in keyword async (1:1)", {ecmaVersion: 8})
+testFail("(\\u0061sync () => { await x })", "Escape sequence in keyword async (1:1)", {ecmaVersion: 8})
+testFail("\\u0061sync x => { await x }", "Escape sequence in keyword async (1:0)", {ecmaVersion: 8})
+testFail("class X { \\u0061sync x() { await x } }", "Escape sequence in keyword async (1:10)", {ecmaVersion: 8})
+testFail("class X { static \\u0061sync x() { await x } }", "Escape sequence in keyword async (1:17)", {ecmaVersion: 8})
+testFail("({ ge\\u0074 x() {} })", "Escape sequence in keyword get (1:3)")
+testFail("export \\u0061sync function y() { await x }", "Escape sequence in keyword async (1:7)", {ecmaVersion: 8, sourceType: "module"})
+testFail("export default \\u0061sync function () { await x }", "Escape sequence in keyword async (1:15)", {ecmaVersion: 8, sourceType: "module"})
+test("(\\u0061sync ())", {
+  "type": "Program",
+  "start": 0,
+  "end": 15,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 15,
+      "expression": {
+        "type": "CallExpression",
+        "start": 1,
+        "end": 14,
+        "callee": {
+          "type": "Identifier",
+          "start": 1,
+          "end": 11,
+          "name": "async"
+        },
+        "arguments": []
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 8})
+testFail("({ \\u0061sync x() { await x } })", "Escape sequence in keyword async (1:3)", {ecmaVersion: 8})
+testFail("for (x \\u006ff y) {}", "Escape sequence in keyword of (1:7)", {ecmaVersion: 6})
+testFail("function x () { new.ta\\u0072get }", "Escape sequence in keyword target (1:20)", {ecmaVersion: 6})
+testFail("class X { st\\u0061tic y() {} }", "Escape sequence in keyword static (1:10)", {ecmaVersion: 6})
 
 testFail("(x=1)=2", "Parenthesized pattern (1:0)")
 

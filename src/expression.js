@@ -245,6 +245,7 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 }
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
+  const didContainEsc = this.containsEsc
   let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
       this.lastTokEnd == base.end && !this.canInsertSemicolon()
   for (let computed;;) {
@@ -261,6 +262,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
       this.awaitPos = 0
       let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
       if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
+        if (didContainEsc) this.raiseRecoverable(base.start, "Escape sequence in keyword async")
         this.checkPatternErrors(refDestructuringErrors, false)
         this.checkYieldAwaitInDefaultParams()
         this.yieldPos = oldYieldPos
@@ -315,13 +317,17 @@ pp.parseExprAtom = function(refDestructuringErrors) {
 
   case tt.name:
     let startPos = this.start, startLoc = this.startLoc
+    const didContainEsc = this.containsEsc
     let id = this.parseIdent(this.type !== tt.name)
-    if (this.options.ecmaVersion >= 8 && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
+    if (this.options.ecmaVersion >= 8 && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function)) {
+      if (didContainEsc) this.raiseRecoverable(startPos, "Escape sequence in keyword async")
       return this.parseFunction(this.startNodeAt(startPos, startLoc), false, false, true)
+    }
     if (canBeArrow && !this.canInsertSemicolon()) {
       if (this.eat(tt.arrow))
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false)
       if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name) {
+        if (didContainEsc) this.raiseRecoverable(startPos, "Escape sequence in keyword async")
         id = this.parseIdent()
         if (this.canInsertSemicolon() || !this.eat(tt.arrow))
           this.unexpected()
@@ -486,6 +492,7 @@ pp.parseNew = function() {
       this.raiseRecoverable(node.property.start, "The only valid meta property for new is new.target")
     if (!this.inFunction)
       this.raiseRecoverable(node.start, "new.target can only be used in functions")
+    this.checkKeywordWithoutUnicodeEscape("target", node.property.start)
     return this.finishNode(node, "MetaProperty")
   }
   let startPos = this.start, startLoc = this.startLoc
@@ -571,18 +578,22 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
     if (!isPattern)
       isGenerator = this.eat(tt.star)
   }
+
+  const didContainEsc = this.containsEsc
   this.parsePropertyName(prop)
   if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
+    if (didContainEsc) this.raiseRecoverable(prop.start, "Escape sequence in keyword async")
     isAsync = true
     this.parsePropertyName(prop, refDestructuringErrors)
   } else {
     isAsync = false
   }
-  this.parsePropertyValue(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
+
+  this.parsePropertyValue(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors, didContainEsc)
   return this.finishNode(prop, "Property")
 }
 
-pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors) {
+pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors, didContainEsc) {
   if ((isGenerator || isAsync) && this.type === tt.colon)
     this.unexpected()
 
@@ -598,6 +609,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
              this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
              (prop.key.name === "get" || prop.key.name === "set") &&
              (this.type != tt.comma && this.type != tt.braceR)) {
+    if (didContainEsc) this.raiseRecoverable(prop.key.start, `Escape sequence in keyword ${prop.key.name}`)
     if (isGenerator || isAsync) this.unexpected()
     prop.kind = prop.key.name
     this.parsePropertyName(prop)
