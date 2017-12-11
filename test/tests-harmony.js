@@ -13256,6 +13256,8 @@ testFail("({ 42 }) = obj", "Unexpected token (1:6)", {ecmaVersion: 6});
 testFail("function f(a, ...b, c)", "Comma is not permitted after the rest element (1:18)", {ecmaVersion: 6});
 
 testFail("function f(a, ...b = 0)", "Unexpected token (1:19)", {ecmaVersion: 6});
+testFail("(([a, ...b = 0]) => {})", "Rest elements cannot have a default value (1:9)", {ecmaVersion: 7});
+testFail("[a, ...b = 0] = []", "Rest elements cannot have a default value (1:7)", {ecmaVersion: 6});
 
 testFail("function x(...{ a }){}", "Unexpected token (1:14)", {ecmaVersion: 6});
 

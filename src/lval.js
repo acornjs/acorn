@@ -40,6 +40,8 @@ pp.toAssignable = function(node, isBinding) {
     case "SpreadElement":
       node.type = "RestElement"
       this.toAssignable(node.argument, isBinding)
+      if (node.argument.type === "AssignmentPattern")
+        this.raise(node.argument.start, "Rest elements cannot have a default value")
       break
 
     case "AssignmentExpression":
