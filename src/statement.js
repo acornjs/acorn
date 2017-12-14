@@ -120,7 +120,8 @@ pp.parseStatement = function(declaration, topLevel, exports) {
     // next token is a colon and the expression was a simple
     // Identifier node, we switch to interpreting it as a label.
   default:
-    if (this.isAsyncFunction() && declaration) {
+    if (this.isAsyncFunction()) {
+      if (!declaration) this.unexpected()
       this.next()
       return this.parseFunctionStatement(node, true)
     }
@@ -219,16 +220,12 @@ pp.parseFunctionStatement = function(node, isAsync) {
   return this.parseFunction(node, true, false, isAsync)
 }
 
-pp.isFunction = function() {
-  return this.type === tt._function || this.isAsyncFunction()
-}
-
 pp.parseIfStatement = function(node) {
   this.next()
   node.test = this.parseParenExpression()
   // allow function declarations in branches, but only in non-strict mode
-  node.consequent = this.parseStatement(!this.strict && this.isFunction())
-  node.alternate = this.eat(tt._else) ? this.parseStatement(!this.strict && this.isFunction()) : null
+  node.consequent = this.parseStatement(!this.strict && this.type == tt._function)
+  node.alternate = this.eat(tt._else) ? this.parseStatement(!this.strict && this.type == tt._function) : null
   return this.finishNode(node, "IfStatement")
 }
 

@@ -3092,21 +3092,7 @@ test("({ async: true })", {
 }, {ecmaVersion: 8});
 
 // Tests for B.3.4 FunctionDeclarations in IfStatement Statement Clauses
-test(
-  "if (x) async function f() {}",
-  {
-    type: "Program",
-    body: [{
-      type: "IfStatement",
-      consequent: {
-        type: "FunctionDeclaration",
-        async: true
-      },
-      alternate: null
-    }]
-  },
-  {ecmaVersion: 8}
-)
+testFail("if (x) async function f() {}", "Unexpected token (1:7)", {ecmaVersion: 8})
 
 testFail("(async)(a) => 12", "Unexpected token (1:11)", {ecmaVersion: 8})
 
