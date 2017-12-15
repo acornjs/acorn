@@ -14740,6 +14740,29 @@ test("/[a-z]/gimuy", {
   ]
 }, {ecmaVersion: 6});
 testFail("/[a-z]/s", "Invalid regular expression flag (1:1)", {ecmaVersion: 6});
+test("/[a-z]/s", {
+  "type": "Program",
+  "start": 0,
+  "end": 8,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 8,
+      "expression": {
+        "type": "Literal",
+        "start": 0,
+        "end": 8,
+        "raw": "/[a-z]/s",
+        "regex": {
+          "pattern": "[a-z]",
+          "flags": "s"
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 9});
 
 testFail("[...x in y] = []", "Assigning to rvalue (1:4)", {ecmaVersion: 6});
 
