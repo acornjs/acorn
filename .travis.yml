@@ -1,9 +1,18 @@
 language: node_js
 sudo: false
-node_js:
-  - '0.12'
-  - '4'
-  - '5'
-  - '6'
-  - '7'
-  - '8'
+matrix:
+  include:
+  - node_js: '0.12'
+  - node_js: '4'
+  - node_js: '5'
+  - node_js: '6'
+  - node_js: '7'
+  - node_js: '8'
+  - node_js: '8'
+    env: TEST_SUITE=test262
+script: >
+  if [ "$TEST_SUITE" != "test262" ]; then
+    npm test
+  else
+    npm run test:test262
+  fi
