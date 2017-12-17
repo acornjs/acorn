@@ -187,13 +187,36 @@ function ignore(_node, _st, _c) {}
 
 export const base = {}
 
-base.Program = base.BlockStatement = (node, st, c) => {
-  for (let stmt of node.body)
-    c(stmt, st, "Statement")
+base.Program = (node, st, c) => {
+  for (let child of node.body)
+    if (
+      child.type === "ImportDeclaration" ||
+      child.type === "ExportNamedDeclaration" ||
+      child.type === "ExportDefaultDeclaration" ||
+      child.type === "ExportAllDeclaration"
+    ) {
+      c(child, st, "ModuleDeclaration")
+    } else {
+      c(child, st, "Statement")
+    }
 }
-base.Statement = skipThrough
+base.BlockStatement = (node, st, c) => {
+  for (let child of node.body)
+    c(child, st, "Statement")
+}
+base.Statement = (node, st, c) => {
+  if (
+    node.type === "VariableDeclaration" ||
+    node.type === "FunctionDeclaration" ||
+    node.type === "ClassDeclaration"
+  ) {
+    c(node, st, "Declaration")
+  } else {
+    c(node, st)
+  }
+}
 base.EmptyStatement = ignore
-base.ExpressionStatement = base.ParenthesizedExpression =
+base.ExpressionStatement = base.ParenthesizedExpression = base.Decorator =
   (node, st, c) => c(node.expression, st, "Expression")
 base.IfStatement = (node, st, c) => {
   c(node.test, st, "Expression")
@@ -209,13 +232,19 @@ base.WithStatement = (node, st, c) => {
 base.SwitchStatement = (node, st, c) => {
   c(node.discriminant, st, "Expression")
   for (let cs of node.cases) {
-    if (cs.test) c(cs.test, st, "Expression")
-    for (let cons of cs.consequent)
-      c(cons, st, "Statement")
+    c(cs, st, "SwitchCase")
   }
 }
-base.ReturnStatement = base.YieldExpression = base.AwaitExpression = (node, st, c) => {
+base.SwitchCase = (node, st, c) => {
+  if (node.test) c(node.test, st, "Expression")
+  for (let cons of node.consequent)
+    c(cons, st, "Statement")
+}
+base.ReturnStatement = base.YieldExpression = (node, st, c) => {
   if (node.argument) c(node.argument, st, "Expression")
+}
+base.AwaitExpression = (node, st, c) => {
+  c(node.argument, st, "Expression")
 }
 base.ThrowStatement = base.SpreadElement =
   (node, st, c) => c(node.argument, st, "Expression")
@@ -233,23 +262,29 @@ base.WhileStatement = base.DoWhileStatement = (node, st, c) => {
   c(node.body, st, "Statement")
 }
 base.ForStatement = (node, st, c) => {
-  if (node.init) c(node.init, st, "ForInit")
+  if (node.init) {
+    if (node.init.type == "VariableDeclaration")
+      c(node.init, st, "Statement")
+    else
+      c(node.init, st, "Expression")
+  }
   if (node.test) c(node.test, st, "Expression")
   if (node.update) c(node.update, st, "Expression")
   c(node.body, st, "Statement")
 }
 base.ForInStatement = base.ForOfStatement = (node, st, c) => {
-  c(node.left, st, "ForInit")
+  if (node.left) {
+    if (node.left.type == "VariableDeclaration")
+      c(node.left, st, "Statement")
+    else
+      c(node.left, st, "Pattern")
+  }
   c(node.right, st, "Expression")
   c(node.body, st, "Statement")
 }
-base.ForInit = (node, st, c) => {
-  if (node.type == "VariableDeclaration") c(node, st)
-  else c(node, st, "Expression")
-}
 base.DebuggerStatement = ignore
 
-base.FunctionDeclaration = (node, st, c) => c(node, st, "Function")
+base.Declaration = skipThrough
 base.VariableDeclaration = (node, st, c) => {
   for (let decl of node.declarations)
     c(decl, st)
@@ -259,8 +294,8 @@ base.VariableDeclarator = (node, st, c) => {
   if (node.init) c(node.init, st, "Expression")
 }
 
+base.FunctionExpression = base.ArrowFunctionExpression = base.FunctionDeclaration = (node, st, c) => c(node, st, "Function")
 base.Function = (node, st, c) => {
-  if (node.id) c(node.id, st, "Pattern")
   for (let param of node.params)
     c(param, st, "Pattern")
   c(node.body, st, node.expression ? "ScopeExpression" : "ScopeBody")
@@ -271,15 +306,11 @@ base.ScopeBody = (node, st, c) => c(node, st, "Statement")
 base.ScopeExpression = (node, st, c) => c(node, st, "Expression")
 
 base.Pattern = (node, st, c) => {
-  if (node.type == "Identifier")
-    c(node, st, "VariablePattern")
-  else if (node.type == "MemberExpression")
-    c(node, st, "MemberPattern")
+  if (node.type == "Identifier" || node.type === "MemberExpression")
+    c(node, st, "Expression")
   else
     c(node, st)
 }
-base.VariablePattern = ignore
-base.MemberPattern = skipThrough
 base.RestElement = (node, st, c) => c(node.argument, st, "Pattern")
 base.ArrayPattern = (node, st, c) => {
   for (let elt of node.elements) {
@@ -288,22 +319,37 @@ base.ArrayPattern = (node, st, c) => {
 }
 base.ObjectPattern = (node, st, c) => {
   for (let prop of node.properties)
-    c(prop.value, st, "Pattern")
+    c(prop, st, "AssignmentProperty")
+}
+base.AssignmentProperty = (node, st, c) => {
+  c(node, st, "Property")
 }
 
 base.Expression = skipThrough
 base.ThisExpression = base.Super = base.MetaProperty = ignore
 base.ArrayExpression = (node, st, c) => {
   for (let elt of node.elements) {
-    if (elt) c(elt, st, "Expression")
+    if (elt) {
+      if (elt.type === "SpreadElement") {
+        c(elt, st)
+      } else {
+        c(elt, st, "Expression")
+      }
+    }
   }
 }
 base.ObjectExpression = (node, st, c) => {
   for (let prop of node.properties)
     c(prop, st)
 }
-base.FunctionExpression = base.ArrowFunctionExpression = base.FunctionDeclaration
-base.SequenceExpression = base.TemplateLiteral = (node, st, c) => {
+base.TemplateLiteral = (node, st, c) => {
+  for (let quasi of node.quasis)
+    c(quasi, st)
+  for (let expr of node.expressions)
+    c(expr, st, "Expression")
+}
+base.TemplateElement = ignore
+base.SequenceExpression = (node, st, c) => {
   for (let expr of node.expressions)
     c(expr, st, "Expression")
 }
@@ -323,19 +369,55 @@ base.ConditionalExpression = (node, st, c) => {
   c(node.consequent, st, "Expression")
   c(node.alternate, st, "Expression")
 }
-base.NewExpression = base.CallExpression = (node, st, c) => {
+base.NewExpression = (node, st, c) => {
   c(node.callee, st, "Expression")
   if (node.arguments)
     for (let arg of node.arguments)
-      c(arg, st, "Expression")
+      if (arg.type === "SpreadElement") {
+        c(arg, st)
+      } else {
+        c(arg, st, "Expression")
+      }
+}
+base.CallExpression = (node, st, c) => {
+  if (node.callee.type === "Super") {
+    c(node.callee, st)
+  } else {
+    c(node.callee, st, "Expression")
+  }
+  if (node.arguments)
+    for (let arg of node.arguments)
+      if (arg.type === "SpreadElement") {
+        c(arg, st)
+      } else {
+        c(arg, st, "Expression")
+      }
 }
 base.MemberExpression = (node, st, c) => {
-  c(node.object, st, "Expression")
+  if (node.object.type === "Super") {
+    c(node.object, st)
+  } else {
+    c(node.object, st, "Expression")
+  }
   if (node.computed) c(node.property, st, "Expression")
 }
-base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
+base.ModuleDeclaration = skipThrough
+base.ExportDefaultDeclaration = (node, st, c) => {
+  if (
+    node.declaration.type === "VariableDeclaration" ||
+    node.declaration.type === "FunctionDeclaration" ||
+    node.declaration.type === "ClassDeclaration"
+  ) {
+    c(node.declaration, st, "Declaration")
+  } else {
+    c(node.declaration, st, "Expression")
+  }
+}
+base.ExportNamedDeclaration = (node, st, c) => {
   if (node.declaration)
-    c(node.declaration, st, node.type == "ExportNamedDeclaration" || node.declaration.id ? "Statement" : "Expression")
+    c(node.declaration, st, "Declaration")
+  for (let spec of node.specifiers)
+    c(spec, st, "ModuleSpecifier")
   if (node.source) c(node.source, st, "Expression")
 }
 base.ExportAllDeclaration = (node, st, c) => {
@@ -343,10 +425,11 @@ base.ExportAllDeclaration = (node, st, c) => {
 }
 base.ImportDeclaration = (node, st, c) => {
   for (let spec of node.specifiers)
-    c(spec, st)
+    c(spec, st, "ModuleSpecifier")
   c(node.source, st, "Expression")
 }
-base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.Literal = ignore
+base.ModuleSpecifier = skipThrough
+base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.ExportSpecifier = base.Identifier = base.Literal = ignore
 
 base.TaggedTemplateExpression = (node, st, c) => {
   c(node.tag, st, "Expression")
@@ -354,12 +437,22 @@ base.TaggedTemplateExpression = (node, st, c) => {
 }
 base.ClassDeclaration = base.ClassExpression = (node, st, c) => c(node, st, "Class")
 base.Class = (node, st, c) => {
-  if (node.id) c(node.id, st, "Pattern")
   if (node.superClass) c(node.superClass, st, "Expression")
-  for (let item of node.body.body)
+  c(node.body, st, "ClassBody")
+  if (node.decorators) {
+    for (let decorator of node.decorators)
+      c(decorator, st)
+  }
+}
+base.ClassBody = (node, st, c) => {
+  for (let item of node.body)
     c(item, st)
 }
 base.MethodDefinition = base.Property = (node, st, c) => {
   if (node.computed) c(node.key, st, "Expression")
   c(node.value, st, "Expression")
+  if (node.decorators) {
+    for (let decorator of node.decorators)
+      c(decorator, st)
+  }
 }
