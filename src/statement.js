@@ -536,40 +536,45 @@ pp.parseClass = function(node, isStatement) {
 
 pp.parseClassMember = function(classBody) {
   let method = this.startNode()
+
+  const tryContextual = (k, noLineBreak = false) => {
+    const start = this.start, startLoc = this.startLoc
+    if (!this.eatContextual(k)) return false
+    if (this.type !== tt.parenL && (!noLineBreak || !this.canInsertSemicolon())) return true
+    if (method.key) this.unexpected()
+    method.computed = false
+    method.key = this.startNodeAt(start, startLoc)
+    method.key.name = k
+    this.finishNode(method.key, "Identifier")
+    return false
+  }
+
+  method.kind = "method"
+  method.static = tryContextual("static")
   let isGenerator = this.eat(tt.star)
   let isAsync = false
-  let isMaybeStatic = this.type === tt.name && this.value === "static"
-  this.parsePropertyName(method)
-  method.static = isMaybeStatic && this.type !== tt.parenL
-  if (method.static) {
-    if (isGenerator) this.unexpected()
-    isGenerator = this.eat(tt.star)
-    this.parsePropertyName(method)
-  }
-  if (this.options.ecmaVersion >= 8 && !isGenerator && !method.computed &&
-      method.key.type === "Identifier" && method.key.name === "async" && this.type !== tt.parenL &&
-      !this.canInsertSemicolon()) {
-    isAsync = true
-    this.parsePropertyName(method)
-  }
-  method.kind = "method"
   let isGetSet = false
-  if (!method.computed) {
-    let {key} = method
-    if (!isGenerator && !isAsync && key.type === "Identifier" && this.type !== tt.parenL && (key.name === "get" || key.name === "set")) {
+  if (!isGenerator) {
+    if (this.options.ecmaVersion >= 8 && tryContextual("async", true)) {
+      isAsync = true
+    } else if (tryContextual("get")) {
       isGetSet = true
-      method.kind = key.name
-      key = this.parsePropertyName(method)
+      method.kind = "get"
+    } else if (tryContextual("set")) {
+      isGetSet = true
+      method.kind = "set"
     }
-    if (!method.computed && !method.static && (key.type === "Identifier" && key.name === "constructor" ||
-        key.type === "Literal" && key.value === "constructor")) {
-      if (isGetSet) this.raise(key.start, "Constructor can't have get/set modifier")
-      if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
-      if (isAsync) this.raise(key.start, "Constructor can't be an async method")
-      method.kind = "constructor"
-    } else if (method.static && key.type === "Identifier" && key.name === "prototype") {
-      this.raise(key.start, "Classes may not have a static property named prototype")
-    }
+  }
+  if (!method.key) this.parsePropertyName(method)
+  let {key} = method
+  if (!method.computed && !method.static && (key.type === "Identifier" && key.name === "constructor" ||
+      key.type === "Literal" && key.value === "constructor")) {
+    if (isGetSet) this.raise(key.start, "Constructor can't have get/set modifier")
+    if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
+    if (isAsync) this.raise(key.start, "Constructor can't be an async method")
+    method.kind = "constructor"
+  } else if (method.static && key.type === "Identifier" && key.name === "prototype") {
+    this.raise(key.start, "Classes may not have a static property named prototype")
   }
   this.parseClassMethod(classBody, method, isGenerator, isAsync)
   if (isGetSet) {
