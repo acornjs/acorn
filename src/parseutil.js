@@ -33,13 +33,17 @@ pp.eat = function(type) {
 // Tests whether parsed token is a contextual keyword.
 
 pp.isContextual = function(name) {
-  return this.type === tt.name && this.value === name
+  const is = this.type === tt.name && this.value === name
+  if (is) this.checkKeywordWithoutUnicodeEscape(name)
+  return is
 }
 
 // Consumes contextual keyword if possible.
 
 pp.eatContextual = function(name) {
-  return this.value === name && this.eat(tt.name)
+  const is = this.isContextual(name)
+  if (is) this.next()
+  return is
 }
 
 // Asserts that following token is given contextual keyword.
@@ -127,4 +131,8 @@ pp.isSimpleAssignTarget = function(expr) {
   if (expr.type === "ParenthesizedExpression")
     return this.isSimpleAssignTarget(expr.expression)
   return expr.type === "Identifier" || expr.type === "MemberExpression"
+}
+
+pp.checkKeywordWithoutUnicodeEscape = function(name, start = this.start) {
+  if (this.containsEsc) this.raiseRecoverable(start, "Escape sequence in keyword " + name)
 }
