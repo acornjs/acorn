@@ -7072,7 +7072,7 @@ test("class A {'constructor'() {}}", {
   }]
 }, {ecmaVersion: 6});
 
-testFail("class A { constructor() {} 'constructor'() }", "Duplicate constructor in the same class (1:27)", {ecmaVersion: 6});
+testFail("class A { constructor() {} 'constructor'() {} }", "Duplicate constructor in the same class (1:27)", {ecmaVersion: 6});
 
 testFail("class A { get constructor() {} }", "Constructor can't have get/set modifier (1:14)", {ecmaVersion: 6});
 test("class A { get ['constructor']() {} }", {
