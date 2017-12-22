@@ -553,15 +553,12 @@ pp.parseClassMember = function(classBody) {
   method.static = tryContextual("static")
   let isGenerator = this.eat(tt.star)
   let isAsync = false
-  let isGetSet = false
   if (!isGenerator) {
     if (this.options.ecmaVersion >= 8 && tryContextual("async", true)) {
       isAsync = true
     } else if (tryContextual("get")) {
-      isGetSet = true
       method.kind = "get"
     } else if (tryContextual("set")) {
-      isGetSet = true
       method.kind = "set"
     }
   }
@@ -569,7 +566,7 @@ pp.parseClassMember = function(classBody) {
   let {key} = method
   if (!method.computed && !method.static && (key.type === "Identifier" && key.name === "constructor" ||
       key.type === "Literal" && key.value === "constructor")) {
-    if (isGetSet) this.raise(key.start, "Constructor can't have get/set modifier")
+    if (method.kind !== "method") this.raise(key.start, "Constructor can't have get/set modifier")
     if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
     if (isAsync) this.raise(key.start, "Constructor can't be an async method")
     method.kind = "constructor"
@@ -577,19 +574,12 @@ pp.parseClassMember = function(classBody) {
     this.raise(key.start, "Classes may not have a static property named prototype")
   }
   this.parseClassMethod(classBody, method, isGenerator, isAsync)
-  if (isGetSet) {
-    let paramCount = method.kind === "get" ? 0 : 1
-    if (method.value.params.length !== paramCount) {
-      let start = method.value.start
-      if (method.kind === "get")
-        this.raiseRecoverable(start, "getter should have no params")
-      else
-        this.raiseRecoverable(start, "setter should have exactly one param")
-    } else {
-      if (method.kind === "set" && method.value.params[0].type === "RestElement")
-        this.raiseRecoverable(method.value.params[0].start, "Setter cannot use rest params")
-    }
-  }
+  if (method.kind === "get" && method.value.params.length !== 0)
+    this.raiseRecoverable(method.value.start, "getter should have no params")
+  if (method.kind === "set" && method.value.params.length !== 1)
+    this.raiseRecoverable(method.value.start, "setter should have exactly one param")
+  if (method.kind === "set" && method.value.params[0].type === "RestElement")
+    this.raiseRecoverable(method.value.params[0].start, "Setter cannot use rest params")
   return method
 }
 
