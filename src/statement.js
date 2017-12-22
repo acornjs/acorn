@@ -422,7 +422,7 @@ pp.parseForIn = function(node, init) {
   let type = this.type === tt._in ? "ForInStatement" : "ForOfStatement"
   this.next()
   node.left = init
-  node.right = this.parseExpression()
+  node.right = type == "ForInStatement" ? this.parseExpression() : this.parseMaybeAssign()
   this.expect(tt.parenR)
   this.exitLexicalScope()
   node.body = this.parseStatement(false)

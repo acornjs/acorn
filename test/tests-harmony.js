@@ -16086,3 +16086,5 @@ test("let instanceof Foo", {
 }, {ecmaVersion: 6})
 
 test("function fn({__proto__: a, __proto__: b}) {}", {}, {ecmaVersion: 6})
+
+testFail("for (let x of y, z) {}", "Unexpected token (1:15)", {ecmaVersion: 6})
