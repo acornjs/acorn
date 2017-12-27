@@ -421,6 +421,12 @@ pp.parseFor = function(node, init) {
 pp.parseForIn = function(node, init) {
   let type = this.type === tt._in ? "ForInStatement" : "ForOfStatement"
   this.next()
+  if (type == "ForInStatement") {
+    if (init.type === "AssignmentPattern" ||
+      (init.type === "VariableDeclaration" && init.declarations[0].init != null &&
+       (this.strict || init.declarations[0].id.type !== "Identifier")))
+      this.raise(init.start, "Invalid assignment in for-in loop head")
+  }
   node.left = init
   node.right = type == "ForInStatement" ? this.parseExpression() : this.parseMaybeAssign()
   this.expect(tt.parenR)
