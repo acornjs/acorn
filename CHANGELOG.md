@@ -1,3 +1,25 @@
+## 5.3.0 (2017-12-28)
+
+### Bug fixes
+
+Fix parsing of floating point literals with leading zeroes in loose mode.
+
+Allow duplicate property names in object patterns.
+
+Don't allow static class methods named `prototype`.
+
+Disallow async functions directly under `if` or `else`.
+
+Parse right-hand-side of `for`/`of` as an assignment expression.
+
+Stricter parsing of `for`/`in`.
+
+Don't allow unicode escapes in contextual keywords.
+
+### New features
+
+Parsing class members was factored into smaller methods to allow plugins to hook into it.
+
 ## 5.2.1 (2017-10-30)
 
 ### Bug fixes
