@@ -665,10 +665,11 @@ pp.readEscapedChar = function(inTemplate) {
         octalStr = octalStr.slice(0, -1)
         octal = parseInt(octalStr, 8)
       }
-      if (octalStr !== "0" && (this.strict || inTemplate)) {
-        this.invalidStringToken(this.pos - 2, "Octal literal in strict mode")
-      }
       this.pos += octalStr.length - 1
+      ch = this.input.charCodeAt(this.pos)
+      if ((octalStr !== "0" || ch == 56 || ch == 57) && (this.strict || inTemplate)) {
+        this.invalidStringToken(this.pos - 1 - octalStr.length, "Octal literal in strict mode")
+      }
       return String.fromCharCode(octal)
     }
     return String.fromCharCode(ch)
