@@ -99,6 +99,7 @@ export function DestructuringErrors() {
   this.trailingComma =
   this.parenthesizedAssign =
   this.parenthesizedBind =
+  this.doubleProto =
     -1
 }
 
@@ -111,9 +112,13 @@ pp.checkPatternErrors = function(refDestructuringErrors, isAssign) {
 }
 
 pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {
-  let pos = refDestructuringErrors ? refDestructuringErrors.shorthandAssign : -1
-  if (!andThrow) return pos >= 0
-  if (pos > -1) this.raise(pos, "Shorthand property assignments are valid only in destructuring patterns")
+  if (!refDestructuringErrors) return false
+  let {shorthandAssign, doubleProto} = refDestructuringErrors
+  if (!andThrow) return shorthandAssign >= 0 || doubleProto >= 0
+  if (shorthandAssign >= 0)
+    this.raise(shorthandAssign, "Shorthand property assignments are valid only in destructuring patterns")
+  if (doubleProto >= 0)
+    this.raiseRecoverable(doubleProto, "Redefinition of __proto__ property")
 }
 
 pp.checkYieldAwaitInDefaultParams = function() {

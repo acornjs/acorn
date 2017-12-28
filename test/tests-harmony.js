@@ -14623,6 +14623,7 @@ test("({ ['__proto__']: 1, __proto__: 2 })", {}, {ecmaVersion: 6});
 test("({ __proto__() { return 1 }, __proto__: 2 })", {}, {ecmaVersion: 6});
 test("({ get __proto__() { return 1 }, __proto__: 2 })", {}, {ecmaVersion: 6});
 test("({ __proto__, __proto__: 2 })", {}, {ecmaVersion: 6});
+test("({__proto__: a, __proto__: b} = {})", {}, {ecmaVersion: 6});
 
 test("export default /foo/", {}, {ecmaVersion: 6, sourceType: "module"});
 
@@ -16088,3 +16089,4 @@ test("let instanceof Foo", {
 test("function fn({__proto__: a, __proto__: b}) {}", {}, {ecmaVersion: 6})
 
 testFail("for (let x of y, z) {}", "Unexpected token (1:15)", {ecmaVersion: 6})
+

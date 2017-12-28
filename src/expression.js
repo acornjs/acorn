@@ -28,7 +28,7 @@ const pp = Parser.prototype
 // either with each other or with an init property — and in
 // strict mode, init properties are also not allowed to be repeated.
 
-pp.checkPropClash = function(prop, propHash) {
+pp.checkPropClash = function(prop, propHash, refDestructuringErrors) {
   if (this.options.ecmaVersion >= 6 && (prop.computed || prop.method || prop.shorthand))
     return
   let {key} = prop, name
@@ -40,7 +40,11 @@ pp.checkPropClash = function(prop, propHash) {
   let {kind} = prop
   if (this.options.ecmaVersion >= 6) {
     if (name === "__proto__" && kind === "init") {
-      if (propHash.proto) this.raiseRecoverable(key.start, "Redefinition of __proto__ property")
+      if (propHash.proto) {
+        if (refDestructuringErrors && refDestructuringErrors.doubleProto < 0) refDestructuringErrors.doubleProto = key.start
+        // Backwards-compat kludge. Can be removed in version 6.0
+        else this.raiseRecoverable(key.start, "Redefinition of __proto__ property")
+      }
       propHash.proto = true
     }
     return
@@ -553,7 +557,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
     } else first = false
 
     const prop = this.parseProperty(isPattern, refDestructuringErrors)
-    if (!isPattern) this.checkPropClash(prop, propHash)
+    if (!isPattern) this.checkPropClash(prop, propHash, refDestructuringErrors)
     node.properties.push(prop)
   }
   return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression")
