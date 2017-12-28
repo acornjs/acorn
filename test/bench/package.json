@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ternjs/acorn.git"
+    "url": "https://github.com/acornjs/acorn.git"
   },
   "license": "MIT",
   "dependencies": {

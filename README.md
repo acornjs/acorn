@@ -1,6 +1,6 @@
 # Acorn
 
-[![Build Status](https://travis-ci.org/ternjs/acorn.svg?branch=master)](https://travis-ci.org/ternjs/acorn)
+[![Build Status](https://travis-ci.org/acornjs/acorn.svg?branch=master)](https://travis-ci.org/acornjs/acorn)
 [![NPM version](https://img.shields.io/npm/v/acorn.svg)](https://www.npmjs.com/package/acorn)
 [![CDNJS](https://img.shields.io/cdnjs/v/acorn.svg)](https://cdnjs.com/libraries/acorn)  
 [Author funding status: ![maintainer happiness](https://marijnhaverbeke.nl/fund/status_s.png?force)](https://marijnhaverbeke.nl/fund/)
@@ -10,13 +10,13 @@ A tiny, fast JavaScript parser, written completely in JavaScript.
 ## Community
 
 Acorn is open source software released under an
-[MIT license](https://github.com/ternjs/acorn/blob/master/LICENSE).
+[MIT license](https://github.com/acornjs/acorn/blob/master/LICENSE).
 
 You are welcome to
-[report bugs](https://github.com/ternjs/acorn/issues) or create pull
-requests on [github](https://github.com/ternjs/acorn). For questions
+[report bugs](https://github.com/acornjs/acorn/issues) or create pull
+requests on [github](https://github.com/acornjs/acorn). For questions
 and discussion, please use the
-[Tern discussion forum](https://discuss.ternjs.net).
+[Tern discussion forum](https://discuss.acornjs.net).
 
 ## Installation
 
@@ -31,7 +31,7 @@ npm install acorn
 Alternately, download the source.
 
 ```sh
-git clone https://github.com/ternjs/acorn.git
+git clone https://github.com/acornjs/acorn.git
 ```
 
 ## Components

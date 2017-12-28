@@ -2766,7 +2766,7 @@ test("function* wrap() {\nasync(a = yield b)\n}", {
 }, {ecmaVersion: 8})
 testFail("function* wrap() {\nasync(a = yield b) => a\n}", "Yield expression cannot be a default value (2:10)", {ecmaVersion: 8})
 
-// https://github.com/ternjs/acorn/issues/464
+// https://github.com/acornjs/acorn/issues/464
 test("f = ({ w = counter(), x = counter(), y = counter(), z = counter() } = { w: null, x: 0, y: false, z: '' }) => {}", {
   "type": "Program",
   "start": 0,

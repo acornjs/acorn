@@ -29109,7 +29109,7 @@ test('var x = (1 + 2)', {}, {
 
 test("function f(f) { 'use strict'; }", {});
 
-// https://github.com/ternjs/acorn/issues/180
+// https://github.com/acornjs/acorn/issues/180
 test("#!/usr/bin/node\n;", {}, {
   allowHashBang: true,
   onComment: [{
@@ -29120,7 +29120,7 @@ test("#!/usr/bin/node\n;", {}, {
   }]
 });
 
-// https://github.com/ternjs/acorn/issues/204
+// https://github.com/acornjs/acorn/issues/204
 test("(function () {} / 1)", {
   type: "Program",
   body: [{
@@ -29165,7 +29165,7 @@ test("function f() {} / 1 /", {
   ]
 });
 
-// https://github.com/ternjs/acorn/issues/320
+// https://github.com/acornjs/acorn/issues/320
 
 test("do /x/; while (false);", {
   type: "Program",
@@ -29209,13 +29209,13 @@ testAssert("[1,2,] + {foo: 1,}", function() {
 }, {onTrailingComma: function(pos) { trailingCommas.push(pos); },
     loose: false})
 
-// https://github.com/ternjs/acorn/issues/275
+// https://github.com/acornjs/acorn/issues/275
 
 testFail("({ get prop(x) {} })", "getter should have no params (1:11)");
 testFail("({ set prop() {} })", "setter should have exactly one param (1:11)");
 testFail("({ set prop(x, y) {} })", "setter should have exactly one param (1:11)");
 
-// https://github.com/ternjs/acorn/issues/363
+// https://github.com/acornjs/acorn/issues/363
 
 test("/[a-z]/gim", {
   type: "Program",

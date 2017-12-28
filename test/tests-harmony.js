@@ -13301,7 +13301,7 @@ testFail("({ get test() { } }) => 42", "Object pattern can't contain getter or s
 
 /* Regression tests */
 
-// # https://github.com/ternjs/acorn/issues/127
+// # https://github.com/acornjs/acorn/issues/127
 test('doSmth(`${x} + ${y} = ${x + y}`)', {
   type: "Program",
   body: [{
@@ -13363,7 +13363,7 @@ test('doSmth(`${x} + ${y} = ${x + y}`)', {
   }]
 }, {ecmaVersion: 6});
 
-// # https://github.com/ternjs/acorn/issues/129
+// # https://github.com/acornjs/acorn/issues/129
 test('function normal(x, y = 10) {}', {
   type: "Program",
   body: [{
@@ -13411,7 +13411,7 @@ test("() => 42", {
   }]
 }, {ecmaVersion: 6, preserveParens: true});
 
-// https://github.com/ternjs/acorn/issues/161
+// https://github.com/acornjs/acorn/issues/161
 test("import foo, * as bar from 'baz';", {
   type: "Program",
   body: [{
@@ -13440,7 +13440,7 @@ test("import foo, * as bar from 'baz';", {
   }]
 }, {ecmaVersion: 6, sourceType: "module"});
 
-// https://github.com/ternjs/acorn/issues/173
+// https://github.com/acornjs/acorn/issues/173
 test("`{${x}}`, `}`", {
   type: "Program",
   body: [{
@@ -13481,7 +13481,7 @@ test("`{${x}}`, `}`", {
   }]
 }, {ecmaVersion: 6});
 
-// https://github.com/ternjs/acorn/issues/186
+// https://github.com/acornjs/acorn/issues/186
 test('var {get} = obj;', {
   type: "Program",
   body: [{
@@ -13515,7 +13515,7 @@ test('var {get} = obj;', {
   }]
 }, {ecmaVersion: 6});
 
-// Destructuring defaults (https://github.com/ternjs/acorn/issues/181)
+// Destructuring defaults (https://github.com/acornjs/acorn/issues/181)
 
 test("var {propName: localVar = defaultValue} = obj", {
   type: "Program",
@@ -13967,7 +13967,7 @@ testFail("f({x = 0})", "Shorthand property assignments are valid only in destruc
 
 testFail("(localVar |= defaultValue) => {}", "Only '=' operator can be used for specifying default value. (1:9)", {loose: false, ecmaVersion: 6});
 
-// https://github.com/ternjs/acorn/issues/191
+// https://github.com/acornjs/acorn/issues/191
 
 test("try {} catch ({message}) {}", {
   type: "Program",
@@ -14019,7 +14019,7 @@ test("try {} catch ({message}) {}", {
   locations: true
 });
 
-// https://github.com/ternjs/acorn/issues/192
+// https://github.com/acornjs/acorn/issues/192
 
 test("class A { static() {} }", {
   type: "Program",
@@ -14069,7 +14069,7 @@ test("class A { static() {} }", {
   locations: true
 });
 
-// https://github.com/ternjs/acorn/issues/213
+// https://github.com/acornjs/acorn/issues/213
 
 test("for (const x of list) process(x);", {
   type: "Program",
@@ -14589,11 +14589,11 @@ test("export default function foo() {} false", {
   type: "Program"
 }, {ecmaVersion: 6, sourceType: "module"})
 
-// https://github.com/ternjs/acorn/issues/274
+// https://github.com/acornjs/acorn/issues/274
 
 testFail("`\\07`", "Octal literal in strict mode (1:1)", {ecmaVersion: 6});
 
-// https://github.com/ternjs/acorn/issues/277
+// https://github.com/acornjs/acorn/issues/277
 
 testFail("x = { method() 42 }", "Unexpected token (1:15)", {ecmaVersion: 6});
 
@@ -14601,21 +14601,21 @@ testFail("x = { get method() 42 }", "Unexpected token (1:19)", {ecmaVersion: 6})
 
 testFail("x = { set method(val) v = val }", "Unexpected token (1:22)", {ecmaVersion: 6});
 
-// https://github.com/ternjs/acorn/issues/278
+// https://github.com/acornjs/acorn/issues/278
 
 testFail("/\\u{110000}/u", "~", {ecmaVersion: 6});
 
-// https://github.com/ternjs/acorn/issues/279
+// https://github.com/acornjs/acorn/issues/279
 
 testFail("super", "'super' outside of function or class (1:0)", {ecmaVersion: 6});
 
-// https://github.com/ternjs/acorn/issues/275
+// https://github.com/acornjs/acorn/issues/275
 
 testFail("class A { get prop(x) {} }", "getter should have no params (1:18)", {ecmaVersion: 6});
 testFail("class A { set prop() {} }", "setter should have exactly one param (1:18)", {ecmaVersion: 6});
 testFail("class A { set prop(x, y) {} }", "setter should have exactly one param (1:18)", {ecmaVersion: 6});
 
-// https://github.com/ternjs/acorn/issues/276
+// https://github.com/acornjs/acorn/issues/276
 
 testFail("({ __proto__: 1, __proto__: 2 })", "Redefinition of __proto__ property (1:17)", {ecmaVersion: 6});
 testFail("({ '__proto__': 1, __proto__: 2 })", "Redefinition of __proto__ property (1:19)", {ecmaVersion: 6});
@@ -14743,7 +14743,7 @@ testFail("var await = 0", "Can not use keyword 'await' outside an async function
   locations: true
 })
 
-// https://github.com/ternjs/acorn/issues/363
+// https://github.com/acornjs/acorn/issues/363
 
 test("/[a-z]/gimuy", {
   type: "Program",

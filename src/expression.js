@@ -836,7 +836,7 @@ pp.parseIdent = function(liberal, isBinding) {
   } else if (this.type.keyword) {
     node.name = this.type.keyword
 
-    // To fix https://github.com/ternjs/acorn/issues/575
+    // To fix https://github.com/acornjs/acorn/issues/575
     // `class` and `function` keywords push new context into this.context.
     // But there is no chance to pop the context if the keyword is consumed as an identifier such as a property name.
     // If the previous token is a dot, this does not apply because the context-managing code already ignored the keyword
