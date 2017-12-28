@@ -29310,19 +29310,19 @@ test("08.5", {
 test("undefined", {}, { ecmaVersion: 8 })
 
 testFail("\\u{74}rue", "Escape sequence in keyword true (1:0)", {ecmaVersion: 6})
-testFail("export { X \\u0061s Y }", "Escape sequence in keyword as (1:11)", {ecmaVersion: 7, sourceType: "module"})
-testFail("import X fro\\u006d 'x'", "Escape sequence in keyword from (1:9)", {ecmaVersion: 7, sourceType: "module"})
-testFail("le\\u0074 x = 5", "Escape sequence in keyword let (1:0)", {ecmaVersion: 6})
-testFail("(function* () { y\\u0069eld 10 })", "Escape sequence in keyword yield (1:16)", {ecmaVersion: 6})
-testFail("(async function() { aw\\u0061it x })", "Escape sequence in keyword await (1:20)", {ecmaVersion: 8})
-testFail("(\\u0061sync function() { await x })", "Escape sequence in keyword async (1:1)", {ecmaVersion: 8})
-testFail("(\\u0061sync () => { await x })", "Escape sequence in keyword async (1:1)", {ecmaVersion: 8})
-testFail("\\u0061sync x => { await x }", "Escape sequence in keyword async (1:0)", {ecmaVersion: 8})
-testFail("class X { \\u0061sync x() { await x } }", "Escape sequence in keyword async (1:10)", {ecmaVersion: 8})
-testFail("class X { static \\u0061sync x() { await x } }", "Escape sequence in keyword async (1:17)", {ecmaVersion: 8})
-testFail("({ ge\\u0074 x() {} })", "Escape sequence in keyword get (1:3)")
-testFail("export \\u0061sync function y() { await x }", "Escape sequence in keyword async (1:7)", {ecmaVersion: 8, sourceType: "module"})
-testFail("export default \\u0061sync function () { await x }", "Escape sequence in keyword async (1:15)", {ecmaVersion: 8, sourceType: "module"})
+testFail("export { X \\u0061s Y }", "Unexpected token (1:11)", {ecmaVersion: 7, sourceType: "module"})
+testFail("import X fro\\u006d 'x'", "Unexpected token (1:9)", {ecmaVersion: 7, sourceType: "module"})
+testFail("le\\u0074 x = 5", "Unexpected token (1:9)", {ecmaVersion: 6})
+testFail("(function* () { y\\u0069eld 10 })", "Can not use 'yield' as identifier inside a generator (1:16)", {ecmaVersion: 6})
+testFail("(async function() { aw\\u0061it x })", "Can not use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
+testFail("(\\u0061sync function() { await x })", "Unexpected token (1:12)", {ecmaVersion: 8})
+testFail("(\\u0061sync () => { await x })", "Unexpected token (1:15)", {ecmaVersion: 8})
+testFail("\\u0061sync x => { await x }", "Unexpected token (1:11)", {ecmaVersion: 8})
+testFail("class X { \\u0061sync x() { await x } }", "Unexpected token (1:21)", {ecmaVersion: 8})
+testFail("class X { static \\u0061sync x() { await x } }", "Unexpected token (1:28)", {ecmaVersion: 8})
+testFail("({ ge\\u0074 x() {} })", "Unexpected token (1:12)")
+testFail("export \\u0061sync function y() { await x }", "Unexpected token (1:7)", {ecmaVersion: 8, sourceType: "module"})
+testFail("export default \\u0061sync function () { await x }", "Unexpected token (1:26)", {ecmaVersion: 8, sourceType: "module"})
 test("(\\u0061sync ())", {
   "type": "Program",
   "start": 0,
@@ -29348,10 +29348,10 @@ test("(\\u0061sync ())", {
   ],
   "sourceType": "script"
 }, {ecmaVersion: 8})
-testFail("({ \\u0061sync x() { await x } })", "Escape sequence in keyword async (1:3)", {ecmaVersion: 8})
-testFail("for (x \\u006ff y) {}", "Escape sequence in keyword of (1:7)", {ecmaVersion: 6})
-testFail("function x () { new.ta\\u0072get }", "Escape sequence in keyword target (1:20)", {ecmaVersion: 6})
-testFail("class X { st\\u0061tic y() {} }", "Escape sequence in keyword static (1:10)", {ecmaVersion: 6})
+testFail("({ \\u0061sync x() { await x } })", "Unexpected token (1:14)", {ecmaVersion: 8})
+testFail("for (x \\u006ff y) {}", "Unexpected token (1:7)", {ecmaVersion: 6})
+testFail("function x () { new.ta\\u0072get }", "The only valid meta property for new is new.target (1:20)", {ecmaVersion: 6})
+testFail("class X { st\\u0061tic y() {} }", "Unexpected token (1:22)", {ecmaVersion: 6})
 
 testFail("(x=1)=2", "Parenthesized pattern (1:0)")
 

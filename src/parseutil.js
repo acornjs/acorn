@@ -33,13 +33,15 @@ pp.eat = function(type) {
 // Tests whether parsed token is a contextual keyword.
 
 pp.isContextual = function(name) {
-  return this.type === tt.name && this.value === name
+  return this.type === tt.name && this.value === name && !this.containsEsc
 }
 
 // Consumes contextual keyword if possible.
 
 pp.eatContextual = function(name) {
-  return this.value === name && this.eat(tt.name)
+  if (!this.isContextual(name)) return false
+  this.next()
+  return true
 }
 
 // Asserts that following token is given contextual keyword.

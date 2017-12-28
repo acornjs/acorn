@@ -250,7 +250,7 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
   let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
-      this.lastTokEnd == base.end && !this.canInsertSemicolon()
+      this.lastTokEnd == base.end && !this.canInsertSemicolon() && this.input.slice(base.start, base.end) === "async"
   for (let computed;;) {
     if ((computed = this.eat(tt.bracketL)) || this.eat(tt.dot)) {
       let node = this.startNodeAt(startPos, startLoc)
@@ -318,14 +318,14 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     return this.finishNode(node, "ThisExpression")
 
   case tt.name:
-    let startPos = this.start, startLoc = this.startLoc
+    let startPos = this.start, startLoc = this.startLoc, containsEsc = this.containsEsc
     let id = this.parseIdent(this.type !== tt.name)
-    if (this.options.ecmaVersion >= 8 && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
+    if (this.options.ecmaVersion >= 8 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
       return this.parseFunction(this.startNodeAt(startPos, startLoc), false, false, true)
     if (canBeArrow && !this.canInsertSemicolon()) {
       if (this.eat(tt.arrow))
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false)
-      if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name) {
+      if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name && !containsEsc) {
         id = this.parseIdent()
         if (this.canInsertSemicolon() || !this.eat(tt.arrow))
           this.unexpected()
@@ -485,8 +485,9 @@ pp.parseNew = function() {
   let meta = this.parseIdent(true)
   if (this.options.ecmaVersion >= 6 && this.eat(tt.dot)) {
     node.meta = meta
+    let containsEsc = this.containsEsc
     node.property = this.parseIdent(true)
-    if (node.property.name !== "target")
+    if (node.property.name !== "target" || containsEsc)
       this.raiseRecoverable(node.property.start, "The only valid meta property for new is new.target")
     if (!this.inFunction)
       this.raiseRecoverable(node.start, "new.target can only be used in functions")
@@ -575,18 +576,19 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
     if (!isPattern)
       isGenerator = this.eat(tt.star)
   }
+  let containsEsc = this.containsEsc
   this.parsePropertyName(prop)
-  if (!isPattern && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
+  if (!isPattern && !containsEsc && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
     isAsync = true
     this.parsePropertyName(prop, refDestructuringErrors)
   } else {
     isAsync = false
   }
-  this.parsePropertyValue(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
+  this.parsePropertyValue(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors, containsEsc)
   return this.finishNode(prop, "Property")
 }
 
-pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors) {
+pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors, containsEsc) {
   if ((isGenerator || isAsync) && this.type === tt.colon)
     this.unexpected()
 
@@ -598,7 +600,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
     prop.kind = "init"
     prop.method = true
     prop.value = this.parseMethod(isGenerator, isAsync)
-  } else if (!isPattern &&
+  } else if (!isPattern && !containsEsc &&
              this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
              (prop.key.name === "get" || prop.key.name === "set") &&
              (this.type != tt.comma && this.type != tt.braceR)) {

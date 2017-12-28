@@ -32,7 +32,7 @@ pp.parseTopLevel = function(node) {
 const loopLabel = {kind: "loop"}, switchLabel = {kind: "switch"}
 
 pp.isLet = function() {
-  if (this.type !== tt.name || this.options.ecmaVersion < 6 || this.value != "let") return false
+  if (this.options.ecmaVersion < 6 || !this.isContextual("let")) return false
   skipWhiteSpace.lastIndex = this.pos
   let skip = skipWhiteSpace.exec(this.input)
   let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
@@ -50,7 +50,7 @@ pp.isLet = function() {
 // - 'async /*foo*/ function' is OK.
 // - 'async /*\n*/ function' is invalid.
 pp.isAsyncFunction = function() {
-  if (this.type !== tt.name || this.options.ecmaVersion < 8 || this.value != "async")
+  if (this.options.ecmaVersion < 8 || !this.isContextual("async"))
     return false
 
   skipWhiteSpace.lastIndex = this.pos

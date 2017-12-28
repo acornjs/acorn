@@ -14627,6 +14627,26 @@ test("({__proto__: a, __proto__: b} = {})", {}, {ecmaVersion: 6});
 
 test("export default /foo/", {}, {ecmaVersion: 6, sourceType: "module"});
 
+test("l\\u0065t\na", {
+  "type": "Program",
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "Identifier",
+        "name": "let"
+      }
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "Identifier",
+        "name": "a"
+      }
+    }
+  ]
+}, {ecmaVersion: 6});
+
 test("var await = 0", {
   type: "Program",
   start: 0,
