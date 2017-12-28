@@ -523,10 +523,9 @@ pp.parseClass = function(node, isStatement) {
   classBody.body = []
   this.expect(tt.braceL)
   while (!this.eat(tt.braceR)) {
-    if (this.eat(tt.semi)) continue
-    const method = this.parseClassMember(classBody)
-    if (method.kind === "constructor") {
-      if (hadConstructor) this.raise(method.start, "Duplicate constructor in the same class")
+    const member = this.parseClassMember(classBody)
+    if (member && member.type === "MethodDefinition" && member.kind === "constructor") {
+      if (hadConstructor) this.raise(member.start, "Duplicate constructor in the same class")
       hadConstructor = true
     }
   }
@@ -535,8 +534,9 @@ pp.parseClass = function(node, isStatement) {
 }
 
 pp.parseClassMember = function(classBody) {
-  let method = this.startNode()
+  if (this.eat(tt.semi)) return null
 
+  let method = this.startNode()
   const tryContextual = (k, noLineBreak = false) => {
     const start = this.start, startLoc = this.startLoc
     if (!this.eatContextual(k)) return false
