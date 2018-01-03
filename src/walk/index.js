@@ -355,7 +355,7 @@ base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifi
 
 base.TaggedTemplateExpression = (node, st, c) => {
   c(node.tag, st, "Expression")
-  c(node.quasi, st)
+  c(node.quasi, st, "Expression")
 }
 base.ClassDeclaration = base.ClassExpression = (node, st, c) => c(node, st, "Class")
 base.Class = (node, st, c) => {
