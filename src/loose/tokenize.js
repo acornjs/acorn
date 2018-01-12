@@ -91,7 +91,7 @@ lp.resetTo = function(pos) {
   let ch = this.input.charAt(pos - 1)
   this.toks.exprAllowed = !ch || /[[{(,;:?/*=+\-~!|&%^<>]/.test(ch) ||
     /[enwfd]/.test(ch) &&
-    /\b(keywords|case|else|return|throw|new|in|(instance|type)of|delete|void)$/.test(this.input.slice(pos - 10, pos))
+    /\b(case|else|return|throw|new|in|(instance|type)?of|delete|void)$/.test(this.input.slice(pos - 10, pos))
 
   if (this.options.locations) {
     this.toks.curLine = 1
