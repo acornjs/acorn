@@ -7768,78 +7768,7 @@ test("var x = /=([^=\\s])+/g", {
   }
 });
 
-test("var x = /[P QR]/\\u0067", {
-  type: "Program",
-  body: [
-    {
-      type: "VariableDeclaration",
-      declarations: [
-        {
-          type: "VariableDeclarator",
-          id: {
-            type: "Identifier",
-            name: "x",
-            loc: {
-              start: {
-                line: 1,
-                column: 4
-              },
-              end: {
-                line: 1,
-                column: 5
-              }
-            }
-          },
-          init: {
-            type: "Literal",
-            value: /[P QR]/g,
-            loc: {
-              start: {
-                line: 1,
-                column: 8
-              },
-              end: {
-                line: 1,
-                column: 22
-              }
-            }
-          },
-          loc: {
-            start: {
-              line: 1,
-              column: 4
-            },
-            end: {
-              line: 1,
-              column: 22
-            }
-          }
-        }
-      ],
-      kind: "var",
-      loc: {
-        start: {
-          line: 1,
-          column: 0
-        },
-        end: {
-          line: 1,
-          column: 22
-        }
-      }
-    }
-  ],
-  loc: {
-    start: {
-      line: 1,
-      column: 0
-    },
-    end: {
-      line: 1,
-      column: 22
-    }
-  }
-});
+testFail("var x = /[P QR]/\\u0067", "Unexpected token (1:16)");
 
 test("new Button", {
   type: "Program",
