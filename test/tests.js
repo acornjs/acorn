@@ -29165,6 +29165,7 @@ test("/[a-z]/gim", {
 testFail("/[a-z]/u", "Invalid regular expression flag (1:1)");
 testFail("/[a-z]/y", "Invalid regular expression flag (1:1)");
 testFail("/[a-z]/s", "Invalid regular expression flag (1:1)");
+testFail("/a/gg", "Duplicate regular expression flag (1:1)");
 
 testFail("function(){}", "Unexpected token (1:8)");
 

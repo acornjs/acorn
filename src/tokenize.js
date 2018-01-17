@@ -407,10 +407,14 @@ pp.readRegexp = function() {
 
   let tmp = content, tmpFlags = ""
   if (mods) {
-    let validFlags = /^[gim]*$/
-    if (this.options.ecmaVersion >= 6) validFlags = /^[gimuy]*$/
-    if (this.options.ecmaVersion >= 9) validFlags = /^[gimsuy]*$/
-    if (!validFlags.test(mods)) this.raise(start, "Invalid regular expression flag")
+    let validFlags = "gim"
+    if (this.options.ecmaVersion >= 6) validFlags += "uy"
+    if (this.options.ecmaVersion >= 9) validFlags += "s"
+    for (let i = 0; i < mods.length; i++) {
+      let mod = mods.charAt(i)
+      if (validFlags.indexOf(mod) == -1) this.raise(start, "Invalid regular expression flag")
+      if (mods.indexOf(mod, i + 1) > -1) this.raise(start, "Duplicate regular expression flag")
+    }
     if (mods.indexOf("u") >= 0) {
       if (regexpUnicodeSupport) {
         tmpFlags = "u"
