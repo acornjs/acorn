@@ -568,7 +568,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
 pp.parseProperty = function(isPattern, refDestructuringErrors) {
   let prop = this.startNode(), isGenerator, isAsync, startPos, startLoc
   if (this.options.ecmaVersion >= 9 && this.eat(tt.ellipsis)) {
-    // To disallow parenthesized identifier.
+    // To disallow parenthesized identifier via `this.toAssignable()`.
     if (this.type === tt.parenL && refDestructuringErrors) {
       if (refDestructuringErrors.parenthesizedAssign < 0) {
         refDestructuringErrors.parenthesizedAssign = this.start
@@ -580,8 +580,13 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
     // Parse argument.
     prop.argument = isPattern ? this.parseIdent(false) : this.parseMaybeAssign(false, refDestructuringErrors)
     // To disallow trailing comma.
-    if (this.type === tt.comma && refDestructuringErrors && refDestructuringErrors.trailingComma < 0) {
-      refDestructuringErrors.trailingComma = this.start
+    if (this.type === tt.comma) {
+      if (isPattern) {
+        this.raise(this.start, "Comma is not permitted after the rest element")
+      } else if (refDestructuringErrors && refDestructuringErrors.trailingComma < 0) {
+        // via `this.toAssignable()`
+        refDestructuringErrors.trailingComma = this.start
+      }
     }
     // Finish
     return this.finishNode(prop, isPattern ? "RestElement" : "SpreadElement")
