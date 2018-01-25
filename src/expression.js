@@ -29,6 +29,8 @@ const pp = Parser.prototype
 // strict mode, init properties are also not allowed to be repeated.
 
 pp.checkPropClash = function(prop, propHash, refDestructuringErrors) {
+  if (this.options.ecmaVersion >= 9 && prop.type === "SpreadElement")
+    return
   if (this.options.ecmaVersion >= 6 && (prop.computed || prop.method || prop.shorthand))
     return
   let {key} = prop, name
@@ -565,6 +567,32 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
 
 pp.parseProperty = function(isPattern, refDestructuringErrors) {
   let prop = this.startNode(), isGenerator, isAsync, startPos, startLoc
+  if (this.options.ecmaVersion >= 9 && this.eat(tt.ellipsis)) {
+    if (isPattern) {
+      prop.argument = this.parseIdent(false)
+      if (this.type === tt.comma) {
+        this.raise(this.start, "Comma is not permitted after the rest element")
+      }
+      return this.finishNode(prop, "RestElement")
+    }
+    // To disallow parenthesized identifier via `this.toAssignable()`.
+    if (this.type === tt.parenL && refDestructuringErrors) {
+      if (refDestructuringErrors.parenthesizedAssign < 0) {
+        refDestructuringErrors.parenthesizedAssign = this.start
+      }
+      if (refDestructuringErrors.parenthesizedBind < 0) {
+        refDestructuringErrors.parenthesizedBind = this.start
+      }
+    }
+    // Parse argument.
+    prop.argument = this.parseMaybeAssign(false, refDestructuringErrors)
+    // To disallow trailing comma via `this.toAssignable()`.
+    if (this.type === tt.comma && refDestructuringErrors && refDestructuringErrors.trailingComma < 0) {
+      refDestructuringErrors.trailingComma = this.start
+    }
+    // Finish
+    return this.finishNode(prop, "SpreadElement")
+  }
   if (this.options.ecmaVersion >= 6) {
     prop.method = false
     prop.shorthand = false

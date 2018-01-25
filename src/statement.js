@@ -665,13 +665,17 @@ pp.checkPatternExport = function(exports, pat) {
     this.checkExport(exports, pat.name, pat.start)
   else if (type == "ObjectPattern")
     for (let prop of pat.properties)
-      this.checkPatternExport(exports, prop.value)
+      this.checkPatternExport(exports, prop)
   else if (type == "ArrayPattern")
     for (let elt of pat.elements) {
       if (elt) this.checkPatternExport(exports, elt)
     }
+  else if (type == "Property")
+    this.checkPatternExport(exports, pat.value)
   else if (type == "AssignmentPattern")
     this.checkPatternExport(exports, pat.left)
+  else if (type == "RestElement")
+    this.checkPatternExport(exports, pat.argument)
   else if (type == "ParenthesizedExpression")
     this.checkPatternExport(exports, pat.expression)
 }

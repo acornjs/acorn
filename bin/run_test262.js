@@ -9,8 +9,6 @@ const unsupportedFeatures = [
   "class-fields",
   "class-fields-private",
   "class-fields-public",
-  "object-rest",
-  "object-spread",
   "optional-catch-binding",
   "regexp-lookbehind",
   "regexp-named-groups",

@@ -23,8 +23,20 @@ pp.toAssignable = function(node, isBinding, refDestructuringErrors) {
     case "ObjectExpression":
       node.type = "ObjectPattern"
       if (refDestructuringErrors) this.checkPatternErrors(refDestructuringErrors, true)
-      for (let prop of node.properties)
+      for (let prop of node.properties) {
         this.toAssignable(prop, isBinding)
+        // Early error:
+        //   AssignmentRestProperty[Yield, Await] :
+        //     `...` DestructuringAssignmentTarget[Yield, Await]
+        //
+        //   It is a Syntax Error if |DestructuringAssignmentTarget| is an |ArrayLiteral| or an |ObjectLiteral|.
+        if (
+          prop.type === "RestElement" &&
+          (prop.argument.type === "ArrayPattern" || prop.argument.type === "ObjectPattern")
+        ) {
+          this.raise(prop.argument.start, "Unexpected token")
+        }
+      }
       break
 
     case "Property":
