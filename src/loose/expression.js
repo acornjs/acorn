@@ -368,6 +368,12 @@ lp.parseObj = function() {
   if (this.curIndent + 1 < indent) { indent = this.curIndent; line = this.curLineStart }
   while (!this.closes(tt.braceR, indent, line)) {
     let prop = this.startNode(), isGenerator, isAsync, start
+    if (this.options.ecmaVersion >= 9 && this.eat(tt.ellipsis)) {
+      prop.argument = this.parseMaybeAssign()
+      node.properties.push(this.finishNode(prop, "SpreadElement"))
+      this.eat(tt.comma)
+      continue
+    }
     if (this.options.ecmaVersion >= 6) {
       start = this.storeCurrentPos()
       prop.method = false
@@ -476,12 +482,13 @@ lp.toAssignable = function(node, binding) {
     return this.dummyIdent()
   } else if (node.type == "ObjectExpression") {
     node.type = "ObjectPattern"
-    let props = node.properties
-    for (let prop of props)
-      this.toAssignable(prop.value, binding)
+    for (let prop of node.properties)
+      this.toAssignable(prop, binding)
   } else if (node.type == "ArrayExpression") {
     node.type = "ArrayPattern"
     this.toAssignableList(node.elements, binding)
+  } else if (node.type == "Property") {
+    this.toAssignable(node.value, binding)
   } else if (node.type == "SpreadElement") {
     node.type = "RestElement"
     this.toAssignable(node.argument, binding)

@@ -10,6 +10,7 @@
     require("./tests-trailing-commas-in-func.js");
     require("./tests-template-literal-revision.js");
     require("./tests-directive.js");
+    require("./tests-rest-spread-properties.js");
     acorn = require("../dist/acorn")
     require("../dist/acorn_loose")
   } else {
