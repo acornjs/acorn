@@ -49,7 +49,9 @@ lp.parseStatement = function() {
     return this.finishNode(node, "DoWhileStatement")
 
   case tt._for:
-    this.next()
+    this.next() // `for` keyword
+    let isAwait = this.options.ecmaVersion >= 9 && this.inAsync && this.eatContextual("await")
+
     this.pushCx()
     this.expect(tt.parenL)
     if (this.tok.type === tt.semi) return this.parseFor(node, null)
@@ -57,13 +59,20 @@ lp.parseStatement = function() {
     if (isLet || this.tok.type === tt._var || this.tok.type === tt._const) {
       let init = this.parseVar(true, isLet ? "let" : this.tok.value)
       if (init.declarations.length === 1 && (this.tok.type === tt._in || this.isContextual("of"))) {
+        if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
+          node.await = isAwait
+        }
         return this.parseForIn(node, init)
       }
       return this.parseFor(node, init)
     }
     let init = this.parseExpression(true)
-    if (this.tok.type === tt._in || this.isContextual("of"))
+    if (this.tok.type === tt._in || this.isContextual("of")) {
+      if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
+        node.await = isAwait
+      }
       return this.parseForIn(node, this.toAssignable(init))
+    }
     return this.parseFor(node, init)
 
   case tt._function:
@@ -282,8 +291,9 @@ lp.parseClass = function(isStatement) {
     if (!method.computed &&
         method.key.type === "Identifier" && method.key.name === "async" && this.tok.type !== tt.parenL &&
         !this.canInsertSemicolon()) {
-      this.parsePropertyName(method)
       isAsync = true
+      isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
+      this.parsePropertyName(method)
     } else {
       isAsync = false
     }

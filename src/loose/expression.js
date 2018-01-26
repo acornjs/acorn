@@ -382,8 +382,9 @@ lp.parseObj = function() {
     }
     this.parsePropertyName(prop)
     if (this.toks.isAsyncProp(prop)) {
-      this.parsePropertyName(prop)
       isAsync = true
+      isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
+      this.parsePropertyName(prop)
     } else {
       isAsync = false
     }

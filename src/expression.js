@@ -542,7 +542,7 @@ pp.parseTemplate = function({isTagged = false} = {}) {
 
 pp.isAsyncProp = function(prop) {
   return !prop.computed && prop.key.type === "Identifier" && prop.key.name === "async" &&
-    (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL || this.type.keyword) &&
+    (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL || this.type.keyword || (this.options.ecmaVersion >= 9 && this.type === tt.star)) &&
     !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
 }
 
@@ -607,6 +607,7 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
   this.parsePropertyName(prop)
   if (!isPattern && !containsEsc && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
     isAsync = true
+    isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
     this.parsePropertyName(prop, refDestructuringErrors)
   } else {
     isAsync = false

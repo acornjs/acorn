@@ -187,10 +187,14 @@ pp.parseDoStatement = function(node) {
 
 pp.parseForStatement = function(node) {
   this.next()
+  let awaitAt = (this.options.ecmaVersion >= 9 && this.inAsync && this.eatContextual("await")) ? this.lastTokStart : -1
   this.labels.push(loopLabel)
   this.enterLexicalScope()
   this.expect(tt.parenL)
-  if (this.type === tt.semi) return this.parseFor(node, null)
+  if (this.type === tt.semi) {
+    if (awaitAt > -1) this.unexpected(awaitAt)
+    return this.parseFor(node, null)
+  }
   let isLet = this.isLet()
   if (this.type === tt._var || this.type === tt._const || isLet) {
     let init = this.startNode(), kind = isLet ? "let" : this.value
@@ -198,19 +202,32 @@ pp.parseForStatement = function(node) {
     this.parseVar(init, true, kind)
     this.finishNode(init, "VariableDeclaration")
     if ((this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1 &&
-        !(kind !== "var" && init.declarations[0].init))
+        !(kind !== "var" && init.declarations[0].init)) {
+      if (this.options.ecmaVersion >= 9) {
+        if (this.type === tt._in) {
+          if (awaitAt > -1) this.unexpected(awaitAt)
+        } else node.await = awaitAt > -1
+      }
       return this.parseForIn(node, init)
+    }
+    if (awaitAt > -1) this.unexpected(awaitAt)
     return this.parseFor(node, init)
   }
   let refDestructuringErrors = new DestructuringErrors
   let init = this.parseExpression(true, refDestructuringErrors)
   if (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
+    if (this.options.ecmaVersion >= 9) {
+      if (this.type === tt._in) {
+        if (awaitAt > -1) this.unexpected(awaitAt)
+      } else node.await = awaitAt > -1
+    }
     this.toAssignable(init, false, refDestructuringErrors)
     this.checkLVal(init)
     return this.parseForIn(node, init)
   } else {
     this.checkExpressionErrors(refDestructuringErrors, true)
   }
+  if (awaitAt > -1) this.unexpected(awaitAt)
   return this.parseFor(node, init)
 }
 
@@ -468,7 +485,7 @@ pp.parseVarId = function(decl, kind) {
 
 pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.initFunction(node)
-  if (this.options.ecmaVersion >= 6 && !isAsync)
+  if (this.options.ecmaVersion >= 9 || this.options.ecmaVersion >= 6 && !isAsync)
     node.generator = this.eat(tt.star)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
@@ -555,6 +572,7 @@ pp.parseClassMember = function(classBody) {
   if (!isGenerator) {
     if (this.options.ecmaVersion >= 8 && tryContextual("async", true)) {
       isAsync = true
+      isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
     } else if (tryContextual("get")) {
       method.kind = "get"
     } else if (tryContextual("set")) {
