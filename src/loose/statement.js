@@ -59,13 +59,20 @@ lp.parseStatement = function() {
     if (isLet || this.tok.type === tt._var || this.tok.type === tt._const) {
       let init = this.parseVar(true, isLet ? "let" : this.tok.value)
       if (init.declarations.length === 1 && (this.tok.type === tt._in || this.isContextual("of"))) {
-        return this.parseForIn(node, init, isAwait)
+        if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
+          node.await = isAwait
+        }
+        return this.parseForIn(node, init)
       }
       return this.parseFor(node, init)
     }
     let init = this.parseExpression(true)
-    if (this.tok.type === tt._in || this.isContextual("of"))
+    if (this.tok.type === tt._in || this.isContextual("of")) {
+      if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
+        node.await = isAwait
+      }
       return this.parseForIn(node, this.toAssignable(init), isAwait)
+    }
     return this.parseFor(node, init)
 
   case tt._function:
@@ -220,12 +227,9 @@ lp.parseFor = function(node, init) {
   return this.finishNode(node, "ForStatement")
 }
 
-lp.parseForIn = function(node, init, isAwait) {
+lp.parseForIn = function(node, init) {
   let type = this.tok.type === tt._in ? "ForInStatement" : "ForOfStatement"
   this.next()
-  if (this.options.ecmaVersion >= 9 && type === "ForOfStatement") {
-    node.await = isAwait
-  }
   node.left = init
   node.right = this.parseExpression()
   this.popCx()
