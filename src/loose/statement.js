@@ -71,7 +71,7 @@ lp.parseStatement = function() {
       if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
         node.await = isAwait
       }
-      return this.parseForIn(node, this.toAssignable(init), isAwait)
+      return this.parseForIn(node, this.toAssignable(init))
     }
     return this.parseFor(node, init)
 
