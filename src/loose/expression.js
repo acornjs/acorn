@@ -376,6 +376,7 @@ lp.parseObj = function() {
     }
     this.parsePropertyName(prop)
     if (this.toks.isAsyncProp(prop)) {
+      isGenerator = this.eat(tt.star)
       this.parsePropertyName(prop)
       isAsync = true
     } else {
