@@ -650,10 +650,10 @@ testFail("function f() { for await (x of xs); }", "Unexpected token (1:19)", { e
 testFail("f = function() { for await (x of xs); }", "Unexpected token (1:21)", { ecmaVersion: 9 })
 testFail("f = () => { for await (x of xs); }", "Unexpected token (1:16)", { ecmaVersion: 9 })
 testFail("async function f() { () => { for await (x of xs); } }", "Unexpected token (1:33)", { ecmaVersion: 9 })
-testFail("async function f() { for await (x in xs); }", "Unexpected token (1:34)", { ecmaVersion: 9 })
-testFail("async function f() { for await (;;); }", "Unexpected token (1:32)", { ecmaVersion: 9 })
-testFail("async function f() { for await (x;;); }", "Unexpected token (1:33)", { ecmaVersion: 9 })
-testFail("async function f() { for await (let x = 0;;); }", "Unexpected token (1:41)", { ecmaVersion: 9 })
+testFail("async function f() { for await (x in xs); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
+testFail("async function f() { for await (;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
+testFail("async function f() { for await (x;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
+testFail("async function f() { for await (let x = 0;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
 testFail("async function f() { for await (x of xs); }", "Unexpected token (1:25)", { ecmaVersion: 8 })
 
 //------------------------------------------------------------------------------
