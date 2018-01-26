@@ -51,6 +51,7 @@ lp.parseStatement = function() {
   case tt._for:
     this.next()
     this.pushCx()
+    if (this.options.ecmaVersion >= 9) node.await = this.eatContextual("await")
     this.expect(tt.parenL)
     if (this.tok.type === tt.semi) return this.parseFor(node, null)
     let isLet = this.toks.isLet()
@@ -282,6 +283,7 @@ lp.parseClass = function(isStatement) {
     if (!method.computed &&
         method.key.type === "Identifier" && method.key.name === "async" && this.tok.type !== tt.parenL &&
         !this.canInsertSemicolon()) {
+      isGenerator = this.eat(tt.star)
       this.parsePropertyName(method)
       isAsync = true
     } else {
