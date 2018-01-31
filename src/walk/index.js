@@ -122,7 +122,7 @@ export function findNodeAround(node, pos, test, base, state) {
   try {
     (function c(node, st, override) {
       let type = override || node.type
-      if (node.start > pos || node.end < pos) return
+      if (node.start > pos || node.end <= pos) return
       base[type](node, st, c)
       if (test(type, node)) throw new Found(node, st)
     })(node, state)
