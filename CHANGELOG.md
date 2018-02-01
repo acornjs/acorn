@@ -1,3 +1,17 @@
+## 5.4.0 (2018-02-01)
+
+### Bug fixes
+
+Disallow duplicate or escaped flags on regular expressions.
+
+Disallow octal escapes in strings in strict mode.
+
+### New features
+
+Add support for async iteration.
+
+Add support for object spread and rest.
+
 ## 5.3.0 (2017-12-28)
 
 ### Bug fixes
