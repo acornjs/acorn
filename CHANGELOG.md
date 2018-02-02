@@ -1,3 +1,9 @@
+## 5.4.1 (2018-02-02)
+
+### Bug fixes
+
+5.4.0 somehow accidentally included an old version of walk.js.
+
 ## 5.4.0 (2018-02-01)
 
 ### Bug fixes
