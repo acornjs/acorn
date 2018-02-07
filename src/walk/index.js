@@ -361,8 +361,11 @@ base.ClassDeclaration = base.ClassExpression = (node, st, c) => c(node, st, "Cla
 base.Class = (node, st, c) => {
   if (node.id) c(node.id, st, "Pattern")
   if (node.superClass) c(node.superClass, st, "Expression")
-  for (let item of node.body.body)
-    c(item, st)
+  c(node.body, st)
+}
+base.ClassBody = (node, st, c) => {
+  for (let elt of node.body)
+    c(elt, st)
 }
 base.MethodDefinition = base.Property = (node, st, c) => {
   if (node.computed) c(node.key, st, "Expression")
