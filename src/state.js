@@ -89,6 +89,9 @@ export class Parser {
     // Scope tracking for duplicate variable names (see scope.js)
     this.scopeStack = []
     this.enterFunctionScope()
+
+    // Lazy initialization
+    this.regexpValidator = null
   }
 
   // DEPRECATED Kept for backwards compatibility until 3.0 in case a plugin uses them
