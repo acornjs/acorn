@@ -12,6 +12,8 @@
     require("./tests-directive.js");
     require("./tests-rest-spread-properties.js");
     require("./tests-async-iteration.js");
+    require("./tests-regexp.js");
+    require("./tests-regexp-2018.js");
     acorn = require("../dist/acorn")
     require("../dist/acorn_loose")
   } else {

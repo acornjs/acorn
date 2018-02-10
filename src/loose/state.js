@@ -1,5 +1,7 @@
 import {tokenizer, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from "../index"
 
+function noop() {}
+
 // Registered plugins
 export const pluginsLoose = {}
 
@@ -9,6 +11,8 @@ export class LooseParser {
     this.options = this.toks.options
     this.input = this.toks.input
     this.tok = this.last = {type: tt.eof, start: 0, end: 0}
+    this.tok.validateRegExpFlags = noop
+    this.tok.validateRegExpPattern = noop
     if (this.options.locations) {
       let here = this.toks.curPosition()
       this.tok.loc = new SourceLocation(this.toks, here, here)
