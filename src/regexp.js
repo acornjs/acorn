@@ -61,7 +61,7 @@ export class RegExpValidator {
     this.parser = parser
     this.ecmaVersion = parser.options.ecmaVersion
     this.validFlags = `gim${this.ecmaVersion >= 6 ? "uy" : ""}${this.ecmaVersion >= 9 ? "s" : ""}`
-    this.pattern = ""
+    this.source = ""
     this.start = 0
     this.pos = 0
     this.numCapturingParens = 0
@@ -105,13 +105,13 @@ export class RegExpValidator {
    */
   validatePattern(start, pattern, unicode) {
     this.start = start | 0
-    this.pattern = pattern + ""
+    this.source = pattern + ""
     this.pos = 0
     this.numCapturingParens = 0
     this.maxBackReference = 0
 
     this.disjunction(unicode)
-    if (this.pos !== this.pattern.length) {
+    if (this.pos !== this.source.length) {
       // Make the same messages as V8.
       if (this.eat(RIGHT_PARENTHESIS)) {
         this.raise("Unmatched ')'")
@@ -131,12 +131,12 @@ export class RegExpValidator {
   // ---------------------------------------------------------------------------
 
   raise(message) {
-    this.parser.raise(this.start, `Invalid regular expression: /${this.pattern}/: ${message}`)
+    this.parser.raise(this.start, `Invalid regular expression: /${this.source}/: ${message}`)
   }
 
   // Node.js 0.12/0.10 don't support String.prototype.codePointAt().
   codePointAt(i) {
-    const s = this.pattern
+    const s = this.source
     const l = s.length
     if (i >= l) {
       return -1
@@ -149,7 +149,7 @@ export class RegExpValidator {
   }
 
   nextIndex(i) {
-    const s = this.pattern
+    const s = this.source
     const l = s.length
     if (i >= l) {
       return l
@@ -182,15 +182,15 @@ export class RegExpValidator {
   }
 
   parseDecimalInt(start, end) {
-    return parseInt(this.pattern.slice(start, end), 10)
+    return parseInt(this.source.slice(start, end), 10)
   }
 
   parseHexInt(start, end) {
-    return parseInt(this.pattern.slice(start, end), 16)
+    return parseInt(this.source.slice(start, end), 16)
   }
 
   parseOctalInt(start, end) {
-    return parseInt(this.pattern.slice(start, end), 8)
+    return parseInt(this.source.slice(start, end), 8)
   }
 
   // ---------------------------------------------------------------------------
@@ -215,7 +215,7 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-Alternative
   alternative(unicode) {
-    while (this.pos < this.pattern.length && this.eatTerm(unicode))
+    while (this.pos < this.source.length && this.eatTerm(unicode))
       ;
   }
 
@@ -890,6 +890,6 @@ export class RegExpValidator {
     // This is a surrogate pair and no `u` flag, so returns a code point.
     // If the right of `-` then returns the lead surrogate.
     // If the left of `-` then returns the trail surrogate.
-    return this.pattern.charCodeAt(isRight ? i : i + 1)
+    return this.source.charCodeAt(isRight ? i : i + 1)
   }
 }
