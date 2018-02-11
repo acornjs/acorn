@@ -10,7 +10,6 @@ const unsupportedFeatures = [
   "class-fields-public",
   "optional-catch-binding",
   "regexp-lookbehind",
-  "regexp-named-groups",
   "regexp-unicode-property-escapes"
 ];
 
