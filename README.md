@@ -28,10 +28,13 @@ The easiest way to install acorn is with [`npm`][npm].
 npm install acorn
 ```
 
-Alternately, download the source.
+Alternately, you can download the source and build acorn yourself:
 
 ```sh
 git clone https://github.com/acornjs/acorn.git
+cd acorn
+npm install
+npm run build
 ```
 
 ## Components
