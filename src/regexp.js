@@ -1,4 +1,5 @@
 import {isIdentifierStart, isIdentifierChar} from "./identifier.js"
+import UNICODE_PROPERTY_VALUES from "./unicode-property-data.js"
 
 const BACKSPACE = 0x08
 const CHARACTER_TABULATION = 0x09
@@ -30,6 +31,7 @@ const LATIN_CAPITAL_LETTER_A = 0x41 // A
 const LATIN_CAPITAL_LETTER_B = 0x42 // B
 const LATIN_CAPITAL_LETTER_D = 0x44 // D
 const LATIN_CAPITAL_LETTER_F = 0x46 // F
+const LATIN_CAPITAL_LETTER_P = 0x50 // P
 const LATIN_CAPITAL_LETTER_S = 0x53 // S
 const LATIN_CAPITAL_LETTER_W = 0x57 // W
 const LATIN_CAPITAL_LETTER_Z = 0x5A // Z
@@ -41,6 +43,7 @@ const LATIN_SMALL_LETTER_D = 0x64 // d
 const LATIN_SMALL_LETTER_F = 0x66 // f
 const LATIN_SMALL_LETTER_K = 0x6B // k
 const LATIN_SMALL_LETTER_N = 0x6E // n
+const LATIN_SMALL_LETTER_P = 0x70 // p
 const LATIN_SMALL_LETTER_R = 0x72 // r
 const LATIN_SMALL_LETTER_S = 0x73 // s
 const LATIN_SMALL_LETTER_T = 0x74 // t
@@ -73,9 +76,9 @@ export class RegExpValidator {
     this.switchU = false
     this.switchN = false
     this.pos = 0
+    this.lastStringValue = ""
     this.numCapturingParens = 0
     this.maxBackReference = 0
-    this.lastGroupName = ""
     this.groupNames = []
     this.backReferenceNames = []
   }
@@ -514,10 +517,10 @@ export class RegExpValidator {
   groupSpecifier() {
     if (this.eat(QUESTION_MARK)) {
       if (this.eatGroupName()) {
-        if (this.groupNames.indexOf(this.lastGroupName) !== -1) {
+        if (this.groupNames.indexOf(this.lastStringValue) !== -1) {
           this.raise("Duplicate capture group name")
         }
-        this.groupNames.push(this.lastGroupName)
+        this.groupNames.push(this.lastStringValue)
         return
       }
       this.raise("Invalid group")
@@ -529,9 +532,9 @@ export class RegExpValidator {
   // RegExpIdentifierName[U] ::
   //   RegExpIdentifierStart[?U]
   //   RegExpIdentifierName[?U] RegExpIdentifierPart[?U]
-  // Note: this updates `this.lastGroupName` property with the eaten name.
+  // Note: this updates `this.lastStringValue` property with the eaten name.
   eatGroupName() {
-    this.lastGroupName = ""
+    this.lastStringValue = ""
     if (this.eat(LESS_THAN_SIGN)) {
       if (this.eatRegExpIdentifierStart()) {
         while (this.eatRegExpIdentifierPart())
@@ -550,7 +553,7 @@ export class RegExpValidator {
   //   `$`
   //   `_`
   //   `\` RegExpUnicodeEscapeSequence[?U]
-  // Note: this appends the eaten character to `this.lastGroupName` property.
+  // Note: this appends the eaten character to `this.lastStringValue` property.
   eatRegExpIdentifierStart() {
     const start = this.pos
     let ch = this.current()
@@ -560,7 +563,7 @@ export class RegExpValidator {
       ch = this._parseRegExpUnicodeEscapeSequence(start + 1, this.pos)
     }
     if (this._isRegExpIdentifierStart(ch)) {
-      this.lastGroupName += this.codePointToString(ch)
+      this.lastStringValue += this.codePointToString(ch)
       return true
     }
 
@@ -578,7 +581,7 @@ export class RegExpValidator {
   //   `\` RegExpUnicodeEscapeSequence[?U]
   //   <ZWNJ>
   //   <ZWJ>
-  // Note: this appends the eaten character to `this.lastGroupName` property.
+  // Note: this appends the eaten character to `this.lastStringValue` property.
   eatRegExpIdentifierPart() {
     const start = this.pos
     let ch = this.current()
@@ -588,7 +591,7 @@ export class RegExpValidator {
       ch = this._parseRegExpUnicodeEscapeSequence(start + 1, this.pos)
     }
     if (this._isRegExpIdentifierPart(ch)) {
-      this.lastGroupName += this.codePointToString(ch)
+      this.lastStringValue += this.codePointToString(ch)
       return true
     }
 
@@ -639,7 +642,7 @@ export class RegExpValidator {
   _eatKGroupName() {
     if (this.eat(LATIN_SMALL_LETTER_K)) {
       if (this.eatGroupName()) {
-        this.backReferenceNames.push(this.lastGroupName)
+        this.backReferenceNames.push(this.lastStringValue)
         return true
       }
       this.raise("Invalid named reference")
@@ -797,9 +800,17 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClassEscape
   eatCharacterClassEscape() {
-    if (this._isCharacterClassEscape(this.current())) {
+    const ch = this.current()
+    if (this._isCharacterClassEscape(ch)) {
       this.advance()
       return true
+    }
+    if (this.switchU && this.ecmaVersion >= 9 && (ch === LATIN_CAPITAL_LETTER_P || ch === LATIN_SMALL_LETTER_P)) {
+      this.advance()
+      if (this.eat(LEFT_CURLY_BRACKET) && this.eatUnicodePropertyValueExpression() && this.eat(RIGHT_CURLY_BRACKET)) {
+        return true
+      }
+      this.raise("Invalid property name")
     }
     return false
   }
@@ -812,6 +823,76 @@ export class RegExpValidator {
       ch === LATIN_SMALL_LETTER_W ||
       ch === LATIN_CAPITAL_LETTER_W
     )
+  }
+
+  // UnicodePropertyValueExpression ::
+  //   UnicodePropertyName `=` UnicodePropertyValue
+  //   LoneUnicodePropertyNameOrValue
+  eatUnicodePropertyValueExpression() {
+    const start = this.pos
+
+    if (this.eatUnicodePropertyName() && this.eat(EQUALS_SIGN)) {
+      const name = this.lastStringValue
+      if (this.eatUnicodePropertyValue()) {
+        const value = this.lastStringValue
+        this._validateUnicodePropertyNameAndValue(name, value)
+        return true
+      }
+    }
+    this.pos = start
+
+    if (this.eatLoneUnicodePropertyNameOrValue()) {
+      const nameOrValue = this.lastStringValue
+      this._validateUnicodePropertyNameOrValue(nameOrValue)
+      return true
+    }
+    return false
+  }
+  _validateUnicodePropertyNameAndValue(name, value) {
+    if (!UNICODE_PROPERTY_VALUES.hasOwnProperty(name) || UNICODE_PROPERTY_VALUES[name].indexOf(value) === -1) {
+      this.raise("Invalid property name")
+    }
+  }
+  _validateUnicodePropertyNameOrValue(nameOrValue) {
+    if (UNICODE_PROPERTY_VALUES.$LONE.indexOf(nameOrValue) === -1) {
+      this.raise("Invalid property name")
+    }
+  }
+
+  // UnicodePropertyName ::
+  //   UnicodePropertyNameCharacters
+  eatUnicodePropertyName() {
+    let ch = 0
+    this.lastStringValue = ""
+    while (this._isUnicodePropertyNameCharacter(ch = this.current())) {
+      this.lastStringValue += this.codePointToString(ch)
+      this.advance()
+    }
+    return this.lastStringValue !== ""
+  }
+  _isUnicodePropertyNameCharacter(ch) {
+    return this._isControlLetter(ch) || ch === LOW_LINE
+  }
+
+  // UnicodePropertyValue ::
+  //   UnicodePropertyValueCharacters
+  eatUnicodePropertyValue() {
+    let ch = 0
+    this.lastStringValue = ""
+    while (this._isUnicodePropertyValueCharacter(ch = this.current())) {
+      this.lastStringValue += this.codePointToString(ch)
+      this.advance()
+    }
+    return this.lastStringValue !== ""
+  }
+  _isUnicodePropertyValueCharacter(ch) {
+    return this._isUnicodePropertyNameCharacter(ch) || this._isDecimalDigit(ch)
+  }
+
+  // LoneUnicodePropertyNameOrValue ::
+  //   UnicodePropertyValueCharacters
+  eatLoneUnicodePropertyNameOrValue() {
+    return this.eatUnicodePropertyValue()
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClass
@@ -1020,6 +1101,8 @@ export class RegExpValidator {
       case LATIN_CAPITAL_LETTER_S:
       case LATIN_SMALL_LETTER_W:
       case LATIN_CAPITAL_LETTER_W:
+      case LATIN_SMALL_LETTER_P:
+      case LATIN_CAPITAL_LETTER_P:
         return -1 // Those are not single character.
 
       // CharacterEscape

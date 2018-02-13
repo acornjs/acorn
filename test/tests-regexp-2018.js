@@ -67,3 +67,36 @@ test("/(?<\\u0061\\u0062\\u0063>a)\\k<\\u{61}\\u{62}\\u{63}>/u", {}, { ecmaVersi
 testFail("/(?<\\u0061\\u0062\\u0063>a)\\k<abd>/u", "Invalid regular expression: /(?<\\u0061\\u0062\\u0063>a)\\k<abd>/: Invalid named capture referenced (1:1)", { ecmaVersion: 2018 })
 testFail("/(?<11>a)\\k<11>/u", "Invalid regular expression: /(?<11>a)\\k<11>/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
 test("/(?<a1>a)\\k<a1>/u", {}, { ecmaVersion: 2018 })
+
+//------------------------------------------------------------------------------
+// Unicode property escapes
+//------------------------------------------------------------------------------
+
+test("/\\p/", {}, { ecmaVersion: 2017 })
+testFail("/\\p/u", "Invalid regular expression: /\\p/: Invalid escape (1:1)", { ecmaVersion: 2017 })
+test("/\\p/", {}, { ecmaVersion: 2018 })
+testFail("/\\p/u", "Invalid regular expression: /\\p/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+test("/\\p{/", {}, { ecmaVersion: 2017 })
+testFail("/\\p{/u", "Invalid regular expression: /\\p{/: Invalid escape (1:1)", { ecmaVersion: 2017 })
+test("/\\p{/", {}, { ecmaVersion: 2018 })
+testFail("/\\p{/u", "Invalid regular expression: /\\p{/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+test("/\\p{ASCII/", {}, { ecmaVersion: 2017 })
+testFail("/\\p{ASCII/u", "Invalid regular expression: /\\p{ASCII/: Invalid escape (1:1)", { ecmaVersion: 2017 })
+test("/\\p{ASCII/", {}, { ecmaVersion: 2018 })
+testFail("/\\p{ASCII/u", "Invalid regular expression: /\\p{ASCII/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+test("/\\p{ASCII}/", {}, { ecmaVersion: 2017 })
+testFail("/\\p{ASCII}/u", "Invalid regular expression: /\\p{ASCII}/: Invalid escape (1:1)", { ecmaVersion: 2017 })
+test("/\\p{ASCII}/", {}, { ecmaVersion: 2018 })
+test("/\\p{ASCII}/u", {}, { ecmaVersion: 2018 })
+
+test("/\\p{Emoji}/u", {}, { ecmaVersion: 2018 })
+testFail("/\\p{General_Category}/u", "Invalid regular expression: /\\p{General_Category}/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+testFail("/\\p{General_Category=}/u", "Invalid regular expression: /\\p{General_Category=}/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+testFail("/\\p{General_Category/u", "Invalid regular expression: /\\p{General_Category/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+testFail("/\\p{General_Category=/u", "Invalid regular expression: /\\p{General_Category=/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+testFail("/\\p{General_Category=Letter/u", "Invalid regular expression: /\\p{General_Category=Letter/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+test("/\\p{General_Category=Letter}/u", {}, { ecmaVersion: 2018 })
+testFail("/\\p{General_Category=Hiragana}/u", "Invalid regular expression: /\\p{General_Category=Hiragana}/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+test("/\\p{Script=Hiragana}/u", {}, { ecmaVersion: 2018 })
+testFail("/[\\p{Script=Hiragana}-\\p{Script=Katakana}]/u", "Invalid regular expression: /[\\p{Script=Hiragana}-\\p{Script=Katakana}]/: Invalid character class (1:1)", { ecmaVersion: 2018 })
+test("/[\\p{Script=Hiragana}\\-\\p{Script=Katakana}]/u", {}, { ecmaVersion: 2018 })

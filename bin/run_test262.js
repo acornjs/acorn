@@ -9,8 +9,7 @@ const unsupportedFeatures = [
   "class-fields-private",
   "class-fields-public",
   "optional-catch-binding",
-  "regexp-lookbehind",
-  "regexp-unicode-property-escapes"
+  "regexp-lookbehind"
 ];
 
 run(
