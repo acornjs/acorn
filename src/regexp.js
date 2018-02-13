@@ -19,7 +19,6 @@ const FULL_STOP = 0x2E // .
 const SOLIDUS = 0x2F // /
 const DIGIT_ZERO = 0x30 // 0
 const DIGIT_ONE = 0x31 // 1
-const DIGIT_THREE = 0x33 // 3
 const DIGIT_SEVEN = 0x37 // 7
 const DIGIT_NINE = 0x39 // 9
 const COLON = 0x3A // :
@@ -76,6 +75,7 @@ export class RegExpValidator {
     this.switchU = false
     this.switchN = false
     this.pos = 0
+    this.lastIntValue = 0
     this.lastStringValue = ""
     this.numCapturingParens = 0
     this.maxBackReference = 0
@@ -191,24 +191,17 @@ export class RegExpValidator {
     return false
   }
 
-  parseDecimalInt(start, end) {
-    return parseInt(this.source.slice(start, end), 10)
-  }
-
-  parseHexInt(start, end) {
-    return parseInt(this.source.slice(start, end), 16)
-  }
-
-  parseOctalInt(start, end) {
-    return parseInt(this.source.slice(start, end), 8)
-  }
-
   codePointToString(ch) {
     if (ch <= 0xFFFF) {
       return String.fromCharCode(ch)
     }
-    ch -= 0x10000
-    return String.fromCharCode((ch >> 10) + 0xD800, (ch & 0x03FF) + 0xDC00)
+    return String.fromCharCode(this._getLeadSurrogate(ch), this._getTrailSurrogate(ch))
+  }
+  _getLeadSurrogate(ch) {
+    return ((ch - 0x10000) >> 10) + 0xD800
+  }
+  _getTrailSurrogate(ch) {
+    return ((ch - 0x10000) & 0x03FF) + 0xDC00
   }
 
   // ---------------------------------------------------------------------------
@@ -353,14 +346,11 @@ export class RegExpValidator {
   _eatBracedQuantifier(noError) {
     const start = this.pos
     if (this.eat(LEFT_CURLY_BRACKET)) {
-      let i = this.pos, min = 0, max = -1
+      let min = 0, max = -1
       if (this.eatDecimalDigits()) {
-        min = this.parseDecimalInt(i, this.pos)
-        if (this.eat(COMMA)) {
-          i = this.pos
-          if (this.eatDecimalDigits()) {
-            max = this.parseDecimalInt(i, this.pos)
-          }
+        min = this.lastIntValue
+        if (this.eat(COMMA) && this.eatDecimalDigits()) {
+          max = this.lastIntValue
         }
         if (this.eat(RIGHT_CURLY_BRACKET)) {
           // SyntaxError in https://www.ecma-international.org/ecma-262/8.0/#sec-term
@@ -453,7 +443,9 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-SyntaxCharacter
   eatSyntaxCharacter() {
-    if (this._isSyntaxCharacter(this.current())) {
+    const ch = this.current()
+    if (this._isSyntaxCharacter(ch)) {
+      this.lastIntValue = ch
       this.advance()
       return true
     }
@@ -560,7 +552,7 @@ export class RegExpValidator {
     this.advance()
 
     if (ch === REVERSE_SOLIDUS && this.eatRegExpUnicodeEscapeSequence()) {
-      ch = this._parseRegExpUnicodeEscapeSequence(start + 1, this.pos)
+      ch = this.lastIntValue
     }
     if (this._isRegExpIdentifierStart(ch)) {
       this.lastStringValue += this.codePointToString(ch)
@@ -588,7 +580,7 @@ export class RegExpValidator {
     this.advance()
 
     if (ch === REVERSE_SOLIDUS && this.eatRegExpUnicodeEscapeSequence()) {
-      ch = this._parseRegExpUnicodeEscapeSequence(start + 1, this.pos)
+      ch = this.lastIntValue
     }
     if (this._isRegExpIdentifierPart(ch)) {
       this.lastStringValue += this.codePointToString(ch)
@@ -624,7 +616,7 @@ export class RegExpValidator {
   _eatBackReference() {
     const start = this.pos
     if (this.eatDecimalEscape()) {
-      const n = this.parseDecimalInt(start, this.pos)
+      const n = this.lastIntValue
       if (this.switchU) {
         // For SyntaxError in https://www.ecma-international.org/ecma-262/8.0/#sec-atomescape
         if (n > this.maxBackReference) {
@@ -674,6 +666,7 @@ export class RegExpValidator {
   }
   _eatZero() {
     if (this.current() === DIGIT_ZERO && !this._isDecimalDigit(this.lookahead())) {
+      this.lastIntValue = 0
       this.advance()
       return true
     }
@@ -682,25 +675,40 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-ControlEscape
   eatControlEscape() {
-    if (this._isControlEscape(this.current())) {
+    const ch = this.current()
+    if (ch === LATIN_SMALL_LETTER_T) {
+      this.lastIntValue = CHARACTER_TABULATION
+      this.advance()
+      return true
+    }
+    if (ch === LATIN_SMALL_LETTER_N) {
+      this.lastIntValue = LINE_FEED
+      this.advance()
+      return true
+    }
+    if (ch === LATIN_SMALL_LETTER_V) {
+      this.lastIntValue = LINE_TABULATION
+      this.advance()
+      return true
+    }
+    if (ch === LATIN_SMALL_LETTER_F) {
+      this.lastIntValue = FORM_FEED
+      this.advance()
+      return true
+    }
+    if (ch === LATIN_SMALL_LETTER_R) {
+      this.lastIntValue = CARRIAGE_RETURN
       this.advance()
       return true
     }
     return false
   }
-  _isControlEscape(ch) {
-    return (
-      ch === LATIN_SMALL_LETTER_F ||
-      ch === LATIN_SMALL_LETTER_N ||
-      ch === LATIN_SMALL_LETTER_R ||
-      ch === LATIN_SMALL_LETTER_T ||
-      ch === LATIN_SMALL_LETTER_V
-    )
-  }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-ControlLetter
   eatControlLetter() {
-    if (this._isControlLetter(this.current())) {
+    const ch = this.current()
+    if (this._isControlLetter(ch)) {
+      this.lastIntValue = ch % 0x20
       this.advance()
       return true
     }
@@ -719,16 +727,18 @@ export class RegExpValidator {
 
     if (this.eat(LATIN_SMALL_LETTER_U)) {
       if (this._eatFixedHexDigits(4)) {
-        const code = this.parseHexInt(this.pos - 4, this.pos)
-        if (this.switchU && code >= 0xD800 && code <= 0xDBFF) {
+        const lead = this.lastIntValue
+        if (this.switchU && lead >= 0xD800 && lead <= 0xDBFF) {
           const leadSurrogateEnd = this.pos
           if (this.eat(REVERSE_SOLIDUS) && this.eat(LATIN_SMALL_LETTER_U) && this._eatFixedHexDigits(4)) {
-            const codeT = this.parseHexInt(this.pos - 4, this.pos)
-            if (codeT >= 0xDC00 && codeT <= 0xDFFF) {
+            const trail = this.lastIntValue
+            if (trail >= 0xDC00 && trail <= 0xDFFF) {
+              this.lastIntValue = (lead - 0xD800) * 0x400 + (trail - 0xDC00) + 0x10000
               return true
             }
           }
           this.pos = leadSurrogateEnd
+          this.lastIntValue = lead
         }
         return true
       }
@@ -737,7 +747,7 @@ export class RegExpValidator {
         this.eat(LEFT_CURLY_BRACKET) &&
         this.eatHexDigits() &&
         this.eat(RIGHT_CURLY_BRACKET) &&
-        this._isValidUnicode(this.parseHexInt(start + 2, this.pos - 1))
+        this._isValidUnicode(this.lastIntValue)
       ) {
         return true
       }
@@ -752,33 +762,23 @@ export class RegExpValidator {
   _isValidUnicode(ch) {
     return ch >= 0 && ch <= 0x10FFFF
   }
-  _parseRegExpUnicodeEscapeSequence(start, end) {
-    start += 1 // skip `u`
-    if (end - start >= 3 && this.codePointAt(start) === LEFT_CURLY_BRACKET) {
-      return this.parseHexInt(start + 1, end - 1)
-    }
-    if (end - start === 4) {
-      return this.parseHexInt(start, end)
-    }
-    if (end - start === 10) {
-      const lead = this.parseHexInt(start, start + 4)
-      const trail = this.parseHexInt(end - 4, end)
-      return (lead - 0xD800) * 0x400 + (trail - 0xDC00) + 0x10000
-    }
-    return LATIN_SMALL_LETTER_U
-  }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-IdentityEscape
   eatIdentityEscape() {
     if (this.switchU) {
-      return (
-        this.eatSyntaxCharacter() ||
-        this.eat(SOLIDUS)
-      )
+      if (this.eatSyntaxCharacter()) {
+        return true
+      }
+      if (this.eat(SOLIDUS)) {
+        this.lastIntValue = SOLIDUS
+        return true
+      }
+      return false
     }
 
     const ch = this.current()
     if (ch !== LATIN_SMALL_LETTER_C && (!this.switchN || ch !== LATIN_SMALL_LETTER_K)) {
+      this.lastIntValue = ch
       this.advance()
       return true
     }
@@ -788,9 +788,11 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-DecimalEscape
   eatDecimalEscape() {
+    this.lastIntValue = 0
     let ch = this.current()
     if (ch >= DIGIT_ONE && ch <= DIGIT_NINE) {
       do {
+        this.lastIntValue = 10 * this.lastIntValue + (ch - DIGIT_ZERO)
         this.advance()
       } while ((ch = this.current()) >= DIGIT_ZERO && ch <= DIGIT_NINE)
       return true
@@ -802,10 +804,12 @@ export class RegExpValidator {
   eatCharacterClassEscape() {
     const ch = this.current()
     if (this._isCharacterClassEscape(ch)) {
+      this.lastIntValue = -1
       this.advance()
       return true
     }
     if (this.switchU && this.ecmaVersion >= 9 && (ch === LATIN_CAPITAL_LETTER_P || ch === LATIN_SMALL_LETTER_P)) {
+      this.lastIntValue = -1
       this.advance()
       if (this.eat(LEFT_CURLY_BRACKET) && this.eatUnicodePropertyValueExpression() && this.eat(RIGHT_CURLY_BRACKET)) {
         return true
@@ -913,22 +917,16 @@ export class RegExpValidator {
   // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRanges
   // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRangesNoDash
   classRanges() {
-    for (; ;) {
-      const leftStart = this.pos
+    for (;;) {
       if (this.eatClassAtom()) {
-        const leftEnd = this.pos
-        if (this.eat(HYPHEN_MINUS)) {
-          const rightStart = this.pos
-          if (this.eatClassAtom()) {
-            const rightEnd = this.pos
-            const left = this._parseClassAtom(leftStart, leftEnd, false)
-            const right = this._parseClassAtom(rightStart, rightEnd, true)
-            if (this.switchU && (left === -1 || right === -1)) {
-              this.raise("Invalid character class")
-            }
-            if (left !== -1 && right !== -1 && left > right) {
-              this.raise("Range out of order in character class")
-            }
+        const left = (this.switchU || this.lastIntValue <= 0xFFFF) ? this.lastIntValue : this._getTrailSurrogate(this.lastIntValue)
+        if (this.eat(HYPHEN_MINUS) && this.eatClassAtom()) {
+          const right = (this.switchU || this.lastIntValue <= 0xFFFF) ? this.lastIntValue : this._getLeadSurrogate(this.lastIntValue)
+          if (this.switchU && (left === -1 || right === -1)) {
+            this.raise("Invalid character class")
+          }
+          if (left !== -1 && right !== -1 && left > right) {
+            this.raise("Range out of order in character class")
           }
         }
       } else {
@@ -959,6 +957,7 @@ export class RegExpValidator {
 
     const ch = this.current()
     if (ch !== RIGHT_SQUARE_BRACKET) {
+      this.lastIntValue = ch
       this.advance()
       return true
     }
@@ -968,29 +967,29 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ClassEscape
   eatClassEscape() {
-    return (
-      this.eat(LATIN_SMALL_LETTER_B) ||
-      (this.switchU && this.eat(HYPHEN_MINUS)) ||
-      (!this.switchU && this._eatCClassControlLetter()) ||
-      this.eatCharacterClassEscape() ||
-      this.eatCharacterEscape()
-    )
-  }
-  _eatCClassControlLetter() {
     const start = this.pos
-    if (this.eat(LATIN_SMALL_LETTER_C)) {
+    if (this.eat(LATIN_SMALL_LETTER_B)) {
+      this.lastIntValue = BACKSPACE
+      return true
+    }
+    if (this.switchU && this.eat(HYPHEN_MINUS)) {
+      this.lastIntValue = HYPHEN_MINUS
+      return true
+    }
+    if (!this.switchU && this.eat(LATIN_SMALL_LETTER_C)) {
       if (this.eatClassControlLetter()) {
         return true
       }
       this.pos = start
     }
-    return false
+    return this.eatCharacterClassEscape() || this.eatCharacterEscape()
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ClassControlLetter
   eatClassControlLetter() {
     const ch = this.current()
     if (this._isDecimalDigit(ch) || ch === LOW_LINE) {
+      this.lastIntValue = ch % 0x20
       this.advance()
       return true
     }
@@ -1000,7 +999,6 @@ export class RegExpValidator {
   // https://www.ecma-international.org/ecma-262/8.0/#prod-HexEscapeSequence
   eatHexEscapeSequence() {
     const start = this.pos
-
     if (this.eat(LATIN_SMALL_LETTER_X)) {
       if (this._eatFixedHexDigits(2)) {
         return true
@@ -1010,14 +1008,16 @@ export class RegExpValidator {
       }
       this.pos = start
     }
-
     return false
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-DecimalDigits
   eatDecimalDigits() {
     const start = this.pos
-    while (this._isDecimalDigit(this.current())) {
+    let ch = 0
+    this.lastIntValue = 0
+    while (this._isDecimalDigit(ch = this.current())) {
+      this.lastIntValue = 10 * this.lastIntValue + (ch - DIGIT_ZERO)
       this.advance()
     }
     return this.pos !== start
@@ -1029,7 +1029,10 @@ export class RegExpValidator {
   // https://www.ecma-international.org/ecma-262/8.0/#prod-HexDigits
   eatHexDigits() {
     const start = this.pos
-    while (this._isHexDigit(this.current())) {
+    let ch = 0
+    this.lastIntValue = 0
+    while (this._isHexDigit(ch = this.current())) {
+      this.lastIntValue = 16 * this.lastIntValue + this._hexToInt(ch)
       this.advance()
     }
     return this.pos !== start
@@ -1041,14 +1044,30 @@ export class RegExpValidator {
       (ch >= LATIN_SMALL_LETTER_A && ch <= LATIN_SMALL_LETTER_F)
     )
   }
+  _hexToInt(ch) {
+    if (ch >= LATIN_CAPITAL_LETTER_A && ch <= LATIN_CAPITAL_LETTER_F) {
+      return 10 + (ch - LATIN_CAPITAL_LETTER_A)
+    }
+    if (ch >= LATIN_SMALL_LETTER_A && ch <= LATIN_SMALL_LETTER_F) {
+      return 10 + (ch - LATIN_SMALL_LETTER_A)
+    }
+    return ch - DIGIT_ZERO
+  }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-LegacyOctalEscapeSequence
   // Allows only 0-377(octal) i.e. 0-255(decimal).
   eatLegacyOctalEscapeSequence() {
-    const ch = this.current()
     if (this.eatOctalDigit()) {
-      if (this.eatOctalDigit() && ch <= DIGIT_THREE) {
-        this.eatOctalDigit()
+      const n1 = this.lastIntValue
+      if (this.eatOctalDigit()) {
+        const n2 = this.lastIntValue
+        if (n1 <= 3 && this.eatOctalDigit()) {
+          this.lastIntValue = n1 * 64 + n2 * 8 + this.lastIntValue
+        } else {
+          this.lastIntValue = n1 * 8 + n2
+        }
+      } else {
+        this.lastIntValue = n1
       }
       return true
     }
@@ -1057,10 +1076,13 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-OctalDigit
   eatOctalDigit() {
-    if (this._isOctalDigit(this.current())) {
+    const ch = this.current()
+    if (this._isOctalDigit(ch)) {
+      this.lastIntValue = ch - DIGIT_ZERO
       this.advance()
       return true
     }
+    this.lastIntValue = 0
     return false
   }
   _isOctalDigit(ch) {
@@ -1072,80 +1094,16 @@ export class RegExpValidator {
   // And HexDigit HexDigit in https://www.ecma-international.org/ecma-262/8.0/#prod-HexEscapeSequence
   _eatFixedHexDigits(length) {
     const start = this.pos
+    this.lastIntValue = 0
     for (let i = 0; i < length; ++i) {
-      if (!this._isHexDigit(this.current())) {
+      const ch = this.current()
+      if (!this._isHexDigit(ch)) {
         this.pos = start
         return false
       }
+      this.lastIntValue = 16 * this.lastIntValue + this._hexToInt(ch)
       this.advance()
     }
     return true
-  }
-
-  // https://www.ecma-international.org/ecma-262/8.0/#sec-classatom
-  // https://www.ecma-international.org/ecma-262/8.0/#sec-classatomnodash
-  // https://www.ecma-international.org/ecma-262/8.0/#sec-classescape
-  // Get the value of chracters to validate class ranges (e.g., [a-z]).
-  _parseClassAtom(start, end, isRight) {
-    const ch1 = this._getOneElementCharSetAt(start, isRight)
-    if (ch1 === REVERSE_SOLIDUS) {
-      const ch2 = this._getOneElementCharSetAt(start + 1, isRight)
-      switch (ch2) {
-      case LATIN_SMALL_LETTER_B:
-        return BACKSPACE
-
-      // CharacterClassEscape
-      case LATIN_SMALL_LETTER_D:
-      case LATIN_CAPITAL_LETTER_D:
-      case LATIN_SMALL_LETTER_S:
-      case LATIN_CAPITAL_LETTER_S:
-      case LATIN_SMALL_LETTER_W:
-      case LATIN_CAPITAL_LETTER_W:
-      case LATIN_SMALL_LETTER_P:
-      case LATIN_CAPITAL_LETTER_P:
-        return -1 // Those are not single character.
-
-      // CharacterEscape
-      case LATIN_SMALL_LETTER_T:
-        return CHARACTER_TABULATION
-      case LATIN_SMALL_LETTER_N:
-        return LINE_FEED
-      case LATIN_SMALL_LETTER_V:
-        return LINE_TABULATION
-      case LATIN_SMALL_LETTER_F:
-        return FORM_FEED
-      case LATIN_SMALL_LETTER_R:
-        return CARRIAGE_RETURN
-      case LATIN_SMALL_LETTER_C:
-        if (end - start === 3) {
-          return this.codePointAt(start + 2) % 32
-        }
-        return LATIN_SMALL_LETTER_C
-      case LATIN_SMALL_LETTER_X:
-        if (end - start === 4) {
-          return this.parseHexInt(start + 2, end)
-        }
-        return LATIN_SMALL_LETTER_X
-      case LATIN_SMALL_LETTER_U:
-        return this._parseRegExpUnicodeEscapeSequence(start + 1, end)
-      default:
-        if (!this.switchU && ch2 >= DIGIT_ZERO && ch2 <= DIGIT_SEVEN) {
-          return this.parseOctalInt(start + 1, end)
-        }
-        return ch2
-      }
-    }
-    return ch1
-  }
-  // https://www.ecma-international.org/ecma-262/8.0/#sec-notation
-  _getOneElementCharSetAt(i, isRight) {
-    const ch = this.codePointAt(i)
-    if (this.switchU || ch <= 0xFFFF) {
-      return ch
-    }
-    // This is a surrogate pair and no `u` flag, so returns a code point.
-    // If the right of `-` then returns the lead surrogate.
-    // If the left of `-` then returns the trail surrogate.
-    return this.source.charCodeAt(isRight ? i : i + 1)
   }
 }
