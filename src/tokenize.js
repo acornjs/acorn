@@ -2,8 +2,8 @@ import {isIdentifierStart, isIdentifierChar} from "./identifier"
 import {types as tt, keywords as keywordTypes} from "./tokentype"
 import {Parser} from "./state"
 import {SourceLocation} from "./locutil"
+import {RegExpValidationState} from "./regexp"
 import {lineBreak, lineBreakG, isNewLine, nonASCIIwhitespace} from "./whitespace"
-import {RegExpValidator} from "./regexp"
 
 // Object type used to represent tokens. Note that normally, tokens
 // simply exist as properties on the parser object. This is only
@@ -388,9 +388,10 @@ pp.readRegexp = function() {
   if (this.containsEsc) this.unexpected(flagsStart)
 
   // Validate pattern
-  const validator = this.regexpValidator || (this.regexpValidator = new RegExpValidator(this))
-  validator.validateFlags(start, flags)
-  validator.validatePattern(start, pattern, flags.indexOf("u") !== -1)
+  const state = this.regexpState || (this.regexpState = new RegExpValidationState(this))
+  state.reset(start, pattern, flags)
+  this.validateRegExpFlags(state)
+  this.validateRegExpPattern(state)
 
   // Create Literal#value property value.
   let value = null

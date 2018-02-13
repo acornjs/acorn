@@ -90,8 +90,8 @@ export class Parser {
     this.scopeStack = []
     this.enterFunctionScope()
 
-    // Lazy initialization
-    this.regexpValidator = null
+    // For RegExp validation
+    this.regexpState = null
   }
 
   // DEPRECATED Kept for backwards compatibility until 3.0 in case a plugin uses them
