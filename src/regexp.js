@@ -2,8 +2,6 @@ import {isIdentifierStart, isIdentifierChar} from "./identifier.js"
 import {Parser} from "./state.js"
 import UNICODE_PROPERTY_VALUES from "./unicode-property-data.js"
 
-/* eslint no-invalid-this: error */
-
 const BACKSPACE = 0x08
 const CHARACTER_TABULATION = 0x09
 const LINE_FEED = 0x0A
@@ -199,14 +197,6 @@ pp.validateRegExpPattern = function(state) {
     this.validateRegExp_pattern(state)
   }
 }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Productions
-// ---------------------------------------------------------------------------
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Pattern
 pp.validateRegExp_pattern = function(state) {
@@ -518,23 +508,30 @@ pp.validateRegExp_groupSpecifier = function(state) {
 
 // GroupName[U] ::
 //   `<` RegExpIdentifierName[?U] `>`
-// RegExpIdentifierName[U] ::
-//   RegExpIdentifierStart[?U]
-//   RegExpIdentifierName[?U] RegExpIdentifierPart[?U]
 // Note: this updates `state.lastStringValue` property with the eaten name.
 pp.validateRegExp_eatGroupName = function(state) {
   state.lastStringValue = ""
   if (state.eat(LESS_THAN_SIGN)) {
-    if (this.validateRegExp_eatRegExpIdentifierStart(state)) {
-      state.lastStringValue += codePointToString(state.lastIntValue)
-      while (this.validateRegExp_eatRegExpIdentifierPart(state)) {
-        state.lastStringValue += codePointToString(state.lastIntValue)
-      }
-      if (state.eat(GREATER_THAN_SIGN)) {
-        return true
-      }
+    if (this.validateRegExp_eatRegExpIdentifierName(state) && state.eat(GREATER_THAN_SIGN)) {
+      return true
     }
     state.raise("Invalid capture group name")
+  }
+  return false
+}
+
+// RegExpIdentifierName[U] ::
+//   RegExpIdentifierStart[?U]
+//   RegExpIdentifierName[?U] RegExpIdentifierPart[?U]
+// Note: this updates `state.lastStringValue` property with the eaten name.
+pp.validateRegExp_eatRegExpIdentifierName = function(state) {
+  state.lastStringValue = ""
+  if (this.validateRegExp_eatRegExpIdentifierStart(state)) {
+    state.lastStringValue += codePointToString(state.lastIntValue)
+    while (this.validateRegExp_eatRegExpIdentifierPart(state)) {
+      state.lastStringValue += codePointToString(state.lastIntValue)
+    }
+    return true
   }
   return false
 }
