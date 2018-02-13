@@ -70,6 +70,8 @@ export class RegExpValidator {
     this.validFlags = `gim${this.ecmaVersion >= 6 ? "uy" : ""}${this.ecmaVersion >= 9 ? "s" : ""}`
     this.source = ""
     this.start = 0
+    this.switchU = false
+    this.switchN = false
     this.pos = 0
     this.numCapturingParens = 0
     this.maxBackReference = 0
@@ -116,15 +118,18 @@ export class RegExpValidator {
   validatePattern(start, pattern, unicode) {
     this.start = start | 0
     this.source = pattern + ""
-    this.pattern(unicode, unicode && this.ecmaVersion >= 9)
+    this.switchU = !!unicode && this.ecmaVersion >= 6
+    this.switchN = !!unicode && this.ecmaVersion >= 9
+    this.pattern()
 
     // The goal symbol for the parse is |Pattern[~U, ~N]|. If the result of
     // parsing contains a |GroupName|, reparse with the goal symbol
     // |Pattern[~U, +N]| and use this result instead. Throw a *SyntaxError*
     // exception if _P_ did not conform to the grammar, if any elements of _P_
     // were not matched by the parse, or if any Early Error conditions exist.
-    if (!unicode && this.ecmaVersion >= 9 && this.groupNames.length > 0) {
-      this.pattern(false, true)
+    if (!this.switchN && this.ecmaVersion >= 9 && this.groupNames.length > 0) {
+      this.switchN = true
+      this.pattern()
     }
   }
 
@@ -208,14 +213,14 @@ export class RegExpValidator {
   // ---------------------------------------------------------------------------
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-Pattern
-  pattern(unicode, namedGroups) {
+  pattern() {
     this.pos = 0
     this.numCapturingParens = 0
     this.maxBackReference = 0
     this.groupNames.length = 0
     this.backReferenceNames.length = 0
 
-    this.disjunction(unicode, namedGroups)
+    this.disjunction()
 
     if (this.pos !== this.source.length) {
       // Make the same messages as V8.
@@ -237,14 +242,14 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
-  disjunction(unicode, namedGroups) {
-    this.alternative(unicode, namedGroups)
+  disjunction() {
+    this.alternative()
     while (this.eat(VERTICAL_LINE)) {
-      this.alternative(unicode, namedGroups)
+      this.alternative()
     }
 
     // Make the same message as V8.
-    if (this.eatQuantifier(unicode, true)) {
+    if (this.eatQuantifier(true)) {
       this.raise("Nothing to repeat")
     }
     if (this.eat(LEFT_CURLY_BRACKET)) {
@@ -253,19 +258,19 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-Alternative
-  alternative(unicode, namedGroups) {
-    while (this.pos < this.source.length && this.eatTerm(unicode, namedGroups))
+  alternative() {
+    while (this.pos < this.source.length && this.eatTerm())
       ;
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Term
-  eatTerm(unicode, namedGroups) {
+  eatTerm() {
     const start = this.pos
 
-    if (this.eatQuantifiableAssertion(namedGroups)) {
-      if (this.eatQuantifier(unicode)) {
+    if (this.eatQuantifiableAssertion()) {
+      if (this.eatQuantifier()) {
         // Make the same message as V8.
-        if (unicode) {
+        if (this.switchU) {
           this.raise("Invalid quantifier")
         }
         return true
@@ -273,12 +278,12 @@ export class RegExpValidator {
       this.pos = start
     }
 
-    if (this.eatAssertion(unicode, namedGroups)) {
+    if (this.eatAssertion()) {
       return true
     }
 
-    if (unicode ? this.eatAtom(true, namedGroups) : this.eatExtendedAtom(namedGroups)) {
-      this.eatQuantifier(unicode)
+    if (this.switchU ? this.eatAtom() : this.eatExtendedAtom()) {
+      this.eatQuantifier()
       return true
     }
 
@@ -286,12 +291,12 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Assertion
-  eatAssertion(unicode, namedGroups) {
+  eatAssertion() {
     return (
       this.eat(CIRCUMFLEX_ACCENT) ||
       this.eat(DOLLAR_SIGN) ||
       this._eatWordBoundary() ||
-      this._eatLookaheadAssertion(unicode, namedGroups)
+      this._eatLookaheadAssertion()
     )
   }
   _eatWordBoundary() {
@@ -304,11 +309,11 @@ export class RegExpValidator {
     }
     return false
   }
-  _eatLookaheadAssertion(unicode, namedGroups) {
+  _eatLookaheadAssertion() {
     const start = this.pos
     if (this.eat(LEFT_PARENTHESIS)) {
       if (this.eat(QUESTION_MARK) && (this.eat(EQUALS_SIGN) || this.eat(EXCLAMATION_MARK))) {
-        this.disjunction(unicode, namedGroups)
+        this.disjunction()
         if (!this.eat(RIGHT_PARENTHESIS)) {
           this.raise("Unterminated group")
         }
@@ -320,13 +325,13 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-QuantifiableAssertion
-  eatQuantifiableAssertion(namedGroups) {
-    return this._eatLookaheadAssertion(false, namedGroups)
+  eatQuantifiableAssertion() {
+    return this._eatLookaheadAssertion()
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-Quantifier
-  eatQuantifier(unicode, noError = false) {
-    if (this.eatQuantifierPrefix(unicode, noError)) {
+  eatQuantifier(noError = false) {
+    if (this.eatQuantifierPrefix(noError)) {
       this.eat(QUESTION_MARK)
       return true
     }
@@ -334,15 +339,15 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-QuantifierPrefix
-  eatQuantifierPrefix(unicode, noError) {
+  eatQuantifierPrefix(noError) {
     return (
       this.eat(ASTERISK) ||
       this.eat(PLUS_SIGN) ||
       this.eat(QUESTION_MARK) ||
-      this._eatBracedQuantifier(unicode, noError)
+      this._eatBracedQuantifier(noError)
     )
   }
-  _eatBracedQuantifier(unicode, noError) {
+  _eatBracedQuantifier(noError) {
     const start = this.pos
     if (this.eat(LEFT_CURLY_BRACKET)) {
       let i = this.pos, min = 0, max = -1
@@ -362,7 +367,7 @@ export class RegExpValidator {
           return true
         }
       }
-      if (unicode && !noError) {
+      if (this.switchU && !noError) {
         this.raise("Incomplete quantifier")
       }
       this.pos = start
@@ -371,31 +376,31 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-Atom
-  eatAtom(unicode, namedGroups) {
+  eatAtom() {
     return (
       this.eatPatternCharacters() ||
       this.eat(FULL_STOP) ||
-      this._eatReverseSolidusAtomEscape(unicode, namedGroups) ||
-      this.eatCharacterClass(unicode, namedGroups) ||
-      this._eatUncapturingGroup(unicode, namedGroups) ||
-      this._eatCapturingGroup(unicode, namedGroups)
+      this._eatReverseSolidusAtomEscape() ||
+      this.eatCharacterClass() ||
+      this._eatUncapturingGroup() ||
+      this._eatCapturingGroup()
     )
   }
-  _eatReverseSolidusAtomEscape(unicode, namedGroups) {
+  _eatReverseSolidusAtomEscape() {
     const start = this.pos
     if (this.eat(REVERSE_SOLIDUS)) {
-      if (this.eatAtomEscape(unicode, namedGroups)) {
+      if (this.eatAtomEscape()) {
         return true
       }
       this.pos = start
     }
     return false
   }
-  _eatUncapturingGroup(unicode, namedGroups) {
+  _eatUncapturingGroup() {
     const start = this.pos
     if (this.eat(LEFT_PARENTHESIS)) {
       if (this.eat(QUESTION_MARK) && this.eat(COLON)) {
-        this.disjunction(unicode, namedGroups)
+        this.disjunction()
         if (this.eat(RIGHT_PARENTHESIS)) {
           return true
         }
@@ -405,14 +410,14 @@ export class RegExpValidator {
     }
     return false
   }
-  _eatCapturingGroup(unicode, namedGroups) {
+  _eatCapturingGroup() {
     if (this.eat(LEFT_PARENTHESIS)) {
       if (this.ecmaVersion >= 9) {
-        this.groupSpecifier(unicode)
+        this.groupSpecifier()
       } else if (this.current() === QUESTION_MARK) {
         this.raise("Invalid group")
       }
-      this.disjunction(unicode, namedGroups)
+      this.disjunction()
       if (this.eat(RIGHT_PARENTHESIS)) {
         this.numCapturingParens += 1
         return true
@@ -423,13 +428,13 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ExtendedAtom
-  eatExtendedAtom(namedGroups) {
+  eatExtendedAtom() {
     return (
       this.eat(FULL_STOP) ||
-      this._eatReverseSolidusAtomEscape(false, namedGroups) ||
-      this.eatCharacterClass(false, namedGroups) ||
-      this._eatUncapturingGroup(false, namedGroups) ||
-      this._eatCapturingGroup(false, namedGroups) ||
+      this._eatReverseSolidusAtomEscape() ||
+      this.eatCharacterClass() ||
+      this._eatUncapturingGroup() ||
+      this._eatCapturingGroup() ||
       this.eatInvalidBracedQuantifier() ||
       this.eatExtendedPatternCharacter()
     )
@@ -437,7 +442,7 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-InvalidBracedQuantifier
   eatInvalidBracedQuantifier() {
-    if (this._eatBracedQuantifier(false, true)) {
+    if (this._eatBracedQuantifier(true)) {
       this.raise("Nothing to repeat")
     }
     return false
@@ -506,9 +511,9 @@ export class RegExpValidator {
   // GroupSpecifier[U] ::
   //   [empty]
   //   `?` GroupName[?U]
-  groupSpecifier(unicode) {
+  groupSpecifier() {
     if (this.eat(QUESTION_MARK)) {
-      if (this.eatGroupName(unicode)) {
+      if (this.eatGroupName()) {
         if (this.groupNames.indexOf(this.lastGroupName) !== -1) {
           this.raise("Duplicate capture group name")
         }
@@ -525,11 +530,11 @@ export class RegExpValidator {
   //   RegExpIdentifierStart[?U]
   //   RegExpIdentifierName[?U] RegExpIdentifierPart[?U]
   // Note: this updates `this.lastGroupName` property with the eaten name.
-  eatGroupName(unicode) {
+  eatGroupName() {
     this.lastGroupName = ""
     if (this.eat(LESS_THAN_SIGN)) {
-      if (this.eatRegExpIdentifierStart(unicode)) {
-        while (this.eatRegExpIdentifierPart(unicode))
+      if (this.eatRegExpIdentifierStart()) {
+        while (this.eatRegExpIdentifierPart())
           ;
         if (this.eat(GREATER_THAN_SIGN)) {
           return true
@@ -546,12 +551,12 @@ export class RegExpValidator {
   //   `_`
   //   `\` RegExpUnicodeEscapeSequence[?U]
   // Note: this appends the eaten character to `this.lastGroupName` property.
-  eatRegExpIdentifierStart(unicode) {
+  eatRegExpIdentifierStart() {
     const start = this.pos
     let ch = this.current()
     this.advance()
 
-    if (ch === REVERSE_SOLIDUS && this.eatRegExpUnicodeEscapeSequence(unicode)) {
+    if (ch === REVERSE_SOLIDUS && this.eatRegExpUnicodeEscapeSequence()) {
       ch = this._parseRegExpUnicodeEscapeSequence(start + 1, this.pos)
     }
     if (this._isRegExpIdentifierStart(ch)) {
@@ -574,12 +579,12 @@ export class RegExpValidator {
   //   <ZWNJ>
   //   <ZWJ>
   // Note: this appends the eaten character to `this.lastGroupName` property.
-  eatRegExpIdentifierPart(unicode) {
+  eatRegExpIdentifierPart() {
     const start = this.pos
     let ch = this.current()
     this.advance()
 
-    if (ch === REVERSE_SOLIDUS && this.eatRegExpUnicodeEscapeSequence(unicode)) {
+    if (ch === REVERSE_SOLIDUS && this.eatRegExpUnicodeEscapeSequence()) {
       ch = this._parseRegExpUnicodeEscapeSequence(start + 1, this.pos)
     }
     if (this._isRegExpIdentifierPart(ch)) {
@@ -595,16 +600,16 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-AtomEscape
-  eatAtomEscape(unicode, namedGroups) {
+  eatAtomEscape() {
     if (
-      this._eatBackReference(unicode) ||
-      this.eatCharacterClassEscape(unicode) ||
-      this.eatCharacterEscape(unicode, namedGroups) ||
-      (namedGroups && this._eatKGroupName(unicode))
+      this._eatBackReference() ||
+      this.eatCharacterClassEscape() ||
+      this.eatCharacterEscape() ||
+      (this.switchN && this._eatKGroupName())
     ) {
       return true
     }
-    if (unicode) {
+    if (this.switchU) {
       // Make the same message as V8.
       if (this.current() === LATIN_SMALL_LETTER_C) {
         this.raise("Invalid unicode escape")
@@ -613,11 +618,11 @@ export class RegExpValidator {
     }
     return false
   }
-  _eatBackReference(unicode) {
+  _eatBackReference() {
     const start = this.pos
     if (this.eatDecimalEscape()) {
       const n = this.parseDecimalInt(start, this.pos)
-      if (unicode) {
+      if (this.switchU) {
         // For SyntaxError in https://www.ecma-international.org/ecma-262/8.0/#sec-atomescape
         if (n > this.maxBackReference) {
           this.maxBackReference = n
@@ -631,9 +636,9 @@ export class RegExpValidator {
     }
     return false
   }
-  _eatKGroupName(unicode) {
+  _eatKGroupName() {
     if (this.eat(LATIN_SMALL_LETTER_K)) {
-      if (this.eatGroupName(unicode)) {
+      if (this.eatGroupName()) {
         this.backReferenceNames.push(this.lastGroupName)
         return true
       }
@@ -643,15 +648,15 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-CharacterEscape
-  eatCharacterEscape(unicode, namedGroups) {
+  eatCharacterEscape() {
     return (
       this.eatControlEscape() ||
       this._eatCControlLetter() ||
       this._eatZero() ||
-      this.eatHexEscapeSequence(unicode) ||
-      this.eatRegExpUnicodeEscapeSequence(unicode) ||
-      (!unicode && this.eatLegacyOctalEscapeSequence()) ||
-      this.eatIdentityEscape(unicode, namedGroups)
+      this.eatHexEscapeSequence() ||
+      this.eatRegExpUnicodeEscapeSequence() ||
+      (!this.switchU && this.eatLegacyOctalEscapeSequence()) ||
+      this.eatIdentityEscape()
     )
   }
   _eatCControlLetter() {
@@ -706,13 +711,13 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-RegExpUnicodeEscapeSequence
-  eatRegExpUnicodeEscapeSequence(unicode) {
+  eatRegExpUnicodeEscapeSequence() {
     const start = this.pos
 
     if (this.eat(LATIN_SMALL_LETTER_U)) {
       if (this._eatFixedHexDigits(4)) {
         const code = this.parseHexInt(this.pos - 4, this.pos)
-        if (unicode && code >= 0xD800 && code <= 0xDBFF) {
+        if (this.switchU && code >= 0xD800 && code <= 0xDBFF) {
           const leadSurrogateEnd = this.pos
           if (this.eat(REVERSE_SOLIDUS) && this.eat(LATIN_SMALL_LETTER_U) && this._eatFixedHexDigits(4)) {
             const codeT = this.parseHexInt(this.pos - 4, this.pos)
@@ -725,7 +730,7 @@ export class RegExpValidator {
         return true
       }
       if (
-        unicode &&
+        this.switchU &&
         this.eat(LEFT_CURLY_BRACKET) &&
         this.eatHexDigits() &&
         this.eat(RIGHT_CURLY_BRACKET) &&
@@ -733,7 +738,7 @@ export class RegExpValidator {
       ) {
         return true
       }
-      if (unicode) {
+      if (this.switchU) {
         this.raise("Invalid unicode escape")
       }
       this.pos = start
@@ -761,8 +766,8 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-IdentityEscape
-  eatIdentityEscape(unicode, namedGroups) {
-    if (unicode) {
+  eatIdentityEscape() {
+    if (this.switchU) {
       return (
         this.eatSyntaxCharacter() ||
         this.eat(SOLIDUS)
@@ -770,7 +775,7 @@ export class RegExpValidator {
     }
 
     const ch = this.current()
-    if (ch !== LATIN_SMALL_LETTER_C && (!namedGroups || ch !== LATIN_SMALL_LETTER_K)) {
+    if (ch !== LATIN_SMALL_LETTER_C && (!this.switchN || ch !== LATIN_SMALL_LETTER_K)) {
       this.advance()
       return true
     }
@@ -810,10 +815,10 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClass
-  eatCharacterClass(unicode, namedGroups) {
+  eatCharacterClass() {
     if (this.eat(LEFT_SQUARE_BRACKET)) {
       this.eat(CIRCUMFLEX_ACCENT)
-      this.classRanges(unicode, namedGroups)
+      this.classRanges()
       if (this.eat(RIGHT_SQUARE_BRACKET)) {
         return true
       }
@@ -826,18 +831,18 @@ export class RegExpValidator {
   // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassRanges
   // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRanges
   // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRangesNoDash
-  classRanges(unicode, namedGroups) {
+  classRanges() {
     for (; ;) {
       const leftStart = this.pos
-      if (this.eatClassAtom(unicode, namedGroups)) {
+      if (this.eatClassAtom()) {
         const leftEnd = this.pos
         if (this.eat(HYPHEN_MINUS)) {
           const rightStart = this.pos
-          if (this.eatClassAtom(unicode, namedGroups)) {
+          if (this.eatClassAtom()) {
             const rightEnd = this.pos
-            const left = this._parseClassAtom(leftStart, leftEnd, unicode, false)
-            const right = this._parseClassAtom(rightStart, rightEnd, unicode, true)
-            if (unicode && (left === -1 || right === -1)) {
+            const left = this._parseClassAtom(leftStart, leftEnd, false)
+            const right = this._parseClassAtom(rightStart, rightEnd, true)
+            if (this.switchU && (left === -1 || right === -1)) {
               this.raise("Invalid character class")
             }
             if (left !== -1 && right !== -1 && left > right) {
@@ -853,14 +858,14 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassAtom
   // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassAtomNoDash
-  eatClassAtom(unicode, namedGroups) {
+  eatClassAtom() {
     const start = this.pos
 
     if (this.eat(REVERSE_SOLIDUS)) {
-      if (this.eatClassEscape(unicode, namedGroups)) {
+      if (this.eatClassEscape()) {
         return true
       }
-      if (unicode) {
+      if (this.switchU) {
         // Make the same message as V8.
         const ch = this.current()
         if (ch === LATIN_SMALL_LETTER_C || this._isOctalDigit(ch)) {
@@ -881,13 +886,13 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ClassEscape
-  eatClassEscape(unicode, namedGroups) {
+  eatClassEscape() {
     return (
       this.eat(LATIN_SMALL_LETTER_B) ||
-      (unicode && this.eat(HYPHEN_MINUS)) ||
-      (!unicode && this._eatCClassControlLetter(unicode)) ||
+      (this.switchU && this.eat(HYPHEN_MINUS)) ||
+      (!this.switchU && this._eatCClassControlLetter()) ||
       this.eatCharacterClassEscape() ||
-      this.eatCharacterEscape(unicode, namedGroups)
+      this.eatCharacterEscape()
     )
   }
   _eatCClassControlLetter() {
@@ -912,14 +917,14 @@ export class RegExpValidator {
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-HexEscapeSequence
-  eatHexEscapeSequence(unicode) {
+  eatHexEscapeSequence() {
     const start = this.pos
 
     if (this.eat(LATIN_SMALL_LETTER_X)) {
       if (this._eatFixedHexDigits(2)) {
         return true
       }
-      if (unicode) {
+      if (this.switchU) {
         this.raise("Invalid escape")
       }
       this.pos = start
@@ -1000,10 +1005,10 @@ export class RegExpValidator {
   // https://www.ecma-international.org/ecma-262/8.0/#sec-classatomnodash
   // https://www.ecma-international.org/ecma-262/8.0/#sec-classescape
   // Get the value of chracters to validate class ranges (e.g., [a-z]).
-  _parseClassAtom(start, end, unicode, isRight) {
-    const ch1 = this._getOneElementCharSetAt(start, unicode, isRight)
+  _parseClassAtom(start, end, isRight) {
+    const ch1 = this._getOneElementCharSetAt(start, isRight)
     if (ch1 === REVERSE_SOLIDUS) {
-      const ch2 = this._getOneElementCharSetAt(start + 1, unicode, isRight)
+      const ch2 = this._getOneElementCharSetAt(start + 1, isRight)
       switch (ch2) {
       case LATIN_SMALL_LETTER_B:
         return BACKSPACE
@@ -1041,7 +1046,7 @@ export class RegExpValidator {
       case LATIN_SMALL_LETTER_U:
         return this._parseRegExpUnicodeEscapeSequence(start + 1, end)
       default:
-        if (!unicode && ch2 >= DIGIT_ZERO && ch2 <= DIGIT_SEVEN) {
+        if (!this.switchU && ch2 >= DIGIT_ZERO && ch2 <= DIGIT_SEVEN) {
           return this.parseOctalInt(start + 1, end)
         }
         return ch2
@@ -1050,9 +1055,9 @@ export class RegExpValidator {
     return ch1
   }
   // https://www.ecma-international.org/ecma-262/8.0/#sec-notation
-  _getOneElementCharSetAt(i, unicode, isRight) {
+  _getOneElementCharSetAt(i, isRight) {
     const ch = this.codePointAt(i)
-    if (unicode || ch <= 0xFFFF) {
+    if (this.switchU || ch <= 0xFFFF) {
       return ch
     }
     // This is a surrogate pair and no `u` flag, so returns a code point.
