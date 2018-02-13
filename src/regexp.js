@@ -77,6 +77,7 @@ export class RegExpValidator {
     this.pos = 0
     this.lastIntValue = 0
     this.lastStringValue = ""
+    this.lastAssertionIsQuantifiable = false
     this.numCapturingParens = 0
     this.maxBackReference = 0
     this.groupNames = []
@@ -211,6 +212,9 @@ export class RegExpValidator {
   // https://www.ecma-international.org/ecma-262/8.0/#prod-Pattern
   pattern() {
     this.pos = 0
+    this.lastIntValue = 0
+    this.lastStringValue = ""
+    this.lastAssertionIsQuantifiable = false
     this.numCapturingParens = 0
     this.maxBackReference = 0
     this.groupNames.length = 0
@@ -261,20 +265,16 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Term
   eatTerm() {
-    const start = this.pos
-
-    if (this.eatQuantifiableAssertion()) {
-      if (this.eatQuantifier()) {
+    if (this.eatAssertion()) {
+      // Handle `QuantifiableAssertion Quantifier` alternative.
+      // `this.lastAssertionIsQuantifiable` is true if the last eaten Assertion
+      // is a QuantifiableAssertion.
+      if (this.lastAssertionIsQuantifiable && this.eatQuantifier()) {
         // Make the same message as V8.
         if (this.switchU) {
           this.raise("Invalid quantifier")
         }
-        return true
       }
-      this.pos = start
-    }
-
-    if (this.eatAssertion()) {
       return true
     }
 
@@ -288,11 +288,12 @@ export class RegExpValidator {
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Assertion
   eatAssertion() {
+    this.lastAssertionIsQuantifiable = false
     return (
       this.eat(CIRCUMFLEX_ACCENT) ||
       this.eat(DOLLAR_SIGN) ||
       this._eatWordBoundary() ||
-      this._eatLookaheadAssertion()
+      this._eatLookaheadOrLookbehindAssertion()
     )
   }
   _eatWordBoundary() {
@@ -305,24 +306,23 @@ export class RegExpValidator {
     }
     return false
   }
-  _eatLookaheadAssertion() {
+  _eatLookaheadOrLookbehindAssertion() {
     const start = this.pos
-    if (this.eat(LEFT_PARENTHESIS)) {
-      if (this.eat(QUESTION_MARK) && (this.eat(EQUALS_SIGN) || this.eat(EXCLAMATION_MARK))) {
+    if (this.eat(LEFT_PARENTHESIS) && this.eat(QUESTION_MARK)) {
+      if (this.ecmaVersion >= 9) {
+        this.eat(LESS_THAN_SIGN)
+      }
+      if (this.eat(EQUALS_SIGN) || this.eat(EXCLAMATION_MARK)) {
         this.disjunction()
         if (!this.eat(RIGHT_PARENTHESIS)) {
           this.raise("Unterminated group")
         }
+        this.lastAssertionIsQuantifiable = true
         return true
       }
-      this.pos = start
     }
+    this.pos = start
     return false
-  }
-
-  // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-QuantifiableAssertion
-  eatQuantifiableAssertion() {
-    return this._eatLookaheadAssertion()
   }
 
   // https://www.ecma-international.org/ecma-262/8.0/#prod-Quantifier

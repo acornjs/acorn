@@ -8,8 +8,7 @@ const unsupportedFeatures = [
   "class-fields",
   "class-fields-private",
   "class-fields-public",
-  "optional-catch-binding",
-  "regexp-lookbehind"
+  "optional-catch-binding"
 ];
 
 run(
