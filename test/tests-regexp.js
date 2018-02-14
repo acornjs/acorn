@@ -1048,6 +1048,7 @@ test("/[\\d][\\12-\\14]{1,}[^\\d]/", {}, { ecmaVersion: 5 })
 test("/[\\d][\\12-\\14]{1,}[^\\d]/", {}, { ecmaVersion: 2015 })
 testFail("/[\\d][\\12-\\14]{1,}[^\\d]/u", "Invalid regular expression flag (1:1)", { ecmaVersion: 5 })
 testFail("/[\\d][\\12-\\14]{1,}[^\\d]/u", "Invalid regular expression: /[\\d][\\12-\\14]{1,}[^\\d]/: Invalid class escape (1:1)", { ecmaVersion: 2015 })
+test("/([a ]\\b)*\\b/", {}, { ecmaVersion: 5 })
 
 /*
 // This is test case generator.
