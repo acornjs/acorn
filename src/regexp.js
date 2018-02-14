@@ -93,7 +93,7 @@ export class RegExpValidationState {
   }
 
   raise(message) {
-    this.parser.raise(this.start, `Invalid regular expression: /${this.source}/: ${message}`)
+    this.parser.raiseRecoverable(this.start, `Invalid regular expression: /${this.source}/: ${message}`)
   }
 
   // If u flag is given, this returns the code point at the index (it combines a surrogate pair).
