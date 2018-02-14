@@ -96,15 +96,16 @@ export class RegExpValidationState {
     this.parser.raise(this.start, `Invalid regular expression: /${this.source}/: ${message}`)
   }
 
-  // Node.js 0.12/0.10 don't support String.prototype.codePointAt().
-  codePointAt(i) {
+  // If u flag is given, this returns the code point at the index (it combines a surrogate pair).
+  // Otherwise, this returns the code unit of the index (can be a part of a surrogate pair).
+  at(i) {
     const s = this.source
     const l = s.length
     if (i >= l) {
       return -1
     }
     const c = s.charCodeAt(i)
-    if (c <= 0xD7FF || c >= 0xE000 || i + 1 >= l) {
+    if (!this.switchU || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l) {
       return c
     }
     return (c << 10) + s.charCodeAt(i + 1) - 0x35FDC00
@@ -117,18 +118,18 @@ export class RegExpValidationState {
       return l
     }
     const c = s.charCodeAt(i)
-    if (c <= 0xD7FF || c >= 0xE000 || i + 1 >= l) {
+    if (!this.switchU || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l) {
       return i + 1
     }
     return i + 2
   }
 
   current() {
-    return this.codePointAt(this.pos)
+    return this.at(this.pos)
   }
 
   lookahead() {
-    return this.codePointAt(this.nextIndex(this.pos))
+    return this.at(this.nextIndex(this.pos))
   }
 
   advance() {
@@ -145,16 +146,9 @@ export class RegExpValidationState {
 }
 
 function codePointToString(ch) {
-  if (ch <= 0xFFFF) {
-    return String.fromCharCode(ch)
-  }
-  return String.fromCharCode(getLeadSurrogate(ch), getTrailSurrogate(ch))
-}
-function getLeadSurrogate(ch) {
-  return ((ch - 0x10000) >> 10) + 0xD800
-}
-function getTrailSurrogate(ch) {
-  return ((ch - 0x10000) & 0x03FF) + 0xDC00
+  if (ch <= 0xFFFF) return String.fromCharCode(ch)
+  ch -= 0x10000
+  return String.fromCharCode((ch >> 10) + 0xD800, (ch & 0x03FF) + 0xDC00)
 }
 
 /**
@@ -925,15 +919,9 @@ pp.validateRegExp_eatCharacterClass = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRangesNoDash
 pp.validateRegExp_classRanges = function(state) {
   while (this.validateRegExp_eatClassAtom(state)) {
-    const left = (state.switchU || state.lastIntValue <= 0xFFFF)
-      ? state.lastIntValue
-      : getTrailSurrogate(state.lastIntValue)
-
+    const left = state.lastIntValue
     if (state.eat(HYPHEN_MINUS) && this.validateRegExp_eatClassAtom(state)) {
-      const right = (state.switchU || state.lastIntValue <= 0xFFFF)
-        ? state.lastIntValue
-        : getLeadSurrogate(state.lastIntValue)
-
+      const right = state.lastIntValue
       if (state.switchU && (left === -1 || right === -1)) {
         state.raise("Invalid character class")
       }
