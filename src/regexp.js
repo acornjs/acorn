@@ -119,7 +119,7 @@ pp.validateRegExpFlags = function(state) {
  * @returns {void}
  */
 pp.validateRegExpPattern = function(state) {
-  this.validateRegExp_pattern(state)
+  this.regexp_pattern(state)
 
   // The goal symbol for the parse is |Pattern[~U, ~N]|. If the result of
   // parsing contains a |GroupName|, reparse with the goal symbol
@@ -128,12 +128,12 @@ pp.validateRegExpPattern = function(state) {
   // were not matched by the parse, or if any Early Error conditions exist.
   if (!state.switchN && this.options.ecmaVersion >= 9 && state.groupNames.length > 0) {
     state.switchN = true
-    this.validateRegExp_pattern(state)
+    this.regexp_pattern(state)
   }
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Pattern
-pp.validateRegExp_pattern = function(state) {
+pp.regexp_pattern = function(state) {
   state.pos = 0
   state.lastIntValue = 0
   state.lastStringValue = ""
@@ -143,7 +143,7 @@ pp.validateRegExp_pattern = function(state) {
   state.groupNames.length = 0
   state.backReferenceNames.length = 0
 
-  this.validateRegExp_disjunction(state)
+  this.regexp_disjunction(state)
 
   if (state.pos !== state.source.length) {
     // Make the same messages as V8.
@@ -165,14 +165,14 @@ pp.validateRegExp_pattern = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
-pp.validateRegExp_disjunction = function(state) {
-  this.validateRegExp_alternative(state)
+pp.regexp_disjunction = function(state) {
+  this.regexp_alternative(state)
   while (state.eat(0x7C /* | */)) {
-    this.validateRegExp_alternative(state)
+    this.regexp_alternative(state)
   }
 
   // Make the same message as V8.
-  if (this.validateRegExp_eatQuantifier(state, true)) {
+  if (this.regexp_eatQuantifier(state, true)) {
     state.raise("Nothing to repeat")
   }
   if (state.eat(0x7B /* { */)) {
@@ -181,18 +181,18 @@ pp.validateRegExp_disjunction = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Alternative
-pp.validateRegExp_alternative = function(state) {
-  while (state.pos < state.source.length && this.validateRegExp_eatTerm(state))
+pp.regexp_alternative = function(state) {
+  while (state.pos < state.source.length && this.regexp_eatTerm(state))
     ;
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Term
-pp.validateRegExp_eatTerm = function(state) {
-  if (this.validateRegExp_eatAssertion(state)) {
+pp.regexp_eatTerm = function(state) {
+  if (this.regexp_eatAssertion(state)) {
     // Handle `QuantifiableAssertion Quantifier` alternative.
     // `state.lastAssertionIsQuantifiable` is true if the last eaten Assertion
     // is a QuantifiableAssertion.
-    if (state.lastAssertionIsQuantifiable && this.validateRegExp_eatQuantifier(state)) {
+    if (state.lastAssertionIsQuantifiable && this.regexp_eatQuantifier(state)) {
       // Make the same message as V8.
       if (state.switchU) {
         state.raise("Invalid quantifier")
@@ -201,8 +201,8 @@ pp.validateRegExp_eatTerm = function(state) {
     return true
   }
 
-  if (state.switchU ? this.validateRegExp_eatAtom(state) : this.validateRegExp_eatExtendedAtom(state)) {
-    this.validateRegExp_eatQuantifier(state)
+  if (state.switchU ? this.regexp_eatAtom(state) : this.regexp_eatExtendedAtom(state)) {
+    this.regexp_eatQuantifier(state)
     return true
   }
 
@@ -210,7 +210,7 @@ pp.validateRegExp_eatTerm = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Assertion
-pp.validateRegExp_eatAssertion = function(state) {
+pp.regexp_eatAssertion = function(state) {
   const start = state.pos
   state.lastAssertionIsQuantifiable = false
 
@@ -234,7 +234,7 @@ pp.validateRegExp_eatAssertion = function(state) {
       lookbehind = state.eat(0x3C /* < */)
     }
     if (state.eat(0x3D /* = */) || state.eat(0x21 /* ! */)) {
-      this.validateRegExp_disjunction(state)
+      this.regexp_disjunction(state)
       if (!state.eat(0x29 /* ) */)) {
         state.raise("Unterminated group")
       }
@@ -248,8 +248,8 @@ pp.validateRegExp_eatAssertion = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Quantifier
-pp.validateRegExp_eatQuantifier = function(state, noError = false) {
-  if (this.validateRegExp_eatQuantifierPrefix(state, noError)) {
+pp.regexp_eatQuantifier = function(state, noError = false) {
+  if (this.regexp_eatQuantifierPrefix(state, noError)) {
     state.eat(0x3F /* ? */)
     return true
   }
@@ -257,21 +257,21 @@ pp.validateRegExp_eatQuantifier = function(state, noError = false) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-QuantifierPrefix
-pp.validateRegExp_eatQuantifierPrefix = function(state, noError) {
+pp.regexp_eatQuantifierPrefix = function(state, noError) {
   return (
     state.eat(0x2A /* * */) ||
     state.eat(0x2B /* + */) ||
     state.eat(0x3F /* ? */) ||
-    this.validateRegExp_eatBracedQuantifier(state, noError)
+    this.regexp_eatBracedQuantifier(state, noError)
   )
 }
-pp.validateRegExp_eatBracedQuantifier = function(state, noError) {
+pp.regexp_eatBracedQuantifier = function(state, noError) {
   const start = state.pos
   if (state.eat(0x7B /* { */)) {
     let min = 0, max = -1
-    if (this.validateRegExp_eatDecimalDigits(state)) {
+    if (this.regexp_eatDecimalDigits(state)) {
       min = state.lastIntValue
-      if (state.eat(0x2C /* , */) && this.validateRegExp_eatDecimalDigits(state)) {
+      if (state.eat(0x2C /* , */) && this.regexp_eatDecimalDigits(state)) {
         max = state.lastIntValue
       }
       if (state.eat(0x7D /* } */)) {
@@ -291,31 +291,31 @@ pp.validateRegExp_eatBracedQuantifier = function(state, noError) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Atom
-pp.validateRegExp_eatAtom = function(state) {
+pp.regexp_eatAtom = function(state) {
   return (
-    this.validateRegExp_eatPatternCharacters(state) ||
+    this.regexp_eatPatternCharacters(state) ||
     state.eat(0x2E /* . */) ||
-    this.validateRegExp_eatReverseSolidusAtomEscape(state) ||
-    this.validateRegExp_eatCharacterClass(state) ||
-    this.validateRegExp_eatUncapturingGroup(state) ||
-    this.validateRegExp_eatCapturingGroup(state)
+    this.regexp_eatReverseSolidusAtomEscape(state) ||
+    this.regexp_eatCharacterClass(state) ||
+    this.regexp_eatUncapturingGroup(state) ||
+    this.regexp_eatCapturingGroup(state)
   )
 }
-pp.validateRegExp_eatReverseSolidusAtomEscape = function(state) {
+pp.regexp_eatReverseSolidusAtomEscape = function(state) {
   const start = state.pos
   if (state.eat(0x5C /* \ */)) {
-    if (this.validateRegExp_eatAtomEscape(state)) {
+    if (this.regexp_eatAtomEscape(state)) {
       return true
     }
     state.pos = start
   }
   return false
 }
-pp.validateRegExp_eatUncapturingGroup = function(state) {
+pp.regexp_eatUncapturingGroup = function(state) {
   const start = state.pos
   if (state.eat(0x28 /* ( */)) {
     if (state.eat(0x3F /* ? */) && state.eat(0x3A /* : */)) {
-      this.validateRegExp_disjunction(state)
+      this.regexp_disjunction(state)
       if (state.eat(0x29 /* ) */)) {
         return true
       }
@@ -325,14 +325,14 @@ pp.validateRegExp_eatUncapturingGroup = function(state) {
   }
   return false
 }
-pp.validateRegExp_eatCapturingGroup = function(state) {
+pp.regexp_eatCapturingGroup = function(state) {
   if (state.eat(0x28 /* ( */)) {
     if (this.options.ecmaVersion >= 9) {
-      this.validateRegExp_groupSpecifier(state)
+      this.regexp_groupSpecifier(state)
     } else if (state.current() === 0x3F /* ? */) {
       state.raise("Invalid group")
     }
-    this.validateRegExp_disjunction(state)
+    this.regexp_disjunction(state)
     if (state.eat(0x29 /* ) */)) {
       state.numCapturingParens += 1
       return true
@@ -343,28 +343,28 @@ pp.validateRegExp_eatCapturingGroup = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ExtendedAtom
-pp.validateRegExp_eatExtendedAtom = function(state) {
+pp.regexp_eatExtendedAtom = function(state) {
   return (
     state.eat(0x2E /* . */) ||
-    this.validateRegExp_eatReverseSolidusAtomEscape(state) ||
-    this.validateRegExp_eatCharacterClass(state) ||
-    this.validateRegExp_eatUncapturingGroup(state) ||
-    this.validateRegExp_eatCapturingGroup(state) ||
-    this.validateRegExp_eatInvalidBracedQuantifier(state) ||
-    this.validateRegExp_eatExtendedPatternCharacter(state)
+    this.regexp_eatReverseSolidusAtomEscape(state) ||
+    this.regexp_eatCharacterClass(state) ||
+    this.regexp_eatUncapturingGroup(state) ||
+    this.regexp_eatCapturingGroup(state) ||
+    this.regexp_eatInvalidBracedQuantifier(state) ||
+    this.regexp_eatExtendedPatternCharacter(state)
   )
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-InvalidBracedQuantifier
-pp.validateRegExp_eatInvalidBracedQuantifier = function(state) {
-  if (this.validateRegExp_eatBracedQuantifier(state, true)) {
+pp.regexp_eatInvalidBracedQuantifier = function(state) {
+  if (this.regexp_eatBracedQuantifier(state, true)) {
     state.raise("Nothing to repeat")
   }
   return false
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-SyntaxCharacter
-pp.validateRegExp_eatSyntaxCharacter = function(state) {
+pp.regexp_eatSyntaxCharacter = function(state) {
   const ch = state.current()
   if (isSyntaxCharacter(ch)) {
     state.lastIntValue = ch
@@ -394,7 +394,7 @@ function isSyntaxCharacter(ch) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-PatternCharacter
 // But eat eager.
-pp.validateRegExp_eatPatternCharacters = function(state) {
+pp.regexp_eatPatternCharacters = function(state) {
   const start = state.pos
   let ch = 0
   while ((ch = state.current()) !== -1 && !isSyntaxCharacter(ch)) {
@@ -404,7 +404,7 @@ pp.validateRegExp_eatPatternCharacters = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ExtendedPatternCharacter
-pp.validateRegExp_eatExtendedPatternCharacter = function(state) {
+pp.regexp_eatExtendedPatternCharacter = function(state) {
   const ch = state.current()
   if (
     ch !== -1 &&
@@ -428,9 +428,9 @@ pp.validateRegExp_eatExtendedPatternCharacter = function(state) {
 // GroupSpecifier[U] ::
 //   [empty]
 //   `?` GroupName[?U]
-pp.validateRegExp_groupSpecifier = function(state) {
+pp.regexp_groupSpecifier = function(state) {
   if (state.eat(0x3F /* ? */)) {
-    if (this.validateRegExp_eatGroupName(state)) {
+    if (this.regexp_eatGroupName(state)) {
       if (state.groupNames.indexOf(state.lastStringValue) !== -1) {
         state.raise("Duplicate capture group name")
       }
@@ -444,10 +444,10 @@ pp.validateRegExp_groupSpecifier = function(state) {
 // GroupName[U] ::
 //   `<` RegExpIdentifierName[?U] `>`
 // Note: this updates `state.lastStringValue` property with the eaten name.
-pp.validateRegExp_eatGroupName = function(state) {
+pp.regexp_eatGroupName = function(state) {
   state.lastStringValue = ""
   if (state.eat(0x3C /* < */)) {
-    if (this.validateRegExp_eatRegExpIdentifierName(state) && state.eat(0x3E /* > */)) {
+    if (this.regexp_eatRegExpIdentifierName(state) && state.eat(0x3E /* > */)) {
       return true
     }
     state.raise("Invalid capture group name")
@@ -459,11 +459,11 @@ pp.validateRegExp_eatGroupName = function(state) {
 //   RegExpIdentifierStart[?U]
 //   RegExpIdentifierName[?U] RegExpIdentifierPart[?U]
 // Note: this updates `state.lastStringValue` property with the eaten name.
-pp.validateRegExp_eatRegExpIdentifierName = function(state) {
+pp.regexp_eatRegExpIdentifierName = function(state) {
   state.lastStringValue = ""
-  if (this.validateRegExp_eatRegExpIdentifierStart(state)) {
+  if (this.regexp_eatRegExpIdentifierStart(state)) {
     state.lastStringValue += codePointToString(state.lastIntValue)
-    while (this.validateRegExp_eatRegExpIdentifierPart(state)) {
+    while (this.regexp_eatRegExpIdentifierPart(state)) {
       state.lastStringValue += codePointToString(state.lastIntValue)
     }
     return true
@@ -476,12 +476,12 @@ pp.validateRegExp_eatRegExpIdentifierName = function(state) {
 //   `$`
 //   `_`
 //   `\` RegExpUnicodeEscapeSequence[?U]
-pp.validateRegExp_eatRegExpIdentifierStart = function(state) {
+pp.regexp_eatRegExpIdentifierStart = function(state) {
   const start = state.pos
   let ch = state.current()
   state.advance()
 
-  if (ch === 0x5C /* \ */ && this.validateRegExp_eatRegExpUnicodeEscapeSequence(state)) {
+  if (ch === 0x5C /* \ */ && this.regexp_eatRegExpUnicodeEscapeSequence(state)) {
     ch = state.lastIntValue
   }
   if (isRegExpIdentifierStart(ch)) {
@@ -503,12 +503,12 @@ function isRegExpIdentifierStart(ch) {
 //   `\` RegExpUnicodeEscapeSequence[?U]
 //   <ZWNJ>
 //   <ZWJ>
-pp.validateRegExp_eatRegExpIdentifierPart = function(state) {
+pp.regexp_eatRegExpIdentifierPart = function(state) {
   const start = state.pos
   let ch = state.current()
   state.advance()
 
-  if (ch === 0x5C /* \ */ && this.validateRegExp_eatRegExpUnicodeEscapeSequence(state)) {
+  if (ch === 0x5C /* \ */ && this.regexp_eatRegExpUnicodeEscapeSequence(state)) {
     ch = state.lastIntValue
   }
   if (isRegExpIdentifierPart(ch)) {
@@ -524,12 +524,12 @@ function isRegExpIdentifierPart(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-AtomEscape
-pp.validateRegExp_eatAtomEscape = function(state) {
+pp.regexp_eatAtomEscape = function(state) {
   if (
-    this.validateRegExp_eatBackReference(state) ||
-    this.validateRegExp_eatCharacterClassEscape(state) ||
-    this.validateRegExp_eatCharacterEscape(state) ||
-    (state.switchN && this.validateRegExp_eatKGroupName(state))
+    this.regexp_eatBackReference(state) ||
+    this.regexp_eatCharacterClassEscape(state) ||
+    this.regexp_eatCharacterEscape(state) ||
+    (state.switchN && this.regexp_eatKGroupName(state))
   ) {
     return true
   }
@@ -542,9 +542,9 @@ pp.validateRegExp_eatAtomEscape = function(state) {
   }
   return false
 }
-pp.validateRegExp_eatBackReference = function(state) {
+pp.regexp_eatBackReference = function(state) {
   const start = state.pos
-  if (this.validateRegExp_eatDecimalEscape(state)) {
+  if (this.regexp_eatDecimalEscape(state)) {
     const n = state.lastIntValue
     if (state.switchU) {
       // For SyntaxError in https://www.ecma-international.org/ecma-262/8.0/#sec-atomescape
@@ -560,9 +560,9 @@ pp.validateRegExp_eatBackReference = function(state) {
   }
   return false
 }
-pp.validateRegExp_eatKGroupName = function(state) {
+pp.regexp_eatKGroupName = function(state) {
   if (state.eat(0x6B /* k */)) {
-    if (this.validateRegExp_eatGroupName(state)) {
+    if (this.regexp_eatGroupName(state)) {
       state.backReferenceNames.push(state.lastStringValue)
       return true
     }
@@ -572,28 +572,28 @@ pp.validateRegExp_eatKGroupName = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-CharacterEscape
-pp.validateRegExp_eatCharacterEscape = function(state) {
+pp.regexp_eatCharacterEscape = function(state) {
   return (
-    this.validateRegExp_eatControlEscape(state) ||
-    this.validateRegExp_eatCControlLetter(state) ||
-    this.validateRegExp_eatZero(state) ||
-    this.validateRegExp_eatHexEscapeSequence(state) ||
-    this.validateRegExp_eatRegExpUnicodeEscapeSequence(state) ||
-    (!state.switchU && this.validateRegExp_eatLegacyOctalEscapeSequence(state)) ||
-    this.validateRegExp_eatIdentityEscape(state)
+    this.regexp_eatControlEscape(state) ||
+    this.regexp_eatCControlLetter(state) ||
+    this.regexp_eatZero(state) ||
+    this.regexp_eatHexEscapeSequence(state) ||
+    this.regexp_eatRegExpUnicodeEscapeSequence(state) ||
+    (!state.switchU && this.regexp_eatLegacyOctalEscapeSequence(state)) ||
+    this.regexp_eatIdentityEscape(state)
   )
 }
-pp.validateRegExp_eatCControlLetter = function(state) {
+pp.regexp_eatCControlLetter = function(state) {
   const start = state.pos
   if (state.eat(0x63 /* c */)) {
-    if (this.validateRegExp_eatControlLetter(state)) {
+    if (this.regexp_eatControlLetter(state)) {
       return true
     }
     state.pos = start
   }
   return false
 }
-pp.validateRegExp_eatZero = function(state) {
+pp.regexp_eatZero = function(state) {
   if (state.current() === 0x30 /* 0 */ && !isDecimalDigit(state.lookahead())) {
     state.lastIntValue = 0
     state.advance()
@@ -603,7 +603,7 @@ pp.validateRegExp_eatZero = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ControlEscape
-pp.validateRegExp_eatControlEscape = function(state) {
+pp.regexp_eatControlEscape = function(state) {
   const ch = state.current()
   if (ch === 0x74 /* t */) {
     state.lastIntValue = 0x09 /* \t */
@@ -634,7 +634,7 @@ pp.validateRegExp_eatControlEscape = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ControlLetter
-pp.validateRegExp_eatControlLetter = function(state) {
+pp.regexp_eatControlLetter = function(state) {
   const ch = state.current()
   if (isControlLetter(ch)) {
     state.lastIntValue = ch % 0x20
@@ -651,15 +651,15 @@ function isControlLetter(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-RegExpUnicodeEscapeSequence
-pp.validateRegExp_eatRegExpUnicodeEscapeSequence = function(state) {
+pp.regexp_eatRegExpUnicodeEscapeSequence = function(state) {
   const start = state.pos
 
   if (state.eat(0x75 /* u */)) {
-    if (this.validateRegExp_eatFixedHexDigits(state, 4)) {
+    if (this.regexp_eatFixedHexDigits(state, 4)) {
       const lead = state.lastIntValue
       if (state.switchU && lead >= 0xD800 && lead <= 0xDBFF) {
         const leadSurrogateEnd = state.pos
-        if (state.eat(0x5C /* \ */) && state.eat(0x75 /* u */) && this.validateRegExp_eatFixedHexDigits(state, 4)) {
+        if (state.eat(0x5C /* \ */) && state.eat(0x75 /* u */) && this.regexp_eatFixedHexDigits(state, 4)) {
           const trail = state.lastIntValue
           if (trail >= 0xDC00 && trail <= 0xDFFF) {
             state.lastIntValue = (lead - 0xD800) * 0x400 + (trail - 0xDC00) + 0x10000
@@ -674,7 +674,7 @@ pp.validateRegExp_eatRegExpUnicodeEscapeSequence = function(state) {
     if (
       state.switchU &&
       state.eat(0x7B /* { */) &&
-      this.validateRegExp_eatHexDigits(state) &&
+      this.regexp_eatHexDigits(state) &&
       state.eat(0x7D /* } */) &&
       isValidUnicode(state.lastIntValue)
     ) {
@@ -693,9 +693,9 @@ function isValidUnicode(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-IdentityEscape
-pp.validateRegExp_eatIdentityEscape = function(state) {
+pp.regexp_eatIdentityEscape = function(state) {
   if (state.switchU) {
-    if (this.validateRegExp_eatSyntaxCharacter(state)) {
+    if (this.regexp_eatSyntaxCharacter(state)) {
       return true
     }
     if (state.eat(0x2F /* / */)) {
@@ -716,7 +716,7 @@ pp.validateRegExp_eatIdentityEscape = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-DecimalEscape
-pp.validateRegExp_eatDecimalEscape = function(state) {
+pp.regexp_eatDecimalEscape = function(state) {
   state.lastIntValue = 0
   let ch = state.current()
   if (ch >= 0x31 /* 1 */ && ch <= 0x39 /* 9 */) {
@@ -730,7 +730,7 @@ pp.validateRegExp_eatDecimalEscape = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClassEscape
-pp.validateRegExp_eatCharacterClassEscape = function(state) {
+pp.regexp_eatCharacterClassEscape = function(state) {
   const ch = state.current()
 
   if (isCharacterClassEscape(ch)) {
@@ -748,7 +748,7 @@ pp.validateRegExp_eatCharacterClassEscape = function(state) {
     state.advance()
     if (
       state.eat(0x7B /* { */) &&
-      this.validateRegExp_eatUnicodePropertyValueExpression(state) &&
+      this.regexp_eatUnicodePropertyValueExpression(state) &&
       state.eat(0x7D /* } */)
     ) {
       return true
@@ -772,34 +772,34 @@ function isCharacterClassEscape(ch) {
 // UnicodePropertyValueExpression ::
 //   UnicodePropertyName `=` UnicodePropertyValue
 //   LoneUnicodePropertyNameOrValue
-pp.validateRegExp_eatUnicodePropertyValueExpression = function(state) {
+pp.regexp_eatUnicodePropertyValueExpression = function(state) {
   const start = state.pos
 
   // UnicodePropertyName `=` UnicodePropertyValue
-  if (this.validateRegExp_eatUnicodePropertyName(state) && state.eat(0x3D /* = */)) {
+  if (this.regexp_eatUnicodePropertyName(state) && state.eat(0x3D /* = */)) {
     const name = state.lastStringValue
-    if (this.validateRegExp_eatUnicodePropertyValue(state)) {
+    if (this.regexp_eatUnicodePropertyValue(state)) {
       const value = state.lastStringValue
-      this.validateRegExp_validateUnicodePropertyNameAndValue(state, name, value)
+      this.regexp_validateUnicodePropertyNameAndValue(state, name, value)
       return true
     }
   }
   state.pos = start
 
   // LoneUnicodePropertyNameOrValue
-  if (this.validateRegExp_eatLoneUnicodePropertyNameOrValue(state)) {
+  if (this.regexp_eatLoneUnicodePropertyNameOrValue(state)) {
     const nameOrValue = state.lastStringValue
-    this.validateRegExp_validateUnicodePropertyNameOrValue(state, nameOrValue)
+    this.regexp_validateUnicodePropertyNameOrValue(state, nameOrValue)
     return true
   }
   return false
 }
-pp.validateRegExp_validateUnicodePropertyNameAndValue = function(state, name, value) {
+pp.regexp_validateUnicodePropertyNameAndValue = function(state, name, value) {
   if (!UNICODE_PROPERTY_VALUES.hasOwnProperty(name) || UNICODE_PROPERTY_VALUES[name].indexOf(value) === -1) {
     state.raise("Invalid property name")
   }
 }
-pp.validateRegExp_validateUnicodePropertyNameOrValue = function(state, nameOrValue) {
+pp.regexp_validateUnicodePropertyNameOrValue = function(state, nameOrValue) {
   if (UNICODE_PROPERTY_VALUES.$LONE.indexOf(nameOrValue) === -1) {
     state.raise("Invalid property name")
   }
@@ -807,7 +807,7 @@ pp.validateRegExp_validateUnicodePropertyNameOrValue = function(state, nameOrVal
 
 // UnicodePropertyName ::
 //   UnicodePropertyNameCharacters
-pp.validateRegExp_eatUnicodePropertyName = function(state) {
+pp.regexp_eatUnicodePropertyName = function(state) {
   let ch = 0
   state.lastStringValue = ""
   while (isUnicodePropertyNameCharacter(ch = state.current())) {
@@ -822,7 +822,7 @@ function isUnicodePropertyNameCharacter(ch) {
 
 // UnicodePropertyValue ::
 //   UnicodePropertyValueCharacters
-pp.validateRegExp_eatUnicodePropertyValue = function(state) {
+pp.regexp_eatUnicodePropertyValue = function(state) {
   let ch = 0
   state.lastStringValue = ""
   while (isUnicodePropertyValueCharacter(ch = state.current())) {
@@ -837,15 +837,15 @@ function isUnicodePropertyValueCharacter(ch) {
 
 // LoneUnicodePropertyNameOrValue ::
 //   UnicodePropertyValueCharacters
-pp.validateRegExp_eatLoneUnicodePropertyNameOrValue = function(state) {
-  return this.validateRegExp_eatUnicodePropertyValue(state)
+pp.regexp_eatLoneUnicodePropertyNameOrValue = function(state) {
+  return this.regexp_eatUnicodePropertyValue(state)
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClass
-pp.validateRegExp_eatCharacterClass = function(state) {
+pp.regexp_eatCharacterClass = function(state) {
   if (state.eat(0x5B /* [ */)) {
     state.eat(0x5E /* ^ */)
-    this.validateRegExp_classRanges(state)
+    this.regexp_classRanges(state)
     if (state.eat(0x5D /* [ */)) {
       return true
     }
@@ -858,10 +858,10 @@ pp.validateRegExp_eatCharacterClass = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassRanges
 // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRanges
 // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRangesNoDash
-pp.validateRegExp_classRanges = function(state) {
-  while (this.validateRegExp_eatClassAtom(state)) {
+pp.regexp_classRanges = function(state) {
+  while (this.regexp_eatClassAtom(state)) {
     const left = state.lastIntValue
-    if (state.eat(0x2D /* - */) && this.validateRegExp_eatClassAtom(state)) {
+    if (state.eat(0x2D /* - */) && this.regexp_eatClassAtom(state)) {
       const right = state.lastIntValue
       if (state.switchU && (left === -1 || right === -1)) {
         state.raise("Invalid character class")
@@ -875,11 +875,11 @@ pp.validateRegExp_classRanges = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassAtom
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassAtomNoDash
-pp.validateRegExp_eatClassAtom = function(state) {
+pp.regexp_eatClassAtom = function(state) {
   const start = state.pos
 
   if (state.eat(0x5C /* \ */)) {
-    if (this.validateRegExp_eatClassEscape(state)) {
+    if (this.regexp_eatClassEscape(state)) {
       return true
     }
     if (state.switchU) {
@@ -904,7 +904,7 @@ pp.validateRegExp_eatClassAtom = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ClassEscape
-pp.validateRegExp_eatClassEscape = function(state) {
+pp.regexp_eatClassEscape = function(state) {
   const start = state.pos
 
   if (state.eat(0x62 /* b */)) {
@@ -918,20 +918,20 @@ pp.validateRegExp_eatClassEscape = function(state) {
   }
 
   if (!state.switchU && state.eat(0x63 /* c */)) {
-    if (this.validateRegExp_eatClassControlLetter(state)) {
+    if (this.regexp_eatClassControlLetter(state)) {
       return true
     }
     state.pos = start
   }
 
   return (
-    this.validateRegExp_eatCharacterClassEscape(state) ||
-    this.validateRegExp_eatCharacterEscape(state)
+    this.regexp_eatCharacterClassEscape(state) ||
+    this.regexp_eatCharacterEscape(state)
   )
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ClassControlLetter
-pp.validateRegExp_eatClassControlLetter = function(state) {
+pp.regexp_eatClassControlLetter = function(state) {
   const ch = state.current()
   if (isDecimalDigit(ch) || ch === 0x5F /* _ */) {
     state.lastIntValue = ch % 0x20
@@ -942,10 +942,10 @@ pp.validateRegExp_eatClassControlLetter = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-HexEscapeSequence
-pp.validateRegExp_eatHexEscapeSequence = function(state) {
+pp.regexp_eatHexEscapeSequence = function(state) {
   const start = state.pos
   if (state.eat(0x78 /* x */)) {
-    if (this.validateRegExp_eatFixedHexDigits(state, 2)) {
+    if (this.regexp_eatFixedHexDigits(state, 2)) {
       return true
     }
     if (state.switchU) {
@@ -957,7 +957,7 @@ pp.validateRegExp_eatHexEscapeSequence = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-DecimalDigits
-pp.validateRegExp_eatDecimalDigits = function(state) {
+pp.regexp_eatDecimalDigits = function(state) {
   const start = state.pos
   let ch = 0
   state.lastIntValue = 0
@@ -972,7 +972,7 @@ function isDecimalDigit(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-HexDigits
-pp.validateRegExp_eatHexDigits = function(state) {
+pp.regexp_eatHexDigits = function(state) {
   const start = state.pos
   let ch = 0
   state.lastIntValue = 0
@@ -1001,12 +1001,12 @@ function hexToInt(ch) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-LegacyOctalEscapeSequence
 // Allows only 0-377(octal) i.e. 0-255(decimal).
-pp.validateRegExp_eatLegacyOctalEscapeSequence = function(state) {
-  if (this.validateRegExp_eatOctalDigit(state)) {
+pp.regexp_eatLegacyOctalEscapeSequence = function(state) {
+  if (this.regexp_eatOctalDigit(state)) {
     const n1 = state.lastIntValue
-    if (this.validateRegExp_eatOctalDigit(state)) {
+    if (this.regexp_eatOctalDigit(state)) {
       const n2 = state.lastIntValue
-      if (n1 <= 3 && this.validateRegExp_eatOctalDigit(state)) {
+      if (n1 <= 3 && this.regexp_eatOctalDigit(state)) {
         state.lastIntValue = n1 * 64 + n2 * 8 + state.lastIntValue
       } else {
         state.lastIntValue = n1 * 8 + n2
@@ -1020,7 +1020,7 @@ pp.validateRegExp_eatLegacyOctalEscapeSequence = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-OctalDigit
-pp.validateRegExp_eatOctalDigit = function(state) {
+pp.regexp_eatOctalDigit = function(state) {
   const ch = state.current()
   if (isOctalDigit(ch)) {
     state.lastIntValue = ch - 0x30 /* 0 */
@@ -1037,7 +1037,7 @@ function isOctalDigit(ch) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Hex4Digits
 // https://www.ecma-international.org/ecma-262/8.0/#prod-HexDigit
 // And HexDigit HexDigit in https://www.ecma-international.org/ecma-262/8.0/#prod-HexEscapeSequence
-pp.validateRegExp_eatFixedHexDigits = function(state, length) {
+pp.regexp_eatFixedHexDigits = function(state, length) {
   const start = state.pos
   state.lastIntValue = 0
   for (let i = 0; i < length; ++i) {
