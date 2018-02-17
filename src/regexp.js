@@ -289,15 +289,16 @@ pp.validateRegExp_eatAssertion = function(state) {
 
   // Lookahead / Lookbehind
   if (state.eat(LEFT_PARENTHESIS) && state.eat(QUESTION_MARK)) {
+    let lookbehind = false
     if (this.options.ecmaVersion >= 9) {
-      state.eat(LESS_THAN_SIGN)
+      lookbehind = state.eat(LESS_THAN_SIGN)
     }
     if (state.eat(EQUALS_SIGN) || state.eat(EXCLAMATION_MARK)) {
       this.validateRegExp_disjunction(state)
       if (!state.eat(RIGHT_PARENTHESIS)) {
         state.raise("Unterminated group")
       }
-      state.lastAssertionIsQuantifiable = true
+      state.lastAssertionIsQuantifiable = !lookbehind
       return true
     }
   }
