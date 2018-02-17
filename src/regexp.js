@@ -2,66 +2,6 @@ import {isIdentifierStart, isIdentifierChar} from "./identifier.js"
 import {Parser} from "./state.js"
 import UNICODE_PROPERTY_VALUES from "./unicode-property-data.js"
 
-const BACKSPACE = 0x08
-const CHARACTER_TABULATION = 0x09
-const LINE_FEED = 0x0A
-const LINE_TABULATION = 0x0B
-const FORM_FEED = 0x0C
-const CARRIAGE_RETURN = 0x0D
-const EXCLAMATION_MARK = 0x21 // !
-const DOLLAR_SIGN = 0x24 // $
-const LEFT_PARENTHESIS = 0x28 // (
-const RIGHT_PARENTHESIS = 0x29 // )
-const ASTERISK = 0x2A // *
-const PLUS_SIGN = 0x2B // +
-const COMMA = 0x2C // ,
-const HYPHEN_MINUS = 0x2D // -
-const FULL_STOP = 0x2E // .
-const SOLIDUS = 0x2F // /
-const DIGIT_ZERO = 0x30 // 0
-const DIGIT_ONE = 0x31 // 1
-const DIGIT_SEVEN = 0x37 // 7
-const DIGIT_NINE = 0x39 // 9
-const COLON = 0x3A // :
-const LESS_THAN_SIGN = 0x3C // <
-const EQUALS_SIGN = 0x3D // =
-const GREATER_THAN_SIGN = 0x3E // >
-const QUESTION_MARK = 0x3F // ?
-const LATIN_CAPITAL_LETTER_A = 0x41 // A
-const LATIN_CAPITAL_LETTER_B = 0x42 // B
-const LATIN_CAPITAL_LETTER_D = 0x44 // D
-const LATIN_CAPITAL_LETTER_F = 0x46 // F
-const LATIN_CAPITAL_LETTER_P = 0x50 // P
-const LATIN_CAPITAL_LETTER_S = 0x53 // S
-const LATIN_CAPITAL_LETTER_W = 0x57 // W
-const LATIN_CAPITAL_LETTER_Z = 0x5A // Z
-const LOW_LINE = 0x5F // _
-const LATIN_SMALL_LETTER_A = 0x61 // a
-const LATIN_SMALL_LETTER_B = 0x62 // b
-const LATIN_SMALL_LETTER_C = 0x63 // c
-const LATIN_SMALL_LETTER_D = 0x64 // d
-const LATIN_SMALL_LETTER_F = 0x66 // f
-const LATIN_SMALL_LETTER_K = 0x6B // k
-const LATIN_SMALL_LETTER_N = 0x6E // n
-const LATIN_SMALL_LETTER_P = 0x70 // p
-const LATIN_SMALL_LETTER_R = 0x72 // r
-const LATIN_SMALL_LETTER_S = 0x73 // s
-const LATIN_SMALL_LETTER_T = 0x74 // t
-const LATIN_SMALL_LETTER_U = 0x75 // u
-const LATIN_SMALL_LETTER_V = 0x76 // v
-const LATIN_SMALL_LETTER_W = 0x77 // w
-const LATIN_SMALL_LETTER_X = 0x78 // x
-const LATIN_SMALL_LETTER_Z = 0x7A // z
-const LEFT_SQUARE_BRACKET = 0x5B // [
-const REVERSE_SOLIDUS = 0x5C // \
-const RIGHT_SQUARE_BRACKET = 0x5D // [
-const CIRCUMFLEX_ACCENT = 0x5E // ^
-const LEFT_CURLY_BRACKET = 0x7B // {
-const VERTICAL_LINE = 0x7C // |
-const RIGHT_CURLY_BRACKET = 0x7D // }
-const ZERO_WIDTH_NON_JOINER = 0x200C
-const ZERO_WIDTH_JOINER = 0x200D
-
 const pp = Parser.prototype
 
 export class RegExpValidationState {
@@ -207,10 +147,10 @@ pp.validateRegExp_pattern = function(state) {
 
   if (state.pos !== state.source.length) {
     // Make the same messages as V8.
-    if (state.eat(RIGHT_PARENTHESIS)) {
+    if (state.eat(0x29 /* ) */)) {
       state.raise("Unmatched ')'")
     }
-    if (state.eat(RIGHT_SQUARE_BRACKET) || state.eat(RIGHT_CURLY_BRACKET)) {
+    if (state.eat(0x5D /* [ */) || state.eat(0x7D /* } */)) {
       state.raise("Lone quantifier brackets")
     }
   }
@@ -227,7 +167,7 @@ pp.validateRegExp_pattern = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
 pp.validateRegExp_disjunction = function(state) {
   this.validateRegExp_alternative(state)
-  while (state.eat(VERTICAL_LINE)) {
+  while (state.eat(0x7C /* | */)) {
     this.validateRegExp_alternative(state)
   }
 
@@ -235,7 +175,7 @@ pp.validateRegExp_disjunction = function(state) {
   if (this.validateRegExp_eatQuantifier(state, true)) {
     state.raise("Nothing to repeat")
   }
-  if (state.eat(LEFT_CURLY_BRACKET)) {
+  if (state.eat(0x7B /* { */)) {
     state.raise("Lone quantifier brackets")
   }
 }
@@ -275,27 +215,27 @@ pp.validateRegExp_eatAssertion = function(state) {
   state.lastAssertionIsQuantifiable = false
 
   // ^, $
-  if (state.eat(CIRCUMFLEX_ACCENT) || state.eat(DOLLAR_SIGN)) {
+  if (state.eat(0x5E /* ^ */) || state.eat(0x24 /* $ */)) {
     return true
   }
 
   // \b \B
-  if (state.eat(REVERSE_SOLIDUS)) {
-    if (state.eat(LATIN_CAPITAL_LETTER_B) || state.eat(LATIN_SMALL_LETTER_B)) {
+  if (state.eat(0x5C /* \ */)) {
+    if (state.eat(0x42 /* B */) || state.eat(0x62 /* b */)) {
       return true
     }
     state.pos = start
   }
 
   // Lookahead / Lookbehind
-  if (state.eat(LEFT_PARENTHESIS) && state.eat(QUESTION_MARK)) {
+  if (state.eat(0x28 /* ( */) && state.eat(0x3F /* ? */)) {
     let lookbehind = false
     if (this.options.ecmaVersion >= 9) {
-      lookbehind = state.eat(LESS_THAN_SIGN)
+      lookbehind = state.eat(0x3C /* < */)
     }
-    if (state.eat(EQUALS_SIGN) || state.eat(EXCLAMATION_MARK)) {
+    if (state.eat(0x3D /* = */) || state.eat(0x21 /* ! */)) {
       this.validateRegExp_disjunction(state)
-      if (!state.eat(RIGHT_PARENTHESIS)) {
+      if (!state.eat(0x29 /* ) */)) {
         state.raise("Unterminated group")
       }
       state.lastAssertionIsQuantifiable = !lookbehind
@@ -310,7 +250,7 @@ pp.validateRegExp_eatAssertion = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Quantifier
 pp.validateRegExp_eatQuantifier = function(state, noError = false) {
   if (this.validateRegExp_eatQuantifierPrefix(state, noError)) {
-    state.eat(QUESTION_MARK)
+    state.eat(0x3F /* ? */)
     return true
   }
   return false
@@ -319,22 +259,22 @@ pp.validateRegExp_eatQuantifier = function(state, noError = false) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-QuantifierPrefix
 pp.validateRegExp_eatQuantifierPrefix = function(state, noError) {
   return (
-    state.eat(ASTERISK) ||
-    state.eat(PLUS_SIGN) ||
-    state.eat(QUESTION_MARK) ||
+    state.eat(0x2A /* * */) ||
+    state.eat(0x2B /* + */) ||
+    state.eat(0x3F /* ? */) ||
     this.validateRegExp_eatBracedQuantifier(state, noError)
   )
 }
 pp.validateRegExp_eatBracedQuantifier = function(state, noError) {
   const start = state.pos
-  if (state.eat(LEFT_CURLY_BRACKET)) {
+  if (state.eat(0x7B /* { */)) {
     let min = 0, max = -1
     if (this.validateRegExp_eatDecimalDigits(state)) {
       min = state.lastIntValue
-      if (state.eat(COMMA) && this.validateRegExp_eatDecimalDigits(state)) {
+      if (state.eat(0x2C /* , */) && this.validateRegExp_eatDecimalDigits(state)) {
         max = state.lastIntValue
       }
-      if (state.eat(RIGHT_CURLY_BRACKET)) {
+      if (state.eat(0x7D /* } */)) {
         // SyntaxError in https://www.ecma-international.org/ecma-262/8.0/#sec-term
         if (max !== -1 && max < min && !noError) {
           state.raise("numbers out of order in {} quantifier")
@@ -354,7 +294,7 @@ pp.validateRegExp_eatBracedQuantifier = function(state, noError) {
 pp.validateRegExp_eatAtom = function(state) {
   return (
     this.validateRegExp_eatPatternCharacters(state) ||
-    state.eat(FULL_STOP) ||
+    state.eat(0x2E /* . */) ||
     this.validateRegExp_eatReverseSolidusAtomEscape(state) ||
     this.validateRegExp_eatCharacterClass(state) ||
     this.validateRegExp_eatUncapturingGroup(state) ||
@@ -363,7 +303,7 @@ pp.validateRegExp_eatAtom = function(state) {
 }
 pp.validateRegExp_eatReverseSolidusAtomEscape = function(state) {
   const start = state.pos
-  if (state.eat(REVERSE_SOLIDUS)) {
+  if (state.eat(0x5C /* \ */)) {
     if (this.validateRegExp_eatAtomEscape(state)) {
       return true
     }
@@ -373,10 +313,10 @@ pp.validateRegExp_eatReverseSolidusAtomEscape = function(state) {
 }
 pp.validateRegExp_eatUncapturingGroup = function(state) {
   const start = state.pos
-  if (state.eat(LEFT_PARENTHESIS)) {
-    if (state.eat(QUESTION_MARK) && state.eat(COLON)) {
+  if (state.eat(0x28 /* ( */)) {
+    if (state.eat(0x3F /* ? */) && state.eat(0x3A /* : */)) {
       this.validateRegExp_disjunction(state)
-      if (state.eat(RIGHT_PARENTHESIS)) {
+      if (state.eat(0x29 /* ) */)) {
         return true
       }
       state.raise("Unterminated group")
@@ -386,14 +326,14 @@ pp.validateRegExp_eatUncapturingGroup = function(state) {
   return false
 }
 pp.validateRegExp_eatCapturingGroup = function(state) {
-  if (state.eat(LEFT_PARENTHESIS)) {
+  if (state.eat(0x28 /* ( */)) {
     if (this.options.ecmaVersion >= 9) {
       this.validateRegExp_groupSpecifier(state)
-    } else if (state.current() === QUESTION_MARK) {
+    } else if (state.current() === 0x3F /* ? */) {
       state.raise("Invalid group")
     }
     this.validateRegExp_disjunction(state)
-    if (state.eat(RIGHT_PARENTHESIS)) {
+    if (state.eat(0x29 /* ) */)) {
       state.numCapturingParens += 1
       return true
     }
@@ -405,7 +345,7 @@ pp.validateRegExp_eatCapturingGroup = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ExtendedAtom
 pp.validateRegExp_eatExtendedAtom = function(state) {
   return (
-    state.eat(FULL_STOP) ||
+    state.eat(0x2E /* . */) ||
     this.validateRegExp_eatReverseSolidusAtomEscape(state) ||
     this.validateRegExp_eatCharacterClass(state) ||
     this.validateRegExp_eatUncapturingGroup(state) ||
@@ -435,20 +375,20 @@ pp.validateRegExp_eatSyntaxCharacter = function(state) {
 }
 function isSyntaxCharacter(ch) {
   return (
-    ch === CIRCUMFLEX_ACCENT ||
-    ch === DOLLAR_SIGN ||
-    ch === REVERSE_SOLIDUS ||
-    ch === FULL_STOP ||
-    ch === ASTERISK ||
-    ch === PLUS_SIGN ||
-    ch === QUESTION_MARK ||
-    ch === LEFT_PARENTHESIS ||
-    ch === RIGHT_PARENTHESIS ||
-    ch === LEFT_SQUARE_BRACKET ||
-    ch === RIGHT_SQUARE_BRACKET ||
-    ch === LEFT_CURLY_BRACKET ||
-    ch === RIGHT_CURLY_BRACKET ||
-    ch === VERTICAL_LINE
+    ch === 0x5E /* ^ */ ||
+    ch === 0x24 /* $ */ ||
+    ch === 0x5C /* \ */ ||
+    ch === 0x2E /* . */ ||
+    ch === 0x2A /* * */ ||
+    ch === 0x2B /* + */ ||
+    ch === 0x3F /* ? */ ||
+    ch === 0x28 /* ( */ ||
+    ch === 0x29 /* ) */ ||
+    ch === 0x5B /* [ */ ||
+    ch === 0x5D /* [ */ ||
+    ch === 0x7B /* { */ ||
+    ch === 0x7D /* } */ ||
+    ch === 0x7C /* | */
   )
 }
 
@@ -468,16 +408,16 @@ pp.validateRegExp_eatExtendedPatternCharacter = function(state) {
   const ch = state.current()
   if (
     ch !== -1 &&
-    ch !== CIRCUMFLEX_ACCENT &&
-    ch !== DOLLAR_SIGN &&
-    ch !== FULL_STOP &&
-    ch !== ASTERISK &&
-    ch !== PLUS_SIGN &&
-    ch !== QUESTION_MARK &&
-    ch !== LEFT_PARENTHESIS &&
-    ch !== RIGHT_PARENTHESIS &&
-    ch !== LEFT_SQUARE_BRACKET &&
-    ch !== VERTICAL_LINE
+    ch !== 0x5E /* ^ */ &&
+    ch !== 0x24 /* $ */ &&
+    ch !== 0x2E /* . */ &&
+    ch !== 0x2A /* * */ &&
+    ch !== 0x2B /* + */ &&
+    ch !== 0x3F /* ? */ &&
+    ch !== 0x28 /* ( */ &&
+    ch !== 0x29 /* ) */ &&
+    ch !== 0x5B /* [ */ &&
+    ch !== 0x7C /* | */
   ) {
     state.advance()
     return true
@@ -489,7 +429,7 @@ pp.validateRegExp_eatExtendedPatternCharacter = function(state) {
 //   [empty]
 //   `?` GroupName[?U]
 pp.validateRegExp_groupSpecifier = function(state) {
-  if (state.eat(QUESTION_MARK)) {
+  if (state.eat(0x3F /* ? */)) {
     if (this.validateRegExp_eatGroupName(state)) {
       if (state.groupNames.indexOf(state.lastStringValue) !== -1) {
         state.raise("Duplicate capture group name")
@@ -506,8 +446,8 @@ pp.validateRegExp_groupSpecifier = function(state) {
 // Note: this updates `state.lastStringValue` property with the eaten name.
 pp.validateRegExp_eatGroupName = function(state) {
   state.lastStringValue = ""
-  if (state.eat(LESS_THAN_SIGN)) {
-    if (this.validateRegExp_eatRegExpIdentifierName(state) && state.eat(GREATER_THAN_SIGN)) {
+  if (state.eat(0x3C /* < */)) {
+    if (this.validateRegExp_eatRegExpIdentifierName(state) && state.eat(0x3E /* > */)) {
       return true
     }
     state.raise("Invalid capture group name")
@@ -541,7 +481,7 @@ pp.validateRegExp_eatRegExpIdentifierStart = function(state) {
   let ch = state.current()
   state.advance()
 
-  if (ch === REVERSE_SOLIDUS && this.validateRegExp_eatRegExpUnicodeEscapeSequence(state)) {
+  if (ch === 0x5C /* \ */ && this.validateRegExp_eatRegExpUnicodeEscapeSequence(state)) {
     ch = state.lastIntValue
   }
   if (isRegExpIdentifierStart(ch)) {
@@ -553,7 +493,7 @@ pp.validateRegExp_eatRegExpIdentifierStart = function(state) {
   return false
 }
 function isRegExpIdentifierStart(ch) {
-  return isIdentifierStart(ch, true) || ch === DOLLAR_SIGN || ch === LOW_LINE
+  return isIdentifierStart(ch, true) || ch === 0x24 /* $ */ || ch === 0x5F /* _ */
 }
 
 // RegExpIdentifierPart[U] ::
@@ -568,7 +508,7 @@ pp.validateRegExp_eatRegExpIdentifierPart = function(state) {
   let ch = state.current()
   state.advance()
 
-  if (ch === REVERSE_SOLIDUS && this.validateRegExp_eatRegExpUnicodeEscapeSequence(state)) {
+  if (ch === 0x5C /* \ */ && this.validateRegExp_eatRegExpUnicodeEscapeSequence(state)) {
     ch = state.lastIntValue
   }
   if (isRegExpIdentifierPart(ch)) {
@@ -580,7 +520,7 @@ pp.validateRegExp_eatRegExpIdentifierPart = function(state) {
   return false
 }
 function isRegExpIdentifierPart(ch) {
-  return isIdentifierChar(ch, true) || ch === DOLLAR_SIGN || ch === LOW_LINE || ch === ZERO_WIDTH_NON_JOINER || ch === ZERO_WIDTH_JOINER
+  return isIdentifierChar(ch, true) || ch === 0x24 /* $ */ || ch === 0x5F /* _ */ || ch === 0x200C /* <ZWNJ> */ || ch === 0x200D /* <ZWJ> */
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-AtomEscape
@@ -595,7 +535,7 @@ pp.validateRegExp_eatAtomEscape = function(state) {
   }
   if (state.switchU) {
     // Make the same message as V8.
-    if (state.current() === LATIN_SMALL_LETTER_C) {
+    if (state.current() === 0x63 /* c */) {
       state.raise("Invalid unicode escape")
     }
     state.raise("Invalid escape")
@@ -621,7 +561,7 @@ pp.validateRegExp_eatBackReference = function(state) {
   return false
 }
 pp.validateRegExp_eatKGroupName = function(state) {
-  if (state.eat(LATIN_SMALL_LETTER_K)) {
+  if (state.eat(0x6B /* k */)) {
     if (this.validateRegExp_eatGroupName(state)) {
       state.backReferenceNames.push(state.lastStringValue)
       return true
@@ -645,7 +585,7 @@ pp.validateRegExp_eatCharacterEscape = function(state) {
 }
 pp.validateRegExp_eatCControlLetter = function(state) {
   const start = state.pos
-  if (state.eat(LATIN_SMALL_LETTER_C)) {
+  if (state.eat(0x63 /* c */)) {
     if (this.validateRegExp_eatControlLetter(state)) {
       return true
     }
@@ -654,7 +594,7 @@ pp.validateRegExp_eatCControlLetter = function(state) {
   return false
 }
 pp.validateRegExp_eatZero = function(state) {
-  if (state.current() === DIGIT_ZERO && !isDecimalDigit(state.lookahead())) {
+  if (state.current() === 0x30 /* 0 */ && !isDecimalDigit(state.lookahead())) {
     state.lastIntValue = 0
     state.advance()
     return true
@@ -665,28 +605,28 @@ pp.validateRegExp_eatZero = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ControlEscape
 pp.validateRegExp_eatControlEscape = function(state) {
   const ch = state.current()
-  if (ch === LATIN_SMALL_LETTER_T) {
-    state.lastIntValue = CHARACTER_TABULATION
+  if (ch === 0x74 /* t */) {
+    state.lastIntValue = 0x09 /* \t */
     state.advance()
     return true
   }
-  if (ch === LATIN_SMALL_LETTER_N) {
-    state.lastIntValue = LINE_FEED
+  if (ch === 0x6E /* n */) {
+    state.lastIntValue = 0x0A /* \n */
     state.advance()
     return true
   }
-  if (ch === LATIN_SMALL_LETTER_V) {
-    state.lastIntValue = LINE_TABULATION
+  if (ch === 0x76 /* v */) {
+    state.lastIntValue = 0x0B /* \v */
     state.advance()
     return true
   }
-  if (ch === LATIN_SMALL_LETTER_F) {
-    state.lastIntValue = FORM_FEED
+  if (ch === 0x66 /* f */) {
+    state.lastIntValue = 0x0C /* \f */
     state.advance()
     return true
   }
-  if (ch === LATIN_SMALL_LETTER_R) {
-    state.lastIntValue = CARRIAGE_RETURN
+  if (ch === 0x72 /* r */) {
+    state.lastIntValue = 0x0D /* \r */
     state.advance()
     return true
   }
@@ -705,8 +645,8 @@ pp.validateRegExp_eatControlLetter = function(state) {
 }
 function isControlLetter(ch) {
   return (
-    (ch >= LATIN_CAPITAL_LETTER_A && ch <= LATIN_CAPITAL_LETTER_Z) ||
-    (ch >= LATIN_SMALL_LETTER_A && ch <= LATIN_SMALL_LETTER_Z)
+    (ch >= 0x41 /* A */ && ch <= 0x5A /* Z */) ||
+    (ch >= 0x61 /* a */ && ch <= 0x7A /* z */)
   )
 }
 
@@ -714,12 +654,12 @@ function isControlLetter(ch) {
 pp.validateRegExp_eatRegExpUnicodeEscapeSequence = function(state) {
   const start = state.pos
 
-  if (state.eat(LATIN_SMALL_LETTER_U)) {
+  if (state.eat(0x75 /* u */)) {
     if (this.validateRegExp_eatFixedHexDigits(state, 4)) {
       const lead = state.lastIntValue
       if (state.switchU && lead >= 0xD800 && lead <= 0xDBFF) {
         const leadSurrogateEnd = state.pos
-        if (state.eat(REVERSE_SOLIDUS) && state.eat(LATIN_SMALL_LETTER_U) && this.validateRegExp_eatFixedHexDigits(state, 4)) {
+        if (state.eat(0x5C /* \ */) && state.eat(0x75 /* u */) && this.validateRegExp_eatFixedHexDigits(state, 4)) {
           const trail = state.lastIntValue
           if (trail >= 0xDC00 && trail <= 0xDFFF) {
             state.lastIntValue = (lead - 0xD800) * 0x400 + (trail - 0xDC00) + 0x10000
@@ -733,9 +673,9 @@ pp.validateRegExp_eatRegExpUnicodeEscapeSequence = function(state) {
     }
     if (
       state.switchU &&
-      state.eat(LEFT_CURLY_BRACKET) &&
+      state.eat(0x7B /* { */) &&
       this.validateRegExp_eatHexDigits(state) &&
-      state.eat(RIGHT_CURLY_BRACKET) &&
+      state.eat(0x7D /* } */) &&
       isValidUnicode(state.lastIntValue)
     ) {
       return true
@@ -758,15 +698,15 @@ pp.validateRegExp_eatIdentityEscape = function(state) {
     if (this.validateRegExp_eatSyntaxCharacter(state)) {
       return true
     }
-    if (state.eat(SOLIDUS)) {
-      state.lastIntValue = SOLIDUS
+    if (state.eat(0x2F /* / */)) {
+      state.lastIntValue = 0x2F /* / */
       return true
     }
     return false
   }
 
   const ch = state.current()
-  if (ch !== LATIN_SMALL_LETTER_C && (!state.switchN || ch !== LATIN_SMALL_LETTER_K)) {
+  if (ch !== 0x63 /* c */ && (!state.switchN || ch !== 0x6B /* k */)) {
     state.lastIntValue = ch
     state.advance()
     return true
@@ -779,11 +719,11 @@ pp.validateRegExp_eatIdentityEscape = function(state) {
 pp.validateRegExp_eatDecimalEscape = function(state) {
   state.lastIntValue = 0
   let ch = state.current()
-  if (ch >= DIGIT_ONE && ch <= DIGIT_NINE) {
+  if (ch >= 0x31 /* 1 */ && ch <= 0x39 /* 9 */) {
     do {
-      state.lastIntValue = 10 * state.lastIntValue + (ch - DIGIT_ZERO)
+      state.lastIntValue = 10 * state.lastIntValue + (ch - 0x30 /* 0 */)
       state.advance()
-    } while ((ch = state.current()) >= DIGIT_ZERO && ch <= DIGIT_NINE)
+    } while ((ch = state.current()) >= 0x30 /* 0 */ && ch <= 0x39 /* 9 */)
     return true
   }
   return false
@@ -802,14 +742,14 @@ pp.validateRegExp_eatCharacterClassEscape = function(state) {
   if (
     state.switchU &&
     this.options.ecmaVersion >= 9 &&
-    (ch === LATIN_CAPITAL_LETTER_P || ch === LATIN_SMALL_LETTER_P)
+    (ch === 0x50 /* P */ || ch === 0x70 /* p */)
   ) {
     state.lastIntValue = -1
     state.advance()
     if (
-      state.eat(LEFT_CURLY_BRACKET) &&
+      state.eat(0x7B /* { */) &&
       this.validateRegExp_eatUnicodePropertyValueExpression(state) &&
-      state.eat(RIGHT_CURLY_BRACKET)
+      state.eat(0x7D /* } */)
     ) {
       return true
     }
@@ -820,12 +760,12 @@ pp.validateRegExp_eatCharacterClassEscape = function(state) {
 }
 function isCharacterClassEscape(ch) {
   return (
-    ch === LATIN_SMALL_LETTER_D ||
-    ch === LATIN_CAPITAL_LETTER_D ||
-    ch === LATIN_SMALL_LETTER_S ||
-    ch === LATIN_CAPITAL_LETTER_S ||
-    ch === LATIN_SMALL_LETTER_W ||
-    ch === LATIN_CAPITAL_LETTER_W
+    ch === 0x64 /* d */ ||
+    ch === 0x44 /* D */ ||
+    ch === 0x73 /* s */ ||
+    ch === 0x53 /* S */ ||
+    ch === 0x77 /* w */ ||
+    ch === 0x57 /* W */
   )
 }
 
@@ -836,7 +776,7 @@ pp.validateRegExp_eatUnicodePropertyValueExpression = function(state) {
   const start = state.pos
 
   // UnicodePropertyName `=` UnicodePropertyValue
-  if (this.validateRegExp_eatUnicodePropertyName(state) && state.eat(EQUALS_SIGN)) {
+  if (this.validateRegExp_eatUnicodePropertyName(state) && state.eat(0x3D /* = */)) {
     const name = state.lastStringValue
     if (this.validateRegExp_eatUnicodePropertyValue(state)) {
       const value = state.lastStringValue
@@ -877,7 +817,7 @@ pp.validateRegExp_eatUnicodePropertyName = function(state) {
   return state.lastStringValue !== ""
 }
 function isUnicodePropertyNameCharacter(ch) {
-  return isControlLetter(ch) || ch === LOW_LINE
+  return isControlLetter(ch) || ch === 0x5F /* _ */
 }
 
 // UnicodePropertyValue ::
@@ -903,10 +843,10 @@ pp.validateRegExp_eatLoneUnicodePropertyNameOrValue = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClass
 pp.validateRegExp_eatCharacterClass = function(state) {
-  if (state.eat(LEFT_SQUARE_BRACKET)) {
-    state.eat(CIRCUMFLEX_ACCENT)
+  if (state.eat(0x5B /* [ */)) {
+    state.eat(0x5E /* ^ */)
     this.validateRegExp_classRanges(state)
-    if (state.eat(RIGHT_SQUARE_BRACKET)) {
+    if (state.eat(0x5D /* [ */)) {
       return true
     }
     // Unreachable since it threw "unterminated regular expression" error before.
@@ -921,7 +861,7 @@ pp.validateRegExp_eatCharacterClass = function(state) {
 pp.validateRegExp_classRanges = function(state) {
   while (this.validateRegExp_eatClassAtom(state)) {
     const left = state.lastIntValue
-    if (state.eat(HYPHEN_MINUS) && this.validateRegExp_eatClassAtom(state)) {
+    if (state.eat(0x2D /* - */) && this.validateRegExp_eatClassAtom(state)) {
       const right = state.lastIntValue
       if (state.switchU && (left === -1 || right === -1)) {
         state.raise("Invalid character class")
@@ -938,14 +878,14 @@ pp.validateRegExp_classRanges = function(state) {
 pp.validateRegExp_eatClassAtom = function(state) {
   const start = state.pos
 
-  if (state.eat(REVERSE_SOLIDUS)) {
+  if (state.eat(0x5C /* \ */)) {
     if (this.validateRegExp_eatClassEscape(state)) {
       return true
     }
     if (state.switchU) {
       // Make the same message as V8.
       const ch = state.current()
-      if (ch === LATIN_SMALL_LETTER_C || isOctalDigit(ch)) {
+      if (ch === 0x63 /* c */ || isOctalDigit(ch)) {
         state.raise("Invalid class escape")
       }
       state.raise("Invalid escape")
@@ -954,7 +894,7 @@ pp.validateRegExp_eatClassAtom = function(state) {
   }
 
   const ch = state.current()
-  if (ch !== RIGHT_SQUARE_BRACKET) {
+  if (ch !== 0x5D /* [ */) {
     state.lastIntValue = ch
     state.advance()
     return true
@@ -967,17 +907,17 @@ pp.validateRegExp_eatClassAtom = function(state) {
 pp.validateRegExp_eatClassEscape = function(state) {
   const start = state.pos
 
-  if (state.eat(LATIN_SMALL_LETTER_B)) {
-    state.lastIntValue = BACKSPACE
+  if (state.eat(0x62 /* b */)) {
+    state.lastIntValue = 0x08 /* <BS> */
     return true
   }
 
-  if (state.switchU && state.eat(HYPHEN_MINUS)) {
-    state.lastIntValue = HYPHEN_MINUS
+  if (state.switchU && state.eat(0x2D /* - */)) {
+    state.lastIntValue = 0x2D /* - */
     return true
   }
 
-  if (!state.switchU && state.eat(LATIN_SMALL_LETTER_C)) {
+  if (!state.switchU && state.eat(0x63 /* c */)) {
     if (this.validateRegExp_eatClassControlLetter(state)) {
       return true
     }
@@ -993,7 +933,7 @@ pp.validateRegExp_eatClassEscape = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ClassControlLetter
 pp.validateRegExp_eatClassControlLetter = function(state) {
   const ch = state.current()
-  if (isDecimalDigit(ch) || ch === LOW_LINE) {
+  if (isDecimalDigit(ch) || ch === 0x5F /* _ */) {
     state.lastIntValue = ch % 0x20
     state.advance()
     return true
@@ -1004,7 +944,7 @@ pp.validateRegExp_eatClassControlLetter = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-HexEscapeSequence
 pp.validateRegExp_eatHexEscapeSequence = function(state) {
   const start = state.pos
-  if (state.eat(LATIN_SMALL_LETTER_X)) {
+  if (state.eat(0x78 /* x */)) {
     if (this.validateRegExp_eatFixedHexDigits(state, 2)) {
       return true
     }
@@ -1022,13 +962,13 @@ pp.validateRegExp_eatDecimalDigits = function(state) {
   let ch = 0
   state.lastIntValue = 0
   while (isDecimalDigit(ch = state.current())) {
-    state.lastIntValue = 10 * state.lastIntValue + (ch - DIGIT_ZERO)
+    state.lastIntValue = 10 * state.lastIntValue + (ch - 0x30 /* 0 */)
     state.advance()
   }
   return state.pos !== start
 }
 function isDecimalDigit(ch) {
-  return ch >= DIGIT_ZERO && ch <= DIGIT_NINE
+  return ch >= 0x30 /* 0 */ && ch <= 0x39 /* 9 */
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-HexDigits
@@ -1044,19 +984,19 @@ pp.validateRegExp_eatHexDigits = function(state) {
 }
 function isHexDigit(ch) {
   return (
-    (ch >= DIGIT_ZERO && ch <= DIGIT_NINE) ||
-    (ch >= LATIN_CAPITAL_LETTER_A && ch <= LATIN_CAPITAL_LETTER_F) ||
-    (ch >= LATIN_SMALL_LETTER_A && ch <= LATIN_SMALL_LETTER_F)
+    (ch >= 0x30 /* 0 */ && ch <= 0x39 /* 9 */) ||
+    (ch >= 0x41 /* A */ && ch <= 0x46 /* F */) ||
+    (ch >= 0x61 /* a */ && ch <= 0x66 /* f */)
   )
 }
 function hexToInt(ch) {
-  if (ch >= LATIN_CAPITAL_LETTER_A && ch <= LATIN_CAPITAL_LETTER_F) {
-    return 10 + (ch - LATIN_CAPITAL_LETTER_A)
+  if (ch >= 0x41 /* A */ && ch <= 0x46 /* F */) {
+    return 10 + (ch - 0x41 /* A */)
   }
-  if (ch >= LATIN_SMALL_LETTER_A && ch <= LATIN_SMALL_LETTER_F) {
-    return 10 + (ch - LATIN_SMALL_LETTER_A)
+  if (ch >= 0x61 /* a */ && ch <= 0x66 /* f */) {
+    return 10 + (ch - 0x61 /* a */)
   }
-  return ch - DIGIT_ZERO
+  return ch - 0x30 /* 0 */
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-LegacyOctalEscapeSequence
@@ -1083,7 +1023,7 @@ pp.validateRegExp_eatLegacyOctalEscapeSequence = function(state) {
 pp.validateRegExp_eatOctalDigit = function(state) {
   const ch = state.current()
   if (isOctalDigit(ch)) {
-    state.lastIntValue = ch - DIGIT_ZERO
+    state.lastIntValue = ch - 0x30 /* 0 */
     state.advance()
     return true
   }
@@ -1091,7 +1031,7 @@ pp.validateRegExp_eatOctalDigit = function(state) {
   return false
 }
 function isOctalDigit(ch) {
-  return ch >= DIGIT_ZERO && ch <= DIGIT_SEVEN
+  return ch >= 0x30 /* 0 */ && ch <= 0x37 /* 7 */
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Hex4Digits
