@@ -375,20 +375,12 @@ pp.regexp_eatSyntaxCharacter = function(state) {
 }
 function isSyntaxCharacter(ch) {
   return (
-    ch === 0x5E /* ^ */ ||
     ch === 0x24 /* $ */ ||
-    ch === 0x5C /* \ */ ||
+    ch >= 0x28 /* ( */ && ch <= 0x2B /* + */ ||
     ch === 0x2E /* . */ ||
-    ch === 0x2A /* * */ ||
-    ch === 0x2B /* + */ ||
     ch === 0x3F /* ? */ ||
-    ch === 0x28 /* ( */ ||
-    ch === 0x29 /* ) */ ||
-    ch === 0x5B /* [ */ ||
-    ch === 0x5D /* [ */ ||
-    ch === 0x7B /* { */ ||
-    ch === 0x7D /* } */ ||
-    ch === 0x7C /* | */
+    ch >= 0x5B /* [ */ && ch <= 0x5E /* ^ */ ||
+    ch >= 0x7B /* { */ && ch <= 0x7D /* } */
   )
 }
 
@@ -408,15 +400,12 @@ pp.regexp_eatExtendedPatternCharacter = function(state) {
   const ch = state.current()
   if (
     ch !== -1 &&
-    ch !== 0x5E /* ^ */ &&
     ch !== 0x24 /* $ */ &&
+    !(ch >= 0x28 /* ( */ && ch <= 0x2B /* + */) &&
     ch !== 0x2E /* . */ &&
-    ch !== 0x2A /* * */ &&
-    ch !== 0x2B /* + */ &&
     ch !== 0x3F /* ? */ &&
-    ch !== 0x28 /* ( */ &&
-    ch !== 0x29 /* ) */ &&
     ch !== 0x5B /* [ */ &&
+    ch !== 0x5E /* ^ */ &&
     ch !== 0x7C /* | */
   ) {
     state.advance()
