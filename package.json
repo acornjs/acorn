@@ -51,6 +51,6 @@
     "rollup-plugin-buble": "^0.16.0",
     "test262": "git+https://github.com/tc39/test262.git#18c1e799a01cc976695983b61e225ce7959bdd91",
     "test262-parser-runner": "^0.3.1",
-    "unicode-9.0.0": "^0.7.0"
+    "unicode-10.0.0": "^0.7.5"
   }
 }

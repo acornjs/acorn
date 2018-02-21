@@ -1,12 +1,14 @@
 'use strict';
 
 // Which Unicode version should be used?
-var version = '9.0.0';
+var pkg = require('../package.json');
+var dependencies = Object.keys(pkg.devDependencies);
+var unicodeVersion = dependencies.find((name) => /^unicode-\d/.test(name));
 
-var start = require('unicode-' + version + '/Binary_Property/ID_Start/code-points.js')
+var start = require(unicodeVersion + '/Binary_Property/ID_Start/code-points.js')
     .filter(function(ch) { return ch > 0x7f; });
 var last = -1;
-var cont = [0x200c, 0x200d].concat(require('unicode-' + version + '/Binary_Property/ID_Continue/code-points.js')
+var cont = [0x200c, 0x200d].concat(require(unicodeVersion + '/Binary_Property/ID_Continue/code-points.js')
     .filter(function(ch) { return ch > 0x7f && search(start, ch, last + 1) == -1; }));
 
 function search(arr, ch, starting) {
