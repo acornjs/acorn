@@ -8,7 +8,7 @@ Support object spread in the AST walker.
 
 The identifier character categorization is now based on Unicode version 10.
 
-Acorn will not validate the content of regular expressions, including new ES9 features.
+Acorn will now validate the content of regular expressions, including new ES9 features.
 
 ## 5.4.1 (2018-02-02)
 
