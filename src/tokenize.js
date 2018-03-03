@@ -628,7 +628,12 @@ pp.readEscapedChar = function(inTemplate) {
       this.pos += octalStr.length - 1
       ch = this.input.charCodeAt(this.pos)
       if ((octalStr !== "0" || ch == 56 || ch == 57) && (this.strict || inTemplate)) {
-        this.invalidStringToken(this.pos - 1 - octalStr.length, "Octal literal in strict mode")
+        this.invalidStringToken(
+          this.pos - 1 - octalStr.length,
+          inTemplate
+            ? "Octal literal in template string"
+            : "Octal literal in strict mode"
+        )
       }
       return String.fromCharCode(octal)
     }

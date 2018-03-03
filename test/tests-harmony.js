@@ -13281,7 +13281,7 @@ testFail("[...a, b] = c", "Comma is not permitted after the rest element (1:5)",
 
 testFail("({ t(eval) { \"use strict\"; } });", "Binding eval in strict mode (1:5)", {ecmaVersion: 6});
 
-testFail("\"use strict\"; `${test}\\02`;", "Octal literal in strict mode (1:22)", {ecmaVersion: 6});
+testFail("\"use strict\"; `${test}\\02`;", "Octal literal in template string (1:22)", {ecmaVersion: 6});
 
 testFail("if (1) import \"acorn\";", "'import' and 'export' may only appear at the top level (1:7)", {ecmaVersion: 6});
 
@@ -14591,7 +14591,9 @@ test("export default function foo() {} false", {
 
 // https://github.com/acornjs/acorn/issues/274
 
-testFail("`\\07`", "Octal literal in strict mode (1:1)", {ecmaVersion: 6});
+testFail("`\\07`", "Octal literal in template string (1:1)", {ecmaVersion: 6});
+
+testFail("(function(){ 'use strict'; '\\07'; })", "Octal literal in strict mode (1:28)", {ecmaVersion: 6});
 
 // https://github.com/acornjs/acorn/issues/277
 
