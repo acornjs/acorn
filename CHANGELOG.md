@@ -1,3 +1,12 @@
+## 5.5.1 (2018-03-06)
+
+### Bug fixes
+
+Fix regression in walker causing property values in object patterns to
+be walked as expressions.
+
+Fix misleading error message for octal escapes in template strings.
+
 ## 5.5.0 (2018-02-27)
 
 ### Bug fixes
