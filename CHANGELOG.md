@@ -1,9 +1,14 @@
+## 5.5.2 (2018-03-08)
+
+### Bug fixes
+
+A republish of the code in 5.5.1 in an attempt to solve an issue with the file timestamps in the npm package being 0.
+
 ## 5.5.1 (2018-03-06)
 
 ### Bug fixes
 
-Fix regression in walker causing property values in object patterns to
-be walked as expressions.
+Fix regression in walker causing property values in object patterns to be walked as expressions.
 
 Fix misleading error message for octal escapes in template strings.
 
