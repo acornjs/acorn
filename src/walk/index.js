@@ -16,11 +16,10 @@
 // walker, and state can be used to give this walked an initial
 // state.
 
-export function simple(node, visitors, base, state, override) {
-  if (!base) base = exports.base
-  ;(function c(node, st, override) {
+export function simple(node, visitors, baseVisitor = base, state, override) {
+  (function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
-    base[type](node, st, c)
+    baseVisitor[type](node, st, c)
     if (found) found(node, st)
   })(node, state, override)
 }
@@ -28,14 +27,13 @@ export function simple(node, visitors, base, state, override) {
 // An ancestor walk keeps an array of ancestor nodes (including the
 // current node) and passes them to the callback as third parameter
 // (and also as state parameter when no other state is present).
-export function ancestor(node, visitors, base, state) {
-  if (!base) base = exports.base
+export function ancestor(node, visitors, baseVisitor = base, state) {
   let ancestors = []
   ;(function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
     let isNew = node != ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
-    base[type](node, st, c)
+    baseVisitor[type](node, st, c)
     if (found) found(node, st || ancestors, ancestors)
     if (isNew) ancestors.pop()
   })(node, state)
@@ -46,8 +44,8 @@ export function ancestor(node, visitors, base, state) {
 // threaded through the walk, and can opt how and whether to walk
 // their child nodes (by calling their third argument on these
 // nodes).
-export function recursive(node, state, funcs, base, override) {
-  let visitor = funcs ? exports.make(funcs, base) : base
+export function recursive(node, state, funcs, baseVisitor, override) {
+  let visitor = funcs ? exports.make(funcs, baseVisitor) : baseVisitor
   ;(function c(node, st, override) {
     visitor[override || node.type](node, st, c)
   })(node, state, override)
@@ -67,25 +65,23 @@ class Found {
 }
 
 // A full walk triggers the callback on each node
-export function full(node, callback, base, state, override) {
-  if (!base) base = exports.base
-  ;(function c(node, st, override) {
+export function full(node, callback, baseVisitor = base, state, override) {
+  (function c(node, st, override) {
     let type = override || node.type
-    base[type](node, st, c)
+    baseVisitor[type](node, st, c)
     if (!override) callback(node, st, type)
   })(node, state, override)
 }
 
 // An fullAncestor walk is like an ancestor walk, but triggers
 // the callback on each node
-export function fullAncestor(node, callback, base, state) {
-  if (!base) base = exports.base
+export function fullAncestor(node, callback, baseVisitor = base, state) {
   let ancestors = []
   ;(function c(node, st, override) {
     let type = override || node.type
     let isNew = node != ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
-    base[type](node, st, c)
+    baseVisitor[type](node, st, c)
     if (!override) callback(node, st || ancestors, ancestors, type)
     if (isNew) ancestors.pop()
   })(node, state)
@@ -94,15 +90,14 @@ export function fullAncestor(node, callback, base, state) {
 // Find a node with a given start, end, and type (all are optional,
 // null can be used as wildcard). Returns a {node, state} object, or
 // undefined when it doesn't find a matching node.
-export function findNodeAt(node, start, end, test, base, state) {
+export function findNodeAt(node, start, end, test, baseVisitor = base, state) {
   test = makeTest(test)
-  if (!base) base = exports.base
   try {
     (function c(node, st, override) {
       let type = override || node.type
       if ((start == null || node.start <= start) &&
           (end == null || node.end >= end))
-        base[type](node, st, c)
+        baseVisitor[type](node, st, c)
       if ((start == null || node.start == start) &&
           (end == null || node.end == end) &&
           test(type, node))
@@ -116,14 +111,13 @@ export function findNodeAt(node, start, end, test, base, state) {
 
 // Find the innermost node of a given type that contains the given
 // position. Interface similar to findNodeAt.
-export function findNodeAround(node, pos, test, base, state) {
+export function findNodeAround(node, pos, test, baseVisitor = base, state) {
   test = makeTest(test)
-  if (!base) base = exports.base
   try {
     (function c(node, st, override) {
       let type = override || node.type
       if (node.start > pos || node.end < pos) return
-      base[type](node, st, c)
+      baseVisitor[type](node, st, c)
       if (test(type, node)) throw new Found(node, st)
     })(node, state)
   } catch (e) {
@@ -133,15 +127,14 @@ export function findNodeAround(node, pos, test, base, state) {
 }
 
 // Find the outermost matching node after a given position.
-export function findNodeAfter(node, pos, test, base, state) {
+export function findNodeAfter(node, pos, test, baseVisitor = base, state) {
   test = makeTest(test)
-  if (!base) base = exports.base
   try {
     (function c(node, st, override) {
       if (node.end < pos) return
       let type = override || node.type
       if (node.start >= pos && test(type, node)) throw new Found(node, st)
-      base[type](node, st, c)
+      baseVisitor[type](node, st, c)
     })(node, state)
   } catch (e) {
     if (e instanceof Found) return e
@@ -150,16 +143,15 @@ export function findNodeAfter(node, pos, test, base, state) {
 }
 
 // Find the outermost matching node before a given position.
-export function findNodeBefore(node, pos, test, base, state) {
+export function findNodeBefore(node, pos, test, baseVisitor = base, state) {
   test = makeTest(test)
-  if (!base) base = exports.base
   let max
   ;(function c(node, st, override) {
     if (node.start > pos) return
     let type = override || node.type
     if (node.end <= pos && (!max || max.node.end < node.end) && test(type, node))
       max = new Found(node, st)
-    base[type](node, st, c)
+    baseVisitor[type](node, st, c)
   })(node, state)
   return max
 }
@@ -173,9 +165,8 @@ const create = Object.create || function(proto) {
 
 // Used to create a custom walker. Will fill in all missing node
 // type properties with the defaults.
-export function make(funcs, base) {
-  if (!base) base = exports.base
-  let visitor = create(base)
+export function make(funcs, baseVisitor = base) {
+  let visitor = create(baseVisitor)
   for (let type in funcs) visitor[type] = funcs[type]
   return visitor
 }
