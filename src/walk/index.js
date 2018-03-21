@@ -285,7 +285,7 @@ base.ArrayPattern = (node, st, c) => {
 base.ObjectPattern = (node, st, c) => {
   for (let prop of node.properties) {
     if (prop.computed) c(prop.key, st, "Expression")
-    c(prop.value, st, "Pattern")
+    if (prop.value) c(prop.value, st, "Pattern")
   }
 }
 
