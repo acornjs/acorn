@@ -33,7 +33,7 @@ export function ancestor(node, visitors, baseVisitor = base, state) {
     let type = override || node.type, found = visitors[type]
     let isNew = node != ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
-    baseVisitor[type](node, st, c)
+    if (baseVisitor[type]) baseVisitor[type](node, st, c)
     if (found) found(node, st || ancestors, ancestors)
     if (isNew) ancestors.pop()
   })(node, state)
@@ -68,7 +68,7 @@ class Found {
 export function full(node, callback, baseVisitor = base, state, override) {
   (function c(node, st, override) {
     let type = override || node.type
-    baseVisitor[type](node, st, c)
+    if (baseVisitor[type]) baseVisitor[type](node, st, c)
     if (!override) callback(node, st, type)
   })(node, state, override)
 }
@@ -81,7 +81,7 @@ export function fullAncestor(node, callback, baseVisitor = base, state) {
     let type = override || node.type
     let isNew = node != ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
-    baseVisitor[type](node, st, c)
+    if (baseVisitor[type]) baseVisitor[type](node, st, c)
     if (!override) callback(node, st || ancestors, ancestors, type)
     if (isNew) ancestors.pop()
   })(node, state)
@@ -96,8 +96,9 @@ export function findNodeAt(node, start, end, test, baseVisitor = base, state) {
     (function c(node, st, override) {
       let type = override || node.type
       if ((start == null || node.start <= start) &&
-          (end == null || node.end >= end))
-        baseVisitor[type](node, st, c)
+          (end == null || node.end >= end)) {
+        if (baseVisitor[type]) baseVisitor[type](node, st, c)
+      }
       if ((start == null || node.start == start) &&
           (end == null || node.end == end) &&
           test(type, node))
@@ -117,7 +118,7 @@ export function findNodeAround(node, pos, test, baseVisitor = base, state) {
     (function c(node, st, override) {
       let type = override || node.type
       if (node.start > pos || node.end < pos) return
-      baseVisitor[type](node, st, c)
+      if (baseVisitor[type]) baseVisitor[type](node, st, c)
       if (test(type, node)) throw new Found(node, st)
     })(node, state)
   } catch (e) {
@@ -134,7 +135,7 @@ export function findNodeAfter(node, pos, test, baseVisitor = base, state) {
       if (node.end < pos) return
       let type = override || node.type
       if (node.start >= pos && test(type, node)) throw new Found(node, st)
-      baseVisitor[type](node, st, c)
+      if (baseVisitor[type]) baseVisitor[type](node, st, c)
     })(node, state)
   } catch (e) {
     if (e instanceof Found) return e
@@ -151,7 +152,7 @@ export function findNodeBefore(node, pos, test, baseVisitor = base, state) {
     let type = override || node.type
     if (node.end <= pos && (!max || max.node.end < node.end) && test(type, node))
       max = new Found(node, st)
-    baseVisitor[type](node, st, c)
+    if (baseVisitor[type]) baseVisitor[type](node, st, c)
   })(node, state)
   return max
 }
