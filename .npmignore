@@ -9,3 +9,4 @@
 .tern-project
 .travis.yml
 /src
+yarn-error.log
