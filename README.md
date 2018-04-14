@@ -16,7 +16,7 @@ You are welcome to
 [report bugs](https://github.com/acornjs/acorn/issues) or create pull
 requests on [github](https://github.com/acornjs/acorn). For questions
 and discussion, please use the
-[Tern discussion forum](https://discuss.acornjs.net).
+[Tern discussion forum](https://discuss.ternjs.net).
 
 ## Installation
 
