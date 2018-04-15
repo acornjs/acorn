@@ -29293,22 +29293,29 @@ test("((b), a=1)", {})
 
 test("(x) = 1", {})
 
-testFail("try {} catch (foo) { var foo; }", "Identifier 'foo' has already been declared (1:25)")
+test("try {} catch (foo) { var foo; }", {})
 testFail("try {} catch (foo) { let foo; }", "Identifier 'foo' has already been declared (1:25)", {ecmaVersion: 6})
-testFail("try {} catch (foo) { try {} catch (_) { var foo; } }", "Identifier 'foo' has already been declared (1:44)")
+test("try {} catch (foo) { try {} catch (_) { var foo; } }", {})
 testFail("try {} catch ([foo]) { var foo; }", "Identifier 'foo' has already been declared (1:27)", {ecmaVersion: 6})
 testFail("try {} catch ({ foo }) { var foo; }", "Identifier 'foo' has already been declared (1:29)", {ecmaVersion: 6})
 testFail("try {} catch ([foo, foo]) {}", "Identifier 'foo' has already been declared (1:20)", {ecmaVersion: 6})
 testFail("try {} catch ({ a: foo, b: { c: [foo] } }) {}", "Identifier 'foo' has already been declared (1:33)", {ecmaVersion: 6})
 testFail("let foo; try {} catch (foo) {} let foo;", "Identifier 'foo' has already been declared (1:35)", {ecmaVersion: 6})
-testFail("try {} catch (foo) { function foo() {} }", "Identifier 'foo' has already been declared (1:30)")
+test("try {} catch (foo) { function foo() {} }", {})
 
 test("try {} catch (foo) {} var foo;", {})
 test("try {} catch (foo) {} let foo;", {}, {ecmaVersion: 6})
 test("try {} catch (foo) { { let foo; } }", {}, {ecmaVersion: 6})
 test("try {} catch (foo) { function x() { var foo; } }", {}, {ecmaVersion: 6})
 test("try {} catch (foo) { function x(foo) {} }", {}, {ecmaVersion: 6})
+test("try {} catch (a) { if(1) function a(){} }", {})
 
+test("try {} catch (foo) { for (var foo = 1;;); }", {})
+test("try {} catch (foo) { for (var foo in bar); }", {})
+test("try {} catch (foo) { for (var [foo] in bar); }", {}, {ecmaVersion: 6})
+testFail("try {} catch ([a, a]) {}", "Identifier 'a' has already been declared (1:18)", {ecmaVersion: 6})
+
+testFail("try {} catch (foo) { for (var foo of bar); }", "Identifier 'foo' has already been declared (1:30)", {ecmaVersion: 6})
 test("'use strict'; let foo = function foo() {}", {}, {ecmaVersion: 6})
 
 test("/**/ --> comment\n", {})

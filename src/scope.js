@@ -22,7 +22,7 @@ pp.enterFunctionScope = function() {
   // lexical: a hash of lexically-declared names in the current lexical scope
   // childVar: a hash of var-declared names in all child lexical scopes of the current lexical scope (within the current function scope)
   // parentLexical: a hash of lexically-declared names in all parent lexical scopes of the current lexical scope (within the current function scope)
-  this.scopeStack.push({var: {}, lexical: {}, childVar: {}, parentLexical: {}})
+  this.scopeStack.push({var: {}, lexical: {}, childVar: {}, parentLexical: {}, parentCatch: {}})
 }
 
 pp.exitFunctionScope = function() {
@@ -31,10 +31,11 @@ pp.exitFunctionScope = function() {
 
 pp.enterLexicalScope = function() {
   const parentScope = this.scopeStack[this.scopeStack.length - 1]
-  const childScope = {var: {}, lexical: {}, childVar: {}, parentLexical: {}}
+  const childScope = {var: {}, lexical: {}, childVar: {}, parentLexical: {}, parentCatch: {}}
 
   this.scopeStack.push(childScope)
   assign(childScope.parentLexical, parentScope.lexical, parentScope.parentLexical)
+  assign(childScope.parentCatch, parentScope.parentCatch, {[parentScope.catch]: true})
 }
 
 pp.exitLexicalScope = function() {
@@ -48,10 +49,10 @@ pp.exitLexicalScope = function() {
  * A name can be declared with `var` if there are no variables with the same name declared with `let`/`const`
  * in the current lexical scope or any of the parent lexical scopes in this function.
  */
-pp.canDeclareVarName = function(name) {
+pp.canDeclareVarName = function(name, allowCatchParamNameRedeclaration) {
   const currentScope = this.scopeStack[this.scopeStack.length - 1]
 
-  return !has(currentScope.lexical, name) && !has(currentScope.parentLexical, name)
+  return !has(currentScope.lexical, name) && !has(currentScope.parentLexical, name) && (allowCatchParamNameRedeclaration || (currentScope.catch !== name && !has(currentScope.parentCatch, name)))
 }
 
 /**
@@ -62,7 +63,7 @@ pp.canDeclareVarName = function(name) {
 pp.canDeclareLexicalName = function(name) {
   const currentScope = this.scopeStack[this.scopeStack.length - 1]
 
-  return !has(currentScope.lexical, name) && !has(currentScope.var, name) && !has(currentScope.childVar, name)
+  return !has(currentScope.lexical, name) && !has(currentScope.var, name) && !has(currentScope.childVar, name) && currentScope.catch !== name
 }
 
 pp.declareVarName = function(name) {
@@ -71,4 +72,8 @@ pp.declareVarName = function(name) {
 
 pp.declareLexicalName = function(name) {
   this.scopeStack[this.scopeStack.length - 1].lexical[name] = true
+}
+
+pp.declareCatchParamName = function(name) {
+  this.scopeStack[this.scopeStack.length - 1].catch = name
 }

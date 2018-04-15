@@ -322,7 +322,10 @@ pp.parseTryStatement = function(node) {
     this.expect(tt.parenL)
     clause.param = this.parseBindingAtom()
     this.enterLexicalScope()
-    this.checkLVal(clause.param, "let")
+    if (clause.param.type == "Identifier") {
+      this.checkLVal(clause.param, "none")
+      this.declareCatchParamName(clause.param.name)
+    } else this.checkLVal(clause.param, "let")
     this.expect(tt.parenR)
     clause.body = this.parseBlock(false)
     this.exitLexicalScope()
@@ -459,7 +462,7 @@ pp.parseVar = function(node, isFor, kind) {
   node.kind = kind
   for (;;) {
     let decl = this.startNode()
-    this.parseVarId(decl, kind)
+    this.parseVarId(decl, kind, isFor)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
     } else if (kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
@@ -475,9 +478,9 @@ pp.parseVar = function(node, isFor, kind) {
   return node
 }
 
-pp.parseVarId = function(decl, kind) {
+pp.parseVarId = function(decl, kind, isFor) {
   decl.id = this.parseBindingAtom(kind)
-  this.checkLVal(decl.id, kind, false)
+  this.checkLVal(decl.id, kind, false, !(isFor && (this.options.ecmaVersion >= 6 && this.isContextual("of"))))
 }
 
 // Parse a function declaration or literal (depending on the
@@ -493,7 +496,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   if (isStatement) {
     node.id = isStatement === "nullableID" && this.type != tt.name ? null : this.parseIdent()
     if (node.id) {
-      this.checkLVal(node.id, "var")
+      this.checkLVal(node.id, "var", false, true)
     }
   }
 
