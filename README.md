@@ -66,7 +66,7 @@ object referring to that same position.
 [estree]: https://github.com/estree/estree
 
 - **ecmaVersion**: Indicates the ECMAScript version to parse. Must be
-  either 3, 5, 6 (2015), 7 (2016), 8 (2017), or 9 (2018, partial
+  either 3, 5, 6 (2015), 7 (2016), 8 (2017), 9 (2018) or 10 (2019, partial
   support). This influences support for strict mode, the set of
   reserved words, and support for new syntax features. Default is 7.
 
@@ -354,7 +354,7 @@ The `bin/acorn` utility can be used to parse a file from the command
 line. It accepts as arguments its input file and the following
 options:
 
-- `--ecma3|--ecma5|--ecma6|--ecma7|--ecma8|--ecma9`: Sets the ECMAScript version
+- `--ecma3|--ecma5|--ecma6|--ecma7|--ecma8|--ecma9|--ecma10`: Sets the ECMAScript version
   to parse. Default is version 7.
 
 - `--module`: Sets the parsing mode to `"module"`. Is set to `"script"` otherwise.
