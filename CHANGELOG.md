@@ -10,12 +10,6 @@ A _second_ republish of the code in 5.5.1, this time with yarn, to hopefully get
 
 A republish of the code in 5.5.1 in an attempt to solve an issue with the file timestamps in the npm package being 0.
 
-## 5.5.2 (2018-03-08)
-
-### Bug fixes
-
-A republish of the code in 5.5.1 in an attempt to solve an issue with the file timestamps in the npm package being 0.
-
 ## 5.5.1 (2018-03-06)
 
 ### Bug fixes
