@@ -14,6 +14,7 @@
     require("./tests-async-iteration.js");
     require("./tests-regexp.js");
     require("./tests-regexp-2018.js");
+    require("./tests-json-superset.js");
     acorn = require("../dist/acorn")
     require("../dist/acorn_loose")
   } else {

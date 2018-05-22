@@ -495,7 +495,7 @@ pp.readString = function(quote) {
       out += this.readEscapedChar(false)
       chunkStart = this.pos
     } else {
-      if (isNewLine(ch)) this.raise(this.start, "Unterminated string constant")
+      if (isNewLine(ch, this.options.ecmaVersion >= 10)) this.raise(this.start, "Unterminated string constant")
       ++this.pos
     }
   }
