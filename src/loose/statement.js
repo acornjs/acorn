@@ -138,9 +138,12 @@ lp.parseStatement = function() {
     if (this.tok.type === tt._catch) {
       let clause = this.startNode()
       this.next()
-      this.expect(tt.parenL)
-      clause.param = this.toAssignable(this.parseExprAtom(), true)
-      this.expect(tt.parenR)
+      if (this.eat(tt.parenL)) {
+        clause.param = this.toAssignable(this.parseExprAtom(), true)
+        this.expect(tt.parenR)
+      } else {
+        clause.param = null
+      }
       clause.body = this.parseBlock()
       node.handler = this.finishNode(clause, "CatchClause")
     }

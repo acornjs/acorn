@@ -319,11 +319,16 @@ pp.parseTryStatement = function(node) {
   if (this.type === tt._catch) {
     let clause = this.startNode()
     this.next()
-    this.expect(tt.parenL)
-    clause.param = this.parseBindingAtom()
-    this.enterLexicalScope()
-    this.checkLVal(clause.param, "let")
-    this.expect(tt.parenR)
+    if (this.eat(tt.parenL)) {
+      clause.param = this.parseBindingAtom()
+      this.enterLexicalScope()
+      this.checkLVal(clause.param, "let")
+      this.expect(tt.parenR)
+    } else {
+      if (this.options.ecmaVersion < 10) this.unexpected()
+      clause.param = null
+      this.enterLexicalScope()
+    }
     clause.body = this.parseBlock(false)
     this.exitLexicalScope()
     node.handler = this.finishNode(clause, "CatchClause")
