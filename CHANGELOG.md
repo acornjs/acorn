@@ -1,3 +1,17 @@
+## 5.6.0 (2018-05-31)
+
+### Bug fixes
+
+Fix a bug in the walker that caused a crash when walking an object pattern spread.
+
+### New features
+
+Allow U+2028 and U+2029 in string when ECMAVersion >= 10.
+
+Allow binding-less catch statements when ECMAVersion >= 10.
+
+Add `allowAwaitOutsideFunction` option for parsing top-level `await`.
+
 ## 5.5.3 (2018-03-08)
 
 ### Bug fixes
