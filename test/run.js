@@ -7,6 +7,7 @@
     require("./tests-harmony.js");
     require("./tests-es7.js");
     require("./tests-asyncawait.js");
+    require("./tests-await-top-level.js");
     require("./tests-trailing-commas-in-func.js");
     require("./tests-template-literal-revision.js");
     require("./tests-directive.js");
