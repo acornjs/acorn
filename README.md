@@ -99,6 +99,8 @@ object referring to that same position.
 - **allowImportExportEverywhere**: By default, `import` and `export`
   declarations can only appear at a program's top level. Setting this
   option to `true` allows them anywhere where a statement is allowed.
+  
+- **allowAwaitOutsideFunction**: By default, `await` expressions can only appear inside `async` functions. Setting this option to `true` allows to have top-level `await` expressions. They are still not allowed in non-`async` functions, though.
 
 - **allowHashBang**: When this is enabled (off by default), if the
   code starts with the characters `#!` (as in a shellscript), the

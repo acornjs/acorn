@@ -34,6 +34,9 @@ export const defaultOptions = {
   // When enabled, import/export statements are not constrained to
   // appearing at the top of the program.
   allowImportExportEverywhere: false,
+  // When enabled, await identifiers are allowed to appear at the top-level scope,
+  // but they are still not allowed in non-async functions.
+  allowAwaitOutsideFunction: false,
   // When enabled, hashbang directive in the beginning of file
   // is allowed and treated as a line comment.
   allowHashBang: false,

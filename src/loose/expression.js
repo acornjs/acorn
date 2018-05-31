@@ -111,7 +111,9 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
 
 lp.parseMaybeUnary = function(sawUnary) {
   let start = this.storeCurrentPos(), expr
-  if (this.options.ecmaVersion >= 8 && this.inAsync && this.toks.isContextual("await")) {
+  if (this.options.ecmaVersion >= 8 && this.toks.isContextual("await") &&
+    (this.inAsync || (!this.inFunction && this.options.allowAwaitOutsideFunction))
+  ) {
     expr = this.parseAwait()
     sawUnary = true
   } else if (this.tok.type.prefix) {
@@ -514,26 +516,29 @@ lp.parseFunctionParams = function(params) {
 }
 
 lp.parseMethod = function(isGenerator, isAsync) {
-  let node = this.startNode(), oldInAsync = this.inAsync
+  let node = this.startNode(), oldInAsync = this.inAsync, oldInFunction = this.inFunction
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
     node.generator = !!isGenerator
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
   this.inAsync = node.async
+  this.inFunction = true
   node.params = this.parseFunctionParams()
   node.body = this.parseBlock()
   this.toks.adaptDirectivePrologue(node.body.body)
   this.inAsync = oldInAsync
+  this.inFunction = oldInFunction
   return this.finishNode(node, "FunctionExpression")
 }
 
 lp.parseArrowExpression = function(node, params, isAsync) {
-  let oldInAsync = this.inAsync
+  let oldInAsync = this.inAsync, oldInFunction = this.inFunction
   this.initFunction(node)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
   this.inAsync = node.async
+  this.inFunction = true
   node.params = this.toAssignableList(params, true)
   node.expression = this.tok.type !== tt.braceL
   if (node.expression) {
@@ -543,6 +548,7 @@ lp.parseArrowExpression = function(node, params, isAsync) {
     this.toks.adaptDirectivePrologue(node.body.body)
   }
   this.inAsync = oldInAsync
+  this.inFunction = oldInFunction
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 

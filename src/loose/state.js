@@ -23,6 +23,7 @@ export class LooseParser {
     this.curLineStart = 0
     this.nextLineStart = this.lineEnd(this.curLineStart) + 1
     this.inAsync = false
+    this.inFunction = false
     // Load plugins
     this.options.pluginsLoose = options.pluginsLoose || {}
     this.loadPlugins(this.options.pluginsLoose)
