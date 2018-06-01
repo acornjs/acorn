@@ -1,3 +1,9 @@
+## 5.6.1 (2018-06-01)
+
+### Bug fixes
+
+Fix regression when passing `null` as fourth argument to `walk.recursive`.
+
 ## 5.6.0 (2018-05-31)
 
 ### Bug fixes
