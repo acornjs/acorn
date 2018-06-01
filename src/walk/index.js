@@ -45,7 +45,7 @@ export function ancestor(node, visitors, baseVisitor = base, state) {
 // their child nodes (by calling their third argument on these
 // nodes).
 export function recursive(node, state, funcs, baseVisitor, override) {
-  let visitor = funcs ? exports.make(funcs, baseVisitor) : baseVisitor
+  let visitor = funcs ? make(funcs, baseVisitor || undefined) : baseVisitor
   ;(function c(node, st, override) {
     visitor[override || node.type](node, st, c)
   })(node, state, override)
