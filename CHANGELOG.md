@@ -1,3 +1,9 @@
+## 5.6.2 (2018-06-05)
+
+### Bug fixes
+
+In the walker, go back to allowing the `baseVisitor` argument to be null to default to the default base everywhere.
+
 ## 5.6.1 (2018-06-01)
 
 ### Bug fixes
