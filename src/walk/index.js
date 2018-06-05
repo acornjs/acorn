@@ -16,8 +16,9 @@
 // walker, and state can be used to give this walked an initial
 // state.
 
-export function simple(node, visitors, baseVisitor = base, state, override) {
-  (function c(node, st, override) {
+export function simple(node, visitors, baseVisitor, state, override) {
+  if (!baseVisitor) baseVisitor = base
+  ;(function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
     baseVisitor[type](node, st, c)
     if (found) found(node, st)
@@ -27,8 +28,9 @@ export function simple(node, visitors, baseVisitor = base, state, override) {
 // An ancestor walk keeps an array of ancestor nodes (including the
 // current node) and passes them to the callback as third parameter
 // (and also as state parameter when no other state is present).
-export function ancestor(node, visitors, baseVisitor = base, state) {
+export function ancestor(node, visitors, baseVisitor, state) {
   let ancestors = []
+  if (!baseVisitor) baseVisitor = base
   ;(function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
     let isNew = node != ancestors[ancestors.length - 1]
@@ -65,8 +67,9 @@ class Found {
 }
 
 // A full walk triggers the callback on each node
-export function full(node, callback, baseVisitor = base, state, override) {
-  (function c(node, st, override) {
+export function full(node, callback, baseVisitor, state, override) {
+  if (!baseVisitor) baseVisitor = base
+  ;(function c(node, st, override) {
     let type = override || node.type
     baseVisitor[type](node, st, c)
     if (!override) callback(node, st, type)
@@ -75,7 +78,8 @@ export function full(node, callback, baseVisitor = base, state, override) {
 
 // An fullAncestor walk is like an ancestor walk, but triggers
 // the callback on each node
-export function fullAncestor(node, callback, baseVisitor = base, state) {
+export function fullAncestor(node, callback, baseVisitor, state) {
+  if (!baseVisitor) baseVisitor = base
   let ancestors = []
   ;(function c(node, st, override) {
     let type = override || node.type
@@ -90,7 +94,8 @@ export function fullAncestor(node, callback, baseVisitor = base, state) {
 // Find a node with a given start, end, and type (all are optional,
 // null can be used as wildcard). Returns a {node, state} object, or
 // undefined when it doesn't find a matching node.
-export function findNodeAt(node, start, end, test, baseVisitor = base, state) {
+export function findNodeAt(node, start, end, test, baseVisitor, state) {
+  if (!baseVisitor) baseVisitor = base
   test = makeTest(test)
   try {
     (function c(node, st, override) {
@@ -111,8 +116,9 @@ export function findNodeAt(node, start, end, test, baseVisitor = base, state) {
 
 // Find the innermost node of a given type that contains the given
 // position. Interface similar to findNodeAt.
-export function findNodeAround(node, pos, test, baseVisitor = base, state) {
+export function findNodeAround(node, pos, test, baseVisitor, state) {
   test = makeTest(test)
+  if (!baseVisitor) baseVisitor = base
   try {
     (function c(node, st, override) {
       let type = override || node.type
@@ -127,8 +133,9 @@ export function findNodeAround(node, pos, test, baseVisitor = base, state) {
 }
 
 // Find the outermost matching node after a given position.
-export function findNodeAfter(node, pos, test, baseVisitor = base, state) {
+export function findNodeAfter(node, pos, test, baseVisitor, state) {
   test = makeTest(test)
+  if (!baseVisitor) baseVisitor = base
   try {
     (function c(node, st, override) {
       if (node.end < pos) return
@@ -143,8 +150,9 @@ export function findNodeAfter(node, pos, test, baseVisitor = base, state) {
 }
 
 // Find the outermost matching node before a given position.
-export function findNodeBefore(node, pos, test, baseVisitor = base, state) {
+export function findNodeBefore(node, pos, test, baseVisitor, state) {
   test = makeTest(test)
+  if (!baseVisitor) baseVisitor = base
   let max
   ;(function c(node, st, override) {
     if (node.start > pos) return
@@ -165,8 +173,8 @@ const create = Object.create || function(proto) {
 
 // Used to create a custom walker. Will fill in all missing node
 // type properties with the defaults.
-export function make(funcs, baseVisitor = base) {
-  let visitor = create(baseVisitor)
+export function make(funcs, baseVisitor) {
+  let visitor = create(baseVisitor || base)
   for (let type in funcs) visitor[type] = funcs[type]
   return visitor
 }
