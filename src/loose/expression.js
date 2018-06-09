@@ -45,7 +45,7 @@ lp.parseMaybeAssign = function(noIn) {
   if (this.toks.isContextual("yield")) {
     let node = this.startNode()
     this.next()
-    if (this.semicolon() || this.canInsertSemicolon() || (this.tok.type != tt.star && !this.tok.type.startsExpr)) {
+    if (this.semicolon() || this.canInsertSemicolon() || (this.tok.type !== tt.star && !this.tok.type.startsExpr)) {
       node.delegate = false
       node.argument = null
     } else {
@@ -88,7 +88,7 @@ lp.parseExprOps = function(noIn) {
 }
 
 lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
-  if (this.curLineStart != line && this.curIndent < indent && this.tokenStartsLine()) return left
+  if (this.curLineStart !== line && this.curIndent < indent && this.tokenStartsLine()) return left
   let prec = this.tok.type.binop
   if (prec != null && (!noIn || this.tok.type !== tt._in)) {
     if (prec > minPrec) {
@@ -96,7 +96,7 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
       node.left = left
       node.operator = this.tok.value
       this.next()
-      if (this.curLineStart != line && this.curIndent < indent && this.tokenStartsLine()) {
+      if (this.curLineStart !== line && this.curIndent < indent && this.tokenStartsLine()) {
         node.right = this.dummyIdent()
       } else {
         let rightStart = this.storeCurrentPos()
@@ -160,8 +160,8 @@ lp.parseExprSubscripts = function() {
 
 lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
   for (;;) {
-    if (this.curLineStart != line && this.curIndent <= startIndent && this.tokenStartsLine()) {
-      if (this.tok.type == tt.dot && this.curIndent == startIndent)
+    if (this.curLineStart !== line && this.curIndent <= startIndent && this.tokenStartsLine()) {
+      if (this.tok.type === tt.dot && this.curIndent === startIndent)
         --startIndent
       else
         return base
@@ -172,13 +172,13 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
     if (this.eat(tt.dot)) {
       let node = this.startNodeAt(start)
       node.object = base
-      if (this.curLineStart != line && this.curIndent <= startIndent && this.tokenStartsLine())
+      if (this.curLineStart !== line && this.curIndent <= startIndent && this.tokenStartsLine())
         node.property = this.dummyIdent()
       else
         node.property = this.parsePropertyAccessor() || this.dummyIdent()
       node.computed = false
       base = this.finishNode(node, "MemberExpression")
-    } else if (this.tok.type == tt.bracketL) {
+    } else if (this.tok.type === tt.bracketL) {
       this.pushCx()
       this.next()
       let node = this.startNodeAt(start)
@@ -188,7 +188,7 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
       this.popCx()
       this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
-    } else if (!noCalls && this.tok.type == tt.parenL) {
+    } else if (!noCalls && this.tok.type === tt.parenL) {
       let exprList = this.parseExprList(tt.parenR)
       if (maybeAsyncArrow && this.eat(tt.arrow))
         return this.parseArrowExpression(this.startNodeAt(start), exprList, true)
@@ -196,7 +196,7 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
       node.callee = base
       node.arguments = exprList
       base = this.finishNode(node, "CallExpression")
-    } else if (this.tok.type == tt.backQuote) {
+    } else if (this.tok.type === tt.backQuote) {
       let node = this.startNodeAt(start)
       node.tag = base
       node.quasi = this.parseTemplate()
@@ -310,7 +310,7 @@ lp.parseNew = function() {
   }
   let start = this.storeCurrentPos()
   node.callee = this.parseSubscripts(this.parseExprAtom(), start, true, startIndent, line)
-  if (this.tok.type == tt.parenL) {
+  if (this.tok.type === tt.parenL) {
     node.arguments = this.parseExprList(tt.parenR)
   } else {
     node.arguments = []
@@ -400,7 +400,7 @@ lp.parseObj = function() {
       prop.value = this.parseMethod(isGenerator, isAsync)
     } else if (this.options.ecmaVersion >= 5 && prop.key.type === "Identifier" &&
                !prop.computed && (prop.key.name === "get" || prop.key.name === "set") &&
-               (this.tok.type != tt.comma && this.tok.type != tt.braceR && this.tok.type != tt.eq)) {
+               (this.tok.type !== tt.comma && this.tok.type !== tt.braceR && this.tok.type !== tt.eq)) {
       prop.kind = prop.key.name
       this.parsePropertyName(prop)
       prop.value = this.parseMethod(false)
@@ -477,25 +477,25 @@ lp.initFunction = function(node) {
 // if possible.
 
 lp.toAssignable = function(node, binding) {
-  if (!node || node.type == "Identifier" || (node.type == "MemberExpression" && !binding)) {
+  if (!node || node.type === "Identifier" || (node.type === "MemberExpression" && !binding)) {
     // Okay
-  } else if (node.type == "ParenthesizedExpression") {
+  } else if (node.type === "ParenthesizedExpression") {
     this.toAssignable(node.expression, binding)
   } else if (this.options.ecmaVersion < 6) {
     return this.dummyIdent()
-  } else if (node.type == "ObjectExpression") {
+  } else if (node.type === "ObjectExpression") {
     node.type = "ObjectPattern"
     for (let prop of node.properties)
       this.toAssignable(prop, binding)
-  } else if (node.type == "ArrayExpression") {
+  } else if (node.type === "ArrayExpression") {
     node.type = "ArrayPattern"
     this.toAssignableList(node.elements, binding)
-  } else if (node.type == "Property") {
+  } else if (node.type === "Property") {
     this.toAssignable(node.value, binding)
-  } else if (node.type == "SpreadElement") {
+  } else if (node.type === "SpreadElement") {
     node.type = "RestElement"
     this.toAssignable(node.argument, binding)
-  } else if (node.type == "AssignmentExpression") {
+  } else if (node.type === "AssignmentExpression") {
     node.type = "AssignmentPattern"
     delete node.operator
   } else {

@@ -1,1 +1,1 @@
-export function isDummy(node) { return node.name == "✖" }
+export function isDummy(node) { return node.name === "✖" }

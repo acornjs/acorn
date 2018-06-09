@@ -40,7 +40,7 @@ pp.toAssignable = function(node, isBinding, refDestructuringErrors) {
       break
 
     case "Property":
-      // AssignmentProperty has type == "Property"
+      // AssignmentProperty has type === "Property"
       if (node.kind !== "init") this.raise(node.key.start, "Object pattern can't contain getter or setter")
       this.toAssignable(node.value, isBinding)
       break
@@ -220,7 +220,7 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
     break
 
   case "Property":
-    // AssignmentProperty has type == "Property"
+    // AssignmentProperty has type === "Property"
     this.checkLVal(expr.value, bindingType, checkClashes)
     break
 

@@ -103,7 +103,7 @@ pp.validateRegExpFlags = function(state) {
 
   for (let i = 0; i < flags.length; i++) {
     const flag = flags.charAt(i)
-    if (validFlags.indexOf(flag) == -1) {
+    if (validFlags.indexOf(flag) === -1) {
       this.raise(state.start, "Invalid regular expression flag")
     }
     if (flags.indexOf(flag, i + 1) > -1) {

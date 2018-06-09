@@ -219,7 +219,7 @@ pp.readToken_mult_modulo_exp = function(code) { // '%*'
   let tokentype = code === 42 ? tt.star : tt.modulo
 
   // exponentiation operator ** and **=
-  if (this.options.ecmaVersion >= 7 && code == 42 && next === 42) {
+  if (this.options.ecmaVersion >= 7 && code === 42 && next === 42) {
     ++size
     tokentype = tt.starstar
     next = this.input.charCodeAt(this.pos + 2)
@@ -245,7 +245,7 @@ pp.readToken_caret = function() { // '^'
 pp.readToken_plus_min = function(code) { // '+-'
   let next = this.input.charCodeAt(this.pos + 1)
   if (next === code) {
-    if (next == 45 && !this.inModule && this.input.charCodeAt(this.pos + 2) == 62 &&
+    if (next === 45 && !this.inModule && this.input.charCodeAt(this.pos + 2) === 62 &&
         (this.lastTokEnd === 0 || lineBreak.test(this.input.slice(this.lastTokEnd, this.pos)))) {
       // A `-->` line comment
       this.skipLineComment(3)
@@ -266,8 +266,8 @@ pp.readToken_lt_gt = function(code) { // '<>'
     if (this.input.charCodeAt(this.pos + size) === 61) return this.finishOp(tt.assign, size + 1)
     return this.finishOp(tt.bitShift, size)
   }
-  if (next == 33 && code == 60 && !this.inModule && this.input.charCodeAt(this.pos + 2) == 45 &&
-      this.input.charCodeAt(this.pos + 3) == 45) {
+  if (next === 33 && code === 60 && !this.inModule && this.input.charCodeAt(this.pos + 2) === 45 &&
+      this.input.charCodeAt(this.pos + 3) === 45) {
     // `<!--`, an XML-style comment that should be interpreted as a line comment
     this.skipLineComment(4)
     this.skipSpace()
@@ -627,7 +627,7 @@ pp.readEscapedChar = function(inTemplate) {
       }
       this.pos += octalStr.length - 1
       ch = this.input.charCodeAt(this.pos)
-      if ((octalStr !== "0" || ch == 56 || ch == 57) && (this.strict || inTemplate)) {
+      if ((octalStr !== "0" || ch === 56 || ch === 57) && (this.strict || inTemplate)) {
         this.invalidStringToken(
           this.pos - 1 - octalStr.length,
           inTemplate
@@ -668,7 +668,7 @@ pp.readWord1 = function() {
       this.containsEsc = true
       word += this.input.slice(chunkStart, this.pos)
       let escStart = this.pos
-      if (this.input.charCodeAt(++this.pos) != 117) // "u"
+      if (this.input.charCodeAt(++this.pos) !== 117) // "u"
         this.invalidStringToken(this.pos, "Expecting Unicode escape sequence \\uXXXX")
       ++this.pos
       let esc = this.readCodePoint()

@@ -36,7 +36,7 @@ pp.isLet = function() {
   skipWhiteSpace.lastIndex = this.pos
   let skip = skipWhiteSpace.exec(this.input)
   let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
-  if (nextCh === 91 || nextCh == 123) return true // '{' and '['
+  if (nextCh === 91 || nextCh === 123) return true // '{' and '['
   if (isIdentifierStart(nextCh, true)) {
     let pos = next + 1
     while (isIdentifierChar(this.input.charCodeAt(pos), true)) ++pos
@@ -58,7 +58,7 @@ pp.isAsyncFunction = function() {
   let next = this.pos + skip[0].length
   return !lineBreak.test(this.input.slice(this.pos, next)) &&
     this.input.slice(next, next + 8) === "function" &&
-    (next + 8 == this.input.length || !isIdentifierChar(this.input.charAt(next + 8)))
+    (next + 8 === this.input.length || !isIdentifierChar(this.input.charAt(next + 8)))
 }
 
 // Parse a single statement.
@@ -98,7 +98,7 @@ pp.parseStatement = function(declaration, topLevel, exports) {
   case tt._try: return this.parseTryStatement(node)
   case tt._const: case tt._var:
     kind = kind || this.value
-    if (!declaration && kind != "var") this.unexpected()
+    if (!declaration && kind !== "var") this.unexpected()
     return this.parseVarStatement(node, kind)
   case tt._while: return this.parseWhileStatement(node)
   case tt._with: return this.parseWithStatement(node)
@@ -134,7 +134,7 @@ pp.parseStatement = function(declaration, topLevel, exports) {
 }
 
 pp.parseBreakContinueStatement = function(node, keyword) {
-  let isBreak = keyword == "break"
+  let isBreak = keyword === "break"
   this.next()
   if (this.eat(tt.semi) || this.insertSemicolon()) node.label = null
   else if (this.type !== tt.name) this.unexpected()
@@ -240,8 +240,8 @@ pp.parseIfStatement = function(node) {
   this.next()
   node.test = this.parseParenExpression()
   // allow function declarations in branches, but only in non-strict mode
-  node.consequent = this.parseStatement(!this.strict && this.type == tt._function)
-  node.alternate = this.eat(tt._else) ? this.parseStatement(!this.strict && this.type == tt._function) : null
+  node.consequent = this.parseStatement(!this.strict && this.type === tt._function)
+  node.alternate = this.eat(tt._else) ? this.parseStatement(!this.strict && this.type === tt._function) : null
   return this.finishNode(node, "IfStatement")
 }
 
@@ -272,7 +272,7 @@ pp.parseSwitchStatement = function(node) {
   // adding statements to.
 
   let cur
-  for (let sawDefault = false; this.type != tt.braceR;) {
+  for (let sawDefault = false; this.type !== tt.braceR;) {
     if (this.type === tt._case || this.type === tt._default) {
       let isCase = this.type === tt._case
       if (cur) this.finishNode(cur, "SwitchCase")
@@ -375,7 +375,7 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
   let kind = this.type.isLoop ? "loop" : this.type === tt._switch ? "switch" : null
   for (let i = this.labels.length - 1; i >= 0; i--) {
     let label = this.labels[i]
-    if (label.statementStart == node.start) {
+    if (label.statementStart === node.start) {
       // Update information about previous labels on this node
       label.statementStart = this.start
       label.kind = kind
@@ -383,9 +383,9 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
   }
   this.labels.push({name: maybeName, kind, statementStart: this.start})
   node.body = this.parseStatement(true)
-  if (node.body.type == "ClassDeclaration" ||
-      node.body.type == "VariableDeclaration" && node.body.kind != "var" ||
-      node.body.type == "FunctionDeclaration" && (this.strict || node.body.generator))
+  if (node.body.type === "ClassDeclaration" ||
+      node.body.type === "VariableDeclaration" && node.body.kind !== "var" ||
+      node.body.type === "FunctionDeclaration" && (this.strict || node.body.generator))
     this.raiseRecoverable(node.body.start, "Invalid labeled declaration")
   this.labels.pop()
   node.label = expr
@@ -442,14 +442,14 @@ pp.parseFor = function(node, init) {
 pp.parseForIn = function(node, init) {
   let type = this.type === tt._in ? "ForInStatement" : "ForOfStatement"
   this.next()
-  if (type == "ForInStatement") {
+  if (type === "ForInStatement") {
     if (init.type === "AssignmentPattern" ||
       (init.type === "VariableDeclaration" && init.declarations[0].init != null &&
        (this.strict || init.declarations[0].id.type !== "Identifier")))
       this.raise(init.start, "Invalid assignment in for-in loop head")
   }
   node.left = init
-  node.right = type == "ForInStatement" ? this.parseExpression() : this.parseMaybeAssign()
+  node.right = type === "ForInStatement" ? this.parseExpression() : this.parseMaybeAssign()
   this.expect(tt.parenR)
   this.exitLexicalScope()
   node.body = this.parseStatement(false)
@@ -469,7 +469,7 @@ pp.parseVar = function(node, isFor, kind) {
       decl.init = this.parseMaybeAssign(isFor)
     } else if (kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
       this.unexpected()
-    } else if (decl.id.type != "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
+    } else if (decl.id.type !== "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
       this.raise(this.lastTokEnd, "Complex binding patterns require an initialization value")
     } else {
       decl.init = null
@@ -496,7 +496,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
     node.async = !!isAsync
 
   if (isStatement) {
-    node.id = isStatement === "nullableID" && this.type != tt.name ? null : this.parseIdent()
+    node.id = isStatement === "nullableID" && this.type !== tt.name ? null : this.parseIdent()
     if (node.id) {
       this.checkLVal(node.id, "var")
     }
@@ -512,7 +512,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.enterFunctionScope()
 
   if (!isStatement)
-    node.id = this.type == tt.name ? this.parseIdent() : null
+    node.id = this.type === tt.name ? this.parseIdent() : null
 
   this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
@@ -684,22 +684,22 @@ pp.checkExport = function(exports, name, pos) {
 
 pp.checkPatternExport = function(exports, pat) {
   let type = pat.type
-  if (type == "Identifier")
+  if (type === "Identifier")
     this.checkExport(exports, pat.name, pat.start)
-  else if (type == "ObjectPattern")
+  else if (type === "ObjectPattern")
     for (let prop of pat.properties)
       this.checkPatternExport(exports, prop)
-  else if (type == "ArrayPattern")
+  else if (type === "ArrayPattern")
     for (let elt of pat.elements) {
       if (elt) this.checkPatternExport(exports, elt)
     }
-  else if (type == "Property")
+  else if (type === "Property")
     this.checkPatternExport(exports, pat.value)
-  else if (type == "AssignmentPattern")
+  else if (type === "AssignmentPattern")
     this.checkPatternExport(exports, pat.left)
-  else if (type == "RestElement")
+  else if (type === "RestElement")
     this.checkPatternExport(exports, pat.argument)
-  else if (type == "ParenthesizedExpression")
+  else if (type === "ParenthesizedExpression")
     this.checkPatternExport(exports, pat.expression)
 }
 

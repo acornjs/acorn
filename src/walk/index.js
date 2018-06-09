@@ -33,7 +33,7 @@ export function ancestor(node, visitors, baseVisitor, state) {
   if (!baseVisitor) baseVisitor = base
   ;(function c(node, st, override) {
     let type = override || node.type, found = visitors[type]
-    let isNew = node != ancestors[ancestors.length - 1]
+    let isNew = node !== ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
     baseVisitor[type](node, st, c)
     if (found) found(node, st || ancestors, ancestors)
@@ -54,8 +54,8 @@ export function recursive(node, state, funcs, baseVisitor, override) {
 }
 
 function makeTest(test) {
-  if (typeof test == "string")
-    return type => type == test
+  if (typeof test === "string")
+    return type => type === test
   else if (!test)
     return () => true
   else
@@ -83,7 +83,7 @@ export function fullAncestor(node, callback, baseVisitor, state) {
   let ancestors = []
   ;(function c(node, st, override) {
     let type = override || node.type
-    let isNew = node != ancestors[ancestors.length - 1]
+    let isNew = node !== ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
     baseVisitor[type](node, st, c)
     if (!override) callback(node, st || ancestors, ancestors, type)
@@ -103,8 +103,8 @@ export function findNodeAt(node, start, end, test, baseVisitor, state) {
       if ((start == null || node.start <= start) &&
           (end == null || node.end >= end))
         baseVisitor[type](node, st, c)
-      if ((start == null || node.start == start) &&
-          (end == null || node.end == end) &&
+      if ((start == null || node.start === start) &&
+          (end == null || node.end === end) &&
           test(type, node))
         throw new Found(node, st)
     })(node, state)
@@ -248,7 +248,7 @@ base.ForInStatement = base.ForOfStatement = (node, st, c) => {
   c(node.body, st, "Statement")
 }
 base.ForInit = (node, st, c) => {
-  if (node.type == "VariableDeclaration") c(node, st)
+  if (node.type === "VariableDeclaration") c(node, st)
   else c(node, st, "Expression")
 }
 base.DebuggerStatement = ignore
@@ -275,9 +275,9 @@ base.ScopeBody = (node, st, c) => c(node, st, "Statement")
 base.ScopeExpression = (node, st, c) => c(node, st, "Expression")
 
 base.Pattern = (node, st, c) => {
-  if (node.type == "Identifier")
+  if (node.type === "Identifier")
     c(node, st, "VariablePattern")
-  else if (node.type == "MemberExpression")
+  else if (node.type === "MemberExpression")
     c(node, st, "MemberPattern")
   else
     c(node, st)
@@ -345,7 +345,7 @@ base.MemberExpression = (node, st, c) => {
 }
 base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
   if (node.declaration)
-    c(node.declaration, st, node.type == "ExportNamedDeclaration" || node.declaration.id ? "Statement" : "Expression")
+    c(node.declaration, st, node.type === "ExportNamedDeclaration" || node.declaration.id ? "Statement" : "Expression")
   if (node.source) c(node.source, st, "Expression")
 }
 base.ExportAllDeclaration = (node, st, c) => {

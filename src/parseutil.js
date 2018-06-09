@@ -13,7 +13,7 @@ pp.strictDirective = function(start) {
     start += skipWhiteSpace.exec(this.input)[0].length
     let match = literal.exec(this.input.slice(start))
     if (!match) return false
-    if ((match[1] || match[2]) == "use strict") return true
+    if ((match[1] || match[2]) === "use strict") return true
     start += match[0].length
   }
 }
@@ -74,7 +74,7 @@ pp.semicolon = function() {
 }
 
 pp.afterTrailingComma = function(tokType, notNext) {
-  if (this.type == tokType) {
+  if (this.type === tokType) {
     if (this.options.onTrailingComma)
       this.options.onTrailingComma(this.lastTokStart, this.lastTokStartLoc)
     if (!notNext)

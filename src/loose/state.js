@@ -108,7 +108,7 @@ export class LooseParser {
   expect(type) {
     if (this.eat(type)) return true
     for (let i = 1; i <= 2; i++) {
-      if (this.lookAhead(i).type == type) {
+      if (this.lookAhead(i).type === type) {
         for (let j = 0; j < i; j++) this.next()
         return true
       }
@@ -139,7 +139,7 @@ export class LooseParser {
 
   closes(closeTok, indent, line, blockHeuristic) {
     if (this.tok.type === closeTok || this.tok.type === tt.eof) return true
-    return line != this.curLineStart && this.curIndent < indent && this.tokenStartsLine() &&
+    return line !== this.curLineStart && this.curIndent < indent && this.tokenStartsLine() &&
       (!blockHeuristic || this.nextLineStart >= this.input.length ||
        this.indentationAfter(this.nextLineStart) < indent)
   }

@@ -116,7 +116,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   }
 
   let startPos = this.start, startLoc = this.startLoc
-  if (this.type == tt.parenL || this.type == tt.name)
+  if (this.type === tt.parenL || this.type === tt.name)
     this.potentialArrowAt = this.start
   let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
@@ -161,7 +161,7 @@ pp.parseExprOps = function(noIn, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
   let expr = this.parseMaybeUnary(refDestructuringErrors, false)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
-  return expr.start == startPos && expr.type === "ArrowFunctionExpression" ? expr : this.parseExprOp(expr, startPos, startLoc, -1, noIn)
+  return expr.start === startPos && expr.type === "ArrowFunctionExpression" ? expr : this.parseExprOp(expr, startPos, startLoc, -1, noIn)
 }
 
 // Parse binary operators with the operator precedence parsing
@@ -251,7 +251,7 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
   let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
-      this.lastTokEnd == base.end && !this.canInsertSemicolon() && this.input.slice(base.start, base.end) === "async"
+      this.lastTokEnd === base.end && !this.canInsertSemicolon() && this.input.slice(base.start, base.end) === "async"
   for (let computed;;) {
     if ((computed = this.eat(tt.bracketL)) || this.eat(tt.dot)) {
       let node = this.startNodeAt(startPos, startLoc)
@@ -296,7 +296,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
 // or `{}`.
 
 pp.parseExprAtom = function(refDestructuringErrors) {
-  let node, canBeArrow = this.potentialArrowAt == this.start
+  let node, canBeArrow = this.potentialArrowAt === this.start
   switch (this.type) {
   case tt._super:
     if (!this.inFunction)
@@ -631,7 +631,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
   } else if (!isPattern && !containsEsc &&
              this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
              (prop.key.name === "get" || prop.key.name === "set") &&
-             (this.type != tt.comma && this.type != tt.braceR)) {
+             (this.type !== tt.comma && this.type !== tt.braceR)) {
     if (isGenerator || isAsync) this.unexpected()
     prop.kind = prop.key.name
     this.parsePropertyName(prop)
@@ -844,7 +844,7 @@ pp.checkUnreserved = function({start, end, name}) {
   if (this.isKeyword(name))
     this.raise(start, `Unexpected keyword '${name}'`)
   if (this.options.ecmaVersion < 6 &&
-    this.input.slice(start, end).indexOf("\\") != -1) return
+    this.input.slice(start, end).indexOf("\\") !== -1) return
   const re = this.strict ? this.reservedWordsStrict : this.reservedWords
   if (re.test(name)) {
     if (!this.inAsync && name === "await")
@@ -859,7 +859,7 @@ pp.checkUnreserved = function({start, end, name}) {
 
 pp.parseIdent = function(liberal, isBinding) {
   let node = this.startNode()
-  if (liberal && this.options.allowReserved == "never") liberal = false
+  if (liberal && this.options.allowReserved === "never") liberal = false
   if (this.type === tt.name) {
     node.name = this.value
   } else if (this.type.keyword) {
@@ -889,7 +889,7 @@ pp.parseYield = function() {
 
   let node = this.startNode()
   this.next()
-  if (this.type == tt.semi || this.canInsertSemicolon() || (this.type != tt.star && !this.type.startsExpr)) {
+  if (this.type === tt.semi || this.canInsertSemicolon() || (this.type !== tt.star && !this.type.startsExpr)) {
     node.delegate = false
     node.argument = null
   } else {

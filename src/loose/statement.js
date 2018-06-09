@@ -284,7 +284,7 @@ lp.parseClass = function(isStatement) {
     this.parsePropertyName(method)
     if (isDummy(method.key)) { if (isDummy(this.parseMaybeAssign())) this.next(); this.eat(tt.comma); continue }
     if (method.key.type === "Identifier" && !method.computed && method.key.name === "static" &&
-        (this.tok.type != tt.parenL && this.tok.type != tt.braceL)) {
+        (this.tok.type !== tt.parenL && this.tok.type !== tt.braceL)) {
       method.static = true
       isGenerator = this.eat(tt.star)
       this.parsePropertyName(method)
@@ -402,7 +402,7 @@ lp.parseImport = function() {
       this.eat(tt.comma)
     }
     node.specifiers = this.parseImportSpecifierList()
-    node.source = this.eatContextual("from") && this.tok.type == tt.string ? this.parseExprAtom() : this.dummyString()
+    node.source = this.eatContextual("from") && this.tok.type === tt.string ? this.parseExprAtom() : this.dummyString()
     if (elt) node.specifiers.unshift(elt)
   }
   this.semicolon()

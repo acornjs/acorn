@@ -19,7 +19,7 @@ export class Parser {
     if (!options.allowReserved) {
       for (let v = options.ecmaVersion;; v--)
         if (reserved = reservedWords[v]) break
-      if (options.sourceType == "module") reserved += " await"
+      if (options.sourceType === "module") reserved += " await"
     }
     this.reservedWords = keywordRegexp(reserved)
     let reservedStrict = (reserved ? reserved + " " : "") + reservedWords.strict
