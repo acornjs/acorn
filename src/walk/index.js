@@ -229,7 +229,7 @@ base.TryStatement = (node, st, c) => {
   if (node.finalizer) c(node.finalizer, st, "Statement")
 }
 base.CatchClause = (node, st, c) => {
-  c(node.param, st, "Pattern")
+  if (node.param) c(node.param, st, "Pattern")
   c(node.body, st, "ScopeBody")
 }
 base.WhileStatement = base.DoWhileStatement = (node, st, c) => {
