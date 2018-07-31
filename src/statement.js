@@ -187,7 +187,7 @@ pp.parseDoStatement = function(node) {
 
 pp.parseForStatement = function(node) {
   this.next()
-  let awaitAt = (this.options.ecmaVersion >= 9 && this.inAsync && this.eatContextual("await")) ? this.lastTokStart : -1
+  let awaitAt = (this.options.ecmaVersion >= 9 && (this.inAsync || (!this.inFunction && this.options.allowAwaitOutsideFunction)) && this.eatContextual("await")) ? this.lastTokStart : -1
   this.labels.push(loopLabel)
   this.enterLexicalScope()
   this.expect(tt.parenL)
