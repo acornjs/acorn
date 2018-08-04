@@ -16237,3 +16237,5 @@ test('for ([...foo, bar].baz in qux);', {
   ],
   "sourceType": "script"
 }, {ecmaVersion: 6})
+
+testFail("var f;\nfunction f() {}", "Identifier 'f' has already been declared (2:9)", {ecmaVersion: 6, sourceType: "module"});
