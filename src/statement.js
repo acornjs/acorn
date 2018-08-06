@@ -498,7 +498,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   if (isStatement) {
     node.id = isStatement === "nullableID" && this.type !== tt.name ? null : this.parseIdent()
     if (node.id) {
-      this.checkLVal(node.id, this.inModule ? "let" : "var")
+      this.checkLVal(node.id, this.inModule && !this.inFunction ? "let" : "var")
     }
   }
 
