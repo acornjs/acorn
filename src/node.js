@@ -4,7 +4,7 @@ import {SourceLocation} from "./locutil"
 export class Node {
   constructor(parser, pos, loc) {
     this.type = ""
-    this.start = pos
+    this.start = pos || 0;
     this.end = 0
     if (parser) {
       if (parser.options.locations)
