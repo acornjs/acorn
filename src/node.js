@@ -4,14 +4,16 @@ import {SourceLocation} from "./locutil"
 export class Node {
   constructor(parser, pos, loc) {
     this.type = ""
-    this.start = pos
+    this.start = pos || 0;
     this.end = 0
-    if (parser.options.locations)
-      this.loc = new SourceLocation(parser, loc)
-    if (parser.options.directSourceFile)
-      this.sourceFile = parser.options.directSourceFile
-    if (parser.options.ranges)
-      this.range = [pos, 0]
+    if (parser) {
+      if (parser.options.locations)
+        this.loc = new SourceLocation(parser, loc)
+      if (parser.options.directSourceFile)
+        this.sourceFile = parser.options.directSourceFile
+      if (parser.options.ranges)
+        this.range = [pos, 0]
+    }
   }
 }
 
