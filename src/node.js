@@ -6,12 +6,14 @@ export class Node {
     this.type = ""
     this.start = pos
     this.end = 0
-    if (parser.options.locations)
-      this.loc = new SourceLocation(parser, loc)
-    if (parser.options.directSourceFile)
-      this.sourceFile = parser.options.directSourceFile
-    if (parser.options.ranges)
-      this.range = [pos, 0]
+    if (parser) {
+      if (parser.options.locations)
+        this.loc = new SourceLocation(parser, loc)
+      if (parser.options.directSourceFile)
+        this.sourceFile = parser.options.directSourceFile
+      if (parser.options.ranges)
+        this.range = [pos, 0]
+    }
   }
 }
 
