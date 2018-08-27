@@ -311,6 +311,11 @@ the `c` argument on it with `(node, state)` arguments. The optional
 that aren't handled in the `functions` object. If not given, the
 default walkers will be used.
 
+**recursiveCallback**`(node, state, callback)` calls a generic callback
+on every walked node. The callback's signature is `(node, state, c)`.
+Like `recursive`, the walk will only continue when the `c` (short for
+continue) argument is called with `(node, state)` arguments.
+
 **make**`(functions, base)` builds a new walker object by using the
 walker functions in `functions` and filling in the missing ones by
 taking defaults from `base`.
