@@ -53,6 +53,15 @@ export function recursive(node, state, funcs, baseVisitor, override) {
   })(node, state, override)
 }
 
+// A recursive callback walk calls a generic callback on every walked node.
+// It exposes control over continuing the walk to a callback function.
+export function recursiveCallback(node, state, callback, override) {
+  let visitor = funcs ? make(funcs, baseVisitor || undefined) : baseVisitor
+  ;(function c(node, st, override) {
+    callback(node, st, function(node, st) { visitor[override || node.type](node, st, c) })
+  })(node, state, override)
+}
+
 function makeTest(test) {
   if (typeof test === "string")
     return type => type === test
