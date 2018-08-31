@@ -3,7 +3,7 @@ import {types as tt} from "./tokentype"
 import {lineBreak} from "./whitespace"
 import {getOptions} from "./options"
 
-// Registered plugins
+// Global registered plugins for loose parser
 export const plugins = {}
 
 function keywordRegexp(words) {
@@ -12,6 +12,7 @@ function keywordRegexp(words) {
 
 export class Parser {
   constructor(options, input, startPos) {
+    this.plugins = {}
     this.options = options = getOptions(options)
     this.sourceFile = options.sourceFile
     this.keywords = keywordRegexp(keywords[options.ecmaVersion >= 6 ? 6 : 5])
@@ -104,9 +105,16 @@ export class Parser {
 
   loadPlugins(pluginConfigs) {
     for (let name in pluginConfigs) {
-      let plugin = plugins[name]
-      if (!plugin) throw new Error("Plugin '" + name + "' not found")
-      plugin(this, pluginConfigs[name])
+      let plugin = this.plugins[name]
+      let loosePlugin = plugins[name]
+
+      if (plugin) {
+        plugin(this, pluginConfigs[name])
+      } else if (loosePlugin) {
+        loosePlugin(this, pluginConfigs[name])
+      } else {
+        throw new Error("Plugin '" + name + "' not found")
+      }
     }
   }
 
