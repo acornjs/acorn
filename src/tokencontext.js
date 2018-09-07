@@ -139,7 +139,7 @@ tt.star.updateContext = function(prevType) {
 
 tt.name.updateContext = function(prevType) {
   let allowed = false
-  if (this.options.ecmaVersion >= 6 && prevType != tt.dot) {
+  if (this.options.ecmaVersion >= 6 && prevType !== tt.dot) {
     if (this.value === "of" && !this.exprAllowed ||
         this.value === "yield" && this.inGeneratorContext())
       allowed = true
