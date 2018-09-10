@@ -400,7 +400,7 @@ lp.parseImport = function() {
       this.finishNode(elt, "ImportDefaultSpecifier")
       this.eat(tt.comma)
     }
-    node.specifiers = this.parseImportSpecifierList()
+    node.specifiers = this.parseImportSpecifiers()
     node.source = this.eatContextual("from") && this.tok.type === tt.string ? this.parseExprAtom() : this.dummyString()
     if (elt) node.specifiers.unshift(elt)
   }
@@ -408,7 +408,7 @@ lp.parseImport = function() {
   return this.finishNode(node, "ImportDeclaration")
 }
 
-lp.parseImportSpecifierList = function() {
+lp.parseImportSpecifiers = function() {
   let elts = []
   if (this.tok.type === tt.star) {
     let elt = this.startNode()
