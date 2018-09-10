@@ -2,6 +2,7 @@ import {reservedWords, keywords} from "./identifier"
 import {types as tt} from "./tokentype"
 import {lineBreak} from "./whitespace"
 import {getOptions} from "./options"
+import {SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR} from "./scopeflags"
 
 // Registered plugins
 export const plugins = {}
@@ -75,8 +76,6 @@ export class Parser {
     // Used to signify the start of a potential arrow function
     this.potentialArrowAt = -1
 
-    // Flags to track whether we are in a function, a generator, an async function.
-    this.inFunction = this.inGenerator = this.inAsync = false
     // Positions to delayed-check that yield/await does not exist in default parameters.
     this.yieldPos = this.awaitPos = 0
     // Labels in scope.
@@ -88,7 +87,7 @@ export class Parser {
 
     // Scope tracking for duplicate variable names (see scope.js)
     this.scopeStack = []
-    this.enterFunctionScope()
+    this.enterScope(SCOPE_FUNCTION) // The top level scope behaves like a function scope as far as the parser is concerned
 
     // For RegExp validation
     this.regexpState = null
@@ -115,4 +114,8 @@ export class Parser {
     this.nextToken()
     return this.parseTopLevel(node)
   }
+
+  get inFunction() { return this.currentFunctionScope() != this.scopeStack[0] }
+  get inGenerator() { return (this.currentFunctionScope().flags & SCOPE_GENERATOR) > 0 }
+  get inAsync() { return (this.currentFunctionScope().flags & SCOPE_ASYNC) > 0 }
 }

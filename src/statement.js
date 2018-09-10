@@ -4,6 +4,7 @@ import {lineBreak, skipWhiteSpace} from "./whitespace"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier"
 import {has} from "./util"
 import {DestructuringErrors} from "./parseutil"
+import {SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_CATCH} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -189,7 +190,7 @@ pp.parseForStatement = function(node) {
   this.next()
   let awaitAt = (this.options.ecmaVersion >= 9 && (this.inAsync || (!this.inFunction && this.options.allowAwaitOutsideFunction)) && this.eatContextual("await")) ? this.lastTokStart : -1
   this.labels.push(loopLabel)
-  this.enterLexicalScope()
+  this.enterScope(0)
   this.expect(tt.parenL)
   if (this.type === tt.semi) {
     if (awaitAt > -1) this.unexpected(awaitAt)
@@ -265,7 +266,7 @@ pp.parseSwitchStatement = function(node) {
   node.cases = []
   this.expect(tt.braceL)
   this.labels.push(switchLabel)
-  this.enterLexicalScope()
+  this.enterScope(0)
 
   // Statements under must be grouped (by label) in SwitchCase
   // nodes. `cur` is used to keep the node that we are currently
@@ -292,7 +293,7 @@ pp.parseSwitchStatement = function(node) {
       cur.consequent.push(this.parseStatement(true))
     }
   }
-  this.exitLexicalScope()
+  this.exitScope()
   if (cur) this.finishNode(cur, "SwitchCase")
   this.next() // Closing brace
   this.labels.pop()
@@ -321,16 +322,16 @@ pp.parseTryStatement = function(node) {
     this.next()
     if (this.eat(tt.parenL)) {
       clause.param = this.parseBindingAtom()
-      this.enterLexicalScope()
+      this.enterScope(SCOPE_CATCH)
       this.checkLVal(clause.param, "let")
       this.expect(tt.parenR)
     } else {
       if (this.options.ecmaVersion < 10) this.unexpected()
       clause.param = null
-      this.enterLexicalScope()
+      this.enterScope(0)
     }
     clause.body = this.parseBlock(false)
-    this.exitLexicalScope()
+    this.exitScope()
     node.handler = this.finishNode(clause, "CatchClause")
   }
   node.finalizer = this.eat(tt._finally) ? this.parseBlock() : null
@@ -406,16 +407,12 @@ pp.parseBlock = function(createNewLexicalScope = true) {
   let node = this.startNode()
   node.body = []
   this.expect(tt.braceL)
-  if (createNewLexicalScope) {
-    this.enterLexicalScope()
-  }
+  if (createNewLexicalScope) this.enterScope(0)
   while (!this.eat(tt.braceR)) {
     let stmt = this.parseStatement(true)
     node.body.push(stmt)
   }
-  if (createNewLexicalScope) {
-    this.exitLexicalScope()
-  }
+  if (createNewLexicalScope) this.exitScope()
   return this.finishNode(node, "BlockStatement")
 }
 
@@ -430,7 +427,7 @@ pp.parseFor = function(node, init) {
   this.expect(tt.semi)
   node.update = this.type === tt.parenR ? null : this.parseExpression()
   this.expect(tt.parenR)
-  this.exitLexicalScope()
+  this.exitScope()
   node.body = this.parseStatement(false)
   this.labels.pop()
   return this.finishNode(node, "ForStatement")
@@ -451,7 +448,7 @@ pp.parseForIn = function(node, init) {
   node.left = init
   node.right = type === "ForInStatement" ? this.parseExpression() : this.parseMaybeAssign()
   this.expect(tt.parenR)
-  this.exitLexicalScope()
+  this.exitScope()
   node.body = this.parseStatement(false)
   this.labels.pop()
   return this.finishNode(node, type)
@@ -502,14 +499,10 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
     }
   }
 
-  let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
-      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
-  this.inGenerator = node.generator
-  this.inAsync = node.async
+  let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
   this.yieldPos = 0
   this.awaitPos = 0
-  this.inFunction = true
-  this.enterFunctionScope()
+  this.enterScope(SCOPE_FUNCTION | (node.generator ? SCOPE_GENERATOR : 0) | (node.async ? SCOPE_ASYNC : 0))
 
   if (!isStatement)
     node.id = this.type === tt.name ? this.parseIdent() : null
@@ -517,11 +510,8 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.parseFunctionParams(node)
   this.parseFunctionBody(node, allowExpressionBody)
 
-  this.inGenerator = oldInGen
-  this.inAsync = oldInAsync
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
-  this.inFunction = oldInFunc
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 

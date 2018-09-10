@@ -1,29 +1,26 @@
 import {Parser} from "./state"
+import {SCOPE_FUNCTION} from "./scopeflags"
 
 const pp = Parser.prototype
 
+class Scope {
+  constructor(flags) {
+    this.flags = flags
+    // A list of var-declared names in the current lexical scope
+    this.var = []
+    // A list of lexically-declared names in the current lexical scope
+    this.lexical = []
+  }
+}
+
 // The functions in this module keep track of declared variables in the current scope in order to detect duplicate variable names.
 
-pp.enterFunctionScope = function() {
-  // var: a list of var-declared names in the current lexical scope
-  // lexical: a list of lexically-declared names in the current lexical scope
-  // childVar: a list of var-declared names in all child lexical scopes of the current lexical scope (within the current function scope)
-  this.scopeStack.push({var: [], lexical: [], childVar: [], function: true})
+pp.enterScope = function(flags) {
+  this.scopeStack.push(new Scope(flags))
 }
 
-pp.exitFunctionScope = function() {
+pp.exitScope = function() {
   this.scopeStack.pop()
-}
-
-pp.enterLexicalScope = function() {
-  this.scopeStack.push({var: [], lexical: [], childVar: [], function: false})
-}
-
-pp.exitLexicalScope = function() {
-  const childScope = this.scopeStack.pop()
-  const parentScope = this.scopeStack[this.scopeStack.length - 1]
-
-  parentScope.childVar = parentScope.childVar.concat(childScope.var, childScope.childVar)
 }
 
 /**
@@ -34,7 +31,7 @@ pp.canDeclareVarName = function(name) {
   for (let i = this.scopeStack.length - 1; i >= 0; --i) {
     const currentScope = this.scopeStack[i]
     if (currentScope.lexical.indexOf(name) !== -1) return false
-    if (currentScope.function) return true
+    if (currentScope.flags & SCOPE_FUNCTION) return true
   }
   return true
 }
@@ -45,15 +42,29 @@ pp.canDeclareVarName = function(name) {
  * any child lexical scopes in this function.
  */
 pp.canDeclareLexicalName = function(name) {
-  const currentScope = this.scopeStack[this.scopeStack.length - 1]
-
-  return currentScope.lexical.indexOf(name) === -1 && currentScope.var.indexOf(name) === -1 && currentScope.childVar.indexOf(name) === -1
+  const currentScope = this.currentScope()
+  return currentScope.lexical.indexOf(name) === -1 && currentScope.var.indexOf(name) === -1
 }
 
-pp.declareVarName = function(name) {
-  this.scopeStack[this.scopeStack.length - 1].var.push(name)
+pp.declareName = function(name, isVar) {
+  if (isVar) {
+    for (let i = this.scopeStack.length - 1; i >= 0; i--) {
+      let scope = this.scopeStack[i]
+      scope.var.push(name)
+      if (scope.flags & SCOPE_FUNCTION) break
+    }
+  } else {
+    this.currentScope().lexical.push(name)
+  }
 }
 
-pp.declareLexicalName = function(name) {
-  this.scopeStack[this.scopeStack.length - 1].lexical.push(name)
+pp.currentScope = function() {
+  return this.scopeStack[this.scopeStack.length - 1]
+}
+
+pp.currentFunctionScope = function() {
+  for (let i = this.scopeStack.length - 1;; i--) {
+    let scope = this.scopeStack[i]
+    if (scope.flags & SCOPE_FUNCTION) return scope
+  }
 }

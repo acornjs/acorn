@@ -20,6 +20,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {DestructuringErrors} from "./parseutil"
 import {lineBreak} from "./whitespace"
+import {SCOPE_FUNCTION, SCOPE_ARROW, SCOPE_ASYNC, SCOPE_GENERATOR} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -682,19 +683,14 @@ pp.parsePropertyName = function(prop) {
 
 pp.initFunction = function(node) {
   node.id = null
-  if (this.options.ecmaVersion >= 6) {
-    node.generator = false
-    node.expression = false
-  }
-  if (this.options.ecmaVersion >= 8)
-    node.async = false
+  if (this.options.ecmaVersion >= 6) node.generator = node.expression = false
+  if (this.options.ecmaVersion >= 8) node.async = false
 }
 
 // Parse object or class method.
 
 pp.parseMethod = function(isGenerator, isAsync) {
-  let node = this.startNode(), oldInGen = this.inGenerator, oldInAsync = this.inAsync,
-      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
+  let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
 
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
@@ -702,51 +698,37 @@ pp.parseMethod = function(isGenerator, isAsync) {
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
 
-  this.inGenerator = node.generator
-  this.inAsync = node.async
   this.yieldPos = 0
   this.awaitPos = 0
-  this.inFunction = true
-  this.enterFunctionScope()
+  this.enterScope(SCOPE_FUNCTION | (node.generator ? SCOPE_GENERATOR : 0) | (isAsync ? SCOPE_ASYNC : 0))
 
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
   this.checkYieldAwaitInDefaultParams()
   this.parseFunctionBody(node, false)
 
-  this.inGenerator = oldInGen
-  this.inAsync = oldInAsync
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
-  this.inFunction = oldInFunc
   return this.finishNode(node, "FunctionExpression")
 }
 
 // Parse arrow function expression with given parameters.
 
 pp.parseArrowExpression = function(node, params, isAsync) {
-  let oldInGen = this.inGenerator, oldInAsync = this.inAsync,
-      oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldInFunc = this.inFunction
+  let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
 
-  this.enterFunctionScope()
+  this.enterScope(SCOPE_FUNCTION | SCOPE_ARROW | (isAsync ? SCOPE_ASYNC : 0))
   this.initFunction(node)
-  if (this.options.ecmaVersion >= 8)
-    node.async = !!isAsync
+  if (this.options.ecmaVersion >= 8) node.async = !!isAsync
 
-  this.inGenerator = false
-  this.inAsync = node.async
   this.yieldPos = 0
   this.awaitPos = 0
-  this.inFunction = true
 
   node.params = this.toAssignableList(params, true)
   this.parseFunctionBody(node, true)
 
-  this.inGenerator = oldInGen
-  this.inAsync = oldInAsync
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
-  this.inFunction = oldInFunc
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
@@ -784,7 +766,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
     this.adaptDirectivePrologue(node.body.body)
     this.labels = oldLabels
   }
-  this.exitFunctionScope()
+  this.exitScope()
 
   if (this.strict && node.id) {
     // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'

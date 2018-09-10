@@ -196,17 +196,10 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
       checkClashes[expr.name] = true
     }
     if (bindingType && bindingType !== "none") {
-      if (
-        bindingType === "var" && !this.canDeclareVarName(expr.name) ||
-        bindingType !== "var" && !this.canDeclareLexicalName(expr.name)
-      ) {
+      if (bindingType === "var" && !this.canDeclareVarName(expr.name) ||
+          bindingType !== "var" && !this.canDeclareLexicalName(expr.name))
         this.raiseRecoverable(expr.start, `Identifier '${expr.name}' has already been declared`)
-      }
-      if (bindingType === "var") {
-        this.declareVarName(expr.name)
-      } else {
-        this.declareLexicalName(expr.name)
-      }
+      this.declareName(expr.name, bindingType === "var")
     }
     break
 
