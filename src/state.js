@@ -2,7 +2,7 @@ import {reservedWords, keywords} from "./identifier"
 import {types as tt} from "./tokentype"
 import {lineBreak} from "./whitespace"
 import {getOptions} from "./options"
-import {SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR} from "./scopeflags"
+import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR} from "./scopeflags"
 
 // Registered plugins
 export const plugins = {}
@@ -87,7 +87,7 @@ export class Parser {
 
     // Scope tracking for duplicate variable names (see scope.js)
     this.scopeStack = []
-    this.enterScope(SCOPE_FUNCTION) // The top level scope behaves like a function scope as far as the parser is concerned
+    this.enterScope(SCOPE_TOP)
 
     // For RegExp validation
     this.regexpState = null
@@ -115,7 +115,7 @@ export class Parser {
     return this.parseTopLevel(node)
   }
 
-  get inFunction() { return this.currentFunctionScope() !== this.scopeStack[0] }
-  get inGenerator() { return (this.currentFunctionScope().flags & SCOPE_GENERATOR) > 0 }
-  get inAsync() { return (this.currentFunctionScope().flags & SCOPE_ASYNC) > 0 }
+  get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
+  get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 }
+  get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 }
 }

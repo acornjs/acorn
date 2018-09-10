@@ -4,8 +4,7 @@ import {lineBreak, skipWhiteSpace} from "./whitespace"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier"
 import {has} from "./util"
 import {DestructuringErrors} from "./parseutil"
-import {SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SIMPLE_CATCH,
-  BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION} from "./scopeflags"
+import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -505,7 +504,7 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
   this.yieldPos = 0
   this.awaitPos = 0
-  this.enterScope(SCOPE_FUNCTION | (node.generator ? SCOPE_GENERATOR : 0) | (node.async ? SCOPE_ASYNC : 0))
+  this.enterScope(functionFlags(node.async, node.generator))
 
   if (!(statement & FUNC_STATEMENT))
     node.id = this.type === tt.name ? this.parseIdent() : null

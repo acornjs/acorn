@@ -1,5 +1,5 @@
 import {Parser} from "./state"
-import {SCOPE_FUNCTION, SCOPE_SIMPLE_CATCH, BIND_LEXICAL, BIND_SIMPLE_CATCH, BIND_FUNCTION} from "./scopeflags"
+import {SCOPE_VAR, SCOPE_FUNCTION, SCOPE_ARROW, SCOPE_SIMPLE_CATCH, BIND_LEXICAL, BIND_SIMPLE_CATCH, BIND_FUNCTION} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -41,7 +41,7 @@ pp.declareName = function(name, bindingType, pos) {
       const scope = this.scopeStack[i]
       if (scope.lexical.indexOf(name) > -1 && !(scope.flags & SCOPE_SIMPLE_CATCH) && scope.lexical[0] === name) redeclared = true
       scope.var.push(name)
-      if (scope.flags & SCOPE_FUNCTION) break
+      if (scope.flags & SCOPE_VAR) break
     }
   }
   if (redeclared) this.raiseRecoverable(pos, `Identifier '${name}' has already been declared`)
@@ -51,9 +51,15 @@ pp.currentScope = function() {
   return this.scopeStack[this.scopeStack.length - 1]
 }
 
-pp.currentFunctionScope = function() {
+pp.currentVarScope = function() {
   for (let i = this.scopeStack.length - 1;; i--) {
     let scope = this.scopeStack[i]
-    if (scope.flags & SCOPE_FUNCTION) return scope
+    if (scope.flags & SCOPE_VAR) return scope
   }
+}
+
+pp.inNonArrowFunction = function() {
+  for (let i = this.scopeStack.length - 1; i >= 0; i--)
+    if (this.scopeStack[i].flags & SCOPE_FUNCTION && !(this.scopeStack[i].flags & SCOPE_ARROW)) return true
+  return false
 }

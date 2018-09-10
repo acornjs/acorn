@@ -20,7 +20,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {DestructuringErrors} from "./parseutil"
 import {lineBreak} from "./whitespace"
-import {SCOPE_FUNCTION, SCOPE_ARROW, SCOPE_ASYNC, SCOPE_GENERATOR, BIND_OUTSIDE, BIND_VAR} from "./scopeflags"
+import {functionFlags, SCOPE_ARROW, BIND_OUTSIDE, BIND_VAR} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -491,7 +491,7 @@ pp.parseNew = function() {
     node.property = this.parseIdent(true)
     if (node.property.name !== "target" || containsEsc)
       this.raiseRecoverable(node.property.start, "The only valid meta property for new is new.target")
-    if (!this.inFunction)
+    if (!this.inNonArrowFunction())
       this.raiseRecoverable(node.start, "new.target can only be used in functions")
     return this.finishNode(node, "MetaProperty")
   }
@@ -700,7 +700,7 @@ pp.parseMethod = function(isGenerator, isAsync) {
 
   this.yieldPos = 0
   this.awaitPos = 0
-  this.enterScope(SCOPE_FUNCTION | (node.generator ? SCOPE_GENERATOR : 0) | (isAsync ? SCOPE_ASYNC : 0))
+  this.enterScope(functionFlags(isAsync, node.generator))
 
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
@@ -717,7 +717,7 @@ pp.parseMethod = function(isGenerator, isAsync) {
 pp.parseArrowExpression = function(node, params, isAsync) {
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
 
-  this.enterScope(SCOPE_FUNCTION | SCOPE_ARROW | (isAsync ? SCOPE_ASYNC : 0))
+  this.enterScope(functionFlags(isAsync, false) | SCOPE_ARROW)
   this.initFunction(node)
   if (this.options.ecmaVersion >= 8) node.async = !!isAsync
 
