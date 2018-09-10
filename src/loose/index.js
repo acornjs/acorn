@@ -1,10 +1,10 @@
 // Acorn: Loose parser
 //
-// This module provides an alternative parser (`parse_dammit`) that
-// exposes that same interface as `parse`, but will try to parse
-// anything as JavaScript, repairing syntax error the best it can.
-// There are circumstances in which it will raise an error and give
-// up, but they are very rare. The resulting AST will be a mostly
+// This module provides an alternative parser that exposes that same
+// interface as the main module's `parse` function, but will try to
+// parse anything as JavaScript, repairing syntax error the best it
+// can. There are circumstances in which it will raise an error and
+// give up, but they are very rare. The resulting AST will be a mostly
 // valid JavaScript AST (as per the [Mozilla parser API][api], except
 // that:
 //
@@ -19,9 +19,9 @@
 // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
 //
 // The expected use for this is to *first* try `acorn.parse`, and only
-// if that fails switch to `parse_dammit`. The loose parser might
-// parse badly indented code incorrectly, so **don't** use it as
-// your default parser.
+// if that fails switch to the loose parser. The loose parser might
+// parse badly indented code incorrectly, so **don't** use it as your
+// default parser.
 //
 // Quite a lot of acorn.js is duplicated here. The alternative was to
 // add a *lot* of extra cruft to that file, making it less readable
@@ -39,7 +39,6 @@ export {LooseParser} from "./state"
 
 defaultOptions.tabSize = 4
 
-// eslint-disable-next-line camelcase
-export function parse_dammit(input, options) {
-  return new LooseParser(input, options).parse()
+export function parse(input, options) {
+  return LooseParser.parse(input, options)
 }

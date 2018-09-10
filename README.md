@@ -216,6 +216,14 @@ var tokens = [...acorn.tokenizer(str)];
 **tokTypes** holds an object mapping names to the token type objects
 that end up in the `type` properties of tokens.
 
+#### The `Parser` class
+
+Instances of this class contain all the state and logic that drives a
+parse. It has static methods `parse`, `parseExpressionAt`, and
+`tokenizer` that match the top-level functions by the same name. When
+extending the parser with plugins, you need to call these methods on
+the extended version of the class.
+
 #### Note on using with [Escodegen][escodegen]
 
 Escodegen supports generating comments from AST, attached in
@@ -244,20 +252,24 @@ console.log(escodegen.generate(ast, {comment: true}));
 
 [escodegen]: https://github.com/estools/escodegen
 
-### dist/acorn_loose.js ###
+### dist/acorn_loose.js
 
 This file implements an error-tolerant parser. It exposes a single
-function. The loose parser is accessible in node.js via `require("acorn/dist/acorn_loose")`.
+function. The loose parser is accessible in node.js via
+`require("acorn/dist/acorn_loose")`.
 
-**parse_dammit**`(input, options)` takes the same arguments and
-returns the same syntax tree as the `parse` function in `acorn.js`,
-but never raises an error, and will do its best to parse syntactically
-invalid code in as meaningful a way as it can. It'll insert identifier
-nodes with name `"✖"` as placeholders in places where it can't make
-sense of the input. Depends on `acorn.js`, because it uses the same
-tokenizer.
+**parse**`(input, options)` takes the same arguments and returns the
+same syntax tree as the `parse` function in `acorn.js`, but never
+raises an error, and will do its best to parse syntactically invalid
+code in as meaningful a way as it can. It'll insert identifier nodes
+with name `"✖"` as placeholders in places where it can't make sense of
+the input. Depends on `acorn.js`, because it uses the same tokenizer.
+Since the loose parser is whitespace-sensitive, and may parse valid
+but weirdly-indented code incorrectly, it is recommended to try
+parsing with the regular parser first, and fall back to this one when
+that fails.
 
-### dist/walk.js ###
+### dist/walk.js
 
 Implements an abstract syntax tree walker. Will store its interface in
 `acorn.walk` when loaded without a module system.
@@ -409,46 +421,49 @@ combine such plugins, so that if you have, for example, a plugin for
 parsing types and a plugin for parsing JSX-style XML literals, you
 could load them both and parse code with both JSX tags and types.
 
-A plugin should register itself by adding a property to
-`acorn.plugins`, which holds a function. Calling `acorn.parse`, a
-`plugins` option can be passed, holding an object mapping plugin names
-to configuration values (or just `true` for plugins that don't take
-options). After the parser object has been created, the initialization
-functions for the chosen plugins are called with `(parser,
-configValue)` arguments. They are expected to use the `parser.extend`
-method to extend parser methods. For example, the `readToken` method
-could be extended like this:
+A plugin is a function from a parser class to an extended parser
+class. Plugins can be used by simply applying them to the `Parser`
+class (or a version of that already extended by another plugin). But
+because that gets a little awkward, syntactically, when you are using
+multiple plugins, the static method `Parser.extend` can be called with
+any number of plugin values as arguments to create a `Parser` class
+extended by all those plugins. You'll usually want to create such an
+extended class only once, and then repeatedly call `parse` on it, to
+avoid needlessly confusing the JavaScript engine's optimizer.
 
 ```javascript
-parser.extend("readToken", function(nextMethod) {
-  return function(code) {
-    console.log("Reading a token!")
-    return nextMethod.call(this, code)
-  }
-})
+const {Parser} = require("acorn")
+
+const MyParser = Parser.extend(
+  require("acorn-jsx"),
+  require("acorn-bigint")
+)
+console.log(MyParser.parse("// Some bigin + JSX code"))
 ```
 
-The `nextMethod` argument passed to `extend`'s second argument is the
-previous value of this method, and should usually be called through to
-whenever the extended method does not handle the call itself.
+Plugins override methods in their new parser class to implement
+additional functionality. It is recommended for a plugin package to
+export its plugin function as its default value or, if it takes
+configuration parameters, to export a constructor function that
+creates the plugin function.
 
-Similarly, the loose parser allows plugins to register themselves via
-`acorn.pluginsLoose`.  The extension mechanism is the same as for the
-normal parser:
+This is what a trivial plugin coul, which adds a bit of code to the
+`readToken` method, might look like:
 
 ```javascript
-looseParser.extend("readToken", function(nextMethod) {
-  return function() {
-    console.log("Reading a token in the loose parser!")
-    return nextMethod.call(this)
+module.exports = function noisyReadToken(Parser) {
+  return class extends Parser {
+    readToken(code) {
+      console.log("Reading a token!")
+      super.readToken(code)
+    }
   }
-})
+}
 ```
 
 ### Existing plugins
 
  - [`acorn-jsx`](https://github.com/RReverser/acorn-jsx): Parse [Facebook JSX syntax extensions](https://github.com/facebook/jsx)
- - [`acorn-objj`](https://github.com/cappuccino/acorn-objj): [Objective-J](http://www.cappuccino-project.org/learn/objective-j.html) language parser built as Acorn plugin
  
  Plugins for ECMAScript proposals:
  
@@ -459,9 +474,4 @@ looseParser.extend("readToken", function(nextMethod) {
    - [`acorn-dynamic-import`](https://github.com/kesne/acorn-dynamic-import): Parse [import() proposal](https://github.com/tc39/proposal-dynamic-import)
    - [`acorn-import-meta`](https://github.com/acornjs/acorn-import-meta): Parse [import.meta proposal](https://github.com/tc39/proposal-import-meta)
    - [`acorn-numeric-separator`](https://github.com/acornjs/acorn-numeric-separator): Parse [numeric separator proposal](https://github.com/tc39/proposal-numeric-separator)
-   - [`acorn-optional-catch-binding`](https://github.com/acornjs/acorn-optional-catch-binding): Parse [optional catch binding proposal](https://github.com/tc39/proposal-optional-catch-binding)
-   - [`acorn-private-methods`](https://github.com/acornjs/acorn-private-methods): parse [private methods, getters and setters proposal](https://github.com/tc39/proposal-private-methods)
-   - [`acorn5-object-spread`](https://github.com/adrianheine/acorn5-object-spread): Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread)
- - [`acorn-object-rest-spread`](https://github.com/victor-homyakov/acorn-object-rest-spread): Parse [Object Rest/Spread Properties proposal](https://github.com/tc39/proposal-object-rest-spread)
- - [`acorn-es7`](https://github.com/angelozerr/acorn-es7): Parse [decorator syntax proposal](https://github.com/wycats/javascript-decorators)
- - [`acorn-static-class-property-initializer`](https://github.com/victor-homyakov/acorn-static-class-property-initializer): Partial support for static class properties from [ES Class Fields & Static Properties Proposal](https://github.com/tc39/proposal-class-public-fields) to support static property initializers in [React components written as ES6+ classes](https://babeljs.io/blog/2015/07/07/react-on-es6-plus)
+   - [`acorn-private-methods`](https://github.com/acornjs/acorn-private-methods): parse [private methods, getters and setters proposal](https://github.com/tc39/proposal-private-methods)n

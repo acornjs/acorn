@@ -60,7 +60,7 @@
     },
     Loose: {
       config: {
-        parse: acorn_loose.parse_dammit,
+        parse: acorn_loose.parse,
         loose: true,
         filter: function (test) {
           var opts = test.options || {};

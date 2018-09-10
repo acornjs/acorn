@@ -12,11 +12,6 @@
 //
 // [ghbt]: https://github.com/acornjs/acorn/issues
 //
-// This file defines the main parser interface. The library also comes
-// with a [error-tolerant parser][dammit] and an
-// [abstract syntax tree walker][walk], defined in other files.
-//
-// [dammit]: acorn_loose.js
 // [walk]: util/walk.js
 
 import {Parser} from "./state"
@@ -47,7 +42,7 @@ export const version = "5.7.3"
 // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
 
 export function parse(input, options) {
-  return new Parser(options, input).parse()
+  return Parser.parse(input, options)
 }
 
 // This function tries to parse a single expression at a given
@@ -55,16 +50,12 @@ export function parse(input, options) {
 // that embed JavaScript expressions.
 
 export function parseExpressionAt(input, pos, options) {
-  let p = new Parser(options, input, pos)
-  p.nextToken()
-  return p.parseExpression()
+  return Parser.parseExpressionAt(input, pos, options)
 }
 
 // Acorn is organized as a tokenizer and a recursive-descent parser.
 // The `tokenizer` export provides an interface to the tokenizer.
 
 export function tokenizer(input, options) {
-  let parser = new Parser(options, input)
-  parser.exprAllowed = true
-  return parser
+  return Parser.tokenizer(input, options)
 }

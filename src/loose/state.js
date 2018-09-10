@@ -154,4 +154,14 @@ export class LooseParser {
     this.next()
     return this.parseTopLevel()
   }
+
+  static extend(...plugins) {
+    let cls = this
+    for (let i = 0; i < plugins.length; i++) cls = plugins[i](cls)
+    return cls
+  }
+
+  static parse(input, options) {
+    return new this(input, options).parse()
+  }
 }

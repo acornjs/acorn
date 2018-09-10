@@ -97,4 +97,26 @@ export class Parser {
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
   get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 }
   get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 }
+
+  static extend(...plugins) {
+    let cls = this
+    for (let i = 0; i < plugins.length; i++) cls = plugins[i](cls)
+    return cls
+  }
+
+  static parse(input, options) {
+    return new this(options, input).parse()
+  }
+
+  static parseExpressionAt(input, pos, options) {
+    let parser = new this(options, input, pos)
+    parser.nextToken()
+    return parser.parseExpression()
+  }
+
+  static tokenizer(input, options) {
+    let parser = new this(options, input)
+    parser.exprAllowed = true
+    return parser
+  }
 }
