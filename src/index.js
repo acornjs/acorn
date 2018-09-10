@@ -27,7 +27,7 @@ import "./expression"
 import "./location"
 import "./scope"
 
-export {Parser, plugins} from "./state"
+export {Parser} from "./state"
 export {defaultOptions} from "./options"
 export {Position, SourceLocation, getLineInfo} from "./locutil"
 export {Node} from "./node"

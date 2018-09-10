@@ -4,9 +4,6 @@ import {lineBreak} from "./whitespace"
 import {getOptions} from "./options"
 import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR} from "./scopeflags"
 
-// Registered plugins
-export const plugins = {}
-
 function keywordRegexp(words) {
   return new RegExp("^(?:" + words.replace(/ /g, "|") + ")$")
 }
@@ -32,9 +29,6 @@ export class Parser {
     // contained any escape sequences. This is needed because words with
     // escape sequences must not be interpreted as keywords.
     this.containsEsc = false
-
-    // Load plugins
-    this.loadPlugins(options.plugins)
 
     // Set up token state
 
@@ -92,18 +86,6 @@ export class Parser {
 
     // For RegExp validation
     this.regexpState = null
-  }
-
-  extend(name, f) {
-    this[name] = f(this[name])
-  }
-
-  loadPlugins(pluginConfigs) {
-    for (let name in pluginConfigs) {
-      let plugin = plugins[name]
-      if (!plugin) throw new Error("Plugin '" + name + "' not found")
-      plugin(this, pluginConfigs[name])
-    }
   }
 
   parse() {

@@ -2,9 +2,6 @@ import {tokenizer, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} f
 
 function noop() {}
 
-// Registered plugins
-export const pluginsLoose = {}
-
 export class LooseParser {
   constructor(input, options = {}) {
     this.toks = tokenizer(input, options)
@@ -24,9 +21,6 @@ export class LooseParser {
     this.nextLineStart = this.lineEnd(this.curLineStart) + 1
     this.inAsync = false
     this.inFunction = false
-    // Load plugins
-    this.options.pluginsLoose = options.pluginsLoose || {}
-    this.loadPlugins(this.options.pluginsLoose)
   }
 
   startNode() {
@@ -154,14 +148,6 @@ export class LooseParser {
 
   extend(name, f) {
     this[name] = f(this[name])
-  }
-
-  loadPlugins(pluginConfigs) {
-    for (let name in pluginConfigs) {
-      let plugin = pluginsLoose[name]
-      if (!plugin) throw new Error("Plugin '" + name + "' not found")
-      plugin(this, pluginConfigs[name])
-    }
   }
 
   parse() {

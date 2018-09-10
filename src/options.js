@@ -86,8 +86,7 @@ export const defaultOptions = {
   directSourceFile: null,
   // When enabled, parenthesized expressions are represented by
   // (non-standard) ParenthesizedExpression nodes
-  preserveParens: false,
-  plugins: {}
+  preserveParens: false
 }
 
 // Interpret and default an options object

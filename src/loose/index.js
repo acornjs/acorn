@@ -35,7 +35,7 @@ import "./tokenize"
 import "./statement"
 import "./expression"
 
-export {LooseParser, pluginsLoose} from "./state"
+export {LooseParser} from "./state"
 
 defaultOptions.tabSize = 4
 
