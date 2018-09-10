@@ -1,3 +1,11 @@
+## 5.7.3 (2018-09-10)
+
+### Bug fixes
+
+Fix failure to tokenize regexps after expressions like `x.of`.
+
+Better error message for unterminated template literals.
+	
 ## 5.7.2 (2018-08-24)
 
 ### Bug fixes
