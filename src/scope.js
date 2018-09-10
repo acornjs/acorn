@@ -1,5 +1,5 @@
 import {Parser} from "./state"
-import {SCOPE_FUNCTION} from "./scopeflags"
+import {SCOPE_FUNCTION, SCOPE_SIMPLE_CATCH, BIND_LEXICAL, BIND_SIMPLE_CATCH, BIND_FUNCTION} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -23,39 +23,28 @@ pp.exitScope = function() {
   this.scopeStack.pop()
 }
 
-/**
- * A name can be declared with `var` if there are no variables with the same name declared with `let`/`const`
- * in the current lexical scope or any of the parent lexical scopes in this function.
- */
-pp.canDeclareVarName = function(name) {
-  for (let i = this.scopeStack.length - 1; i >= 0; --i) {
-    const currentScope = this.scopeStack[i]
-    if (currentScope.lexical.indexOf(name) !== -1) return false
-    if (currentScope.flags & SCOPE_FUNCTION) return true
-  }
-  return true
-}
-
-/**
- * A name can be declared with `let`/`const` if there are no variables with the same name declared with `let`/`const`
- * in the current scope, and there are no variables with the same name declared with `var` in the current scope or in
- * any child lexical scopes in this function.
- */
-pp.canDeclareLexicalName = function(name) {
-  const currentScope = this.currentScope()
-  return currentScope.lexical.indexOf(name) === -1 && currentScope.var.indexOf(name) === -1
-}
-
-pp.declareName = function(name, isVar) {
-  if (isVar) {
-    for (let i = this.scopeStack.length - 1; i >= 0; i--) {
-      let scope = this.scopeStack[i]
+pp.declareName = function(name, bindingType, pos) {
+  let redeclared = false
+  if (bindingType === BIND_LEXICAL) {
+    const scope = this.currentScope()
+    redeclared = scope.lexical.indexOf(name) > -1 || scope.var.indexOf(name) > -1
+    scope.lexical.push(name)
+  } else if (bindingType === BIND_SIMPLE_CATCH) {
+    const scope = this.currentScope()
+    scope.lexical.push(name)
+  } else if (bindingType === BIND_FUNCTION) {
+    const scope = this.currentScope()
+    redeclared = scope.lexical.indexOf(name) > -1
+    scope.var.push(name)
+  } else {
+    for (let i = this.scopeStack.length - 1; i >= 0; --i) {
+      const scope = this.scopeStack[i]
+      if (scope.lexical.indexOf(name) > -1 && !(scope.flags & SCOPE_SIMPLE_CATCH) && scope.lexical[0] === name) redeclared = true
       scope.var.push(name)
       if (scope.flags & SCOPE_FUNCTION) break
     }
-  } else {
-    this.currentScope().lexical.push(name)
   }
+  if (redeclared) this.raiseRecoverable(pos, `Identifier '${name}' has already been declared`)
 }
 
 pp.currentScope = function() {

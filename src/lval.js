@@ -1,6 +1,7 @@
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {has} from "./util"
+import {BIND_NONE, BIND_OUTSIDE} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -185,7 +186,7 @@ pp.parseMaybeDefault = function(startPos, startLoc, left) {
 // 'let' indicating that the lval creates a lexical ('let' or 'const') binding
 // 'none' indicating that the binding should be checked for illegal identifiers, but not for duplicate references
 
-pp.checkLVal = function(expr, bindingType, checkClashes) {
+pp.checkLVal = function(expr, bindingType = BIND_NONE, checkClashes) {
   switch (expr.type) {
   case "Identifier":
     if (this.strict && this.reservedWordsStrictBind.test(expr.name))
@@ -195,12 +196,7 @@ pp.checkLVal = function(expr, bindingType, checkClashes) {
         this.raiseRecoverable(expr.start, "Argument name clash")
       checkClashes[expr.name] = true
     }
-    if (bindingType && bindingType !== "none") {
-      if (bindingType === "var" && !this.canDeclareVarName(expr.name) ||
-          bindingType !== "var" && !this.canDeclareLexicalName(expr.name))
-        this.raiseRecoverable(expr.start, `Identifier '${expr.name}' has already been declared`)
-      this.declareName(expr.name, bindingType === "var")
-    }
+    if (bindingType !== BIND_NONE && bindingType !== BIND_OUTSIDE) this.declareName(expr.name, bindingType, expr.start)
     break
 
   case "MemberExpression":

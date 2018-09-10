@@ -115,7 +115,7 @@ export class Parser {
     return this.parseTopLevel(node)
   }
 
-  get inFunction() { return this.currentFunctionScope() != this.scopeStack[0] }
+  get inFunction() { return this.currentFunctionScope() !== this.scopeStack[0] }
   get inGenerator() { return (this.currentFunctionScope().flags & SCOPE_GENERATOR) > 0 }
   get inAsync() { return (this.currentFunctionScope().flags & SCOPE_ASYNC) > 0 }
 }

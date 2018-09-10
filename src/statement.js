@@ -4,7 +4,8 @@ import {lineBreak, skipWhiteSpace} from "./whitespace"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier"
 import {has} from "./util"
 import {DestructuringErrors} from "./parseutil"
-import {SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_CATCH} from "./scopeflags"
+import {SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SIMPLE_CATCH,
+  BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -19,7 +20,7 @@ pp.parseTopLevel = function(node) {
   let exports = {}
   if (!node.body) node.body = []
   while (this.type !== tt.eof) {
-    let stmt = this.parseStatement(true, true, exports)
+    let stmt = this.parseStatement(null, true, exports)
     node.body.push(stmt)
   }
   this.adaptDirectivePrologue(node.body)
@@ -69,7 +70,7 @@ pp.isAsyncFunction = function() {
 // `if (foo) /blah/.exec(foo)`, where looking at the previous token
 // does not help.
 
-pp.parseStatement = function(declaration, topLevel, exports) {
+pp.parseStatement = function(context, topLevel, exports) {
   let starttype = this.type, node = this.startNode(), kind
 
   if (this.isLet()) {
@@ -87,10 +88,10 @@ pp.parseStatement = function(declaration, topLevel, exports) {
   case tt._do: return this.parseDoStatement(node)
   case tt._for: return this.parseForStatement(node)
   case tt._function:
-    if (!declaration && this.options.ecmaVersion >= 6) this.unexpected()
-    return this.parseFunctionStatement(node, false)
+    if ((context && (this.strict || context !== "if")) && this.options.ecmaVersion >= 6) this.unexpected()
+    return this.parseFunctionStatement(node, false, !context)
   case tt._class:
-    if (!declaration) this.unexpected()
+    if (context) this.unexpected()
     return this.parseClass(node, true)
   case tt._if: return this.parseIfStatement(node)
   case tt._return: return this.parseReturnStatement(node)
@@ -99,7 +100,7 @@ pp.parseStatement = function(declaration, topLevel, exports) {
   case tt._try: return this.parseTryStatement(node)
   case tt._const: case tt._var:
     kind = kind || this.value
-    if (!declaration && kind !== "var") this.unexpected()
+    if (context && kind !== "var") this.unexpected()
     return this.parseVarStatement(node, kind)
   case tt._while: return this.parseWhileStatement(node)
   case tt._with: return this.parseWithStatement(node)
@@ -122,14 +123,14 @@ pp.parseStatement = function(declaration, topLevel, exports) {
     // Identifier node, we switch to interpreting it as a label.
   default:
     if (this.isAsyncFunction()) {
-      if (!declaration) this.unexpected()
+      if (context) this.unexpected()
       this.next()
-      return this.parseFunctionStatement(node, true)
+      return this.parseFunctionStatement(node, true, !context)
     }
 
     let maybeName = this.value, expr = this.parseExpression()
     if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon))
-      return this.parseLabeledStatement(node, maybeName, expr)
+      return this.parseLabeledStatement(node, maybeName, expr, context)
     else return this.parseExpressionStatement(node, expr)
   }
 }
@@ -167,7 +168,7 @@ pp.parseDebuggerStatement = function(node) {
 pp.parseDoStatement = function(node) {
   this.next()
   this.labels.push(loopLabel)
-  node.body = this.parseStatement(false)
+  node.body = this.parseStatement("do")
   this.labels.pop()
   this.expect(tt._while)
   node.test = this.parseParenExpression()
@@ -232,17 +233,17 @@ pp.parseForStatement = function(node) {
   return this.parseFor(node, init)
 }
 
-pp.parseFunctionStatement = function(node, isAsync) {
+pp.parseFunctionStatement = function(node, isAsync, declarationPosition) {
   this.next()
-  return this.parseFunction(node, true, false, isAsync)
+  return this.parseFunction(node, FUNC_STATEMENT | (declarationPosition ? 0 : FUNC_HANGING_STATEMENT), false, isAsync)
 }
 
 pp.parseIfStatement = function(node) {
   this.next()
   node.test = this.parseParenExpression()
   // allow function declarations in branches, but only in non-strict mode
-  node.consequent = this.parseStatement(!this.strict && this.type === tt._function)
-  node.alternate = this.eat(tt._else) ? this.parseStatement(!this.strict && this.type === tt._function) : null
+  node.consequent = this.parseStatement("if")
+  node.alternate = this.eat(tt._else) ? this.parseStatement("if") : null
   return this.finishNode(node, "IfStatement")
 }
 
@@ -290,7 +291,7 @@ pp.parseSwitchStatement = function(node) {
       this.expect(tt.colon)
     } else {
       if (!cur) this.unexpected()
-      cur.consequent.push(this.parseStatement(true))
+      cur.consequent.push(this.parseStatement(null))
     }
   }
   this.exitScope()
@@ -322,8 +323,9 @@ pp.parseTryStatement = function(node) {
     this.next()
     if (this.eat(tt.parenL)) {
       clause.param = this.parseBindingAtom()
-      this.enterScope(SCOPE_CATCH)
-      this.checkLVal(clause.param, "let")
+      let simple = clause.param.type === "Identifier"
+      this.enterScope(simple ? SCOPE_SIMPLE_CATCH : 0)
+      this.checkLVal(clause.param, simple ? BIND_SIMPLE_CATCH : BIND_LEXICAL)
       this.expect(tt.parenR)
     } else {
       if (this.options.ecmaVersion < 10) this.unexpected()
@@ -351,7 +353,7 @@ pp.parseWhileStatement = function(node) {
   this.next()
   node.test = this.parseParenExpression()
   this.labels.push(loopLabel)
-  node.body = this.parseStatement(false)
+  node.body = this.parseStatement("while")
   this.labels.pop()
   return this.finishNode(node, "WhileStatement")
 }
@@ -360,7 +362,7 @@ pp.parseWithStatement = function(node) {
   if (this.strict) this.raise(this.start, "'with' in strict mode")
   this.next()
   node.object = this.parseParenExpression()
-  node.body = this.parseStatement(false)
+  node.body = this.parseStatement("with")
   return this.finishNode(node, "WithStatement")
 }
 
@@ -369,7 +371,7 @@ pp.parseEmptyStatement = function(node) {
   return this.finishNode(node, "EmptyStatement")
 }
 
-pp.parseLabeledStatement = function(node, maybeName, expr) {
+pp.parseLabeledStatement = function(node, maybeName, expr, context) {
   for (let label of this.labels)
     if (label.name === maybeName)
       this.raise(expr.start, "Label '" + maybeName + "' is already declared")
@@ -383,7 +385,7 @@ pp.parseLabeledStatement = function(node, maybeName, expr) {
     } else break
   }
   this.labels.push({name: maybeName, kind, statementStart: this.start})
-  node.body = this.parseStatement(true)
+  node.body = this.parseStatement(context)
   if (node.body.type === "ClassDeclaration" ||
       node.body.type === "VariableDeclaration" && node.body.kind !== "var" ||
       node.body.type === "FunctionDeclaration" && (this.strict || node.body.generator || node.body.async))
@@ -409,7 +411,7 @@ pp.parseBlock = function(createNewLexicalScope = true) {
   this.expect(tt.braceL)
   if (createNewLexicalScope) this.enterScope(0)
   while (!this.eat(tt.braceR)) {
-    let stmt = this.parseStatement(true)
+    let stmt = this.parseStatement(null)
     node.body.push(stmt)
   }
   if (createNewLexicalScope) this.exitScope()
@@ -428,7 +430,7 @@ pp.parseFor = function(node, init) {
   node.update = this.type === tt.parenR ? null : this.parseExpression()
   this.expect(tt.parenR)
   this.exitScope()
-  node.body = this.parseStatement(false)
+  node.body = this.parseStatement("for")
   this.labels.pop()
   return this.finishNode(node, "ForStatement")
 }
@@ -449,7 +451,7 @@ pp.parseForIn = function(node, init) {
   node.right = type === "ForInStatement" ? this.parseExpression() : this.parseMaybeAssign()
   this.expect(tt.parenR)
   this.exitScope()
-  node.body = this.parseStatement(false)
+  node.body = this.parseStatement("for")
   this.labels.pop()
   return this.finishNode(node, type)
 }
@@ -479,24 +481,25 @@ pp.parseVar = function(node, isFor, kind) {
 
 pp.parseVarId = function(decl, kind) {
   decl.id = this.parseBindingAtom(kind)
-  this.checkLVal(decl.id, kind, false)
+  this.checkLVal(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false)
 }
+
+const FUNC_STATEMENT = 1, FUNC_HANGING_STATEMENT = 2, FUNC_NULLABLE_ID = 4
 
 // Parse a function declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
+pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
   this.initFunction(node)
   if (this.options.ecmaVersion >= 9 || this.options.ecmaVersion >= 6 && !isAsync)
     node.generator = this.eat(tt.star)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
 
-  if (isStatement) {
-    node.id = isStatement === "nullableID" && this.type !== tt.name ? null : this.parseIdent()
-    if (node.id) {
-      this.checkLVal(node.id, this.inModule && !this.inFunction ? "let" : "var")
-    }
+  if (statement & FUNC_STATEMENT) {
+    node.id = (statement & FUNC_NULLABLE_ID) && this.type !== tt.name ? null : this.parseIdent()
+    if (node.id && !(statement & FUNC_HANGING_STATEMENT))
+      this.checkLVal(node.id, this.inModule && !this.inFunction ? BIND_LEXICAL : BIND_FUNCTION)
   }
 
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
@@ -504,7 +507,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
   this.awaitPos = 0
   this.enterScope(SCOPE_FUNCTION | (node.generator ? SCOPE_GENERATOR : 0) | (node.async ? SCOPE_ASYNC : 0))
 
-  if (!isStatement)
+  if (!(statement & FUNC_STATEMENT))
     node.id = this.type === tt.name ? this.parseIdent() : null
 
   this.parseFunctionParams(node)
@@ -512,7 +515,7 @@ pp.parseFunction = function(node, isStatement, allowExpressionBody, isAsync) {
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
-  return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
+  return this.finishNode(node, (statement & FUNC_STATEMENT) ? "FunctionDeclaration" : "FunctionExpression")
 }
 
 pp.parseFunctionParams = function(node) {
@@ -627,7 +630,7 @@ pp.parseExport = function(node, exports) {
       let fNode = this.startNode()
       this.next()
       if (isAsync) this.next()
-      node.declaration = this.parseFunction(fNode, "nullableID", false, isAsync)
+      node.declaration = this.parseFunction(fNode, FUNC_STATEMENT | FUNC_NULLABLE_ID, false, isAsync, true)
     } else if (this.type === tt._class) {
       let cNode = this.startNode()
       node.declaration = this.parseClass(cNode, "nullableID")
@@ -639,7 +642,7 @@ pp.parseExport = function(node, exports) {
   }
   // export var|const|let|function|class ...
   if (this.shouldParseExportStatement()) {
-    node.declaration = this.parseStatement(true)
+    node.declaration = this.parseStatement(null)
     if (node.declaration.type === "VariableDeclaration")
       this.checkVariableExport(exports, node.declaration.declarations)
     else
@@ -754,7 +757,7 @@ pp.parseImportSpecifiers = function() {
     // import defaultObj, { x, y as z } from '...'
     let node = this.startNode()
     node.local = this.parseIdent()
-    this.checkLVal(node.local, "let")
+    this.checkLVal(node.local, BIND_LEXICAL)
     nodes.push(this.finishNode(node, "ImportDefaultSpecifier"))
     if (!this.eat(tt.comma)) return nodes
   }
@@ -763,7 +766,7 @@ pp.parseImportSpecifiers = function() {
     this.next()
     this.expectContextual("as")
     node.local = this.parseIdent()
-    this.checkLVal(node.local, "let")
+    this.checkLVal(node.local, BIND_LEXICAL)
     nodes.push(this.finishNode(node, "ImportNamespaceSpecifier"))
     return nodes
   }
@@ -782,7 +785,7 @@ pp.parseImportSpecifiers = function() {
       this.checkUnreserved(node.imported)
       node.local = node.imported
     }
-    this.checkLVal(node.local, "let")
+    this.checkLVal(node.local, BIND_LEXICAL)
     nodes.push(this.finishNode(node, "ImportSpecifier"))
   }
   return nodes

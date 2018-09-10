@@ -29293,15 +29293,16 @@ test("((b), a=1)", {})
 
 test("(x) = 1", {})
 
-testFail("try {} catch (foo) { var foo; }", "Identifier 'foo' has already been declared (1:25)")
+test("try {} catch (foo) { var foo; }", {}, {ecmaVersion: 6})
 testFail("try {} catch (foo) { let foo; }", "Identifier 'foo' has already been declared (1:25)", {ecmaVersion: 6})
-testFail("try {} catch (foo) { try {} catch (_) { var foo; } }", "Identifier 'foo' has already been declared (1:44)")
+test("try {} catch (foo) { try {} catch (_) { var foo; } }", {}, {ecmaVersion: 6})
 testFail("try {} catch ([foo]) { var foo; }", "Identifier 'foo' has already been declared (1:27)", {ecmaVersion: 6})
 testFail("try {} catch ({ foo }) { var foo; }", "Identifier 'foo' has already been declared (1:29)", {ecmaVersion: 6})
 testFail("try {} catch ([foo, foo]) {}", "Identifier 'foo' has already been declared (1:20)", {ecmaVersion: 6})
 testFail("try {} catch ({ a: foo, b: { c: [foo] } }) {}", "Identifier 'foo' has already been declared (1:33)", {ecmaVersion: 6})
 testFail("let foo; try {} catch (foo) {} let foo;", "Identifier 'foo' has already been declared (1:35)", {ecmaVersion: 6})
 testFail("try {} catch (foo) { function foo() {} }", "Identifier 'foo' has already been declared (1:30)")
+test("try {} catch (foo) { if (1) function foo() {} }", {}, {ecmaVersion: 6})
 
 test("try {} catch (foo) {} var foo;", {})
 test("try {} catch (foo) {} let foo;", {}, {ecmaVersion: 6})

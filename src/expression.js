@@ -20,7 +20,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {DestructuringErrors} from "./parseutil"
 import {lineBreak} from "./whitespace"
-import {SCOPE_FUNCTION, SCOPE_ARROW, SCOPE_ASYNC, SCOPE_GENERATOR} from "./scopeflags"
+import {SCOPE_FUNCTION, SCOPE_ARROW, SCOPE_ASYNC, SCOPE_GENERATOR, BIND_OUTSIDE, BIND_VAR} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -323,7 +323,7 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     let startPos = this.start, startLoc = this.startLoc, containsEsc = this.containsEsc
     let id = this.parseIdent(this.type !== tt.name)
     if (this.options.ecmaVersion >= 8 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
-      return this.parseFunction(this.startNodeAt(startPos, startLoc), false, false, true)
+      return this.parseFunction(this.startNodeAt(startPos, startLoc), 0, false, true)
     if (canBeArrow && !this.canInsertSemicolon()) {
       if (this.eat(tt.arrow))
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false)
@@ -374,7 +374,7 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   case tt._function:
     node = this.startNode()
     this.next()
-    return this.parseFunction(node, false)
+    return this.parseFunction(node, 0)
 
   case tt._class:
     return this.parseClass(this.startNode(), false)
@@ -768,10 +768,8 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
   }
   this.exitScope()
 
-  if (this.strict && node.id) {
-    // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
-    this.checkLVal(node.id, "none")
-  }
+  // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
+  if (this.strict && node.id) this.checkLVal(node.id, BIND_OUTSIDE)
   this.strict = oldStrict
 }
 
@@ -787,7 +785,7 @@ pp.isSimpleParamList = function(params) {
 pp.checkParams = function(node, allowDuplicates) {
   let nameHash = {}
   for (let param of node.params)
-    this.checkLVal(param, "var", allowDuplicates ? null : nameHash)
+    this.checkLVal(param, BIND_VAR, allowDuplicates ? null : nameHash)
 }
 
 // Parses a comma-separated list of expressions, and returns them as

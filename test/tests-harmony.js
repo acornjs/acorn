@@ -16243,3 +16243,5 @@ testFail("var f;\nfunction f() {}", "Identifier 'f' has already been declared (2
 test("function f() { var x; function x() {} }", {}, {ecmaVersion: 6, sourceType: "module"})
 
 test("a.of / 2", {}, {ecmaVersion: 6})
+
+test("let x = 1; x = 2", {}, {ecmaVersion: 6})
