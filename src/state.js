@@ -94,10 +94,6 @@ export class Parser {
     this.regexpState = null
   }
 
-  // DEPRECATED Kept for backwards compatibility until 3.0 in case a plugin uses them
-  isKeyword(word) { return this.keywords.test(word) }
-  isReservedWord(word) { return this.reservedWords.test(word) }
-
   extend(name, f) {
     this[name] = f(this[name])
   }
