@@ -535,17 +535,20 @@ pp.parseClass = function(node, isStatement) {
   classBody.body = []
   this.expect(tt.braceL)
   while (!this.eat(tt.braceR)) {
-    const member = this.parseClassMember(classBody)
-    if (member && member.type === "MethodDefinition" && member.kind === "constructor") {
-      if (hadConstructor) this.raise(member.start, "Duplicate constructor in the same class")
-      hadConstructor = true
+    const element = this.parseClassElement(classBody)
+    if (element) {
+      classBody.body.push(element)
+      if (element.type === "MethodDefinition" && element.kind === "constructor") {
+        if (hadConstructor) this.raise(element.start, "Duplicate constructor in the same class")
+        hadConstructor = true
+      }
     }
   }
   node.body = this.finishNode(classBody, "ClassBody")
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
-pp.parseClassMember = function(classBody) {
+pp.parseClassElement = function(classBody) {
   if (this.eat(tt.semi)) return null
 
   let method = this.startNode()
@@ -586,7 +589,7 @@ pp.parseClassMember = function(classBody) {
   } else if (method.static && key.type === "Identifier" && key.name === "prototype") {
     this.raise(key.start, "Classes may not have a static property named prototype")
   }
-  this.parseClassMethod(classBody, method, isGenerator, isAsync)
+  this.parseClassMethod(method, isGenerator, isAsync)
   if (method.kind === "get" && method.value.params.length !== 0)
     this.raiseRecoverable(method.value.start, "getter should have no params")
   if (method.kind === "set" && method.value.params.length !== 1)
@@ -596,9 +599,9 @@ pp.parseClassMember = function(classBody) {
   return method
 }
 
-pp.parseClassMethod = function(classBody, method, isGenerator, isAsync) {
+pp.parseClassMethod = function(method, isGenerator, isAsync) {
   method.value = this.parseMethod(isGenerator, isAsync)
-  classBody.body.push(this.finishNode(method, "MethodDefinition"))
+  return this.finishNode(method, "MethodDefinition")
 }
 
 pp.parseClassId = function(node, isStatement) {
