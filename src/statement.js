@@ -103,7 +103,7 @@ pp.parseStatement = function(context, topLevel, exports) {
     return this.parseVarStatement(node, kind)
   case tt._while: return this.parseWhileStatement(node)
   case tt._with: return this.parseWithStatement(node)
-  case tt.braceL: return this.parseBlock()
+  case tt.braceL: return this.parseBlock(true, node)
   case tt.semi: return this.parseEmptyStatement(node)
   case tt._export:
   case tt._import:
@@ -404,8 +404,7 @@ pp.parseExpressionStatement = function(node, expr) {
 // strict"` declarations when `allowStrict` is true (used for
 // function bodies).
 
-pp.parseBlock = function(createNewLexicalScope = true) {
-  let node = this.startNode()
+pp.parseBlock = function(createNewLexicalScope = true, node = this.startNode()) {
   node.body = []
   this.expect(tt.braceL)
   if (createNewLexicalScope) this.enterScope(0)
