@@ -828,7 +828,7 @@ pp.checkUnreserved = function({start, end, name}) {
     this.raiseRecoverable(start, "Can not use 'yield' as identifier inside a generator")
   if (this.inAsync && name === "await")
     this.raiseRecoverable(start, "Can not use 'await' as identifier inside an async function")
-  if (this.isKeyword(name))
+  if (this.keywords.test(name))
     this.raise(start, `Unexpected keyword '${name}'`)
   if (this.options.ecmaVersion < 6 &&
     this.input.slice(start, end).indexOf("\\") !== -1) return
