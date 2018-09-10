@@ -67,6 +67,7 @@ export class Parser {
     // context to predict whether a regular expression is allowed in a
     // given position.
     this.context = this.initialContext()
+    this.inTemplate = false
     this.exprAllowed = true
 
     // Figure out if it's a module code.
