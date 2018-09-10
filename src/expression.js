@@ -531,6 +531,7 @@ pp.parseTemplate = function({isTagged = false} = {}) {
   let curElt = this.parseTemplateElement({isTagged})
   node.quasis = [curElt]
   while (!curElt.tail) {
+    if (this.type === tt.eof) this.raise(this.pos, "Unterminated template literal")
     this.expect(tt.dollarBraceL)
     node.expressions.push(this.parseExpression())
     this.expect(tt.braceR)
