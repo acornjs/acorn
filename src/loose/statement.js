@@ -57,7 +57,7 @@ lp.parseStatement = function() {
     if (this.tok.type === tt.semi) return this.parseFor(node, null)
     let isLet = this.toks.isLet()
     if (isLet || this.tok.type === tt._var || this.tok.type === tt._const) {
-      let init = this.parseVar(true, isLet ? "let" : this.tok.value)
+      let init = this.parseVar(this.startNode(), true, isLet ? "let" : this.tok.value)
       if (init.declarations.length === 1 && (this.tok.type === tt._in || this.isContextual("of"))) {
         if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
           node.await = isAwait
@@ -153,7 +153,7 @@ lp.parseStatement = function() {
 
   case tt._var:
   case tt._const:
-    return this.parseVar(false, kind || this.tok.value)
+    return this.parseVar(node, false, kind || this.tok.value)
 
   case tt._while:
     this.next()
@@ -241,8 +241,7 @@ lp.parseForIn = function(node, init) {
   return this.finishNode(node, type)
 }
 
-lp.parseVar = function(noIn, kind) {
-  let node = this.startNode()
+lp.parseVar = function(node, noIn, kind) {
   node.kind = kind
   this.next()
   node.declarations = []
