@@ -40,9 +40,17 @@ pp.next = function() {
 }
 
 pp.getToken = function() {
+  let prevType = this.type
   this.next()
   this.updateContext(prevType)
   return new Token(this)
+}
+
+pp.turnSlashIntoRegexp = function() {
+  if (this.type === tt.slash || this.type === tt.assign && this.value === "/=") {
+    this.pos = this.start + 1
+    this.readRegexp()
+  }
 }
 
 // If we're in an ES6 environment, make parsers iterable
@@ -170,7 +178,6 @@ pp.skipSpace = function() {
 pp.finishToken = function(type, val) {
   this.end = this.pos
   if (this.options.locations) this.endLoc = this.curPosition()
-  let prevType = this.type
   this.type = type
   this.value = val
 }

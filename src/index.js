@@ -64,7 +64,9 @@ export function parseExpressionAt(input, pos, options) {
 // The `tokenizer` export provides an interface to the tokenizer.
 
 export function tokenizer(input, options) {
-  return new Parser(options, input)
+  let parser = new Parser(options, input)
+  parser.exprAllowed = true
+  return parser
 }
 
 // This is a terrible kludge to support the existing, pre-ES6

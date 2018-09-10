@@ -1,4 +1,4 @@
-import {tokTypes as tt, Token, isNewLine, SourceLocation, getLineInfo, lineBreakG} from "../index"
+import {tokTypes as tt, isNewLine, SourceLocation, getLineInfo, lineBreakG} from "../index"
 import {LooseParser} from "./state"
 
 const lp = LooseParser.prototype
@@ -26,14 +26,15 @@ lp.next = function() {
 lp.readToken = function() {
   for (;;) {
     try {
-      this.toks.next()
-      if (this.toks.type === tt.dot &&
-          this.input.substr(this.toks.end, 1) === "." &&
+      let tok = this.toks.getToken()
+      if (tok.type === tt.dot &&
+          this.toks.input.substr(tok.end, 1) === "." &&
           this.options.ecmaVersion >= 6) {
         this.toks.end++
-        this.toks.type = tt.ellipsis
+        tok.end++
+        tok.type = tt.ellipsis
       }
-      return new Token(this.toks)
+      return tok
     } catch (e) {
       if (!(e instanceof SyntaxError)) throw e
 

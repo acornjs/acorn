@@ -68,7 +68,7 @@ export class Parser {
     // given position.
     this.context = this.initialContext()
     this.inTemplate = false
-    this.exprAllowed = true
+    this.exprAllowed = false
 
     // Figure out if it's a module code.
     this.inModule = options.sourceType === "module"
