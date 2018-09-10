@@ -29,7 +29,7 @@
 // invasive changes and simplifications without creating a complicated
 // tangle.
 
-import {addLooseExports, defaultOptions} from "../index"
+import {defaultOptions} from "../index"
 import {LooseParser, pluginsLoose} from "./state"
 import "./tokenize"
 import "./statement"
@@ -43,5 +43,3 @@ defaultOptions.tabSize = 4
 export function parse_dammit(input, options) {
   return new LooseParser(input, options).parse()
 }
-
-addLooseExports(parse_dammit, LooseParser, pluginsLoose)
