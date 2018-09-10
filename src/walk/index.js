@@ -9,8 +9,8 @@
 //     });
 //
 // to do something with all expressions. All Parser API node types
-// can be used to identify node types, as well as Expression,
-// Statement, and ScopeBody, which denote categories of nodes.
+// can be used to identify node types, as well as Expression and
+// Statement, which denote categories of nodes.
 //
 // The base argument can be used to pass a custom (recursive)
 // walker, and state can be used to give this walked an initial
@@ -230,7 +230,7 @@ base.TryStatement = (node, st, c) => {
 }
 base.CatchClause = (node, st, c) => {
   if (node.param) c(node.param, st, "Pattern")
-  c(node.body, st, "ScopeBody")
+  c(node.body, st, "Statement")
 }
 base.WhileStatement = base.DoWhileStatement = (node, st, c) => {
   c(node.test, st, "Expression")
@@ -267,12 +267,8 @@ base.Function = (node, st, c) => {
   if (node.id) c(node.id, st, "Pattern")
   for (let param of node.params)
     c(param, st, "Pattern")
-  c(node.body, st, node.expression ? "ScopeExpression" : "ScopeBody")
+  c(node.body, st, node.expression ? "Expression" : "Statement")
 }
-// FIXME drop these node types in next major version
-// (They are awkward, and in ES6 every block can be a scope.)
-base.ScopeBody = (node, st, c) => c(node, st, "Statement")
-base.ScopeExpression = (node, st, c) => c(node, st, "Expression")
 
 base.Pattern = (node, st, c) => {
   if (node.type === "Identifier")
