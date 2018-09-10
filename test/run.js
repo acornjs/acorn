@@ -1,28 +1,21 @@
 (function() {
-  var driver, acorn;
-
-  if (typeof require !== "undefined") {
-    driver = require("./driver.js");
-    require("./tests.js");
-    require("./tests-harmony.js");
-    require("./tests-es7.js");
-    require("./tests-asyncawait.js");
-    require("./tests-await-top-level.js");
-    require("./tests-trailing-commas-in-func.js");
-    require("./tests-template-literal-revision.js");
-    require("./tests-directive.js");
-    require("./tests-rest-spread-properties.js");
-    require("./tests-async-iteration.js");
-    require("./tests-regexp.js");
-    require("./tests-regexp-2018.js");
-    require("./tests-json-superset.js");
-    require("./tests-optional-catch-binding.js");
-    acorn = require("../dist/acorn")
-    require("../dist/acorn_loose")
-  } else {
-    driver = window;
-    acorn = window.acorn;
-  }
+  var driver = require("./driver.js")
+  require("./tests.js");
+  require("./tests-harmony.js");
+  require("./tests-es7.js");
+  require("./tests-asyncawait.js");
+  require("./tests-await-top-level.js");
+  require("./tests-trailing-commas-in-func.js");
+  require("./tests-template-literal-revision.js");
+  require("./tests-directive.js");
+  require("./tests-rest-spread-properties.js");
+  require("./tests-async-iteration.js");
+  require("./tests-regexp.js");
+  require("./tests-regexp-2018.js");
+  require("./tests-json-superset.js");
+  require("./tests-optional-catch-binding.js");
+  var acorn = require("../dist/acorn")
+  var acorn_loose = require("../dist/acorn_loose")
 
   var htmlLog = typeof document === "object" && document.getElementById('log');
   var htmlGroup = htmlLog;
@@ -67,7 +60,7 @@
     },
     Loose: {
       config: {
-        parse: acorn.parse_dammit,
+        parse: acorn_loose.parse_dammit,
         loose: true,
         filter: function (test) {
           var opts = test.options || {};
