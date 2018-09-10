@@ -30,7 +30,7 @@
 // tangle.
 
 import {defaultOptions} from "../index"
-import {LooseParser, pluginsLoose} from "./state"
+import {LooseParser} from "./state"
 import "./tokenize"
 import "./statement"
 import "./expression"
