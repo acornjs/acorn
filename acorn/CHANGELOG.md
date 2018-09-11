@@ -1,3 +1,25 @@
+## 6.0.0 (FIXME)
+
+### Bug fixes
+
+Better handle variable-redefinition checks for catch bindings and functions directly under if statements.
+
+Forbid `new.target` in top-level arrow functions.
+
+Fix issue with parsing a regexp after `yield` in some contexts.
+
+### New features
+
+The package now comes with TypeScript definitions.
+
+### Breaking changes
+
+The default value of the `ecmaVersion` option is now 9 (2018).
+
+Plugins work differently, and will have to be rewritten to work with this version.
+
+The loose parser and walker have been moved into separate packages (`acorn-loose` and `acorn-walk`).
+
 ## 5.7.3 (2018-09-10)
 
 ### Bug fixes

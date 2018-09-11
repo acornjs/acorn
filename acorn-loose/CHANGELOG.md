@@ -1,3 +1,11 @@
+## 6.0.0 (FIXME)
+
+### Breaking changes
+
+This module has been moved into its own package, `acorn-loose`.
+
+Plugins work differently, and will have to be rewritten to work with this version.
+
 ## 5.1.0 (2017-07-05)
 
 ### Bug fixes
