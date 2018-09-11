@@ -21,8 +21,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "prepare": "npm run build && node test/run.js && node test/lint.js",
-    "test": "node test/run.js && node test/lint.js",
+    "prepare": "npm run test",
+    "test": "npm run link && node test/run.js && node test/lint.js",
+    "link": "mkdir -p acorn-loose/node_modules && ln -s ../../acorn acorn-loose/node_modules/acorn",
     "pretest": "npm run build:main && npm run build:loose",
     "test:test262": "node bin/run_test262.js",
     "build": "npm run build:main && npm run build:walk && npm run build:loose && npm run build:bin",
@@ -44,7 +45,5 @@
     "test262": "git+https://github.com/tc39/test262.git#3bfad28cc302fd4455badcfcbca7c5bb7ce41a72",
     "test262-parser-runner": "^0.4.0",
     "unicode-11.0.0": "^0.7.7"
-  },
-  "workspaces": ["acorn", "acorn-loose", "acorn-walk"],
-  "private": true
+  }
 }

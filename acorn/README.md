@@ -26,7 +26,7 @@ Alternately, you can download the source and build acorn yourself:
 ```sh
 git clone https://github.com/acornjs/acorn.git
 cd acorn
-yarn install # Needs to be yarn because we use workspaces
+npm install
 ```
 
 ## Interface

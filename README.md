@@ -29,12 +29,12 @@ This repository holds three packages:
  - [acorn-walk](https://github.com/acornjs/acorn/blob/master/acorn-walk/): The
    syntax tree walker
 
-To build the content of the repository, run `yarn install`.
+To build the content of the repository, run `npm install`.
 
 ```sh
 git clone https://github.com/acornjs/acorn.git
 cd acorn
-yarn install
+npm install
 ```
 
 ## Plugin developments
