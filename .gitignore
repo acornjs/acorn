@@ -3,7 +3,7 @@ node_modules
 /.tern-port
 /local
 /bin/_acorn.js
-/acorn/dist/*.js
-/acorn-loose/dist/*.js
-/acorn-walk/dist/*.js
+/acorn/dist
+/acorn-loose/dist
+/acorn-walk/dist
 /yarn.lock
