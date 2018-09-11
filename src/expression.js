@@ -297,9 +297,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
 // or `{}`.
 
 pp.parseExprAtom = function(refDestructuringErrors) {
-  this.turnSlashIntoRegexp()
   let node, canBeArrow = this.potentialArrowAt === this.start
-
   switch (this.type) {
   case tt._super:
     if (!this.inFunction)
@@ -529,21 +527,17 @@ pp.parseTemplateElement = function({isTagged}) {
 
 pp.parseTemplate = function({isTagged = false} = {}) {
   let node = this.startNode()
-  this.inTemplate = true
   this.next()
   node.expressions = []
   let curElt = this.parseTemplateElement({isTagged})
   node.quasis = [curElt]
   while (!curElt.tail) {
     if (this.type === tt.eof) this.raise(this.pos, "Unterminated template literal")
-    this.inTemplate = false
     this.expect(tt.dollarBraceL)
     node.expressions.push(this.parseExpression())
-    this.inTemplate = true
     this.expect(tt.braceR)
     node.quasis.push(curElt = this.parseTemplateElement({isTagged}))
   }
-  this.inTemplate = false
   this.next()
   return this.finishNode(node, "TemplateLiteral")
 }
@@ -847,9 +841,22 @@ pp.checkUnreserved = function({start, end, name}) {
 pp.parseIdent = function(liberal, isBinding) {
   let node = this.startNode()
   if (liberal && this.options.allowReserved === "never") liberal = false
-  if (this.type === tt.name) node.name = this.value
-  else if (this.type.keyword) node.name = this.type.keyword
-  else this.unexpected()
+  if (this.type === tt.name) {
+    node.name = this.value
+  } else if (this.type.keyword) {
+    node.name = this.type.keyword
+
+    // To fix https://github.com/acornjs/acorn/issues/575
+    // `class` and `function` keywords push new context into this.context.
+    // But there is no chance to pop the context if the keyword is consumed as an identifier such as a property name.
+    // If the previous token is a dot, this does not apply because the context-managing code already ignored the keyword
+    if ((node.name === "class" || node.name === "function") &&
+        (this.lastTokEnd !== this.lastTokStart + 1 || this.input.charCodeAt(this.lastTokStart) !== 46)) {
+      this.context.pop()
+    }
+  } else {
+    this.unexpected()
+  }
   this.next()
   this.finishNode(node, "Identifier")
   if (!liberal) this.checkUnreserved(node)
@@ -863,7 +870,6 @@ pp.parseYield = function() {
 
   let node = this.startNode()
   this.next()
-  this.turnSlashIntoRegexp()
   if (this.type === tt.semi || this.canInsertSemicolon() || (this.type !== tt.star && !this.type.startsExpr)) {
     node.delegate = false
     node.argument = null

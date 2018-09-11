@@ -7,9 +7,11 @@ import {types as tt} from "./tokentype"
 import {lineBreak} from "./whitespace"
 
 export class TokContext {
-  constructor(token, isExpr, generator) {
+  constructor(token, isExpr, preserveSpace, override, generator) {
     this.token = token
     this.isExpr = !!isExpr
+    this.preserveSpace = !!preserveSpace
+    this.override = override
     this.generator = !!generator
   }
 }
@@ -20,11 +22,11 @@ export const types = {
   b_tmpl: new TokContext("${", false),
   p_stat: new TokContext("(", false),
   p_expr: new TokContext("(", true),
-  q_tmpl: new TokContext("`", true),
+  q_tmpl: new TokContext("`", true, true, p => p.tryReadTemplateToken()),
   f_stat: new TokContext("function", false),
   f_expr: new TokContext("function", true),
-  f_expr_gen: new TokContext("function", true, true),
-  f_gen: new TokContext("function", false, true)
+  f_expr_gen: new TokContext("function", true, false, null, true),
+  f_gen: new TokContext("function", false, false, null, true)
 }
 
 const pp = Parser.prototype
@@ -71,10 +73,6 @@ pp.updateContext = function(prevType) {
     update.call(this, prevType)
   else
     this.exprAllowed = type.beforeExpr
-}
-
-pp.curContext = function() {
-  return this.context[this.context.length - 1]
 }
 
 // Token-specific context update code

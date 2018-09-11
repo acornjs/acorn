@@ -40,17 +40,8 @@ pp.next = function() {
 }
 
 pp.getToken = function() {
-  let prevType = this.type
   this.next()
-  this.updateContext(prevType)
   return new Token(this)
-}
-
-pp.turnSlashIntoRegexp = function() {
-  if (this.type === tt.slash || this.type === tt.assign && this.value === "/=") {
-    this.pos = this.start + 1
-    this.readRegexp()
-  }
 }
 
 // If we're in an ES6 environment, make parsers iterable
@@ -67,17 +58,25 @@ if (typeof Symbol !== "undefined")
     }
   }
 
+// Toggle strict mode. Re-reads the next number or string to please
+// pedantic tests (`"use strict"; 010;` should fail).
+
+pp.curContext = function() {
+  return this.context[this.context.length - 1]
+}
+
 // Read a single token, updating the parser object's token-related
 // properties.
 
 pp.nextToken = function() {
-  if (!this.inTemplate) this.skipSpace()
+  let curContext = this.curContext()
+  if (!curContext || !curContext.preserveSpace) this.skipSpace()
 
   this.start = this.pos
   if (this.options.locations) this.startLoc = this.curPosition()
   if (this.pos >= this.input.length) return this.finishToken(tt.eof)
 
-  if (this.inTemplate) this.tryReadTemplateToken()
+  if (curContext.override) return curContext.override(this)
   else this.readToken(this.fullCharCodeAtPos())
 }
 
@@ -178,8 +177,11 @@ pp.skipSpace = function() {
 pp.finishToken = function(type, val) {
   this.end = this.pos
   if (this.options.locations) this.endLoc = this.curPosition()
+  let prevType = this.type
   this.type = type
   this.value = val
+
+  this.updateContext(prevType)
 }
 
 // ### Token reading

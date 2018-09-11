@@ -61,8 +61,7 @@ export class Parser {
     // context to predict whether a regular expression is allowed in a
     // given position.
     this.context = this.initialContext()
-    this.inTemplate = false
-    this.exprAllowed = false
+    this.exprAllowed = true
 
     // Figure out if it's a module code.
     this.inModule = options.sourceType === "module"
@@ -115,8 +114,6 @@ export class Parser {
   }
 
   static tokenizer(input, options) {
-    let parser = new this(options, input)
-    parser.exprAllowed = true
-    return parser
+    return new this(options, input)
   }
 }

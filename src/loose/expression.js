@@ -340,16 +340,13 @@ lp.parseTemplateElement = function() {
 
 lp.parseTemplate = function() {
   let node = this.startNode()
-  this.toks.inTemplate = true
   this.next()
   node.expressions = []
   let curElt = this.parseTemplateElement()
   node.quasis = [curElt]
   while (!curElt.tail) {
-    this.toks.inTemplate = false
     this.next()
     node.expressions.push(this.parseExpression())
-    this.toks.inTemplate = true
     if (this.expect(tt.braceR)) {
       curElt = this.parseTemplateElement()
     } else {
@@ -360,7 +357,6 @@ lp.parseTemplate = function() {
     }
     node.quasis.push(curElt)
   }
-  this.toks.inTemplate = false
   this.expect(tt.backQuote)
   return this.finishNode(node, "TemplateLiteral")
 }
