@@ -1,13 +1,4 @@
 {
-  "name": "acorn",
-  "description": "ECMAScript parser",
-  "homepage": "https://github.com/acornjs/acorn",
-  "main": "dist/acorn.js",
-  "module": "dist/acorn.es.js",
-  "version": "5.7.3",
-  "engines": {
-    "node": ">=0.4.0"
-  },
   "maintainers": [
     {
       "name": "Marijn Haverbeke",
@@ -35,14 +26,11 @@
     "pretest": "npm run build:main && npm run build:loose",
     "test:test262": "node bin/run_test262.js",
     "build": "npm run build:main && npm run build:walk && npm run build:loose && npm run build:bin",
-    "build:main": "rollup -c rollup/config.main.js",
-    "build:walk": "rollup -c rollup/config.walk.js",
-    "build:loose": "rollup -c rollup/config.loose.js && rollup -c rollup/config.loose_es.js",
-    "build:bin": "rollup -c rollup/config.bin.js",
-    "lint": "eslint src/"
-  },
-  "bin": {
-    "acorn": "./bin/acorn"
+    "build:main": "rollup -c acorn/rollup.config.js",
+    "build:walk": "rollup -c acorn-walk/rollup.config.js",
+    "build:loose": "rollup -c acorn-loose/rollup.config.js",
+    "build:bin": "rollup -c acorn/rollup.config.bin.js",
+    "lint": "eslint acorn/src/ acorn-walk/src/ acorn-loose/src/"
   },
   "devDependencies": {
     "eslint": "^4.10.0",
@@ -56,5 +44,7 @@
     "test262": "git+https://github.com/tc39/test262.git#3bfad28cc302fd4455badcfcbca7c5bb7ce41a72",
     "test262-parser-runner": "^0.4.0",
     "unicode-11.0.0": "^0.7.7"
-  }
+  },
+  "workspaces": ["acorn", "acorn-loose", "acorn-walk"],
+  "private": true
 }

@@ -14,8 +14,8 @@
   require("./tests-regexp-2018.js");
   require("./tests-json-superset.js");
   require("./tests-optional-catch-binding.js");
-  var acorn = require("../dist/acorn")
-  var acorn_loose = require("../dist/acorn_loose")
+  var acorn = require("../acorn")
+  var acorn_loose = require("../acorn-loose")
 
   var htmlLog = typeof document === "object" && document.getElementById('log');
   var htmlGroup = htmlLog;

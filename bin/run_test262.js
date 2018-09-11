@@ -1,7 +1,7 @@
 const fs = require("fs")
 const path = require("path")
 const run = require("test262-parser-runner")
-const parse = require("..").parse
+const parse = require("../acorn").parse
 
 const unsupportedFeatures = [
   "BigInt",
