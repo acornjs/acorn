@@ -1,10 +1,10 @@
-import {tokenizer, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from "../index"
+import {Parser, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from "../index"
 
 function noop() {}
 
 export class LooseParser {
   constructor(input, options = {}) {
-    this.toks = tokenizer(input, options)
+    this.toks = this.constructor.BaseParser.tokenizer(input, options)
     this.options = this.toks.options
     this.input = this.toks.input
     this.tok = this.last = {type: tt.eof, start: 0, end: 0}
@@ -165,3 +165,6 @@ export class LooseParser {
     return new this(input, options).parse()
   }
 }
+
+// Allows plugins to extend the base parser / tokenizer used
+LooseParser.BaseParser = Parser
