@@ -8,11 +8,10 @@ matrix:
   - node_js: '6'
   - node_js: '7'
   - node_js: '8'
-  - node_js: '8'
     env: TEST_SUITE=test262
 script: >
   if [ "$TEST_SUITE" != "test262" ]; then
-    npm test
+    yarn install
   else
-    npm run test:test262
+    yarn install && yarn run test:test262
   fi
