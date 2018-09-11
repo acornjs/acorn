@@ -535,7 +535,7 @@ pp.parseClass = function(node, isStatement) {
   classBody.body = []
   this.expect(tt.braceL)
   while (!this.eat(tt.braceR)) {
-    const element = this.parseClassElement(classBody)
+    const element = this.parseClassElement()
     if (element) {
       classBody.body.push(element)
       if (element.type === "MethodDefinition" && element.kind === "constructor") {
@@ -548,7 +548,7 @@ pp.parseClass = function(node, isStatement) {
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
-pp.parseClassElement = function(classBody) {
+pp.parseClassElement = function() {
   if (this.eat(tt.semi)) return null
 
   let method = this.startNode()
