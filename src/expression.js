@@ -104,7 +104,12 @@ pp.parseExpression = function(noIn, refDestructuringErrors) {
 // operators like `+=`.
 
 pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
-  if (this.inGenerator && this.isContextual("yield")) return this.parseYield()
+  if (this.isContextual("yield")) {
+    if (this.inGenerator) return this.parseYield()
+    // The tokenizer will assume an expression is allowed after
+    // `yield`, but this isn't that kind of yield
+    else this.exprAllowed = false
+  }
 
   let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1
   if (refDestructuringErrors) {

@@ -16247,3 +16247,5 @@ test("function f() { var x; function x() {} }", {}, {ecmaVersion: 6, sourceType:
 test("a.of / 2", {}, {ecmaVersion: 6})
 
 test("let x = 1; x = 2", {}, {ecmaVersion: 6})
+
+test("function *f2() { () => yield / 1 }", {}, {ecmaVersion: 6})
