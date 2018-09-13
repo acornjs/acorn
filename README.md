@@ -77,7 +77,7 @@ export its plugin function as its default value or, if it takes
 configuration parameters, to export a constructor function that
 creates the plugin function.
 
-This is what a trivial plugin coul, which adds a bit of code to the
+This is what a trivial plugin, which adds a bit of code to the
 `readToken` method, might look like:
 
 ```javascript
