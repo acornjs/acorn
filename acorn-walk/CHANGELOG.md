@@ -1,3 +1,9 @@
+## 6.0.1 (2018-09-14)
+
+### Bug fixes
+
+Fix bad "main" field in package.json.
+
 ## 6.0.0 (2018-09-14)
 
 ### Breaking changes
