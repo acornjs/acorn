@@ -6,6 +6,8 @@ This module has been moved into its own package, `acorn-loose`.
 
 Plugins work differently, and will have to be rewritten to work with this version.
 
+The `parse_dammit` function is now simply called `parse`.
+
 ## 5.1.0 (2017-07-05)
 
 ### Bug fixes
