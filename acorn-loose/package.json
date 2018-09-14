@@ -29,5 +29,8 @@
     "type": "git",
     "url": "https://github.com/acornjs/acorn.git"
   },
+  "scripts": {
+    "prepare": "cd ..; npm run build:loose"
+  },
   "license": "MIT"
 }
