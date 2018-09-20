@@ -1,6 +1,6 @@
-import {LooseParser} from "./state"
-import {isDummy} from "./parseutil"
-import {getLineInfo, tokTypes as tt} from "acorn"
+import {LooseParser} from "./state.mjs"
+import {isDummy} from "./parseutil.mjs"
+import {getLineInfo, tokTypes as tt} from "../../acorn/src/index.mjs"
 
 const lp = LooseParser.prototype
 

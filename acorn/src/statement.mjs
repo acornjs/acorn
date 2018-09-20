@@ -1,10 +1,10 @@
-import {types as tt} from "./tokentype"
-import {Parser} from "./state"
-import {lineBreak, skipWhiteSpace} from "./whitespace"
-import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier"
-import {has} from "./util"
-import {DestructuringErrors} from "./parseutil"
-import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION} from "./scopeflags"
+import {types as tt} from "./tokentype.mjs"
+import {Parser} from "./state.mjs"
+import {lineBreak, skipWhiteSpace} from "./whitespace.mjs"
+import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier.mjs"
+import {has} from "./util.mjs"
+import {DestructuringErrors} from "./parseutil.mjs"
+import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION} from "./scopeflags.mjs"
 
 const pp = Parser.prototype
 

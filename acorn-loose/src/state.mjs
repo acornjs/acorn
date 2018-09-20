@@ -1,4 +1,4 @@
-import {Parser, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from "acorn"
+import {Parser, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from "../../acorn/src/index.mjs"
 
 function noop() {}
 

@@ -1,17 +1,13 @@
 export as namespace acorn
 export = acorn
-
-declare namespace acorn {
+ declare namespace acorn {
   function parse(input: string, options?: Options): Node
-
-  function parseExpressionAt(input: string, pos?: number, options?: Options): Node
-
-  function tokenizer(input: string, options?: Options): {
+   function parseExpressionAt(input: string, pos?: number, options?: Options): Node
+   function tokenizer(input: string, options?: Options): {
     getToken(): Token
     [Symbol.iterator](): Iterator<Token>
   }
-
-  interface Options {
+   interface Options {
     ecmaVersion?: 3 | 5 | 6 | 7 | 8 | 9 | 10 | 2015 | 2016 | 2017 | 2018 | 2019
     sourceType?: 'script' | 'module'
     onInsertedSemicolon?: (lastTokEnd: number, lastTokEndLoc?: Position) => void
@@ -32,8 +28,7 @@ declare namespace acorn {
     directSourceFile?: string
     preserveParens?: boolean
   }
-
-  class Parser {
+   class Parser {
     constructor(options: Options, input: string, startPos?: number)
     parse(): Node
     static parse(input: string, options?: Options): Node
@@ -44,23 +39,17 @@ declare namespace acorn {
     }
     static extend(...plugins: Constructor<Parser>[]): Constructor<Parser>
   }
-
-  type Constructor<T> = new (...args: any[]) => T
-
-  interface Position { line: number; column: number; offset: number }
-
-  const defaultOptions: Options
-
-  function getLineInfo(input: string, offset: number): Position
-
-  class SourceLocation {
+   type Constructor<T> = new (...args: any[]) => T
+   interface Position { line: number; column: number; offset: number }
+   const defaultOptions: Options
+   function getLineInfo(input: string, offset: number): Position
+   class SourceLocation {
     start: Position
     end: Position
     source?: string | null
     constructor(p: Parser, start: Position, end: Position)
   }
-
-  class Node {
+   class Node {
     type: string
     start: number
     end: number
@@ -69,8 +58,7 @@ declare namespace acorn {
     range?: [number, number]
     constructor(parser: Parser, pos: number, loc?: SourceLocation)
   }
-
-  class TokenType {
+   class TokenType {
     label: string
     keyword: string
     beforeExpr: boolean
@@ -83,8 +71,7 @@ declare namespace acorn {
     updateContext?: (prevType: TokenType) => void
     constructor(label: string, conf?: any)
   }
-
-  const tokTypes: {
+   const tokTypes: {
     num: TokenType
     regexp: TokenType
     string: TokenType
@@ -159,12 +146,10 @@ declare namespace acorn {
     _void: TokenType
     _delete: TokenType
   }
-
-  class TokContext {
+   class TokContext {
     constructor(token: string, isExpr: boolean, preserveSpace: boolean, override?: (p: Parser) => void)
   }
-
-  const tokContexts: {
+   const tokContexts: {
     b_stat: TokContext
     b_expr: TokContext
     b_tmpl: TokContext
@@ -173,15 +158,11 @@ declare namespace acorn {
     q_tmpl: TokContext
     f_expr: TokContext
   }
-
-  function isIdentifierStart(code: number, astral?: boolean): boolean
-
-  function isIdentifierChar(code: number, astral?: boolean): boolean
-
-  interface AbstractToken {
+   function isIdentifierStart(code: number, astral?: boolean): boolean
+   function isIdentifierChar(code: number, astral?: boolean): boolean
+   interface AbstractToken {
   }
-
-  interface Comment extends AbstractToken {
+   interface Comment extends AbstractToken {
     type: string
     value: string
     start: number
@@ -189,8 +170,7 @@ declare namespace acorn {
     loc?: SourceLocation
     range?: [number, number]
   }
-
-  class Token {
+   class Token {
     type: TokenType
     value: any
     start: number
@@ -199,12 +179,8 @@ declare namespace acorn {
     range?: [number, number]
     constructor(p: Parser)
   }
-
-  function isNewLine(code: number): boolean
-
-  const lineBreak: RegExp
-
-  const lineBreakG: RegExp
-
-  const version: string
+   function isNewLine(code: number): boolean
+   const lineBreak: RegExp
+   const lineBreakG: RegExp
+   const version: string
 }

@@ -1,4 +1,4 @@
-import {lineBreakG} from "./whitespace"
+import {lineBreakG} from "./whitespace.mjs"
 
 // These are used when `options.locations` is on, for the
 // `startLoc` and `endLoc` properties.

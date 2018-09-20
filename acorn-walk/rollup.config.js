@@ -1,7 +1,7 @@
 import buble from "rollup-plugin-buble"
 
 export default {
-  entry: "acorn-walk/src/index.js",
+  entry: "acorn-walk/src/index.mjs",
   moduleName: "acorn.walk",
   plugins: [
     buble({transforms: {dangerousForOf: true}})

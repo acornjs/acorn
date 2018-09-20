@@ -1,6 +1,6 @@
-import {types as tt} from "./tokentype"
-import {Parser} from "./state"
-import {lineBreak, skipWhiteSpace} from "./whitespace"
+import {types as tt} from "./tokentype.mjs"
+import {Parser} from "./state.mjs"
+import {lineBreak, skipWhiteSpace} from "./whitespace.mjs"
 
 const pp = Parser.prototype
 

@@ -1,6 +1,6 @@
-import {isIdentifierStart, isIdentifierChar} from "./identifier.js"
-import {Parser} from "./state.js"
-import UNICODE_PROPERTY_VALUES from "./unicode-property-data.js"
+import {isIdentifierStart, isIdentifierChar} from "./identifier.mjs"
+import {Parser} from "./state.mjs"
+import UNICODE_PROPERTY_VALUES from "./unicode-property-data.mjs"
 
 const pp = Parser.prototype
 

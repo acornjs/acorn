@@ -29,13 +29,13 @@
 // invasive changes and simplifications without creating a complicated
 // tangle.
 
-import {defaultOptions} from "acorn"
-import {LooseParser} from "./state"
-import "./tokenize"
-import "./statement"
-import "./expression"
+import {defaultOptions} from "../../acorn/src/index.mjs"
+import {LooseParser} from "./state.mjs"
+import "./tokenize.mjs"
+import "./statement.mjs"
+import "./expression.mjs"
 
-export {LooseParser} from "./state"
+export {LooseParser} from "./state.mjs"
 
 defaultOptions.tabSize = 4
 
