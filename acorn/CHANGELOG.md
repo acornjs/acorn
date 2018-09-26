@@ -1,3 +1,9 @@
+## 6.0.2 (2018-09-26)
+
+### Bug fixes
+
+Fix bug where default expressions could fail to parse inside an object destructuring assignment expression.
+
 ## 6.0.1 (2018-09-14)
 
 ### Bug fixes
