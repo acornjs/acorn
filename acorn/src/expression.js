@@ -111,11 +111,12 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     else this.exprAllowed = false
   }
 
-  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1
+  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1, oldShorthandAssign = -1
   if (refDestructuringErrors) {
     oldParenAssign = refDestructuringErrors.parenthesizedAssign
     oldTrailingComma = refDestructuringErrors.trailingComma
-    refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = -1
+    oldShorthandAssign = refDestructuringErrors.shorthandAssign;
+    refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.shorthandAssign = -1
   } else {
     refDestructuringErrors = new DestructuringErrors
     ownDestructuringErrors = true
@@ -141,6 +142,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   }
   if (oldParenAssign > -1) refDestructuringErrors.parenthesizedAssign = oldParenAssign
   if (oldTrailingComma > -1) refDestructuringErrors.trailingComma = oldTrailingComma
+  if (oldShorthandAssign > -1) refDestructuringErrors.shorthandAssign = oldShorthandAssign
   return left
 }
 

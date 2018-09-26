@@ -42,10 +42,8 @@ declare namespace acorn {
       getToken(): Token
       [Symbol.iterator](): Iterator<Token>
     }
-    static extend(...plugins: Constructor<Parser>[]): Constructor<Parser>
+    static extend(...plugins: (typeof Parser)[]): typeof Parser
   }
-
-  type Constructor<T> = new (...args: any[]) => T
 
   interface Position { line: number; column: number; offset: number }
 
