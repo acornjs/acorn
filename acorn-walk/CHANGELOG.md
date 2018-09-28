@@ -1,3 +1,9 @@
+## 6.1.0 (2018-09-28)
+
+### New features
+
+The walker now walks `TemplateElement` nodes.
+
 ## 6.0.1 (2018-09-14)
 
 ### Bug fixes
