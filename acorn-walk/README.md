@@ -50,7 +50,7 @@ scope at each point in the tree.)
 
 ```js
 const acorn = require("acorn")
-const walk = require("acorn/dist/walk")
+const walk = require("acorn-walk")
 
 walk.simple(acorn.parse("let x = 10"), {
   Literal(node) {
@@ -65,7 +65,7 @@ and passing the array to the callbacks as a third parameter.
 
 ```js
 const acorn = require("acorn")
-const walk = require("acorn/dist/walk")
+const walk = require("acorn-walk")
 
 walk.ancestor(acorn.parse("foo('hi')"), {
   Literal(_, ancestors) {
@@ -100,7 +100,7 @@ parameter.
 
 ```js
 const acorn = require("acorn")
-const walk = require("acorn/dist/walk")
+const walk = require("acorn-walk")
 
 walk.full(acorn.parse("1 + 1"), node => {
   console.log(`There's a ${node.type} node at ${node.ch}`)
