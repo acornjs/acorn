@@ -115,7 +115,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   if (refDestructuringErrors) {
     oldParenAssign = refDestructuringErrors.parenthesizedAssign
     oldTrailingComma = refDestructuringErrors.trailingComma
-    oldShorthandAssign = refDestructuringErrors.shorthandAssign;
+    oldShorthandAssign = refDestructuringErrors.shorthandAssign
     refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.shorthandAssign = -1
   } else {
     refDestructuringErrors = new DestructuringErrors
@@ -307,10 +307,12 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   let node, canBeArrow = this.potentialArrowAt === this.start
   switch (this.type) {
   case tt._super:
-    if (!this.inFunction)
-      this.raise(this.start, "'super' outside of function or class")
+    if (!this.allowSuper)
+      this.raise(this.start, "'super' keyword outside a method")
     node = this.startNode()
     this.next()
+    if (this.type === tt.parenL && !this.allowDirectSuper)
+      this.raise(node.start, "super() call outside constructor of a subclass")
     // The `super` keyword can appear at below:
     // SuperProperty:
     //     super [ Expression ]
@@ -696,8 +698,9 @@ pp.initFunction = function(node) {
 
 // Parse object or class method.
 
-pp.parseMethod = function(isGenerator, isAsync) {
+pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
   let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+  let oldAllowDirectSuper = this.allowDirectSuper, oldAllowSuper = this.allowSuper
 
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
@@ -707,6 +710,8 @@ pp.parseMethod = function(isGenerator, isAsync) {
 
   this.yieldPos = 0
   this.awaitPos = 0
+  this.allowDirectSuper = allowDirectSuper
+  this.allowSuper = true
   this.enterScope(functionFlags(isAsync, node.generator))
 
   this.expect(tt.parenL)
@@ -716,6 +721,8 @@ pp.parseMethod = function(isGenerator, isAsync) {
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
+  this.allowDirectSuper = oldAllowDirectSuper
+  this.allowSuper = oldAllowSuper
   return this.finishNode(node, "FunctionExpression")
 }
 
@@ -730,6 +737,7 @@ pp.parseArrowExpression = function(node, params, isAsync) {
 
   this.yieldPos = 0
   this.awaitPos = 0
+  // Arrow functions inherit the treatment of the super keyword.
 
   node.params = this.toAssignableList(params, true)
   this.parseFunctionBody(node, true)

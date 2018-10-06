@@ -83,6 +83,11 @@ export class Parser {
     this.scopeStack = []
     this.enterScope(SCOPE_TOP)
 
+    // Tracking if super() is allowed in the current context.
+    this.allowDirectSuper = false
+    // Tracking if super.property() is allowed in the current context.
+    this.allowSuper = false
+
     // For RegExp validation
     this.regexpState = null
   }

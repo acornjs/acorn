@@ -501,8 +501,11 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
   }
 
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+  let oldAllowDirectSuper = this.allowDirectSuper, oldAllowSuper = this.allowSuper
   this.yieldPos = 0
   this.awaitPos = 0
+  this.allowDirectSuper = false
+  this.allowSuper = false
   this.enterScope(functionFlags(node.async, node.generator))
 
   if (!(statement & FUNC_STATEMENT))
@@ -513,6 +516,8 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
+  this.allowDirectSuper = oldAllowDirectSuper
+  this.allowSuper = oldAllowSuper
   return this.finishNode(node, (statement & FUNC_STATEMENT) ? "FunctionDeclaration" : "FunctionExpression")
 }
 
@@ -535,7 +540,7 @@ pp.parseClass = function(node, isStatement) {
   classBody.body = []
   this.expect(tt.braceL)
   while (!this.eat(tt.braceR)) {
-    const element = this.parseClassElement()
+    const element = this.parseClassElement(node.superClass !== null)
     if (element) {
       classBody.body.push(element)
       if (element.type === "MethodDefinition" && element.kind === "constructor") {
@@ -548,7 +553,7 @@ pp.parseClass = function(node, isStatement) {
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
-pp.parseClassElement = function() {
+pp.parseClassElement = function(constructorAllowsSuper) {
   if (this.eat(tt.semi)) return null
 
   let method = this.startNode()
@@ -580,16 +585,18 @@ pp.parseClassElement = function() {
   }
   if (!method.key) this.parsePropertyName(method)
   let {key} = method
+  let allowsDirectSuper = false
   if (!method.computed && !method.static && (key.type === "Identifier" && key.name === "constructor" ||
       key.type === "Literal" && key.value === "constructor")) {
     if (method.kind !== "method") this.raise(key.start, "Constructor can't have get/set modifier")
     if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
     if (isAsync) this.raise(key.start, "Constructor can't be an async method")
     method.kind = "constructor"
+    allowsDirectSuper = constructorAllowsSuper
   } else if (method.static && key.type === "Identifier" && key.name === "prototype") {
     this.raise(key.start, "Classes may not have a static property named prototype")
   }
-  this.parseClassMethod(method, isGenerator, isAsync)
+  this.parseClassMethod(method, isGenerator, isAsync, allowsDirectSuper)
   if (method.kind === "get" && method.value.params.length !== 0)
     this.raiseRecoverable(method.value.start, "getter should have no params")
   if (method.kind === "set" && method.value.params.length !== 1)
@@ -599,8 +606,8 @@ pp.parseClassElement = function() {
   return method
 }
 
-pp.parseClassMethod = function(method, isGenerator, isAsync) {
-  method.value = this.parseMethod(isGenerator, isAsync)
+pp.parseClassMethod = function(method, isGenerator, isAsync, allowsDirectSuper) {
+  method.value = this.parseMethod(isGenerator, isAsync, allowsDirectSuper)
   return this.finishNode(method, "MethodDefinition")
 }
 
