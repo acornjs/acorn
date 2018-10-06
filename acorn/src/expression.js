@@ -20,7 +20,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {DestructuringErrors} from "./parseutil"
 import {lineBreak} from "./whitespace"
-import {functionFlags, SCOPE_ARROW, BIND_OUTSIDE, BIND_VAR} from "./scopeflags"
+import {functionFlags, SCOPE_ARROW, SCOPE_SUPER, SCOPE_DIRECT_SUPER, BIND_OUTSIDE, BIND_VAR} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -700,7 +700,6 @@ pp.initFunction = function(node) {
 
 pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
   let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
-  let oldAllowDirectSuper = this.allowDirectSuper, oldAllowSuper = this.allowSuper
 
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
@@ -710,9 +709,7 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
 
   this.yieldPos = 0
   this.awaitPos = 0
-  this.allowDirectSuper = allowDirectSuper
-  this.allowSuper = true
-  this.enterScope(functionFlags(isAsync, node.generator))
+  this.enterScope(functionFlags(isAsync, node.generator) | SCOPE_SUPER | (allowDirectSuper ? SCOPE_DIRECT_SUPER : 0))
 
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
@@ -721,8 +718,6 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
-  this.allowDirectSuper = oldAllowDirectSuper
-  this.allowSuper = oldAllowSuper
   return this.finishNode(node, "FunctionExpression")
 }
 
@@ -737,7 +732,6 @@ pp.parseArrowExpression = function(node, params, isAsync) {
 
   this.yieldPos = 0
   this.awaitPos = 0
-  // Arrow functions inherit the treatment of the super keyword.
 
   node.params = this.toAssignableList(params, true)
   this.parseFunctionBody(node, true)

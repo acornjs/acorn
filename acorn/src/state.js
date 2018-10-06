@@ -2,7 +2,7 @@ import {reservedWords, keywords} from "./identifier"
 import {types as tt} from "./tokentype"
 import {lineBreak} from "./whitespace"
 import {getOptions} from "./options"
-import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR} from "./scopeflags"
+import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER} from "./scopeflags"
 
 function keywordRegexp(words) {
   return new RegExp("^(?:" + words.replace(/ /g, "|") + ")$")
@@ -83,11 +83,6 @@ export class Parser {
     this.scopeStack = []
     this.enterScope(SCOPE_TOP)
 
-    // Tracking if super() is allowed in the current context.
-    this.allowDirectSuper = false
-    // Tracking if super.property() is allowed in the current context.
-    this.allowSuper = false
-
     // For RegExp validation
     this.regexpState = null
   }
@@ -101,8 +96,10 @@ export class Parser {
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
   get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 }
   get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 }
+  get allowSuper() { return (this.currentThisScope().flags & SCOPE_SUPER) > 0 }
+  get allowDirectSuper() { return (this.currentThisScope().flags & SCOPE_DIRECT_SUPER) > 0 }
 
-  // Switch to a getter at the next major bump.
+  // Switch to a getter for 7.0.0.
   inNonArrowFunction() { return (this.currentThisScope().flags & SCOPE_FUNCTION) > 0 }
 
   static extend(...plugins) {

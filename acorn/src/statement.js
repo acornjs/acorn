@@ -501,11 +501,8 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
   }
 
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
-  let oldAllowDirectSuper = this.allowDirectSuper, oldAllowSuper = this.allowSuper
   this.yieldPos = 0
   this.awaitPos = 0
-  this.allowDirectSuper = false
-  this.allowSuper = false
   this.enterScope(functionFlags(node.async, node.generator))
 
   if (!(statement & FUNC_STATEMENT))
@@ -516,8 +513,6 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
-  this.allowDirectSuper = oldAllowDirectSuper
-  this.allowSuper = oldAllowSuper
   return this.finishNode(node, (statement & FUNC_STATEMENT) ? "FunctionDeclaration" : "FunctionExpression")
 }
 
