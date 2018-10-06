@@ -1,5 +1,5 @@
 import {Parser} from "./state"
-import {SCOPE_VAR, SCOPE_FUNCTION, SCOPE_ARROW, SCOPE_SIMPLE_CATCH, BIND_LEXICAL, BIND_SIMPLE_CATCH, BIND_FUNCTION} from "./scopeflags"
+import {SCOPE_VAR, SCOPE_ARROW, SCOPE_SIMPLE_CATCH, BIND_LEXICAL, BIND_SIMPLE_CATCH, BIND_FUNCTION} from "./scopeflags"
 
 const pp = Parser.prototype
 
