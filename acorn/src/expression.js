@@ -20,7 +20,7 @@ import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {DestructuringErrors} from "./parseutil"
 import {lineBreak} from "./whitespace"
-import {functionFlags, SCOPE_ARROW, BIND_OUTSIDE, BIND_VAR} from "./scopeflags"
+import {functionFlags, SCOPE_ARROW, SCOPE_SUPER, SCOPE_DIRECT_SUPER, BIND_OUTSIDE, BIND_VAR} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -115,7 +115,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   if (refDestructuringErrors) {
     oldParenAssign = refDestructuringErrors.parenthesizedAssign
     oldTrailingComma = refDestructuringErrors.trailingComma
-    oldShorthandAssign = refDestructuringErrors.shorthandAssign;
+    oldShorthandAssign = refDestructuringErrors.shorthandAssign
     refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.shorthandAssign = -1
   } else {
     refDestructuringErrors = new DestructuringErrors
@@ -307,10 +307,12 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   let node, canBeArrow = this.potentialArrowAt === this.start
   switch (this.type) {
   case tt._super:
-    if (!this.inFunction)
-      this.raise(this.start, "'super' outside of function or class")
+    if (!this.allowSuper)
+      this.raise(this.start, "'super' keyword outside a method")
     node = this.startNode()
     this.next()
+    if (this.type === tt.parenL && !this.allowDirectSuper)
+      this.raise(node.start, "super() call outside constructor of a subclass")
     // The `super` keyword can appear at below:
     // SuperProperty:
     //     super [ Expression ]
@@ -696,7 +698,7 @@ pp.initFunction = function(node) {
 
 // Parse object or class method.
 
-pp.parseMethod = function(isGenerator, isAsync) {
+pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
   let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
 
   this.initFunction(node)
@@ -707,7 +709,7 @@ pp.parseMethod = function(isGenerator, isAsync) {
 
   this.yieldPos = 0
   this.awaitPos = 0
-  this.enterScope(functionFlags(isAsync, node.generator))
+  this.enterScope(functionFlags(isAsync, node.generator) | SCOPE_SUPER | (allowDirectSuper ? SCOPE_DIRECT_SUPER : 0))
 
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)

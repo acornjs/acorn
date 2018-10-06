@@ -6,7 +6,9 @@ export const
     SCOPE_ASYNC = 4,
     SCOPE_GENERATOR = 8,
     SCOPE_ARROW = 16,
-    SCOPE_SIMPLE_CATCH = 32
+    SCOPE_SIMPLE_CATCH = 32,
+    SCOPE_SUPER = 64,
+    SCOPE_DIRECT_SUPER = 128
 
 export function functionFlags(async, generator) {
   return SCOPE_FUNCTION | (async ? SCOPE_ASYNC : 0) | (generator ? SCOPE_GENERATOR : 0)

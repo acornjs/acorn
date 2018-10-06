@@ -2953,6 +2953,117 @@ test("x = { set() { } }", {
   locations: true
 });
 
+test("x = { method() { super.a(); } }", {
+  type: "Program",
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line:1, column: 31}
+  },
+  body: [{
+    type: "ExpressionStatement",
+    expression: {
+      type: "AssignmentExpression",
+      loc: {
+        start: {line: 1, column: 0},
+        end: {line: 1, column: 31}
+      },
+      operator: "=",
+      left: {
+        type: "Identifier",
+        name: "x",
+        loc: {
+          start: {line: 1, column: 0},
+          end: {line: 1, column: 1}
+        }
+      },
+      right: {
+        type: "ObjectExpression",
+        loc: {
+          start: {line: 1, column: 4},
+          end: {line: 1, column: 31}
+        },
+        properties: [{
+          type: "Property",
+          loc: {
+            start: {line: 1, column: 6},
+            end: {line: 1, column: 29}
+          },
+          method: true,
+          shorthand: false,
+          computed: false,
+          key: {
+            type: "Identifier",
+            name: "method"
+          },
+          kind: "init",
+          value: {
+            type: "FunctionExpression",
+            loc: {
+              start: {line: 1, column: 12},
+              end: {line: 1, column: 29}
+            },
+            id: null,
+            expression: false,
+            generator: false,
+            params: [],
+            body: {
+              type: "BlockStatement",
+              loc: {
+                start: {line: 1, column: 15},
+                end: {line: 1, column: 29}
+              },
+              body: [{
+                type: "ExpressionStatement",
+                loc: {
+                  start: {line: 1, column: 17},
+                  end: {line: 1, column: 27},
+                },
+                expression: {
+                  type: "CallExpression",
+                  loc: {
+                    start: {line: 1, column: 17},
+                    end: {line: 1, column: 26}
+                  },
+                  callee: {
+                    type: "MemberExpression",
+                    loc: {
+                      start: {line: 1, column: 17},
+                      end: {line: 1, column: 24}
+                    },
+                    object: {
+                      type: "Super",
+                      loc: {
+                        start: {line: 1, column: 17},
+                        end: {line: 1, column: 22}
+                      }
+                    },
+                    property: {
+                      type: "Identifier",
+                      loc: {
+                        start: {line: 1, column: 23},
+                        end: {line: 1, column: 24}
+                      },
+                      name: "a"
+                    },
+                    computed: false
+                  },
+                  arguments: []
+                }
+              }]
+            }
+          }
+        }]
+      }
+    }
+  }],
+  sourceType: "script"
+}, {
+  ecmaVersion: 6,
+  locations: true
+});
+
+testFail("x = { method() { super(); } }", "super() call outside constructor of a subclass (1:17)", {ecmaVersion: 6});
+
 // Harmony: Object Literal Property Value Shorthand
 
 test("x = { y, z }", {
@@ -6924,7 +7035,9 @@ test("(class { *static() {} })", {
   "sourceType": "script"
 }, {ecmaVersion: 6});
 
-test("\"use strict\"; (class A {constructor() { super() }})", {
+testFail("(class A {constructor() { super() }})", "super() call outside constructor of a subclass (1:26)", {ecmaVersion: 6});
+
+test("\"use strict\"; (class A extends B {constructor() { super() }})", {
   type: "Program",
   body: [
     {
@@ -6955,7 +7068,14 @@ test("\"use strict\"; (class A {constructor() { super() }})", {
             end: {line: 1, column: 22}
           }
         },
-        superClass: null,
+        superClass: {
+          type: "Identifier",
+          name: "B",
+          loc: {
+            start: {line: 1, column: 31},
+            end: {line: 1, column: 32}
+          }
+        },
         body: {
           type: "ClassBody",
           body: [{
@@ -6965,8 +7085,8 @@ test("\"use strict\"; (class A {constructor() { super() }})", {
               type: "Identifier",
               name: "constructor",
               loc: {
-                start: {line: 1, column: 24},
-                end: {line: 1, column: 35}
+                start: {line: 1, column: 34},
+                end: {line: 1, column: 45}
               }
             },
             value: {
@@ -6982,65 +7102,71 @@ test("\"use strict\"; (class A {constructor() { super() }})", {
                     callee: {
                       type: "Super",
                       loc: {
-                        start: {line: 1, column: 40},
-                        end: {line: 1, column: 45}
+                        start: {line: 1, column: 50},
+                        end: {line: 1, column: 55}
                       }
                     },
                     arguments: [],
                     loc: {
-                      start: {line: 1, column: 40},
-                      end: {line: 1, column: 47}
+                      start: {line: 1, column: 50},
+                      end: {line: 1, column: 57}
                     }
                   },
                   loc: {
-                    start: {line: 1, column: 40},
-                    end: {line: 1, column: 47}
+                    start: {line: 1, column: 50},
+                    end: {line: 1, column: 57}
                   }
                 }],
                 loc: {
-                  start: {line: 1, column: 38},
-                  end: {line: 1, column: 49}
+                  start: {line: 1, column: 48},
+                  end: {line: 1, column: 59}
                 }
               },
               generator: false,
               expression: false,
               loc: {
-                start: {line: 1, column: 35},
-                end: {line: 1, column: 49}
+                start: {line: 1, column: 45},
+                end: {line: 1, column: 59}
               }
             },
             kind: "constructor",
             static: false,
             loc: {
-              start: {line: 1, column: 24},
-              end: {line: 1, column: 49}
+              start: {line: 1, column: 34},
+              end: {line: 1, column: 59}
             }
           }],
           loc: {
-            start: {line: 1, column: 23},
-            end: {line: 1, column: 50}
+            start: {line: 1, column: 33},
+            end: {line: 1, column: 60}
           }
         },
         loc: {
           start: {line: 1, column: 15},
-          end: {line: 1, column: 50}
+          end: {line: 1, column: 60}
         }
       },
       loc: {
         start: {line: 1, column: 14},
-        end: {line: 1, column: 51}
+        end: {line: 1, column: 61}
       }
     }
   ],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 1, column: 51}
+    end: {line: 1, column: 61}
   }
 }, {
   ecmaVersion: 6,
   ranges: true,
   locations: true
 });
+
+testFail("(class A extends B { constructor() { function f() { super() } } })", "'super' keyword outside a method (1:52)", {ecmaVersion: 6});
+
+test("(class A extends B { constructor() { (() => { super() }); } })", {}, {ecmaVersion: 6});
+
+testFail("(class A extends B { method() { super() } })", "super() call outside constructor of a subclass (1:32)", {ecmaVersion: 6});
 
 test("class A {'constructor'() {}}", {
   type: "Program",
@@ -7318,123 +7444,7 @@ test("class A {foo() {} static bar() {}}", {
   locations: true
 });
 
-test("\"use strict\"; (class A { static constructor() { super() }})", {
-  type: "Program",
-  body: [
-    {
-      type: "ExpressionStatement",
-      expression: {
-        type: "Literal",
-        value: "use strict",
-        raw: "\"use strict\"",
-        loc: {
-          start: {line: 1, column: 0},
-          end: {line: 1, column: 12}
-        }
-      },
-      loc: {
-        start: {line: 1, column: 0},
-        end: {line: 1, column: 13}
-      }
-    },
-    {
-      type: "ExpressionStatement",
-      expression: {
-        type: "ClassExpression",
-        id: {
-          type: "Identifier",
-          name: "A",
-          loc: {
-            start: {line: 1, column: 21},
-            end: {line: 1, column: 22}
-          }
-        },
-        superClass: null,
-        body: {
-          type: "ClassBody",
-          body: [{
-            type: "MethodDefinition",
-            computed: false,
-            key: {
-              type: "Identifier",
-              name: "constructor",
-              loc: {
-                start: {line: 1, column: 32},
-                end: {line: 1, column: 43}
-              }
-            },
-            value: {
-              type: "FunctionExpression",
-              id: null,
-              params: [],
-              body: {
-                type: "BlockStatement",
-                body: [{
-                  type: "ExpressionStatement",
-                  expression: {
-                    type: "CallExpression",
-                    callee: {
-                      type: "Super",
-                      loc: {
-                        start: {line: 1, column: 48},
-                        end: {line: 1, column: 53}
-                      }
-                    },
-                    arguments: [],
-                    loc: {
-                      start: {line: 1, column: 48},
-                      end: {line: 1, column: 55}
-                    }
-                  },
-                  loc: {
-                    start: {line: 1, column: 48},
-                    end: {line: 1, column: 55}
-                  }
-                }],
-                loc: {
-                  start: {line: 1, column: 46},
-                  end: {line: 1, column: 57}
-                }
-              },
-              generator: false,
-              expression: false,
-              loc: {
-                start: {line: 1, column: 43},
-                end: {line: 1, column: 57}
-              }
-            },
-            kind: "method",
-            static: true,
-            loc: {
-              start: {line: 1, column: 25},
-              end: {line: 1, column: 57}
-            }
-          }],
-          loc: {
-            start: {line: 1, column: 23},
-            end: {line: 1, column: 58}
-          }
-        },
-        loc: {
-          start: {line: 1, column: 15},
-          end: {line: 1, column: 58}
-        }
-      },
-      loc: {
-        start: {line: 1, column: 14},
-        end: {line: 1, column: 59}
-      }
-    }
-  ],
-  loc: {
-    start: {line: 1, column: 0},
-    end: {line: 1, column: 59}
-  }
-}, {
-  ecmaVersion: 6,
-  ranges: true,
-  locations: true
-});
+testFail("\"use strict\"; (class A extends B { static constructor() { super() }})", "super() call outside constructor of a subclass (1:58)", {ecmaVersion: 6, loose: false});
 
 test("class A { foo() {} bar() {}}", {
   type: "Program",
@@ -14611,7 +14621,7 @@ testFail("/\\u{110000}/u", "~", {ecmaVersion: 6});
 
 // https://github.com/acornjs/acorn/issues/279
 
-testFail("super", "'super' outside of function or class (1:0)", {ecmaVersion: 6});
+testFail("super", "'super' keyword outside a method (1:0)", {ecmaVersion: 6});
 
 // https://github.com/acornjs/acorn/issues/275
 
@@ -15903,7 +15913,11 @@ test("function *f() { yield\n{}/1/g\n}", {
   ]
 }, {ecmaVersion: 6})
 
-test("class B extends A { foo(a = super.foo()) { return a }}", {}, {ecmaVersion: 6})
+testFail("class B { constructor(a = super()) { return a }}", "super() call outside constructor of a subclass (1:26)", {ecmaVersion: 6})
+
+test("class B extends A { constructor(a = super()) { return a }}", {}, {ecmaVersion: 6})
+
+test("class B { foo(a = super.foo()) { return a }}", {}, {ecmaVersion: 6})
 
 testFail("function* wrap() {\n({a = yield b} = obj) => a\n}", "Yield expression cannot be a default value (2:6)", {ecmaVersion: 6})
 
