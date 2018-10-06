@@ -58,8 +58,10 @@ pp.currentVarScope = function() {
   }
 }
 
-pp.inNonArrowFunction = function() {
-  for (let i = this.scopeStack.length - 1; i >= 0; i--)
-    if (this.scopeStack[i].flags & SCOPE_FUNCTION && !(this.scopeStack[i].flags & SCOPE_ARROW)) return true
-  return false
+// Could be useful for `this`, `new.target`, `super()`, `super.property`, and `super[property]`.
+pp.currentThisScope = function() {
+  for (let i = this.scopeStack.length - 1;; i--) {
+    let scope = this.scopeStack[i]
+    if (scope.flags & SCOPE_VAR && !(scope.flags & SCOPE_ARROW)) return scope
+  }
 }

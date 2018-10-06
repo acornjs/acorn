@@ -102,6 +102,9 @@ export class Parser {
   get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 }
   get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 }
 
+  // Switch to a getter at the next major bump.
+  inNonArrowFunction() { return (this.currentThisScope().flags & SCOPE_FUNCTION) > 0 }
+
   static extend(...plugins) {
     let cls = this
     for (let i = 0; i < plugins.length; i++) cls = plugins[i](cls)
