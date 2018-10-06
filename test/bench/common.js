@@ -25,7 +25,7 @@ if (isWorker) {
 
 exports.parsers = {
   'Acorn (dev)'() {
-    const { parse } = req('../../dist/acorn.js', '');
+    const { parse } = req('../../acorn/dist/acorn.js', '');
     return {
       version: '',
       parse: s => parse(s, { locations: true })
