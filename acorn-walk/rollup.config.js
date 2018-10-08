@@ -9,6 +9,6 @@ export default {
   sourceMap: true,
   targets: [
     {dest: "acorn-walk/dist/walk.js", format: "umd"},
-    {dest: "acorn-walk/dist/walk.es.js", format: "es"}
+    {dest: "acorn-walk/dist/walk.mjs", format: "es"}
   ]
 }
