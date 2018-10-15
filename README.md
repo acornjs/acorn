@@ -39,7 +39,7 @@ npm install
 
 ## Plugin developments
 
-Acorn is designed support allow plugins which, within reasonable
+Acorn is designed to support plugins which can, within reasonable
 bounds, redefine the way the parser works. Plugins can add new token
 types and new tokenizer contexts (if necessary), and extend methods in
 the parser object. This is not a clean, elegant API—using it requires
