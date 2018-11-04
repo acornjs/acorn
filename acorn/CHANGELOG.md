@@ -1,3 +1,11 @@
+## 6.0.3 (2018-11-04)
+
+### Bug fixes
+
+Fix bug in tokenizing an expression-less return followed by a function followed by a regular expression.
+
+Remove stray symlink in the package tarball.
+
 ## 6.0.2 (2018-09-26)
 
 ### Bug fixes
