@@ -23,7 +23,7 @@
   "scripts": {
     "prepare": "npm run test",
     "test": "npm run link && node test/run.js && node test/lint.js",
-    "link": "mkdir -p acorn-loose/node_modules && ln -s ../../acorn acorn-loose/node_modules/acorn",
+    "link": "mkdir -p acorn-loose/node_modules && cd acorn-loose/node_modules && ln -sf ../../acorn .",
     "pretest": "npm run build:main && npm run build:loose",
     "test:test262": "node bin/run_test262.js",
     "build": "npm run build:main && npm run build:walk && npm run build:loose && npm run build:bin",
