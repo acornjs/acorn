@@ -26839,6 +26839,7 @@ test("foo: function x() {} /regexp/", {});
 test("x = {foo: function x() {} / divide}", {});
 test("foo; function f() {} /regexp/", {});
 test("{function f() {} /regexp/}", {});
+test("function fn() {return\nfunction foo() {}\n/42/}", {});
 
 test("{}/=/", {
   type: "Program",

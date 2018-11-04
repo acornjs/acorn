@@ -111,6 +111,7 @@ tt.incDec.updateContext = function() {
 
 tt._function.updateContext = tt._class.updateContext = function(prevType) {
   if (prevType.beforeExpr && prevType !== tt.semi && prevType !== tt._else &&
+      !(prevType === tt._return && lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) &&
       !((prevType === tt.colon || prevType === tt.braceL) && this.curContext() === types.b_stat))
     this.context.push(types.f_expr)
   else
