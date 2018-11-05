@@ -51,7 +51,7 @@ pp.braceIsBlock = function(prevType) {
     return true
   if (prevType === tt.braceL)
     return parent === types.b_stat
-  if (prevType === tt._var || prevType === tt.name)
+  if (prevType === tt._var || prevType === tt._const || prevType === tt.name)
     return false
   return !this.exprAllowed
 }

@@ -16058,6 +16058,8 @@ test("for (var {a} of /b/) {}", {}, {ecmaVersion: 6})
 
 test("for (let {a} of /b/) {}", {}, {ecmaVersion: 6})
 
+test("for (const {a} of /b/) {}", {}, {ecmaVersion: 6})
+
 test("function* bar() { yield /re/ }", {}, {ecmaVersion: 6})
 
 test("function* bar() { yield class {} }", {}, {ecmaVersion: 6})
