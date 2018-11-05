@@ -1,3 +1,9 @@
+## 6.0.4 (2018-11-05)
+
+### Bug fixes
+
+Further improvements to tokenizing regular expressions in corner cases.
+
 ## 6.0.3 (2018-11-04)
 
 ### Bug fixes
