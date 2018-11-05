@@ -304,6 +304,10 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
 // or `{}`.
 
 pp.parseExprAtom = function(refDestructuringErrors) {
+  // If a division operator appears in an expression position, the
+  // tokenizer got confused, and we force it to read a regexp instead.
+  if (this.type === tt.slash) this.readRegexp()
+
   let node, canBeArrow = this.potentialArrowAt === this.start
   switch (this.type) {
   case tt._super:
