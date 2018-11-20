@@ -11,6 +11,6 @@ export default {
     {dest: "acorn-loose/dist/acorn-loose.js", format: "umd"},
     {dest: "acorn-loose/dist/acorn-loose.mjs", format: "es"}
   ],
-  external: function (id) { return !/^[\.\/]/.test(id) },
+  external: ["acorn"],
   globals: {acorn: "acorn"}
 }
