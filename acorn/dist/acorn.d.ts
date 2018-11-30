@@ -43,7 +43,7 @@ declare namespace acorn {
       getToken(): Token
       [Symbol.iterator](): Iterator<Token>
     }
-    static extend(...plugins: (typeof Parser)[]): typeof Parser
+    static extend(...plugins: ((BaseParser: typeof Parser) => typeof Parser)[]): typeof Parser
   }
 
   interface Position { line: number; column: number; offset: number }
