@@ -37,6 +37,7 @@ pp.isLet = function() {
   skipWhiteSpace.lastIndex = this.pos
   let skip = skipWhiteSpace.exec(this.input)
   let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
+  if (lineBreak.test(this.input.slice(this.end, next))) return false
   if (nextCh === 91 || nextCh === 123) return true // '{' and '['
   if (isIdentifierStart(nextCh, true)) {
     let pos = next + 1

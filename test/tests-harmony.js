@@ -13217,6 +13217,8 @@ test("var let = 1", {
 
 testFail("'use strict'; let + 1", "The keyword 'let' is reserved (1:14)", {ecmaVersion: 6})
 
+test("if (1) let\n{}", {}, {ecmaVersion: 6})
+
 test("var yield = 2", {
   "type": "Program",
   "body": [
