@@ -17,7 +17,7 @@ export const defaultOptions = {
   sourceType: "script",
   // `onInsertedSemicolon` can be a callback that will be called
   // when a semicolon is automatically inserted. It will be passed
-  // th position of the comma as an offset, and if `locations` is
+  // the position of the comma as an offset, and if `locations` is
   // enabled, it is given the location as a `{line, column}` object
   // as second argument.
   onInsertedSemicolon: null,
