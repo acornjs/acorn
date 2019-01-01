@@ -70,7 +70,7 @@ pp.toAssignable = function(node, isBinding, refDestructuringErrors) {
       break
 
     case "ParenthesizedExpression":
-      this.toAssignable(node.expression, isBinding)
+      this.toAssignable(node.expression, isBinding, refDestructuringErrors)
       break
 
     case "MemberExpression":
