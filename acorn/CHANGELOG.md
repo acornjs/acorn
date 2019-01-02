@@ -1,3 +1,13 @@
+## 6.0.5 (2019-01-02)
+
+### Bug fixes
+
+Fix TypeScript type for `Parser.extend` and add `allowAwaitOutsideFunction` to options type.
+
+Don't treat `let` as a keyword when the next token is `{` on the next line.
+
+Fix bug that broke checking for parentheses around an object pattern in a destructuring assignment when `preserveParens` was on.
+
 ## 6.0.4 (2018-11-05)
 
 ### Bug fixes
