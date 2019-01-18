@@ -479,7 +479,7 @@ pp.parseVar = function(node, isFor, kind) {
 }
 
 pp.parseVarId = function(decl, kind) {
-  decl.id = this.parseBindingAtom(kind)
+  decl.id = this.parseBindingAtom()
   this.checkLVal(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false)
 }
 
