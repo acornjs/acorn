@@ -529,6 +529,11 @@ pp.parseFunctionParams = function(node) {
 pp.parseClass = function(node, isStatement) {
   this.next()
 
+  // ecma-262 14.6 Class Definitions
+  // A class definition is always strict mode code.
+  const oldStrict = this.strict;
+  this.strict = true;
+
   this.parseClassId(node, isStatement)
   this.parseClassSuper(node)
   let classBody = this.startNode()
@@ -546,6 +551,7 @@ pp.parseClass = function(node, isStatement) {
     }
   }
   node.body = this.finishNode(classBody, "ClassBody")
+  this.strict = oldStrict;
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
