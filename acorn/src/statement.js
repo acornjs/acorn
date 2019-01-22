@@ -479,6 +479,9 @@ pp.parseVar = function(node, isFor, kind) {
 }
 
 pp.parseVarId = function(decl, kind) {
+  if ((kind === "const" || kind === "let") && this.isContextual("let")) {
+    this.raiseRecoverable(this.start, "let is disallowed as a lexically bound name");
+  }
   decl.id = this.parseBindingAtom()
   this.checkLVal(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false)
 }
