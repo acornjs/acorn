@@ -1099,7 +1099,7 @@ testFail("class A { async\n* f() {} }", "Unexpected token (2:0)", { ecmaVersion:
 testFail("class A { *async f() {} }", "Unexpected token (1:17)", { ecmaVersion: 9 })
 testFail("class A { *async* f() {} }", "Unexpected token (1:16)", { ecmaVersion: 9 })
 testFail("class A { async* f() { () => await a; } }", "Unexpected token (1:35)", { ecmaVersion: 9 })
-testFail("class A { async* f() { () => yield a; } }", "Unexpected token (1:35)", { ecmaVersion: 9 })
+testFail("class A { async* f() { () => yield a; } }", "The keyword 'yield' is reserved (1:29)", { ecmaVersion: 9 })
 
 testFail("f = async function*() { await a; yield b; }", "Unexpected token (1:18)", { ecmaVersion: 8 })
 testFail("obj = { async* f() { await a; yield b; } }", "Unexpected token (1:13)", { ecmaVersion: 8 })

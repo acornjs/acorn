@@ -13247,9 +13247,11 @@ testFail("(function() { \"use strict\"; f(yield v) })", "The keyword 'yield' is 
 
 testFail("var obj = { *test** }", "Unexpected token (1:17)", {ecmaVersion: 6});
 
-testFail("class A extends yield B { }", "Unexpected token (1:22)", {ecmaVersion: 6});
+testFail("class A extends yield B { }", "The keyword 'yield' is reserved (1:16)", {ecmaVersion: 6});
 
 testFail("class default", "Unexpected token (1:6)", {ecmaVersion: 6});
+
+testFail("class let {}", "The keyword 'let' is reserved (1:6)", {ecmaVersion: 6})
 
 testFail("`test", "Unterminated template (1:1)", {ecmaVersion: 6});
 
