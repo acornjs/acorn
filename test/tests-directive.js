@@ -221,6 +221,33 @@ test("\"use strict\" + 1", {
   ]
 }, { ecmaVersion: 6 })
 
+test("; 'use strict'; with ({}) {}", {
+  type: "Program",
+  body: [
+    { type: "EmptyStatement" },
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "Literal",
+        value: "use strict",
+        raw: "'use strict'"
+      },
+      directive: undefined // check this property does not exist.
+    },
+    {
+      type: "WithStatement",
+      object: {
+        type: "ObjectExpression",
+        properties: []
+      },
+      body: {
+        type: "BlockStatement",
+        body: []
+      }
+    }
+  ]
+}, { ecmaVersion: 6 })
+
 //------------------------------------------------------------------------
 // One directive
 //------------------------------------------------------------------------
