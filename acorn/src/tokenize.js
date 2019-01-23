@@ -637,6 +637,11 @@ pp.readEscapedChar = function(inTemplate) {
       }
       return String.fromCharCode(octal)
     }
+    if (isNewLine(ch)) {
+      // Unicode new line characters after \ get removed from output in both
+      // template literals and strings
+      return ""
+    }
     return String.fromCharCode(ch)
   }
 }
