@@ -509,7 +509,11 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
   if (statement & FUNC_STATEMENT) {
     node.id = (statement & FUNC_NULLABLE_ID) && this.type !== tt.name ? null : this.parseIdent()
     if (node.id && !(statement & FUNC_HANGING_STATEMENT))
-      this.checkLVal(node.id, this.inModule && !this.inFunction ? BIND_LEXICAL : BIND_FUNCTION)
+      // If it is a regular function declaration in sloppy mode, then it is
+      // subject to Annex B semantics (BIND_FUNCTION). Otherwise, the binding
+      // mode depends on properties of the current scope (see
+      // treatFunctionsAsVar).
+      this.checkLVal(node.id, (this.strict || node.generator || node.async) ? this.treatFunctionsAsVar ? BIND_VAR : BIND_LEXICAL : BIND_FUNCTION);
   }
 
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos

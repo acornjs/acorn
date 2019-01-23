@@ -16191,6 +16191,22 @@ testFail("(x) => {} + 2", "Unexpected token (1:10)", {ecmaVersion: 6})
 
 test("function *f1() { function g() { return yield / 1 } }", {}, {ecmaVersion: 6})
 
+test("function f() {} function f() {}", {}, {ecmaVersion: 6})
+
+test("function *f() {} function *f() {}", {}, {ecmaVersion: 6})
+
+// Annex B allows function redeclaration for plain functions in sloppy mode
+test("{ function f() {} function f() {} }", {}, {ecmaVersion: 6})
+
+testFail("'use strict'; { function f() {} function f() {} }",
+    "Identifier 'f' has already been declared (1:41)", {ecmaVersion: 6})
+
+testFail("{ function f() {} function* f() {} }",
+    "Identifier 'f' has already been declared (1:28)", {ecmaVersion: 6})
+
+testFail("{ function* f() {} function f() {} }",
+    "Identifier 'f' has already been declared (1:28)", {ecmaVersion: 6})
+
 test("class Foo {} /regexp/", {}, {ecmaVersion: 6})
 
 test("(class Foo {} / 2)", {}, {ecmaVersion: 6})
