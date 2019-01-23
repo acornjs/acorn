@@ -804,7 +804,7 @@ test("`$`", {
   locations: true
 });
 
-test("`\\n\\r\\b\\v\\t\\f\\\n\\\r\n`", {
+test("`\\n\\r\\b\\v\\t\\f\\\n\\\r\n\\\u2028\\\u2029`", {
   type: "Program",
   body: [{
     type: "ExpressionStatement",
@@ -812,27 +812,27 @@ test("`\\n\\r\\b\\v\\t\\f\\\n\\\r\n`", {
       type: "TemplateLiteral",
       quasis: [{
         type: "TemplateElement",
-        value: {raw: "\\n\\r\\b\\v\\t\\f\\\n\\\n", cooked: "\n\r\b\u000b\t\f"},
+        value: {raw: "\\n\\r\\b\\v\\t\\f\\\n\\\n\\\u2028\\\u2029", cooked: "\n\r\b\u000b\t\f"},
         tail: true,
         loc: {
           start: {line: 1, column: 1},
-          end: {line: 3, column: 0}
+          end: {line: 3, column: 4}
         }
       }],
       expressions: [],
       loc: {
         start: {line: 1, column: 0},
-        end: {line: 3, column: 1}
+        end: {line: 3, column: 5}
       }
     },
     loc: {
       start: {line: 1, column: 0},
-      end: {line: 3, column: 1}
+      end: {line: 3, column: 5}
     }
   }],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 3, column: 1}
+    end: {line: 3, column: 5}
   }
 }, {
   ecmaVersion: 6,
