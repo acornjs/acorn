@@ -428,8 +428,8 @@ pp.parseFor = function(node, init) {
   this.expect(tt.semi)
   node.update = this.type === tt.parenR ? null : this.parseExpression()
   this.expect(tt.parenR)
-  this.exitScope()
   node.body = this.parseStatement("for")
+  this.exitScope()
   this.labels.pop()
   return this.finishNode(node, "ForStatement")
 }
@@ -449,8 +449,8 @@ pp.parseForIn = function(node, init) {
   node.left = init
   node.right = type === "ForInStatement" ? this.parseExpression() : this.parseMaybeAssign()
   this.expect(tt.parenR)
-  this.exitScope()
   node.body = this.parseStatement("for")
+  this.exitScope()
   this.labels.pop()
   return this.finishNode(node, type)
 }
