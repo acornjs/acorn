@@ -15407,6 +15407,7 @@ test("class A {*yield() {}}", {
     "sourceType": "script"
 }, {ecmaVersion: 6})
 
+testFail("(function* g() {\nfor (yield '' in {}; ; ) ;\n }", "Assigning to rvalue (2:5)", {ecmaVersion: 6})
 testFail("(function* yield() {})", "Can not use 'yield' as identifier inside a generator (1:11)", {ecmaVersion: 6})
 testFail("function* wrap() {\nfunction* yield() {}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
 test("function* wrap() {\n({*yield() {}})\n}", {}, {ecmaVersion: 6})

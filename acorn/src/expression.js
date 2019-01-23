@@ -105,7 +105,7 @@ pp.parseExpression = function(noIn, refDestructuringErrors) {
 
 pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   if (this.isContextual("yield")) {
-    if (this.inGenerator) return this.parseYield()
+    if (this.inGenerator) return this.parseYield(noIn)
     // The tokenizer will assume an expression is allowed after
     // `yield`, but this isn't that kind of yield
     else this.exprAllowed = false
@@ -878,7 +878,7 @@ pp.parseIdent = function(liberal, isBinding) {
 
 // Parses yield expression inside generator.
 
-pp.parseYield = function() {
+pp.parseYield = function(noIn) {
   if (!this.yieldPos) this.yieldPos = this.start
 
   let node = this.startNode()
@@ -888,7 +888,7 @@ pp.parseYield = function() {
     node.argument = null
   } else {
     node.delegate = this.eat(tt.star)
-    node.argument = this.parseMaybeAssign()
+    node.argument = this.parseMaybeAssign(noIn)
   }
   return this.finishNode(node, "YieldExpression")
 }
