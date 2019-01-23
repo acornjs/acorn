@@ -6,15 +6,22 @@ const pp = Parser.prototype
 
 // ## Parser utilities
 
-const literal = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
+const literal = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)")/
 pp.strictDirective = function(start) {
   for (;;) {
+    // Try to find string literal.
     skipWhiteSpace.lastIndex = start
     start += skipWhiteSpace.exec(this.input)[0].length
     let match = literal.exec(this.input.slice(start))
     if (!match) return false
     if ((match[1] || match[2]) === "use strict") return true
     start += match[0].length
+
+    // Skip semicolon, if any.
+    skipWhiteSpace.lastIndex = start
+    start += skipWhiteSpace.exec(this.input)[0].length
+    if (this.input[start] === ';')
+      start++
   }
 }
 
