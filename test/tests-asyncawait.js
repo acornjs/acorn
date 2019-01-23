@@ -3507,4 +3507,4 @@ test(
 
 test("({ async delete() {} })", {}, {ecmaVersion: 8})
 
-testFail("abc: async function a() {}", "Invalid labeled declaration (1:5)", {ecmaVersion: 8})
+testFail("abc: async function a() {}", "Unexpected token (1:5)", {ecmaVersion: 8})

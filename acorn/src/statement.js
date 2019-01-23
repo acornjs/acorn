@@ -32,13 +32,19 @@ pp.parseTopLevel = function(node) {
 
 const loopLabel = {kind: "loop"}, switchLabel = {kind: "switch"}
 
-pp.isLet = function() {
+pp.isLet = function(context) {
   if (this.options.ecmaVersion < 6 || !this.isContextual("let")) return false
   skipWhiteSpace.lastIndex = this.pos
   let skip = skipWhiteSpace.exec(this.input)
   let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
-  if (nextCh === 123 && !lineBreak.test(this.input.slice(this.end, next)) // '{'
-      || nextCh === 91) return true // '['
+  // For ambiguous cases, determine if a LexicalDeclaration (or only a
+  // Statement) is allowed here. If context is not empty then only a Statement
+  // is allowed. However, `let [` is an explicit negative lookahead for
+  // ExpressionStatement, so special-case it first.
+  if (nextCh === 91) return true // '['
+  if (context) return false
+
+  if (nextCh === 123) return true // '{'
   if (isIdentifierStart(nextCh, true)) {
     let pos = next + 1
     while (isIdentifierChar(this.input.charCodeAt(pos), true)) ++pos
@@ -73,7 +79,7 @@ pp.isAsyncFunction = function() {
 pp.parseStatement = function(context, topLevel, exports) {
   let starttype = this.type, node = this.startNode(), kind
 
-  if (this.isLet()) {
+  if (this.isLet(context)) {
     starttype = tt._var
     kind = "let"
   }
@@ -88,7 +94,10 @@ pp.parseStatement = function(context, topLevel, exports) {
   case tt._do: return this.parseDoStatement(node)
   case tt._for: return this.parseForStatement(node)
   case tt._function:
-    if ((context && (this.strict || context !== "if")) && this.options.ecmaVersion >= 6) this.unexpected()
+    // Function as sole body of either an if statement or a labeled statement
+    // works, but not when it is part of a labeled statement that is the sole
+    // body of an if statement.
+    if ((context && (this.strict || context !== "if" && context !== "label")) && this.options.ecmaVersion >= 6) this.unexpected()
     return this.parseFunctionStatement(node, false, !context)
   case tt._class:
     if (context) this.unexpected()
@@ -385,11 +394,7 @@ pp.parseLabeledStatement = function(node, maybeName, expr, context) {
     } else break
   }
   this.labels.push({name: maybeName, kind, statementStart: this.start})
-  node.body = this.parseStatement(context)
-  if (node.body.type === "ClassDeclaration" ||
-      node.body.type === "VariableDeclaration" && node.body.kind !== "var" ||
-      node.body.type === "FunctionDeclaration" && (this.strict || node.body.generator || node.body.async))
-    this.raiseRecoverable(node.body.start, "Invalid labeled declaration")
+  node.body = this.parseStatement(context ? context.indexOf("label") === -1 ? context + "label" : context : "label")
   this.labels.pop()
   node.label = expr
   return this.finishNode(node, "LabeledStatement")

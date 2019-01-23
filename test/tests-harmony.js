@@ -6031,6 +6031,109 @@ test("for (let x of list) process(x);", {
   locations: true
 });
 
+test("for (let\n{x} of list) process(x);", {
+  type: "Program",
+  body: [{
+    type: "ForOfStatement",
+    left: {
+      type: "VariableDeclaration",
+      declarations: [{
+        type: "VariableDeclarator",
+        id: {
+          type: "ObjectPattern",
+          loc: {
+            start: {line: 2, column: 0},
+            end: {line: 2, column: 3}
+          },
+          properties: [{
+            type: "Property",
+            kind: "init",
+            key: {
+              type: "Identifier",
+              name: "x",
+              loc: {
+                start: {line: 2, column: 1},
+                end: {line: 2, column: 2}
+              }
+            },
+            value: {
+              type: "Identifier",
+              name: "x",
+              loc: {
+                start: {line: 2, column: 1},
+                end: {line: 2, column: 2}
+              }
+            },
+            loc: {
+              start: {line: 2, column: 1},
+              end: {line: 2, column: 2}
+            }
+          }]
+        },
+        init: null,
+        loc: {
+          start: {line: 2, column: 0},
+          end: {line: 2, column: 3}
+        }
+      }],
+      kind: "let",
+      loc: {
+        start: {line: 1, column: 5},
+        end: {line: 2, column: 3}
+      }
+    },
+    right: {
+      type: "Identifier",
+      name: "list",
+      loc: {
+        start: {line: 2, column: 7},
+        end: {line: 2, column: 11}
+      }
+    },
+    body: {
+      type: "ExpressionStatement",
+      expression: {
+        type: "CallExpression",
+        callee: {
+          type: "Identifier",
+          name: "process",
+          loc: {
+            start: {line: 2, column: 13},
+            end: {line: 2, column: 20}
+          }
+        },
+        arguments: [{
+          type: "Identifier",
+          name: "x",
+          loc: {
+            start: {line: 2, column: 21},
+            end: {line: 2, column: 22}
+          }
+        }],
+        loc: {
+          start: {line: 2, column: 13},
+          end: {line: 2, column: 23}
+        }
+      },
+      loc: {
+        start: {line: 2, column: 13},
+        end: {line: 2, column: 24}
+      }
+    },
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 2, column: 24}
+    }
+  }],
+  loc: {
+    start: {line: 1, column: 0},
+    end: {line: 2, column: 24}
+  }
+}, {
+  ecmaVersion: 6,
+  locations: true
+});
+
 // Harmony: Class (strawman)
 
 test("var A = class extends B {}", {
@@ -14535,7 +14638,7 @@ testFail("var [x]", "Complex binding patterns require an initialization value (1
 testFail("var _𖫵 = 11;", "Unexpected character '𖫵' (1:5)", {ecmaVersion: 6});
 testFail("var 𫠞_ = 12;", "Unexpected character '𫠞' (1:4)", {ecmaVersion: 6});
 testFail("var 𫠝_ = 10;", "Unexpected character '𫠝' (1:4)", {ecmaVersion: 5});
-testFail("if (1) let x = 10;", "Unexpected token (1:7)", {ecmaVersion: 6});
+testFail("if (1) let x = 10;", "Unexpected token (1:11)", {ecmaVersion: 6});
 testFail("for (;;) const x = 10;", "Unexpected token (1:9)", {ecmaVersion: 6});
 testFail("while (1) function foo(){}", "Unexpected token (1:10)", {ecmaVersion: 6});
 testFail("if (1) ; else class Cls {}", "Unexpected token (1:14)", {ecmaVersion: 6});
@@ -15949,9 +16052,12 @@ testFail("export { default} from './y.js';\nexport default 42;",
 testFail("export * from foo", "Unexpected token (1:14)", {sourceType: "module", ecmaVersion: 6, loose: false});
 testFail("export { bar } from foo", "Unexpected token (1:20)", {sourceType: "module", ecmaVersion: 6, loose: false});
 
-testFail("foo: class X {}", "Invalid labeled declaration (1:5)", {ecmaVersion: 6})
+testFail("foo: class X {}", "Unexpected token (1:5)", {ecmaVersion: 6})
 
-testFail("'use strict'; bar: function x() {}", "Invalid labeled declaration (1:19)", {ecmaVersion: 6})
+testFail("'use strict'; bar: function x() {}", "Unexpected token (1:19)", {ecmaVersion: 6})
+
+testFail("'use strict'; bar: function* x() {}", "Unexpected token (1:19)", {ecmaVersion: 6})
+testFail("bar: function* x() {}", "Unexpected token (1:13)", {ecmaVersion: 6})
 
 testFail("({x, y}) = {}", "Parenthesized pattern (1:0)", {ecmaVersion: 6})
 
