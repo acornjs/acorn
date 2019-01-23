@@ -493,8 +493,11 @@ const FUNC_STATEMENT = 1, FUNC_HANGING_STATEMENT = 2, FUNC_NULLABLE_ID = 4
 
 pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
   this.initFunction(node)
-  if (this.options.ecmaVersion >= 9 || this.options.ecmaVersion >= 6 && !isAsync)
+  if (this.options.ecmaVersion >= 9 || this.options.ecmaVersion >= 6 && !isAsync) {
+    if (this.type === tt.star && (statement & FUNC_HANGING_STATEMENT))
+      this.unexpected()
     node.generator = this.eat(tt.star)
+  }
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
 
