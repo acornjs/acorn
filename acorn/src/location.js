@@ -12,6 +12,12 @@ const pp = Parser.prototype
 pp.raise = function(pos, message) {
   let loc = getLineInfo(this.input, pos)
   message += " (" + loc.line + ":" + loc.column + ")"
+  let lines = this.input.split('\n')
+  message = message + '\n' + lines[loc.line - 1] + '\n';
+  for (var i = 0; i < loc.column; i++) {
+    message += ' '
+  }
+  message += '^\n'
   let err = new SyntaxError(message)
   err.pos = pos; err.loc = loc; err.raisedAt = this.pos
   throw err
