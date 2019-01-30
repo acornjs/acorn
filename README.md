@@ -64,7 +64,7 @@ avoid needlessly confusing the JavaScript engine's optimizer.
 const {Parser} = require("acorn")
 
 const MyParser = Parser.extend(
-  require("acorn-jsx"),
+  require("acorn-jsx")(),
   require("acorn-bigint")
 )
 console.log(MyParser.parse("// Some bigint + JSX code"))
