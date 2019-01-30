@@ -41,8 +41,9 @@
     "eslint-plugin-standard": "^3.0.1",
     "rollup": "^1.7.0",
     "rollup-plugin-buble": "^0.19.0",
-    "test262": "git+https://github.com/tc39/test262.git#e39604fa41b1ad0effdcf586e4d554ff2d8c3eb7",
+    "test262": "git+https://github.com/tc39/test262.git#c822f4c92914333d197191b2b3dec4e923acb4a3",
     "test262-parser-runner": "^0.5.0",
+    "test262-stream": "^1.2.1",
     "unicode-11.0.0": "^0.7.7"
   }
 }
