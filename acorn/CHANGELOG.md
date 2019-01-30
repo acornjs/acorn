@@ -1,3 +1,25 @@
+## 6.0.6 (2019-01-30)
+
+### Bug fixes
+
+The content of class declarations and expressions is now always parsed in strict mode.
+
+Don't allow `let` or `const` to bind the variable name `let`.
+
+Treat class declarations as lexical.
+
+Don't allow a generator function declaration as the sole body of an `if` or `else`.
+
+Ignore `"use strict"` when after an empty statement.
+
+Allow string line continuations with special line terminator characters.
+
+Treat `for` bodies as part of the `for` scope when checking for conflicting bindings.
+
+Fix bug with parsing `yield` in a `for` loop initializer.
+
+Implement special cases around scope checking for functions.
+
 ## 6.0.5 (2019-01-02)
 
 ### Bug fixes
