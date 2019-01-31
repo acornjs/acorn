@@ -22,6 +22,9 @@ pp.parseTopLevel = function(node) {
     let stmt = this.parseStatement(null, true, exports)
     node.body.push(stmt)
   }
+  if (this.inModule)
+    for (let name of Object.keys(this.undefinedExports))
+      this.raiseRecoverable(this.undefinedExports[name].start, `Export '${name}' is not defined`);
   this.adaptDirectivePrologue(node.body)
   this.next()
   if (this.options.ecmaVersion >= 6) {
@@ -689,9 +692,11 @@ pp.parseExport = function(node, exports) {
       if (this.type !== tt.string) this.unexpected()
       node.source = this.parseExprAtom()
     } else {
-      // check for keywords used as local names
       for (let spec of node.specifiers) {
+        // check for keywords used as local names
         this.checkUnreserved(spec.local)
+        // check if export is defined
+        this.checkLocalExport(spec.local)
       }
 
       node.source = null
