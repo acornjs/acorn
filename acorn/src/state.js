@@ -74,6 +74,8 @@ export class Parser {
     this.yieldPos = this.awaitPos = 0
     // Labels in scope.
     this.labels = []
+    // Thus-far undefined exports.
+    this.undefinedExports = {};
 
     // If enabled, skip leading hashbang line.
     if (this.pos === 0 && options.allowHashBang && this.input.slice(0, 2) === "#!")

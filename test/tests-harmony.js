@@ -4499,7 +4499,7 @@ test("export * from \"crypto\"", {
   locations: true
 });
 
-test("export { encrypt }", {
+test("export { encrypt }\nvar encrypt", {
   type: "Program",
   body: [{
     type: "ExportNamedDeclaration",
@@ -4532,10 +4532,33 @@ test("export { encrypt }", {
       start: {line: 1, column: 0},
       end: {line: 1, column: 18}
     }
+  }, {
+    type: "VariableDeclaration",
+    declarations: [{
+      type: "VariableDeclarator",
+      id: {
+        type: "Identifier",
+        name: "encrypt",
+        loc: {
+          start: {line: 2, column: 4},
+          end: {line: 2, column: 11}
+        }
+      },
+      init: null,
+      loc: {
+        start: {line: 2, column: 4},
+        end: {line: 2, column: 11}
+      }
+    }],
+    kind: "var",
+    loc: {
+      start: {line: 2, column: 0},
+      end: {line: 2, column: 11}
+    }
   }],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 1, column: 18}
+    end: {line: 2, column: 11}
   }
 }, {
   ecmaVersion: 6,
@@ -4544,9 +4567,55 @@ test("export { encrypt }", {
   locations: true
 });
 
-test("export { encrypt, decrypt }", {
+test("function encrypt() {} let decrypt; export { encrypt, decrypt }", {
   type: "Program",
   body: [{
+    type: "FunctionDeclaration",
+    id: {
+      type: "Identifier",
+      name: "encrypt",
+      loc: {
+        start: {line: 1, column: 9},
+        end: {line: 1, column: 16}
+      }
+    },
+    params: [],
+    body: {
+      type: "BlockStatement",
+      body: [],
+      loc: {
+        start: {line: 1, column: 19},
+        end: {line: 1, column: 21}
+      }
+    },
+    loc: {
+      start: {line: 1, column: 0},
+      end: {line: 1, column: 21}
+    }
+  }, {
+    type: "VariableDeclaration",
+    declarations: [{
+      type: "VariableDeclarator",
+      id: {
+        type: "Identifier",
+        name: "decrypt",
+        loc: {
+          start: {line: 1, column: 26},
+          end: {line: 1, column: 33}
+        }
+      },
+      init: null,
+      loc: {
+        start: {line: 1, column: 26},
+        end: {line: 1, column: 33}
+      }
+    }],
+    kind: "let",
+    loc: {
+      start: {line: 1, column: 22},
+      end: {line: 1, column: 34}
+    }
+  }, {
     type: "ExportNamedDeclaration",
     declaration: null,
     specifiers: [
@@ -4556,21 +4625,21 @@ test("export { encrypt, decrypt }", {
           type: "Identifier",
           name: "encrypt",
           loc: {
-            start: {line: 1, column: 9},
-            end: {line: 1, column: 16}
+            start: {line: 1, column: 44},
+            end: {line: 1, column: 51}
           }
         },
         local: {
           type: "Identifier",
           name: "encrypt",
           loc: {
-            start: {line: 1, column: 9},
-            end: {line: 1, column: 16}
+            start: {line: 1, column: 44},
+            end: {line: 1, column: 51}
           }
         },
         loc: {
-          start: {line: 1, column: 9},
-          end: {line: 1, column: 16}
+          start: {line: 1, column: 44},
+          end: {line: 1, column: 51}
         }
       },
       {
@@ -4579,33 +4648,33 @@ test("export { encrypt, decrypt }", {
           type: "Identifier",
           name: "decrypt",
           loc: {
-            start: {line: 1, column: 18},
-            end: {line: 1, column: 25}
+            start: {line: 1, column: 53},
+            end: {line: 1, column: 60}
           }
         },
         local: {
           type: "Identifier",
           name: "decrypt",
           loc: {
-            start: {line: 1, column: 18},
-            end: {line: 1, column: 25}
+            start: {line: 1, column: 53},
+            end: {line: 1, column: 60}
           }
         },
         loc: {
-          start: {line: 1, column: 18},
-          end: {line: 1, column: 25}
+          start: {line: 1, column: 53},
+          end: {line: 1, column: 60}
         }
       }
     ],
     source: null,
     loc: {
-      start: {line: 1, column: 0},
-      end: {line: 1, column: 27}
+      start: {line: 1, column: 35},
+      end: {line: 1, column: 62}
     }
   }],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 1, column: 27}
+    end: {line: 1, column: 62}
   }
 }, {
   ecmaVersion: 6,
@@ -4614,7 +4683,42 @@ test("export { encrypt, decrypt }", {
   locations: true
 });
 
-test("export { encrypt as default }", {
+testFail("export { encrypt }", "Export 'encrypt' is not defined (1:9)", {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
+testFail("export { encrypt, encrypt }", "Duplicate export 'encrypt' (1:18)", {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
+testFail("export { encrypt }; export { encrypt }", "Duplicate export 'encrypt' (1:29)", {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
+testFail("export { decrypt as encrypt }; function encrypt() {}", "Export 'decrypt' is not defined (1:9)", {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
+testFail("export { encrypt }; if (true) function encrypt() {}", "Unexpected token (1:30)", {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
+testFail("{ function encrypt() {} } export { encrypt }", "Export 'encrypt' is not defined (1:35)", {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
+test("{ var encrypt } export { encrypt }", {}, {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
+test("export { encrypt as default }; function* encrypt() {}", {
   type: "Program",
   body: [{
     type: "ExportNamedDeclaration",
@@ -4645,21 +4749,36 @@ test("export { encrypt as default }", {
     source: null,
     loc: {
       start: {line: 1, column: 0},
-      end: {line: 1, column: 29}
+      end: {line: 1, column: 30}
+    }
+  }, {
+    type: "FunctionDeclaration",
+    generator: true,
+    params: [],
+    body: {
+      type: "BlockStatement",
+      body: [],
+      loc: {
+        start: {line: 1, column: 51},
+        end: {line: 1, column: 53}
+      }
+    },
+    loc: {
+      start: {line: 1, column: 31},
+      end: {line: 1, column: 53}
     }
   }],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 1, column: 29}
+    end: {line: 1, column: 53}
   }
 }, {
   ecmaVersion: 6,
   sourceType: "module",
-  ranges: true,
   locations: true
 });
 
-test("export { encrypt, decrypt as dec }", {
+test("export { encrypt, decrypt as dec }; let encrypt, decrypt", {
   type: "Program",
   body: [{
     type: "ExportNamedDeclaration",
@@ -4715,12 +4834,50 @@ test("export { encrypt, decrypt as dec }", {
     source: null,
     loc: {
       start: {line: 1, column: 0},
-      end: {line: 1, column: 34}
+      end: {line: 1, column: 35}
+    }
+  }, {
+    type: "VariableDeclaration",
+    declarations: [{
+      type: "VariableDeclarator",
+      id: {
+        type: "Identifier",
+        name: "encrypt",
+        loc: {
+          start: {line: 1, column: 40},
+          end: {line: 1, column: 47}
+        }
+      },
+      init: null,
+      loc: {
+        start: {line: 1, column: 40},
+        end: {line: 1, column: 47}
+      }
+    }, {
+      type: "VariableDeclarator",
+      id: {
+        type: "Identifier",
+        name: "decrypt",
+        loc: {
+          start: {line: 1, column: 49},
+          end: {line: 1, column: 56}
+        }
+      },
+      init: null,
+      loc: {
+        start: {line: 1, column: 49},
+        end: {line: 1, column: 56}
+      }
+    }],
+    kind: "let",
+    loc: {
+      start: {line: 1, column: 36},
+      end: {line: 1, column: 56}
     }
   }],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 1, column: 34}
+    end: {line: 1, column: 56}
   }
 }, {
   ecmaVersion: 6,
@@ -16228,7 +16385,7 @@ testFail("class A extends B { constructor() { (super)() } }", "Unexpected token 
 testFail("class A extends B { foo() { (super).foo } }", "Unexpected token (1:34)", { ecmaVersion: 6 })
 test("({super: 1})", {}, { ecmaVersion: 6 })
 test("import {super as a} from 'a'", {}, { ecmaVersion: 6, sourceType: "module" })
-test("export {a as super}", {}, { ecmaVersion: 6, sourceType: "module" })
+test("function a() {} export {a as super}", {}, { ecmaVersion: 6, sourceType: "module" })
 test("let instanceof Foo", {
   "type": "Program",
   "start": 0,
