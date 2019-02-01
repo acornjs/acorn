@@ -663,6 +663,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
         this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
     }
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
+    if (isGenerator || isAsync) this.unexpected()
     this.checkUnreserved(prop.key)
     prop.kind = "init"
     if (isPattern) {
