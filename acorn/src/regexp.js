@@ -1,6 +1,7 @@
 import {isIdentifierStart, isIdentifierChar} from "./identifier.js"
 import {Parser} from "./state.js"
 import UNICODE_PROPERTY_VALUES from "./unicode-property-data.js"
+import {has} from "./util.js"
 
 const pp = Parser.prototype
 
@@ -8,6 +9,7 @@ export class RegExpValidationState {
   constructor(parser) {
     this.parser = parser
     this.validFlags = `gim${parser.options.ecmaVersion >= 6 ? "uy" : ""}${parser.options.ecmaVersion >= 9 ? "s" : ""}`
+    this.unicodeProperties = UNICODE_PROPERTY_VALUES[parser.options.ecmaVersion >= 10 ? 10 : parser.options.ecmaVersion]
     this.source = ""
     this.flags = ""
     this.start = 0
@@ -784,14 +786,14 @@ pp.regexp_eatUnicodePropertyValueExpression = function(state) {
   return false
 }
 pp.regexp_validateUnicodePropertyNameAndValue = function(state, name, value) {
-  if (!UNICODE_PROPERTY_VALUES.hasOwnProperty(name) || UNICODE_PROPERTY_VALUES[name].indexOf(value) === -1) {
+  if (!has(state.unicodeProperties.nonBinary, name))
     state.raise("Invalid property name")
-  }
+  if (!state.unicodeProperties.nonBinary[name].test(value))
+    state.raise("Invalid property value")
 }
 pp.regexp_validateUnicodePropertyNameOrValue = function(state, nameOrValue) {
-  if (UNICODE_PROPERTY_VALUES.$LONE.indexOf(nameOrValue) === -1) {
+  if (!state.unicodeProperties.binary.test(nameOrValue))
     state.raise("Invalid property name")
-  }
 }
 
 // UnicodePropertyName ::
