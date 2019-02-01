@@ -718,7 +718,7 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
   this.checkYieldAwaitInDefaultParams()
-  this.parseFunctionBody(node, false)
+  this.parseFunctionBody(node, false, true)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
@@ -738,7 +738,7 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   this.awaitPos = 0
 
   node.params = this.toAssignableList(params, true)
-  this.parseFunctionBody(node, true)
+  this.parseFunctionBody(node, true, false)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
@@ -747,7 +747,7 @@ pp.parseArrowExpression = function(node, params, isAsync) {
 
 // Parse function body and check parameters.
 
-pp.parseFunctionBody = function(node, isArrowFunction) {
+pp.parseFunctionBody = function(node, isArrowFunction, isMethod) {
   let isExpression = isArrowFunction && this.type !== tt.braceL
   let oldStrict = this.strict, useStrict = false
 
@@ -773,7 +773,7 @@ pp.parseFunctionBody = function(node, isArrowFunction) {
 
     // Add the params to varDeclaredNames to ensure that an error is thrown
     // if a let/const declaration in the function clashes with one of the params.
-    this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && this.isSimpleParamList(node.params))
+    this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && !isMethod && this.isSimpleParamList(node.params))
     node.body = this.parseBlock(false)
     node.expression = false
     this.adaptDirectivePrologue(node.body.body)
