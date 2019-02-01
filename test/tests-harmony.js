@@ -4078,7 +4078,7 @@ test("export var document = { }", {
   locations: true
 });
 
-testFail("export var await", "Can not use keyword 'await' outside an async function (1:11)", { ecmaVersion: 6, sourceType: "module" })
+testFail("export var await", "Cannot use keyword 'await' outside an async function (1:11)", { ecmaVersion: 6, sourceType: "module" })
 
 test("export let document", {
   type: "Program",
@@ -14805,7 +14805,7 @@ testFail("'use strict'; ({eval = defValue} = obj)", "Assigning to eval in strict
 
 testFail("[...eval] = arr", "Assigning to eval in strict mode (1:4)", {ecmaVersion: 6, sourceType: "module"});
 
-testFail("function* y({yield}) {}", "Can not use 'yield' as identifier inside a generator (1:13)", {ecmaVersion: 6});
+testFail("function* y({yield}) {}", "Cannot use 'yield' as identifier inside a generator (1:13)", {ecmaVersion: 6});
 
 test("function foo() { new.target; }", {
   type: "Program",
@@ -15022,7 +15022,7 @@ test("var await = 0", {
   allowReserved: false,
   locations: true
 })
-testFail("var await = 0", "Can not use keyword 'await' outside an async function (1:4)", {
+testFail("var await = 0", "Cannot use keyword 'await' outside an async function (1:4)", {
   ecmaVersion: 6,
   sourceType: "module",
   allowReserved: false,
@@ -15668,8 +15668,8 @@ test("class A {*yield() {}}", {
 }, {ecmaVersion: 6})
 
 testFail("(function* g() {\nfor (yield '' in {}; ; ) ;\n }", "Assigning to rvalue (2:5)", {ecmaVersion: 6})
-testFail("(function* yield() {})", "Can not use 'yield' as identifier inside a generator (1:11)", {ecmaVersion: 6})
-testFail("function* wrap() {\nfunction* yield() {}\n}", "Can not use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
+testFail("(function* yield() {})", "Cannot use 'yield' as identifier inside a generator (1:11)", {ecmaVersion: 6})
+testFail("function* wrap() {\nfunction* yield() {}\n}", "Cannot use 'yield' as identifier inside a generator (2:10)", {ecmaVersion: 6})
 test("function* wrap() {\n({*yield() {}})\n}", {}, {ecmaVersion: 6})
 test("function* wrap() {\nclass A {*yield() {}}\n}", {}, {ecmaVersion: 6})
 

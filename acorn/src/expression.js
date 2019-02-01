@@ -269,20 +269,25 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
       if (computed) this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
     } else if (!noCalls && this.eat(tt.parenL)) {
-      let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+      let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
       this.yieldPos = 0
       this.awaitPos = 0
+      this.awaitIdentPos = 0
       let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
       if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
         this.checkPatternErrors(refDestructuringErrors, false)
         this.checkYieldAwaitInDefaultParams()
+        if (this.awaitIdentPos > 0)
+          this.raise(this.awaitIdentPos, "Cannot use 'await' as identifier inside an async function")
         this.yieldPos = oldYieldPos
         this.awaitPos = oldAwaitPos
+        this.awaitIdentPos = oldAwaitIdentPos
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, true)
       }
       this.checkExpressionErrors(refDestructuringErrors, true)
       this.yieldPos = oldYieldPos || this.yieldPos
       this.awaitPos = oldAwaitPos || this.awaitPos
+      this.awaitIdentPos = oldAwaitIdentPos || this.awaitIdentPos
       let node = this.startNodeAt(startPos, startLoc)
       node.callee = base
       node.arguments = exprList
@@ -334,14 +339,14 @@ pp.parseExprAtom = function(refDestructuringErrors) {
 
   case tt.name:
     let startPos = this.start, startLoc = this.startLoc, containsEsc = this.containsEsc
-    let id = this.parseIdent(this.type !== tt.name)
+    let id = this.parseIdent(false)
     if (this.options.ecmaVersion >= 8 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
       return this.parseFunction(this.startNodeAt(startPos, startLoc), 0, false, true)
     if (canBeArrow && !this.canInsertSemicolon()) {
       if (this.eat(tt.arrow))
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false)
       if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name && !containsEsc) {
-        id = this.parseIdent()
+        id = this.parseIdent(false)
         if (this.canInsertSemicolon() || !this.eat(tt.arrow))
           this.unexpected()
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], true)
@@ -428,6 +433,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
     let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, spreadStart
     this.yieldPos = 0
     this.awaitPos = 0
+    // Do not save awaitIdentPos to allow checking awaits nested in parameters
     while (this.type !== tt.parenR) {
       first ? first = false : this.expect(tt.comma)
       if (allowTrailingComma && this.afterTrailingComma(tt.parenR, true)) {
@@ -665,6 +671,8 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
     if (isGenerator || isAsync) this.unexpected()
     this.checkUnreserved(prop.key)
+    if (prop.key.name === "await" && !this.awaitIdentPos)
+      this.awaitIdentPos = startPos
     prop.kind = "init"
     if (isPattern) {
       prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
@@ -704,7 +712,7 @@ pp.initFunction = function(node) {
 // Parse object or class method.
 
 pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
-  let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+  let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
 
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
@@ -714,6 +722,7 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
 
   this.yieldPos = 0
   this.awaitPos = 0
+  this.awaitIdentPos = 0
   this.enterScope(functionFlags(isAsync, node.generator) | SCOPE_SUPER | (allowDirectSuper ? SCOPE_DIRECT_SUPER : 0))
 
   this.expect(tt.parenL)
@@ -723,13 +732,14 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
+  this.awaitIdentPos = oldAwaitIdentPos
   return this.finishNode(node, "FunctionExpression")
 }
 
 // Parse arrow function expression with given parameters.
 
 pp.parseArrowExpression = function(node, params, isAsync) {
-  let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+  let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
 
   this.enterScope(functionFlags(isAsync, false) | SCOPE_ARROW)
   this.initFunction(node)
@@ -737,12 +747,14 @@ pp.parseArrowExpression = function(node, params, isAsync) {
 
   this.yieldPos = 0
   this.awaitPos = 0
+  this.awaitIdentPos = 0
 
   node.params = this.toAssignableList(params, true)
   this.parseFunctionBody(node, true, false)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
+  this.awaitIdentPos = oldAwaitIdentPos
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
@@ -833,9 +845,9 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructur
 
 pp.checkUnreserved = function({start, end, name}) {
   if (this.inGenerator && name === "yield")
-    this.raiseRecoverable(start, "Can not use 'yield' as identifier inside a generator")
+    this.raiseRecoverable(start, "Cannot use 'yield' as identifier inside a generator")
   if (this.inAsync && name === "await")
-    this.raiseRecoverable(start, "Can not use 'await' as identifier inside an async function")
+    this.raiseRecoverable(start, "Cannot use 'await' as identifier inside an async function")
   if (this.keywords.test(name))
     this.raise(start, `Unexpected keyword '${name}'`)
   if (this.options.ecmaVersion < 6 &&
@@ -843,7 +855,7 @@ pp.checkUnreserved = function({start, end, name}) {
   const re = this.strict ? this.reservedWordsStrict : this.reservedWords
   if (re.test(name)) {
     if (!this.inAsync && name === "await")
-      this.raiseRecoverable(start, "Can not use keyword 'await' outside an async function")
+      this.raiseRecoverable(start, "Cannot use keyword 'await' outside an async function")
     this.raiseRecoverable(start, `The keyword '${name}' is reserved`)
   }
 }
@@ -873,7 +885,11 @@ pp.parseIdent = function(liberal, isBinding) {
   }
   this.next()
   this.finishNode(node, "Identifier")
-  if (!liberal) this.checkUnreserved(node)
+  if (!liberal) {
+    this.checkUnreserved(node)
+    if (node.name === "await" && !this.awaitIdentPos)
+      this.awaitIdentPos = node.start
+  }
   return node
 }
 
