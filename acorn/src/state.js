@@ -68,7 +68,7 @@ export class Parser {
     this.potentialArrowAt = -1
 
     // Positions to delayed-check that yield/await does not exist in default parameters.
-    this.yieldPos = this.awaitPos = 0
+    this.yieldPos = this.awaitPos = this.awaitIdentPos = 0
     // Labels in scope.
     this.labels = []
     // Thus-far undefined exports.

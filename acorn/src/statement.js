@@ -520,9 +520,10 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
       this.checkLVal(node.id, (this.strict || node.generator || node.async) ? this.treatFunctionsAsVar ? BIND_VAR : BIND_LEXICAL : BIND_FUNCTION);
   }
 
-  let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos
+  let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
   this.yieldPos = 0
   this.awaitPos = 0
+  this.awaitIdentPos = 0
   this.enterScope(functionFlags(node.async, node.generator))
 
   if (!(statement & FUNC_STATEMENT))
@@ -533,6 +534,7 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
+  this.awaitIdentPos = oldAwaitIdentPos
   return this.finishNode(node, (statement & FUNC_STATEMENT) ? "FunctionDeclaration" : "FunctionExpression")
 }
 

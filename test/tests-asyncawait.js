@@ -216,9 +216,9 @@ test("async function await() { }", {
 }, {ecmaVersion: 8})
 
 // cannot use 'await' inside async functions.
-testFail("async function wrap() {\nasync function await() { }\n}", "Can not use 'await' as identifier inside an async function (2:15)", {ecmaVersion: 8})
-testFail("async function foo(await) { }", "Can not use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 8})
-testFail("async function foo() { return {await} }", "Can not use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 8})
+testFail("async function wrap() {\nasync function await() { }\n}", "Cannot use 'await' as identifier inside an async function (2:15)", {ecmaVersion: 8})
+testFail("async function foo(await) { }", "Cannot use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 8})
+testFail("async function foo() { return {await} }", "Cannot use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 8})
 
 //-----------------------------------------------------------------------------
 // Async Function Expressions
@@ -333,9 +333,9 @@ test("export default (async function() { })", {
 }, {ecmaVersion: 8, sourceType: "module"})
 
 // cannot use 'await' inside async functions.
-testFail("(async function await() { })", "Can not use 'await' as identifier inside an async function (1:16)", {ecmaVersion: 8})
-testFail("(async function foo(await) { })", "Can not use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
-testFail("(async function foo() { return {await} })", "Can not use 'await' as identifier inside an async function (1:32)", {ecmaVersion: 8})
+testFail("(async function await() { })", "Cannot use 'await' as identifier inside an async function (1:16)", {ecmaVersion: 8})
+testFail("(async function foo(await) { })", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
+testFail("(async function foo() { return {await} })", "Cannot use 'await' as identifier inside an async function (1:32)", {ecmaVersion: 8})
 
 //-----------------------------------------------------------------------------
 // Async Arrow Function Expressions
@@ -825,11 +825,26 @@ test("async (await)", {
 }, {ecmaVersion: 8})
 
 // cannot use 'await' inside async functions.
-testFail("async await => 1", "Can not use 'await' as identifier inside an async function (1:6)", {ecmaVersion: 8})
-testFail("async (await) => 1", "Can not use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 8})
-testFail("async ({await}) => 1", "Can not use 'await' as identifier inside an async function (1:8)", {ecmaVersion: 8})
-testFail("async ({a: await}) => 1", "Can not use 'await' as identifier inside an async function (1:11)", {ecmaVersion: 8})
-testFail("async ([await]) => 1", "Can not use 'await' as identifier inside an async function (1:8)", {ecmaVersion: 8})
+testFail("async await => 1", "Cannot use 'await' as identifier inside an async function (1:6)", {ecmaVersion: 8})
+testFail("async (await) => 1", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 8})
+testFail("async (...await) => 1", "Cannot use 'await' as identifier inside an async function (1:10)", {ecmaVersion: 8})
+testFail("async ({await}) => 1", "Cannot use 'await' as identifier inside an async function (1:8)", {ecmaVersion: 8})
+testFail("async ({a: await}) => 1", "Cannot use 'await' as identifier inside an async function (1:11)", {ecmaVersion: 8})
+test("async ({await: a}) => 1", {}, {ecmaVersion: 8})
+testFail("async ([await]) => 1", "Cannot use 'await' as identifier inside an async function (1:8)", {ecmaVersion: 8})
+testFail("async ([...await]) => 1", "Cannot use 'await' as identifier inside an async function (1:11)", {ecmaVersion: 8})
+test("async (b = {await: a}) => 1", {}, {ecmaVersion: 8})
+testFail("async (b = {await}) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
+testFail("async (b = {a: await}) => 1", "Cannot use 'await' as identifier inside an async function (1:15)", {ecmaVersion: 8})
+test("async (b = {await: a}) => 1", {}, {ecmaVersion: 8})
+testFail("async (b = [await]) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
+testFail("async (b = [...await]) => 1", "Cannot use 'await' as identifier inside an async function (1:15)", {ecmaVersion: 8})
+testFail("async (b = class await {}) => 1", "Cannot use 'await' as identifier inside an async function (1:17)", {ecmaVersion: 8})
+test("async (b = function await() {}) => 1", {}, {ecmaVersion: 8})
+test("async (b = function* await() {}) => 1", {}, {ecmaVersion: 8})
+testFail("async (b = (await) => {}) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
+testFail("async (await, b = async()) => 2", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 8})
+testFail("async (await, b = async () => {}) => 1", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 8})
 
 // can use 'yield' identifier outside generators.
 test("async yield => 1", {
@@ -1095,9 +1110,9 @@ test("({async await() { }})", {
 
 // cannot use 'await' inside async functions.
 test("async function wrap() {\n({async await() { }})\n}", {}, {ecmaVersion: 8})
-testFail("({async foo() { var await }})", "Can not use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
-testFail("({async foo(await) { }})", "Can not use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
-testFail("({async foo() { return {await} }})", "Can not use 'await' as identifier inside an async function (1:24)", {ecmaVersion: 8})
+testFail("({async foo() { var await }})", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
+testFail("({async foo(await) { }})", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
+testFail("({async foo() { return {await} }})", "Cannot use 'await' as identifier inside an async function (1:24)", {ecmaVersion: 8})
 
 // invalid syntax 'async foo: 1'
 testFail("({async foo: 1})", "Unexpected token (1:11)", {ecmaVersion: 8})
@@ -1641,9 +1656,9 @@ test("class A {static async await() { }}", {
 
 // cannot use 'await' inside async functions.
 test("async function wrap() {\nclass A {async await() { }}\n}", {}, {ecmaVersion: 8})
-testFail("class A {async foo() { var await }}", "Can not use 'await' as identifier inside an async function (1:27)", {ecmaVersion: 8})
-testFail("class A {async foo(await) { }}", "Can not use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 8})
-testFail("class A {async foo() { return {await} }}", "Can not use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 8})
+testFail("class A {async foo() { var await }}", "Cannot use 'await' as identifier inside an async function (1:27)", {ecmaVersion: 8})
+testFail("class A {async foo(await) { }}", "Cannot use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 8})
+testFail("class A {async foo() { return {await} }}", "Cannot use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 8})
 //-----------------------------------------------------------------------------
 // Await Expressions
 
@@ -1669,11 +1684,11 @@ test("await", {
 }, {ecmaVersion: 8})
 
 // 'await' is a keyword in modules.
-testFail("await", "Can not use keyword 'await' outside an async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
+testFail("await", "Cannot use keyword 'await' outside an async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
 
 // Await expressions is invalid outside of async functions.
 testFail("await a", "Unexpected token (1:6)", {ecmaVersion: 8})
-testFail("await a", "Can not use keyword 'await' outside an async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
+testFail("await a", "Cannot use keyword 'await' outside an async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
 
 // Await expressions in async functions.
 test("async function foo(a, b) { await a }", {

@@ -13,7 +13,7 @@ pp.toAssignable = function(node, isBinding, refDestructuringErrors) {
     switch (node.type) {
     case "Identifier":
       if (this.inAsync && node.name === "await")
-        this.raise(node.start, "Can not use 'await' as identifier inside an async function")
+        this.raise(node.start, "Cannot use 'await' as identifier inside an async function")
       break
 
     case "ObjectPattern":
