@@ -6,5 +6,3 @@ language/expressions/async-arrow-function/await-as-param-rest-nested-arrow-param
 language/expressions/async-arrow-function/await-as-param-rest-nested-arrow-parameter-position.js (strict mode)
 language/expressions/async-arrow-function/early-errors-arrow-await-in-formals-default.js (default)
 language/expressions/async-arrow-function/early-errors-arrow-await-in-formals-default.js (strict mode)
-language/expressions/object/prop-def-invalid-async-prefix.js (default)
-language/expressions/object/prop-def-invalid-async-prefix.js (strict mode)
