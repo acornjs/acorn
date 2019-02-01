@@ -96,7 +96,7 @@ testFail("/\\p{General_Category/u", "Invalid regular expression: /\\p{General_Ca
 testFail("/\\p{General_Category=/u", "Invalid regular expression: /\\p{General_Category=/: Invalid property name (1:1)", { ecmaVersion: 2018 })
 testFail("/\\p{General_Category=Letter/u", "Invalid regular expression: /\\p{General_Category=Letter/: Invalid property name (1:1)", { ecmaVersion: 2018 })
 test("/\\p{General_Category=Letter}/u", {}, { ecmaVersion: 2018 })
-testFail("/\\p{General_Category=Hiragana}/u", "Invalid regular expression: /\\p{General_Category=Hiragana}/: Invalid property name (1:1)", { ecmaVersion: 2018 })
+testFail("/\\p{General_Category=Hiragana}/u", "Invalid regular expression: /\\p{General_Category=Hiragana}/: Invalid property value (1:1)", { ecmaVersion: 2018 })
 test("/\\p{Script=Hiragana}/u", {}, { ecmaVersion: 2018 })
 testFail("/[\\p{Script=Hiragana}-\\p{Script=Katakana}]/u", "Invalid regular expression: /[\\p{Script=Hiragana}-\\p{Script=Katakana}]/: Invalid character class (1:1)", { ecmaVersion: 2018 })
 test("/[\\p{Script=Hiragana}\\-\\p{Script=Katakana}]/u", {}, { ecmaVersion: 2018 })

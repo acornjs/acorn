@@ -2,27 +2,24 @@ import {reservedWords, keywords} from "./identifier"
 import {types as tt} from "./tokentype"
 import {lineBreak} from "./whitespace"
 import {getOptions} from "./options"
+import {wordsRegexp} from "./util"
 import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER} from "./scopeflags"
-
-function keywordRegexp(words) {
-  return new RegExp("^(?:" + words.replace(/ /g, "|") + ")$")
-}
 
 export class Parser {
   constructor(options, input, startPos) {
     this.options = options = getOptions(options)
     this.sourceFile = options.sourceFile
-    this.keywords = keywordRegexp(keywords[options.ecmaVersion >= 6 ? 6 : 5])
+    this.keywords = wordsRegexp(keywords[options.ecmaVersion >= 6 ? 6 : 5])
     let reserved = ""
     if (!options.allowReserved) {
       for (let v = options.ecmaVersion;; v--)
         if (reserved = reservedWords[v]) break
       if (options.sourceType === "module") reserved += " await"
     }
-    this.reservedWords = keywordRegexp(reserved)
+    this.reservedWords = wordsRegexp(reserved)
     let reservedStrict = (reserved ? reserved + " " : "") + reservedWords.strict
-    this.reservedWordsStrict = keywordRegexp(reservedStrict)
-    this.reservedWordsStrictBind = keywordRegexp(reservedStrict + " " + reservedWords.strictBind)
+    this.reservedWordsStrict = wordsRegexp(reservedStrict)
+    this.reservedWordsStrictBind = wordsRegexp(reservedStrict + " " + reservedWords.strictBind)
     this.input = String(input)
 
     // Used to signal to callers of `readWord1` whether the word
