@@ -494,8 +494,9 @@ pp.parseVarId = function(decl, kind) {
 const FUNC_STATEMENT = 1, FUNC_HANGING_STATEMENT = 2, FUNC_NULLABLE_ID = 4
 
 // Parse a function declaration or literal (depending on the
-// `isStatement` parameter).
+// `statement & FUNC_STATEMENT`).
 
+// Remove `allowExpressionBody` for 7.0.0, as it is only called with false
 pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
   this.initFunction(node)
   if (this.options.ecmaVersion >= 9 || this.options.ecmaVersion >= 6 && !isAsync) {
@@ -525,7 +526,7 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
     node.id = this.type === tt.name ? this.parseIdent() : null
 
   this.parseFunctionParams(node)
-  this.parseFunctionBody(node, allowExpressionBody)
+  this.parseFunctionBody(node, allowExpressionBody, false)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
@@ -663,7 +664,7 @@ pp.parseExport = function(node, exports) {
       let fNode = this.startNode()
       this.next()
       if (isAsync) this.next()
-      node.declaration = this.parseFunction(fNode, FUNC_STATEMENT | FUNC_NULLABLE_ID, false, isAsync, true)
+      node.declaration = this.parseFunction(fNode, FUNC_STATEMENT | FUNC_NULLABLE_ID, false, isAsync)
     } else if (this.type === tt._class) {
       let cNode = this.startNode()
       node.declaration = this.parseClass(cNode, "nullableID")

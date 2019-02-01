@@ -38,8 +38,6 @@ language/expressions/async-arrow-function/await-as-param-rest-nested-arrow-param
 language/expressions/async-arrow-function/await-as-param-rest-nested-arrow-parameter-position.js (strict mode)
 language/expressions/async-arrow-function/early-errors-arrow-await-in-formals-default.js (default)
 language/expressions/async-arrow-function/early-errors-arrow-await-in-formals-default.js (strict mode)
-language/expressions/object/method-definition/early-errors-object-async-method-duplicate-parameters.js (default)
-language/expressions/object/method-definition/early-errors-object-method-duplicate-parameters.js (default)
 language/expressions/object/prop-def-invalid-async-prefix.js (default)
 language/expressions/object/prop-def-invalid-async-prefix.js (strict mode)
 language/module-code/early-export-global.js (default)
