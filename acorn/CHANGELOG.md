@@ -1,3 +1,17 @@
+## 6.0.7 (2019-02-04)
+
+### Bug fixes
+
+Check that exported bindings are defined.
+
+Don't treat `\u180e` as a whitespace character.
+
+Check for duplicate parameter names in methods.
+
+Don't allow shorthand properties when they are generators or async methods.
+
+Forbid binding `await` in async arrow function's parameter list.
+
 ## 6.0.6 (2019-01-30)
 
 ### Bug fixes
