@@ -16226,7 +16226,15 @@ testFail("var foo = 1; let foo = 1;", "Identifier 'foo' has already been declare
 
 testFail("{ var foo = 1; let foo = 1; }", "Identifier 'foo' has already been declared (1:19)", {ecmaVersion: 6})
 
+testFail("let bar; var foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:26)", {ecmaVersion: 6})
+
+testFail("{ let bar; var foo = 1; let foo = 1; }", "Identifier 'foo' has already been declared (1:28)", {ecmaVersion: 6})
+
 testFail("let foo = 1; var foo = 1;", "Identifier 'foo' has already been declared (1:17)", {ecmaVersion: 6})
+
+testFail("let bar; let foo = 1; var foo = 1;", "Identifier 'foo' has already been declared (1:26)", {ecmaVersion: 6})
+
+testFail("{ let bar; let foo = 1; var foo = 1; }", "Identifier 'foo' has already been declared (1:28)", {ecmaVersion: 6})
 
 testFail("let foo = 1; let foo = 1;", "Identifier 'foo' has already been declared (1:17)", {ecmaVersion: 6})
 
