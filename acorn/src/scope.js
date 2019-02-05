@@ -53,7 +53,7 @@ pp.declareName = function(name, bindingType, pos) {
   } else {
     for (let i = this.scopeStack.length - 1; i >= 0; --i) {
       const scope = this.scopeStack[i]
-      if (scope.lexical.indexOf(name) > -1 && !(scope.flags & SCOPE_SIMPLE_CATCH) && scope.lexical[0] === name ||
+      if (scope.lexical.indexOf(name) > -1 && !((scope.flags & SCOPE_SIMPLE_CATCH) && scope.lexical[0] === name) ||
           !this.treatFunctionsAsVarInScope(scope) && scope.functions.indexOf(name) > -1) {
         redeclared = true
         break
