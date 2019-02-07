@@ -3,7 +3,7 @@ if (parseInt(process.versions.node) > 4) {
   var join = require("path").join
   try {
     require("child_process").execSync(
-      join("node_modules", ".bin", "eslint") + " " + join(__dirname, "..", "src"),
+      join("node_modules", ".bin", "eslint") + " " + join(__dirname, "..", "*", "src"),
       {encoding: "utf8", stdio: "inherit"}
     )
     console.log("OK")

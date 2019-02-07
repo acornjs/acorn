@@ -20,7 +20,7 @@ pp.strictDirective = function(start) {
     // Skip semicolon, if any.
     skipWhiteSpace.lastIndex = start
     start += skipWhiteSpace.exec(this.input)[0].length
-    if (this.input[start] === ';')
+    if (this.input[start] === ";")
       start++
   }
 }

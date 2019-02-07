@@ -24,7 +24,7 @@ pp.parseTopLevel = function(node) {
   }
   if (this.inModule)
     for (let name of Object.keys(this.undefinedExports))
-      this.raiseRecoverable(this.undefinedExports[name].start, `Export '${name}' is not defined`);
+      this.raiseRecoverable(this.undefinedExports[name].start, `Export '${name}' is not defined`)
   this.adaptDirectivePrologue(node.body)
   this.next()
   if (this.options.ecmaVersion >= 6) {
@@ -488,7 +488,7 @@ pp.parseVar = function(node, isFor, kind) {
 
 pp.parseVarId = function(decl, kind) {
   if ((kind === "const" || kind === "let") && this.isContextual("let")) {
-    this.raiseRecoverable(this.start, "let is disallowed as a lexically bound name");
+    this.raiseRecoverable(this.start, "let is disallowed as a lexically bound name")
   }
   decl.id = this.parseBindingAtom()
   this.checkLVal(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false)
@@ -517,7 +517,7 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
       // subject to Annex B semantics (BIND_FUNCTION). Otherwise, the binding
       // mode depends on properties of the current scope (see
       // treatFunctionsAsVar).
-      this.checkLVal(node.id, (this.strict || node.generator || node.async) ? this.treatFunctionsAsVar ? BIND_VAR : BIND_LEXICAL : BIND_FUNCTION);
+      this.checkLVal(node.id, (this.strict || node.generator || node.async) ? this.treatFunctionsAsVar ? BIND_VAR : BIND_LEXICAL : BIND_FUNCTION)
   }
 
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
@@ -552,8 +552,8 @@ pp.parseClass = function(node, isStatement) {
 
   // ecma-262 14.6 Class Definitions
   // A class definition is always strict mode code.
-  const oldStrict = this.strict;
-  this.strict = true;
+  const oldStrict = this.strict
+  this.strict = true
 
   this.parseClassId(node, isStatement)
   this.parseClassSuper(node)
@@ -572,7 +572,7 @@ pp.parseClass = function(node, isStatement) {
     }
   }
   node.body = this.finishNode(classBody, "ClassBody")
-  this.strict = oldStrict;
+  this.strict = oldStrict
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
@@ -636,13 +636,13 @@ pp.parseClassMethod = function(method, isGenerator, isAsync, allowsDirectSuper) 
 
 pp.parseClassId = function(node, isStatement) {
   if (this.type === tt.name) {
-    node.id = this.parseIdent();
+    node.id = this.parseIdent()
     if (isStatement === true)
       this.checkLVal(node.id, BIND_LEXICAL, false)
   } else {
     if (isStatement === true)
-      this.unexpected();
-    node.id = null;
+      this.unexpected()
+    node.id = null
   }
 }
 
