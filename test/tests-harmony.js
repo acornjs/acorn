@@ -4688,6 +4688,16 @@ testFail("export { encrypt }", "Export 'encrypt' is not defined (1:9)", {
   sourceType: "module"
 });
 
+testFail("class Test {}; export default class Test {}", "Identifier 'Test' has already been declared (1:36)", {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
+test("export default class Test {}; export { Test }", {}, {
+  ecmaVersion: 6,
+  sourceType: "module"
+});
+
 testFail("export { encrypt, encrypt }", "Duplicate export 'encrypt' (1:18)", {
   ecmaVersion: 6,
   sourceType: "module"

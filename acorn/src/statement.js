@@ -637,7 +637,7 @@ pp.parseClassMethod = function(method, isGenerator, isAsync, allowsDirectSuper) 
 pp.parseClassId = function(node, isStatement) {
   if (this.type === tt.name) {
     node.id = this.parseIdent()
-    if (isStatement === true)
+    if (isStatement)
       this.checkLVal(node.id, BIND_LEXICAL, false)
   } else {
     if (isStatement === true)
