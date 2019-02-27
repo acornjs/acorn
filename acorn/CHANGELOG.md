@@ -1,3 +1,9 @@
+## 6.1.1 (2019-02-27)
+
+### Bug fixes
+
+Fix bug that caused parsing default exports of with names to fail.
+
 ## 6.1.0 (2019-02-08)
 
 ### Bug fixes
