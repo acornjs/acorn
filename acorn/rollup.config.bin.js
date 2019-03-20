@@ -1,10 +1,12 @@
 import buble from "rollup-plugin-buble"
 
 export default {
-  entry: "acorn/src/bin/acorn.js",
-  dest: "acorn/dist/bin.js",
-  format: "cjs",
-  external: ["fs", "path", "acorn"],
-  paths: {acorn: "./acorn.js"},
+  input: "acorn/src/bin/acorn.js",
+  output: {
+    file: "acorn/dist/bin.js",
+    format: "cjs",
+    paths: {acorn: "./acorn.js"},
+    external: ["fs", "path", "acorn"]
+  },
   plugins: [buble()]
 }
