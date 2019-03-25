@@ -6028,95 +6028,6 @@ test("for (var x of list) process(x);", {
   locations: true
 });
 
-test("for (var x = 42 of list) process(x);", {
-  type: "Program",
-  body: [{
-    type: "ForOfStatement",
-    left: {
-      type: "VariableDeclaration",
-      declarations: [{
-        type: "VariableDeclarator",
-        id: {
-          type: "Identifier",
-          name: "x",
-          loc: {
-            start: {line: 1, column: 9},
-            end: {line: 1, column: 10}
-          }
-        },
-        init: {
-          type: "Literal",
-          value: 42,
-          raw: "42",
-          loc: {
-            start: {line: 1, column: 13},
-            end: {line: 1, column: 15}
-          }
-        },
-        loc: {
-          start: {line: 1, column: 9},
-          end: {line: 1, column: 15}
-        }
-      }],
-      kind: "var",
-      loc: {
-        start: {line: 1, column: 5},
-        end: {line: 1, column: 15}
-      }
-    },
-    right: {
-      type: "Identifier",
-      name: "list",
-      loc: {
-        start: {line: 1, column: 19},
-        end: {line: 1, column: 23}
-      }
-    },
-    body: {
-      type: "ExpressionStatement",
-      expression: {
-        type: "CallExpression",
-        callee: {
-          type: "Identifier",
-          name: "process",
-          loc: {
-            start: {line: 1, column: 25},
-            end: {line: 1, column: 32}
-          }
-        },
-        arguments: [{
-          type: "Identifier",
-          name: "x",
-          loc: {
-            start: {line: 1, column: 33},
-            end: {line: 1, column: 34}
-          }
-        }],
-        loc: {
-          start: {line: 1, column: 25},
-          end: {line: 1, column: 35}
-        }
-      },
-      loc: {
-        start: {line: 1, column: 25},
-        end: {line: 1, column: 36}
-      }
-    },
-    loc: {
-      start: {line: 1, column: 0},
-      end: {line: 1, column: 36}
-    }
-  }],
-  loc: {
-    start: {line: 1, column: 0},
-    end: {line: 1, column: 36}
-  }
-}, {
-  ecmaVersion: 6,
-  ranges: true,
-  locations: true
-});
-
 test("for (let x of list) process(x);", {
   type: "Program",
   body: [{
@@ -13204,9 +13115,15 @@ testFail("\"use strict\"; ({ v: eval } = obj)", "Assigning to eval in strict mod
 
 testFail("\"use strict\"; ({ v: arguments } = obj)", "Assigning to arguments in strict mode (1:20)", {ecmaVersion: 6});
 
-testFail("for (let x = 42 in list) process(x);", "Unexpected token (1:16)", {ecmaVersion: 6});
+testFail("for (let x = 42 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
+testFail("for (const x = 42 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 
-testFail("for (let x = 42 of list) process(x);", "Unexpected token (1:16)", {ecmaVersion: 6});
+testFail("for (let x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
+testFail("for (const x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
+testFail("for (var x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
+testFail("for (var {x} = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
+testFail("for (var [x] = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
+testFail("var x; for (x = 42 of list) process(x);", "Invalid left-hand side in for-loop (1:12)", {ecmaVersion: 6});
 
 testFail("import foo", "Unexpected token (1:10)", {ecmaVersion: 6, sourceType: "module"});
 
