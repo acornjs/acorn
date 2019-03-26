@@ -451,7 +451,12 @@ pp.parseForIn = function(node, init) {
   if (
     init.type === "VariableDeclaration" &&
     init.declarations[0].init != null &&
-    (!isForIn || this.strict || init.kind !== "var" || init.declarations[0].id.type !== "Identifier")
+    (
+      this.options.ecmaVersion < 8 ||
+      this.strict ||
+      init.kind !== "var" ||
+      init.declarations[0].id.type !== "Identifier"
+    )
   ) {
     this.raise(
       init.start,
