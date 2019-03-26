@@ -13121,6 +13121,7 @@ testFail("for (const x = 42 in list) process(x);", "for-in loop variable declara
 testFail("for (let x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 testFail("for (const x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 testFail("for (var x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
+testFail("for (var x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 8});
 testFail("for (var {x} = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 testFail("for (var [x] = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 testFail("var x; for (x = 42 of list) process(x);", "Invalid left-hand side in for-loop (1:12)", {ecmaVersion: 6});
