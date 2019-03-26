@@ -19689,9 +19689,11 @@ test("for (var x in list) process(x);", {
     }
   }
 });
-testFail("var x; for (x = 0 in list) process(x);", "Invalid assignment in for-in loop head (1:12)", { ecmaVersion: 6 })
-testFail("'use strict'; for (var x = 0 in list) process(x);", "Invalid assignment in for-in loop head (1:19)")
-testFail("for (var [x] = 0 in list) process(x);", "Invalid assignment in for-in loop head (1:5)", { ecmaVersion: 6 })
+testFail("var x; for (x = 0 in list) process(x);", "Invalid left-hand side in for-loop (1:12)", { ecmaVersion: 6 })
+testFail("'use strict'; for (var x = 0 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:19)")
+testFail("for (var [x] = 0 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
+testFail("for (var {x} = 0 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
+testFail("for (var x = 42 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
 
 test("for (var x = 42 in list) process(x);", {
   type: "Program",
@@ -19847,7 +19849,7 @@ test("for (var x = 42 in list) process(x);", {
       column: 36
     }
   }
-});
+}, { ecmaVersion: 8, locations: true });
 
 test("for (var i = function() { return 10 in [] } in list) process(x);", {
   type: "Program",
@@ -20074,7 +20076,7 @@ test("for (var i = function() { return 10 in [] } in list) process(x);", {
       column: 64
     }
   }
-});
+}, { ecmaVersion: 8, locations: true });
 
 test("while (true) { continue; }", {
   type: "Program",
