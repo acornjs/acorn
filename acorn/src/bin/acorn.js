@@ -46,7 +46,11 @@ function run(code) {
       } while (token.type !== acorn.tokTypes.eof)
     }
   } catch (e) {
-    console.error(e.message)
+    let messageText = e.message
+    if (infile && infile !== "-") {
+      messageText = infile + ": " + messageText
+    }
+    console.error(messageText)
     process.exit(1)
   }
   if (!silent) console.log(JSON.stringify(result, null, compact ? null : 2))
