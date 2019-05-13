@@ -46,7 +46,7 @@ function run(code) {
       } while (token.type !== acorn.tokTypes.eof)
     }
   } catch (e) {
-    console.error(infile ? e.message.replace(/\(\d+:\d+\)$/, m => m.slice(0, 1) + infile + " " + m.slice(1)) : e.message)
+    console.error(infile && infile != "-" ? e.message.replace(/\(\d+:\d+\)$/, m => m.slice(0, 1) + infile + " " + m.slice(1)) : e.message)
     process.exit(1)
   }
   if (!silent) console.log(JSON.stringify(result, null, compact ? null : 2))
