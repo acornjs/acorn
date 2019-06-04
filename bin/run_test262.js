@@ -11,14 +11,13 @@ const unsupportedFeatures = [
   "class-static-fields-private",
   "class-static-fields-public",
   "class-static-methods-private",
-  "dynamic-import",
   "export-star-as-namespace-from-module",
   "import.meta",
   "numeric-separator-literal"
 ];
 
 run(
-  (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: 10, allowHashBang: true}),
+  (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: 11, allowHashBang: true}),
   {
     testsDirectory: path.dirname(require.resolve("test262/package.json")),
     skip: test => (test.attrs.features && unsupportedFeatures.some(f => test.attrs.features.includes(f))),
