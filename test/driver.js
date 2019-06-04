@@ -61,7 +61,7 @@ exports.runTests = function(config, callback) {
   }
 };
 
-function ppJSON(v) { return v instanceof RegExp ? v.toString() : JSON.stringify(v, null, 2); }
+function ppJSON(v) { return v instanceof RegExp ? v.toString() : (typeof v == "bigint" ? v.toString() : JSON.stringify(v, null, 2)); }
 function addPath(str, pt) {
   if (str.charAt(str.length-1) == ")")
     return str.slice(0, str.length-1) + "/" + pt + ")";

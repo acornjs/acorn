@@ -427,10 +427,14 @@ pp.readInt = function(radix, len) {
 }
 
 pp.readRadixNumber = function(radix) {
+  let start = this.pos
   this.pos += 2 // 0x
   let val = this.readInt(radix)
   if (val == null) this.raise(this.start + 2, "Expected number in radix " + radix)
-  if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
+  if (this.options.ecmaVersion >= 11 && this.input.charCodeAt(this.pos) === 110) {
+    val = typeof BigInt !== "undefined" ? BigInt(this.input.slice(start, this.pos)) : null
+    ++this.pos
+  } else if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
   return this.finishToken(tt.num, val)
 }
 
@@ -443,6 +447,13 @@ pp.readNumber = function(startsWithDot) {
   if (octal && this.strict) this.raise(start, "Invalid number")
   if (octal && /[89]/.test(this.input.slice(start, this.pos))) octal = false
   let next = this.input.charCodeAt(this.pos)
+  if (!octal && !startsWithDot && this.options.ecmaVersion >= 11 && next === 110) {
+    let str = this.input.slice(start, this.pos)
+    let val = typeof BigInt !== "undefined" ? BigInt(str) : null
+    ++this.pos
+    if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
+    return this.finishToken(tt.num, val)
+  }
   if (next === 46 && !octal) { // '.'
     ++this.pos
     this.readInt(10)
