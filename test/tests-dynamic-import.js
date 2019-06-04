@@ -1,4 +1,4 @@
-// Tests for ECMAScript 2020 dynaimic import
+// Tests for ECMAScript 2020 dynamic import
 
 if (typeof exports != 'undefined') {
   var test = require('./driver.js').test;
@@ -87,9 +87,42 @@ test(
 );
 
 testFail('function failsParse() { return import.then(); }', 'Unexpected token (1:37)', {
-  ecmaVersion: 11
+  ecmaVersion: 11,
+  loose: false
 });
 
 testFail("var dynImport = import; dynImport('http');", 'Unexpected token (1:22)', {
-  ecmaVersion: 11
+  ecmaVersion: 11,
+  loose: false
+});
+
+testFail("import('test.js')", 'Unexpected token (1:6)', {
+  ecmaVersion: 10,
+  loose: false,
+  sourceType: 'module'
+});
+
+testFail("import()", 'import() requires exactly one argument (1:0)', {
+  ecmaVersion: 11,
+  loose: false
+});
+
+testFail("import(a, b)", 'import() requires exactly one argument (1:0)', {
+  ecmaVersion: 11,
+  loose: false
+});
+
+testFail("import(...[a])", '... is not allowed in import() (1:7)', {
+  ecmaVersion: 11,
+  loose: false
+});
+
+testFail("import(source,)", 'Unexpected token (1:14)', {
+  ecmaVersion: 11,
+  loose: false
+});
+
+testFail("new import(source)", 'Cannot use new with import(...) (1:4)', {
+  ecmaVersion: 11,
+  loose: false
 });

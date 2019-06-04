@@ -281,7 +281,7 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow)
     this.yieldPos = 0
     this.awaitPos = 0
     this.awaitIdentPos = 0
-    let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
+    let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8 && base.type !== "Import", false, refDestructuringErrors)
     if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
       this.checkPatternErrors(refDestructuringErrors, false)
       this.checkYieldAwaitInDefaultParams()
@@ -299,6 +299,16 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow)
     let node = this.startNodeAt(startPos, startLoc)
     node.callee = base
     node.arguments = exprList
+    if (node.callee.type === "Import") {
+      if (node.arguments.length !== 1) {
+        this.raise(node.start, "import() requires exactly one argument")
+      }
+
+      const importArg = node.arguments[0]
+      if (importArg && importArg.type === "SpreadElement") {
+        this.raise(importArg.start, "... is not allowed in import()")
+      }
+    }
     base = this.finishNode(node, "CallExpression")
   } else if (this.type === tt.backQuote) {
     let node = this.startNodeAt(startPos, startLoc)
@@ -538,7 +548,10 @@ pp.parseNew = function() {
   }
   let startPos = this.start, startLoc = this.startLoc
   node.callee = this.parseSubscripts(this.parseExprAtom(), startPos, startLoc, true)
-  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false)
+  if (this.options.ecmaVersion > 10 && node.callee.type === "Import") {
+    this.raise(node.callee.start, "Cannot use new with import(...)")
+  }
+  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8 && node.callee.type !== "Import", false)
   else node.arguments = empty
   return this.finishNode(node, "NewExpression")
 }
