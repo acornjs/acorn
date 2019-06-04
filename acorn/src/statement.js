@@ -120,6 +120,14 @@ pp.parseStatement = function(context, topLevel, exports) {
   case tt.semi: return this.parseEmptyStatement(node)
   case tt._export:
   case tt._import:
+    if (this.options.ecmaVersion > 10 && starttype === tt._import) {
+      skipWhiteSpace.lastIndex = this.pos
+      let skip = skipWhiteSpace.exec(this.input)
+      let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
+      if (nextCh === 40) // '('
+        return this.parseExpressionStatement(node, this.parseExpression())
+    }
+
     if (!this.options.allowImportExportEverywhere) {
       if (!topLevel)
         this.raise(this.start, "'import' and 'export' may only appear at the top level")

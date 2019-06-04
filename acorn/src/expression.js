@@ -409,9 +409,25 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   case tt.backQuote:
     return this.parseTemplate()
 
+  case tt._import:
+    if (this.options.ecmaVersion > 10) {
+      return this.parseDynamicImport()
+    } else {
+      return this.unexpected()
+    }
+
   default:
     this.unexpected()
   }
+}
+
+pp.parseDynamicImport = function() {
+  const node = this.startNode()
+  this.next()
+  if (this.type !== tt.parenL) {
+    this.unexpected()
+  }
+  return this.finishNode(node, "Import")
 }
 
 pp.parseLiteral = function(value) {
