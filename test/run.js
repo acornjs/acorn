@@ -14,6 +14,7 @@
   require("./tests-regexp-2018.js");
   require("./tests-json-superset.js");
   require("./tests-optional-catch-binding.js");
+  require("./tests-bigint.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")
 

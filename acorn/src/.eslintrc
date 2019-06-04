@@ -25,7 +25,8 @@
         "space-before-function-paren": ["error", "never"]
     },
     "globals": {
-        "Packages": false
+        "Packages": false,
+        "BigInt": false
     },
     "plugins": [
         "import"

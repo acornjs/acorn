@@ -244,6 +244,7 @@ lp.parseExprAtom = function() {
     node = this.startNode()
     node.value = this.tok.value
     node.raw = this.input.slice(this.tok.start, this.tok.end)
+    if (this.tok.type === tt.num && node.raw.charCodeAt(node.raw.length - 1) === 110) node.bigint = node.raw.slice(0, -1)
     this.next()
     return this.finishNode(node, "Literal")
 
