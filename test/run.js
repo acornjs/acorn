@@ -15,6 +15,7 @@
   require("./tests-json-superset.js");
   require("./tests-optional-catch-binding.js");
   require("./tests-bigint.js");
+  require("./tests-dynamic-import.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")
 

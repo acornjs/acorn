@@ -178,6 +178,12 @@ lp.parseStatement = function() {
     return this.parseClass(true)
 
   case tt._import:
+    if (this.options.ecmaVersion > 10 && this.lookAhead(1).type === tt.parenL) {
+      node.expression = this.parseExpression()
+      this.semicolon()
+      return this.finishNode(node, "ExpressionStatement")
+    }
+
     return this.parseImport()
 
   case tt._export:

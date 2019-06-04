@@ -10,7 +10,6 @@ const unsupportedFeatures = [
   "class-static-fields-private",
   "class-static-fields-public",
   "class-static-methods-private",
-  "dynamic-import",
   "export-star-as-namespace-from-module",
   "import.meta",
   "numeric-separator-literal"

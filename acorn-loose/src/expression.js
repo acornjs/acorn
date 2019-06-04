@@ -296,9 +296,22 @@ lp.parseExprAtom = function() {
   case tt.backQuote:
     return this.parseTemplate()
 
+  case tt._import:
+    if (this.options.ecmaVersion > 10) {
+      return this.parseDynamicImport()
+    } else {
+      return this.dummyIdent()
+    }
+
   default:
     return this.dummyIdent()
   }
+}
+
+lp.parseDynamicImport = function() {
+  const node = this.startNode()
+  this.next()
+  return this.finishNode(node, "Import")
 }
 
 lp.parseNew = function() {
