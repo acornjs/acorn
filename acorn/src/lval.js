@@ -1,7 +1,7 @@
 import {types as tt} from "./tokentype"
 import {Parser} from "./state"
 import {has} from "./util"
-import {BIND_NONE, BIND_OUTSIDE} from "./scopeflags"
+import {BIND_NONE, BIND_OUTSIDE, BIND_LEXICAL} from "./scopeflags"
 
 const pp = Parser.prototype
 
@@ -189,6 +189,8 @@ pp.parseMaybeDefault = function(startPos, startLoc, left) {
 pp.checkLVal = function(expr, bindingType = BIND_NONE, checkClashes) {
   switch (expr.type) {
   case "Identifier":
+    if (bindingType === BIND_LEXICAL && expr.name === "let")
+      this.raiseRecoverable(expr.start, "let is disallowed as a lexically bound name")
     if (this.strict && this.reservedWordsStrictBind.test(expr.name))
       this.raiseRecoverable(expr.start, (bindingType ? "Binding " : "Assigning to ") + expr.name + " in strict mode")
     if (checkClashes) {

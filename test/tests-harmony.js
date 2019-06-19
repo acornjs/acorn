@@ -13409,9 +13409,25 @@ testFail("let let", "let is disallowed as a lexically bound name (1:4)", {ecmaVe
 
 testFail("const let", "let is disallowed as a lexically bound name (1:6)", {ecmaVersion: 6})
 
-testFail("'use strict'; let let", "let is disallowed as a lexically bound name (1:18)", {ecmaVersion: 6})
+testFail("let { let } = {};", "let is disallowed as a lexically bound name (1:6)", {ecmaVersion: 6})
 
-testFail("'use strict'; const let", "let is disallowed as a lexically bound name (1:20)", {ecmaVersion: 6})
+testFail("const { let } = {};", "let is disallowed as a lexically bound name (1:8)", {ecmaVersion: 6})
+
+testFail("let [let] = [];", "let is disallowed as a lexically bound name (1:5)", {ecmaVersion: 6})
+
+testFail("const [let] = [];", "let is disallowed as a lexically bound name (1:7)", {ecmaVersion: 6})
+
+testFail("'use strict'; let let", "The keyword 'let' is reserved (1:18)", {ecmaVersion: 6})
+
+testFail("'use strict'; const let", "The keyword 'let' is reserved (1:20)", {ecmaVersion: 6})
+
+testFail("'use strict'; let { let } = {};", "The keyword 'let' is reserved (1:20)", {ecmaVersion: 6})
+
+testFail("'use strict'; const { let } = {};", "The keyword 'let' is reserved (1:22)", {ecmaVersion: 6})
+
+testFail("'use strict'; let [let] = [];", "The keyword 'let' is reserved (1:19)", {ecmaVersion: 6})
+
+testFail("'use strict'; const [let] = [];", "The keyword 'let' is reserved (1:21)", {ecmaVersion: 6})
 
 test("if (1) let\n{}", {}, {ecmaVersion: 6})
 
