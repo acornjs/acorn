@@ -260,7 +260,6 @@ The utility spits out the syntax tree as JSON data.
 Plugins for ECMAScript proposals:
  
  - [`acorn-stage3`](https://github.com/acornjs/acorn-stage3): Parse most stage 3 proposals, bundling:
-   - [`acorn-async-iteration`](https://github.com/acornjs/acorn-async-iteration): Parse [async iteration proposal](https://github.com/tc39/proposal-async-iteration)
    - [`acorn-bigint`](https://github.com/acornjs/acorn-bigint): Parse [BigInt proposal](https://github.com/tc39/proposal-bigint)
    - [`acorn-class-fields`](https://github.com/acornjs/acorn-class-fields): Parse [class fields proposal](https://github.com/tc39/proposal-class-fields)
    - [`acorn-dynamic-import`](https://github.com/kesne/acorn-dynamic-import): Parse [import() proposal](https://github.com/tc39/proposal-dynamic-import)
