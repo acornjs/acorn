@@ -1,3 +1,11 @@
+## 6.1.0 (2019-07-04)
+
+## New features
+
+Support bigint syntax.
+
+Support dynamic import.
+
 ## 6.0.0 (2018-09-14)
 
 ### Breaking changes
