@@ -16,7 +16,7 @@ declare namespace acorn {
     sourceType?: 'script' | 'module'
     onInsertedSemicolon?: (lastTokEnd: number, lastTokEndLoc?: Position) => void
     onTrailingComma?: (lastTokEnd: number, lastTokEndLoc?: Position) => void
-    allowReserved?: boolean
+    allowReserved?: boolean | 'never'
     allowReturnOutsideFunction?: boolean
     allowImportExportEverywhere?: boolean
     allowAwaitOutsideFunction?: boolean
