@@ -297,8 +297,8 @@ lp.parseExprAtom = function() {
     return this.parseTemplate()
 
   case tt._import:
-    if (this.options.ecmaVersion > 10) {
-      return this.parseDynamicImport()
+    if (this.options.ecmaVersion >= 11) {
+      return this.parseExprImport()
     } else {
       return this.dummyIdent()
     }
@@ -308,10 +308,21 @@ lp.parseExprAtom = function() {
   }
 }
 
-lp.parseDynamicImport = function() {
+lp.parseExprImport = function() {
   const node = this.startNode()
-  this.next()
-  return this.finishNode(node, "Import")
+  this.next() // skip `import`
+  switch (this.tok.type) {
+  case tt.parenL:
+    return this.parseDynamicImport(node)
+  default:
+    node.name = "import"
+    return this.finishNode(node, "Identifier")
+  }
+}
+
+lp.parseDynamicImport = function(node) {
+  node.source = this.parseExprList(tt.parenR)[0] || this.dummyString()
+  return this.finishNode(node, "ImportExpression")
 }
 
 lp.parseNew = function() {
