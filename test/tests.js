@@ -29406,3 +29406,5 @@ test("'use strict'; let foo = function foo() {}", {}, {ecmaVersion: 6})
 
 test("/**/ --> comment\n", {})
 test("x.class++", {})
+
+testFail("½", "Unexpected character '½' (1:0)")
