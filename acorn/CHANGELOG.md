@@ -1,3 +1,11 @@
+## 6.2.1 (2019-07-21)
+
+### Bug fixes
+
+Fix bug causing Acorn to treat some characters as identifier characters that shouldn't be treated as such.
+
+Fix issue where setting the `allowReserved` option to `"never"` allowed reserved words in some circumstances.
+
 ## 6.2.0 (2019-07-04)
 
 ### Bug fixes
