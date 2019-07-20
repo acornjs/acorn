@@ -18,7 +18,7 @@ function search(arr, ch, starting) {
 
 function esc(code) {
   let hex = code.toString(16)
-  return hex.length <= 2 ? hex.padStart(2, "0") : "\\u" + hex.padStart(4, "0")
+  return hex.length <= 2 ? "\\x" + hex.padStart(2, "0") : "\\u" + hex.padStart(4, "0")
 }
 
 function generate(chars) {
