@@ -1,5 +1,5 @@
-import {Parser} from "./state"
-import {SourceLocation} from "./locutil"
+import {Parser} from "./state.mjs"
+import {SourceLocation} from "./locutil.mjs"
 
 export class Node {
   constructor(parser, pos, loc) {

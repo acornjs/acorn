@@ -1,4 +1,4 @@
-import {wordsRegexp} from "./util.js"
+import {wordsRegexp} from "./util.mjs"
 
 // This file contains Unicode properties extracted from the ECMAScript
 // specification. The lists are extracted like so:

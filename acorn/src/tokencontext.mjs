@@ -2,9 +2,9 @@
 // given point in the program is loosely based on sweet.js' approach.
 // See https://github.com/mozilla/sweet.js/wiki/design
 
-import {Parser} from "./state"
-import {types as tt} from "./tokentype"
-import {lineBreak} from "./whitespace"
+import {Parser} from "./state.mjs"
+import {types as tt} from "./tokentype.mjs"
+import {lineBreak} from "./whitespace.mjs"
 
 export class TokContext {
   constructor(token, isExpr, preserveSpace, override, generator) {
