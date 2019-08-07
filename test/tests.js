@@ -29,8 +29,7 @@ test("new Object", {
         arguments: []
       }
     }
-  ],
-  sourceType: "script"
+  ]
 }, {
   allowReserved: "never"
 });
