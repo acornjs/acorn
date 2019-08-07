@@ -902,7 +902,6 @@ pp.checkUnreserved = function({start, end, name}) {
 
 pp.parseIdent = function(liberal, isBinding) {
   let node = this.startNode()
-  if (liberal && this.options.allowReserved === "never") liberal = false
   if (this.type === tt.name) {
     node.name = this.value
   } else if (this.type.keyword) {
