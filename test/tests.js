@@ -7,6 +7,34 @@ if (typeof exports != "undefined") {
   var acorn = require("../acorn");
 }
 
+test("new Object", {
+  type: "Program",
+  start: 0,
+  end: 10,
+  body: [
+    {
+      type: "ExpressionStatement",
+      start: 0,
+      end: 10,
+      expression: {
+        type: "NewExpression",
+        start: 0,
+        end: 10,
+        callee: {
+          type: "Identifier",
+          start: 4,
+          end: 10,
+          name: "Object"
+        },
+        arguments: []
+      }
+    }
+  ],
+  sourceType: "script"
+}, {
+  allowReserved: "never"
+});
+
 test("this\n", {
   type: "Program",
   body: [
