@@ -64,6 +64,9 @@ an object containing any of these fields:
   either `"script"` or `"module"`. This influences global strict mode
   and parsing of `import` and `export` declarations.
 
+  **NOTE**: If set to `"module"`, then static `import` / `export` syntax
+  will be valid, even if `ecmaVersion` is less than 6.
+
 - **onInsertedSemicolon**: If given a callback, that callback will be
   called whenever a missing semicolon is inserted by the parser. The
   callback will be given the character offset of the point where the

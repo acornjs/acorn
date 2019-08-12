@@ -7,6 +7,35 @@ if (typeof exports != "undefined") {
   var acorn = require("../acorn");
 }
 
+test("import ''", {
+  type: "Program",
+  start: 0,
+  end: 9,
+  body: [
+    {
+      type: "ImportDeclaration",
+      start: 0,
+      end: 9,
+      specifiers: [],
+      source: {
+        type: "Literal",
+        start: 7,
+        end: 9,
+        value: "",
+        raw: "''"
+      }
+    }
+  ]
+}, {
+  ecmaVersion: 5,
+  sourceType: "module"
+});
+
+testFail("import('')", "Unexpected token (1:6)", {
+  ecmaVersion: 5,
+  sourceType: "module"
+});
+
 test("new Object", {
   type: "Program",
   start: 0,
