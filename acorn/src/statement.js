@@ -27,9 +27,7 @@ pp.parseTopLevel = function(node) {
       this.raiseRecoverable(this.undefinedExports[name].start, `Export '${name}' is not defined`)
   this.adaptDirectivePrologue(node.body)
   this.next()
-  if (this.options.ecmaVersion >= 6 || this.options.sourceType === "module") {
-    node.sourceType = this.options.sourceType
-  }
+  node.sourceType = this.options.sourceType
   return this.finishNode(node, "Program")
 }
 
