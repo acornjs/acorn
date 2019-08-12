@@ -439,13 +439,13 @@ pp.parseDynamicImport = function(node) {
   node.source = this.parseMaybeAssign()
 
   // Verify ending.
-  const commaPos = this.start
-  const commaExists = this.eat(tt.comma)
   if (!this.eat(tt.parenR)) {
-    this.unexpected(commaPos)
-  }
-  if (commaExists) {
-    this.raiseRecoverable(commaPos, "Trailing comma is not allowed in import()")
+    const errorPos = this.start
+    if (this.eat(tt.comma) && this.eat(tt.parenR)) {
+      this.raiseRecoverable(errorPos, "Trailing comma is not allowed in import()")
+    } else {
+      this.unexpected(errorPos)
+    }
   }
 
   return this.finishNode(node, "ImportExpression")
