@@ -1,3 +1,9 @@
+## 6.3.0 (2019-08-12)
+
+### New features
+
+`sourceType: "module"` can now be used even when `ecmaVersion` is less than 6, to parse module-style code that otherwise conforms to an older standard.
+
 ## 6.2.1 (2019-07-21)
 
 ### Bug fixes
