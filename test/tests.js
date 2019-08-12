@@ -21,8 +21,8 @@ test("import ''", {
         type: "Literal",
         start: 7,
         end: 9,
-        value: '',
-        raw: ''
+        value: "",
+        raw: "''"
       }
     }
   ]
