@@ -230,7 +230,7 @@ testFail("import(a, b)", 'Unexpected token (1:8)', {
   loose: false
 });
 
-testFail("import(...[a])", '... is not allowed in import() (1:7)', {
+testFail("import(...[a])", 'Unexpected token (1:7)', {
   ecmaVersion: 11,
   loose: false
 });

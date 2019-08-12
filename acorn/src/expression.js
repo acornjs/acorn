@@ -439,9 +439,6 @@ pp.parseDynamicImport = function(node) {
   this.next() // skip `(`
 
   // Parse node.source.
-  if (this.type === tt.ellipsis) {
-    this.raise(this.start, "... is not allowed in import()")
-  }
   node.source = this.parseMaybeAssign()
 
   // Verify ending.
