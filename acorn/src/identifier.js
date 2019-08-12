@@ -14,6 +14,7 @@ const ecma5AndLessKeywords = "break case catch continue debugger default do else
 
 export const keywords = {
   5: ecma5AndLessKeywords,
+  "5plus": ecma5AndLessKeywords + " export import",
   6: ecma5AndLessKeywords + " const class extends export import super"
 }
 
