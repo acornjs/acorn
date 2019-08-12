@@ -65,7 +65,7 @@ an object containing any of these fields:
   and parsing of `import` and `export` declarations.
 
   **NOTE**: If set to `"module"`, then static `import` / `export` syntax
-  will be valid, even if ecmaVersion is less than 6.
+  will be valid, even if `ecmaVersion` is less than 6.
 
 - **onInsertedSemicolon**: If given a callback, that callback will be
   called whenever a missing semicolon is inserted by the parser. The
