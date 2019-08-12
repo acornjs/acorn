@@ -7,7 +7,6 @@ if (typeof exports != "undefined") {
   var acorn = require("../acorn");
 }
 
-
 test("import ''", {
   type: "Program",
   start: 0,
