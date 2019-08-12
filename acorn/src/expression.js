@@ -281,7 +281,7 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow)
     this.yieldPos = 0
     this.awaitPos = 0
     this.awaitIdentPos = 0
-    let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8 && base.type !== "Import", false, refDestructuringErrors)
+    let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
     if (maybeAsyncArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
       this.checkPatternErrors(refDestructuringErrors, false)
       this.checkYieldAwaitInDefaultParams()
@@ -299,16 +299,6 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow)
     let node = this.startNodeAt(startPos, startLoc)
     node.callee = base
     node.arguments = exprList
-    if (node.callee.type === "Import") {
-      if (node.arguments.length !== 1) {
-        this.raise(node.start, "import() requires exactly one argument")
-      }
-
-      const importArg = node.arguments[0]
-      if (importArg && importArg.type === "SpreadElement") {
-        this.raise(importArg.start, "... is not allowed in import()")
-      }
-    }
     base = this.finishNode(node, "CallExpression")
   } else if (this.type === tt.backQuote) {
     let node = this.startNodeAt(startPos, startLoc)
@@ -420,8 +410,8 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     return this.parseTemplate()
 
   case tt._import:
-    if (this.options.ecmaVersion > 10) {
-      return this.parseDynamicImport()
+    if (this.options.ecmaVersion >= 11) {
+      return this.parseExprImport()
     } else {
       return this.unexpected()
     }
@@ -431,13 +421,34 @@ pp.parseExprAtom = function(refDestructuringErrors) {
   }
 }
 
-pp.parseDynamicImport = function() {
+pp.parseExprImport = function() {
   const node = this.startNode()
-  this.next()
-  if (this.type !== tt.parenL) {
+  this.next() // skip `import`
+  switch (this.type) {
+  case tt.parenL:
+    return this.parseDynamicImport(node)
+  default:
     this.unexpected()
   }
-  return this.finishNode(node, "Import")
+}
+
+pp.parseDynamicImport = function(node) {
+  this.next() // skip `(`
+
+  // Parse node.source.
+  node.source = this.parseMaybeAssign()
+
+  // Verify ending.
+  if (!this.eat(tt.parenR)) {
+    const errorPos = this.start
+    if (this.eat(tt.comma) && this.eat(tt.parenR)) {
+      this.raiseRecoverable(errorPos, "Trailing comma is not allowed in import()")
+    } else {
+      this.unexpected(errorPos)
+    }
+  }
+
+  return this.finishNode(node, "ImportExpression")
 }
 
 pp.parseLiteral = function(value) {
@@ -547,12 +558,12 @@ pp.parseNew = function() {
       this.raiseRecoverable(node.start, "new.target can only be used in functions")
     return this.finishNode(node, "MetaProperty")
   }
-  let startPos = this.start, startLoc = this.startLoc
+  let startPos = this.start, startLoc = this.startLoc, isImport = this.type === tt._import
   node.callee = this.parseSubscripts(this.parseExprAtom(), startPos, startLoc, true)
-  if (this.options.ecmaVersion > 10 && node.callee.type === "Import") {
-    this.raise(node.callee.start, "Cannot use new with import(...)")
+  if (isImport && node.callee.type === "ImportExpression") {
+    this.raise(startPos, "Cannot use new with import()")
   }
-  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8 && node.callee.type !== "Import", false)
+  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false)
   else node.arguments = empty
   return this.finishNode(node, "NewExpression")
 }

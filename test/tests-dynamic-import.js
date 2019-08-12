@@ -17,23 +17,63 @@ test(
         start: 0,
         end: 26,
         expression: {
-          type: 'CallExpression',
+          type: 'ImportExpression',
           start: 0,
           end: 26,
-          callee: { type: 'Import', start: 0, end: 6 },
-          arguments: [
-            {
-              type: 'Literal',
-              start: 7,
-              end: 25,
-              value: 'dynamicImport.js',
-              raw: "'dynamicImport.js'"
-            }
-          ]
+          source: {
+            type: 'Literal',
+            start: 7,
+            end: 25,
+            value: 'dynamicImport.js',
+            raw: "'dynamicImport.js'"
+          }
         }
       }
     ],
     sourceType: 'script'
+  },
+  { ecmaVersion: 11 }
+);
+
+// Assignment is OK.
+test(
+  "import(a = 'dynamicImport.js')",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 30,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 30,
+        "expression": {
+          "type": "ImportExpression",
+          "start": 0,
+          "end": 30,
+          "source": {
+            "type": "AssignmentExpression",
+            "start": 7,
+            "end": 29,
+            "operator": "=",
+            "left": {
+              "type": "Identifier",
+              "start": 7,
+              "end": 8,
+              "name": "a"
+            },
+            "right": {
+              "type": "Literal",
+              "start": 11,
+              "end": 29,
+              "value": "dynamicImport.js",
+              "raw": "'dynamicImport.js'"
+            }
+          }
+        }
+      }
+    ],
+    "sourceType": "script"
   },
   { ecmaVersion: 11 }
 );
@@ -69,11 +109,10 @@ test(
                 end: 36,
                 delegate: false,
                 argument: {
-                  type: 'CallExpression',
+                  type: 'ImportExpression',
                   start: 22,
                   end: 36,
-                  callee: { type: 'Import', start: 22, end: 28 },
-                  arguments: [{ type: 'Literal', start: 29, end: 35, value: 'http', raw: "'http'" }]
+                  source: { type: 'Literal', start: 29, end: 35, value: 'http', raw: "'http'" }
                 }
               }
             }
@@ -82,6 +121,85 @@ test(
       }
     ],
     sourceType: 'script'
+  },
+  { ecmaVersion: 11 }
+);
+
+// `new import(s)` is syntax error, but `new (import(s))` is not.
+test(
+  "new (import(s))",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 15,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 15,
+        "expression": {
+          "type": "NewExpression",
+          "start": 0,
+          "end": 15,
+          "callee": {
+            "type": "ImportExpression",
+            "start": 5,
+            "end": 14,
+            "source": {
+              "type": "Identifier",
+              "start": 12,
+              "end": 13,
+              "name": "s"
+            }
+          },
+          "arguments": []
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  { ecmaVersion: 11 }
+);
+
+// `import(s,t)` is syntax error, but `import((s,t))` is not.
+test(
+  "import((s,t))",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 13,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 13,
+        "expression": {
+          "type": "ImportExpression",
+          "start": 0,
+          "end": 13,
+          "source": {
+            "type": "SequenceExpression",
+            "start": 8,
+            "end": 11,
+            "expressions": [
+              {
+                "type": "Identifier",
+                "start": 8,
+                "end": 9,
+                "name": "s"
+              },
+              {
+                "type": "Identifier",
+                "start": 10,
+                "end": 11,
+                "name": "t"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "sourceType": "script"
   },
   { ecmaVersion: 11 }
 );
@@ -102,27 +220,32 @@ testFail("import('test.js')", 'Unexpected token (1:6)', {
   sourceType: 'module'
 });
 
-testFail("import()", 'import() requires exactly one argument (1:0)', {
+testFail("import()", 'Unexpected token (1:7)', {
   ecmaVersion: 11,
   loose: false
 });
 
-testFail("import(a, b)", 'import() requires exactly one argument (1:0)', {
+testFail("import(a, b)", 'Unexpected token (1:8)', {
   ecmaVersion: 11,
   loose: false
 });
 
-testFail("import(...[a])", '... is not allowed in import() (1:7)', {
+testFail("import(...[a])", 'Unexpected token (1:7)', {
   ecmaVersion: 11,
   loose: false
 });
 
-testFail("import(source,)", 'Unexpected token (1:14)', {
+testFail("import(source,)", 'Trailing comma is not allowed in import() (1:13)', {
   ecmaVersion: 11,
   loose: false
 });
 
-testFail("new import(source)", 'Cannot use new with import(...) (1:4)', {
+testFail("new import(source)", 'Cannot use new with import() (1:4)', {
+  ecmaVersion: 11,
+  loose: false
+});
+
+testFail("(import)(s)", 'Unexpected token (1:7)', {
   ecmaVersion: 11,
   loose: false
 });
