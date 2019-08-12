@@ -10,7 +10,7 @@ lp.parseTopLevel = function() {
   while (this.tok.type !== tt.eof) node.body.push(this.parseStatement())
   this.toks.adaptDirectivePrologue(node.body)
   this.last = this.tok
-  if (this.options.ecmaVersion >= 6 || this.options.sourceType==="module") {
+  if (this.options.ecmaVersion >= 6 || this.options.sourceType === "module") {
     node.sourceType = this.options.sourceType
   }
   return this.finishNode(node, "Program")
