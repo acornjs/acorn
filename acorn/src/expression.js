@@ -314,7 +314,7 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow)
 // `new`, or an expression wrapped in punctuation like `()`, `[]`,
 // or `{}`.
 
-pp.parseExprAtom = function(refDestructuringErrors, noDynamicImport) {
+pp.parseExprAtom = function(refDestructuringErrors) {
   // If a division operator appears in an expression position, the
   // tokenizer got confused, and we force it to read a regexp instead.
   if (this.type === tt.slash) this.readRegexp()
@@ -411,7 +411,7 @@ pp.parseExprAtom = function(refDestructuringErrors, noDynamicImport) {
 
   case tt._import:
     if (this.options.ecmaVersion >= 11) {
-      return this.parseExprImport(noDynamicImport)
+      return this.parseExprImport()
     } else {
       return this.unexpected()
     }
@@ -421,14 +421,11 @@ pp.parseExprAtom = function(refDestructuringErrors, noDynamicImport) {
   }
 }
 
-pp.parseExprImport = function(noDynamicImport) {
+pp.parseExprImport = function() {
   const node = this.startNode()
   this.next() // skip `import`
   switch (this.type) {
   case tt.parenL:
-    if (noDynamicImport) {
-      this.raise(this.start, "Cannot use new with import()")
-    }
     return this.parseDynamicImport(node)
   default:
     this.unexpected()
@@ -561,8 +558,11 @@ pp.parseNew = function() {
       this.raiseRecoverable(node.start, "new.target can only be used in functions")
     return this.finishNode(node, "MetaProperty")
   }
-  let startPos = this.start, startLoc = this.startLoc
-  node.callee = this.parseSubscripts(this.parseExprAtom(null, true), startPos, startLoc, true)
+  let startPos = this.start, startLoc = this.startLoc, isImport = this.type === tt._import
+  node.callee = this.parseSubscripts(this.parseExprAtom(), startPos, startLoc, true)
+  if (isImport && node.callee.type === "ImportExpression") {
+    this.raise(startPos, "Cannot use new with import()")
+  }
   if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false)
   else node.arguments = empty
   return this.finishNode(node, "NewExpression")

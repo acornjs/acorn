@@ -240,7 +240,7 @@ testFail("import(source,)", 'Trailing comma is not allowed in import() (1:13)', 
   loose: false
 });
 
-testFail("new import(source)", 'Cannot use new with import() (1:10)', {
+testFail("new import(source)", 'Cannot use new with import() (1:4)', {
   ecmaVersion: 11,
   loose: false
 });
