@@ -9,7 +9,7 @@ export class Parser {
   constructor(options, input, startPos) {
     this.options = options = getOptions(options)
     this.sourceFile = options.sourceFile
-    this.keywords = wordsRegexp(keywords[options.ecmaVersion >= 6 ? 6 : 5])
+    this.keywords = wordsRegexp(keywords[options.ecmaVersion >= 6 ? 6 : options.sourceType==="module" ? "5plus" : 5])
     let reserved = ""
     if (options.allowReserved !== true) {
       for (let v = options.ecmaVersion;; v--)
