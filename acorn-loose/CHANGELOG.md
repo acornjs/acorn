@@ -1,6 +1,12 @@
+## 7.0.0 (2019-08-12)
+
+### Breaking changes
+
+Changes the node format for dynamic imports to use the `ImportExpression` node type, as defined in [ESTree](https://github.com/estree/estree/blob/master/es2020.md#importexpression).
+
 ## 6.1.0 (2019-07-04)
 
-## New features
+### New features
 
 Support bigint syntax.
 
