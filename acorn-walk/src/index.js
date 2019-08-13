@@ -363,7 +363,7 @@ base.ImportDeclaration = (node, st, c) => {
 base.ImportExpression = (node, st, c) => {
   c(node.source, st, "Expression")
 }
-base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.Literal = base.Import = ignore
+base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.Literal = ignore
 
 base.TaggedTemplateExpression = (node, st, c) => {
   c(node.tag, st, "Expression")
