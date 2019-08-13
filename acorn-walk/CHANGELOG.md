@@ -1,3 +1,9 @@
+## 7.0.0 (2017-08-12)
+
+### New features
+
+Support walking `ImportExpression` nodes.
+
 ## 6.2.0 (2017-07-04)
 
 ### New features
