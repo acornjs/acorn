@@ -30,9 +30,9 @@ Disallow binding `let` in patterns.
 
 ### New features
 
-Support bigint syntax with `ecmaVersion` >= 10.
+Support bigint syntax with `ecmaVersion` >= 11.
 
-Support dynamic `import` syntax with `ecmaVersion` >= 10.
+Support dynamic `import` syntax with `ecmaVersion` >= 11.
 
 Upgrade to Unicode version 12.
 
