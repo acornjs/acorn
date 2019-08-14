@@ -333,7 +333,7 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     //     super [ Expression ]
     //     super . IdentifierName
     // SuperCall:
-    //     super Arguments
+    //     super ( Arguments )
     if (this.type !== tt.dot && this.type !== tt.bracketL && this.type !== tt.parenL)
       this.unexpected()
     return this.finishNode(node, "Super")
