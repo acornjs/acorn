@@ -28,7 +28,7 @@ export function simple(node, visitors, baseVisitor, state, override) {
 // An ancestor walk keeps an array of ancestor nodes (including the
 // current node) and passes them to the callback as third parameter
 // (and also as state parameter when no other state is present).
-export function ancestor(node, visitors, baseVisitor, state) {
+export function ancestor(node, visitors, baseVisitor, state, override) {
   let ancestors = []
   if (!baseVisitor) baseVisitor = base
   ;(function c(node, st, override) {
@@ -38,7 +38,7 @@ export function ancestor(node, visitors, baseVisitor, state) {
     baseVisitor[type](node, st, c)
     if (found) found(node, st || ancestors, ancestors)
     if (isNew) ancestors.pop()
-  })(node, state)
+  })(node, state, override)
 }
 
 // A recursive walk is one where your functions override the default
