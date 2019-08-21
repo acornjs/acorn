@@ -623,7 +623,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
   while (!this.eat(tt.braceR)) {
     if (!first) {
       this.expect(tt.comma)
-      if (this.afterTrailingComma(tt.braceR)) break
+      if (this.options.ecmaVersion >= 5 && this.afterTrailingComma(tt.braceR)) break
     } else first = false
 
     const prop = this.parseProperty(isPattern, refDestructuringErrors)
