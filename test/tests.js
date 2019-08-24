@@ -29464,3 +29464,79 @@ test("/**/ --> comment\n", {})
 test("x.class++", {})
 
 testFail("½", "Unexpected character '½' (1:0)")
+
+test("1 + 2", {
+  type: "Program",
+  start: 15,
+  end: 20,
+  loc: { 
+    start: { line: 2, column: 4 },
+    end: { line: 2, column: 9 }
+  },
+  body: [
+    {
+      type: "ExpressionStatement",
+      start: 15,
+      end: 20,
+      loc: { start: { line: 2, column: 4 }, end: { line: 2, column: 9 } },
+      expression: {
+        type: "BinaryExpression",
+        operator: "+",
+        start: 15,
+        end: 20,
+        left: { type: "Literal", start: 15, end: 16, value: 1 },
+        right: { type: "Literal", start: 19, end: 20, value: 2 }
+      }
+    }
+  ]
+}, {
+  loose: false,
+  startOffset: 15,
+  startColumn: 4,
+  startLine: 2,
+  locations: true
+})
+
+
+test("\n\n5 + 1\n\nfoo", {
+  type: "Program",
+  start: 15,
+  end: 27,
+  loc: {
+    start: { line: 2, column: 4 },
+    end: { line: 6, column: 3 }
+  },
+  body: [
+    {
+      type: "ExpressionStatement",
+      start: 17,
+      end: 22,
+      loc: { start: { line: 4, column: 0 }, end: { line: 4, column: 5 } },
+      expression: {
+        type: "BinaryExpression",
+        start: 17,
+        end: 22,
+        loc: { start: { line: 4, column: 0 }, end: { line: 4, column: 5 } }
+      }
+    },
+    {
+      type: "ExpressionStatement",
+      start: 24,
+      end: 27,
+      loc: { start: { line: 6, column: 0 }, end: { line: 6, column: 3 } },
+      expression: {
+        type: "Identifier",
+        start: 24,
+        end: 27,
+        loc: { start: { line: 6, column: 0 }, end: { line: 6, column: 3 } }
+      }
+    }
+  ]
+}, {
+  loose: false,
+  startOffset: 15,
+  startColumn: 4,
+  startLine: 2,
+  locations: true
+})
+

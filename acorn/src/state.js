@@ -46,6 +46,11 @@ export class Parser {
     this.value = null
     // Its start and end offset
     this.start = this.end = this.pos
+    // Additional displacement that should be added to the
+    // eventual positions
+    this.dispOffset = options.startOffset
+    this.dispLine = options.startLine - 1
+    this.dispColumn = options.startColumn
     // And, if locations are used, the {line, column} object
     // corresponding to those offsets
     this.startLoc = this.endLoc = this.curPosition()

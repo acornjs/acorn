@@ -20,18 +20,18 @@ export class Node {
 const pp = Parser.prototype
 
 pp.startNode = function() {
-  return new Node(this, this.start, this.startLoc)
+  return new Node(this, this.start + this.dispOffset, this.startLoc)
 }
 
 pp.startNodeAt = function(pos, loc) {
-  return new Node(this, pos, loc)
+  return new Node(this, pos + this.dispOffset, loc)
 }
 
 // Finish an AST node, adding `type` and `end` properties.
 
 function finishNodeAt(node, type, pos, loc) {
   node.type = type
-  node.end = pos
+  node.end = pos + this.dispOffset
   if (this.options.locations)
     node.loc.end = loc
   if (this.options.ranges)

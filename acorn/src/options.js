@@ -86,7 +86,16 @@ export const defaultOptions = {
   directSourceFile: null,
   // When enabled, parenthesized expressions are represented by
   // (non-standard) ParenthesizedExpression nodes
-  preserveParens: false
+  preserveParens: false,
+  // When parsing JavaScript as part of a different file, you can set this
+  // option to set the start offset.
+  startOffset: 0,
+  // When parsing JavaScript as part of a different file, you can set this
+  // option to set the start line number.
+  startLine: 1,
+  // When parsing JavaScript as part of a different file, you can set this
+  // option to set the start column number.
+  startColumn: 0
 }
 
 // Interpret and default an options object
