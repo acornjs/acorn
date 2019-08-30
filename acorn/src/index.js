@@ -22,17 +22,57 @@ import "./expression"
 import "./location"
 import "./scope"
 
-export {Parser} from "./state"
-export {defaultOptions} from "./options"
-export {Position, SourceLocation, getLineInfo} from "./locutil"
-export {Node} from "./node"
-export {TokenType, types as tokTypes, keywords as keywordTypes} from "./tokentype"
-export {TokContext, types as tokContexts} from "./tokencontext"
-export {isIdentifierChar, isIdentifierStart} from "./identifier"
-export {Token} from "./tokenize"
-export {isNewLine, lineBreak, lineBreakG, nonASCIIwhitespace} from "./whitespace"
+import {defaultOptions} from "./options"
+import {Position, SourceLocation, getLineInfo} from "./locutil"
+import {Node} from "./node"
+import {TokenType, types as tokTypes, keywords as keywordTypes} from "./tokentype"
+import {TokContext, types as tokContexts} from "./tokencontext"
+import {isIdentifierChar, isIdentifierStart} from "./identifier"
+import {Token} from "./tokenize"
+import {isNewLine, lineBreak, lineBreakG, nonASCIIwhitespace} from "./whitespace"
 
 export const version = "7.0.0"
+export {
+  Parser,
+  defaultOptions,
+  Position,
+  SourceLocation,
+  getLineInfo,
+  Node,
+  TokenType,
+  tokTypes,
+  keywordTypes,
+  TokContext,
+  tokContexts,
+  isIdentifierChar,
+  isIdentifierStart,
+  Token,
+  isNewLine,
+  lineBreak,
+  lineBreakG,
+  nonASCIIwhitespace
+}
+
+Parser.acorn = {
+  version,
+  defaultOptions,
+  Position,
+  SourceLocation,
+  getLineInfo,
+  Node,
+  TokenType,
+  tokTypes,
+  keywordTypes,
+  TokContext,
+  tokContexts,
+  isIdentifierChar,
+  isIdentifierStart,
+  Token,
+  isNewLine,
+  lineBreak,
+  lineBreakG,
+  nonASCIIwhitespace
+}
 
 // The main exported interface (under `self.acorn` when in the
 // browser) is a `parse` function that takes a code string and
