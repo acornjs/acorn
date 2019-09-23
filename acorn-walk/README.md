@@ -38,8 +38,9 @@ that will recurse through such a node. There are several ways to run
 such a walker.
 
 **simple**`(node, visitors, base, state)` does a 'simple' walk over a
-tree. `node` should be the AST node to walk, and `visitors` an object
-with properties whose names correspond to node types in the [ESTree
+tree. `node` should be the AST node to walk, and `visitors` [an object
+with properties](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions)
+whose names correspond to node types in the [ESTree
 spec](https://github.com/estree/estree). The properties should contain
 functions that will be called with the node object and, if applicable
 the state at that point. The last two arguments are optional. `base`
