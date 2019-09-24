@@ -1,3 +1,13 @@
+## 7.1.0 (2019-09-24)
+
+### Bug fixes
+
+Disallow trailing object literal commas when ecmaVersion is less than 5.
+
+### New features
+
+Add a static `acorn` property to the `Parser` class that contains the entire module interface, to allow plugins to access the instance of the library that they are acting on.
+
 ## 7.0.0 (2019-08-13)
 
 ### Breaking changes
