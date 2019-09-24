@@ -54,6 +54,7 @@ export {
 }
 
 Parser.acorn = {
+  Parser,
   version,
   defaultOptions,
   Position,
