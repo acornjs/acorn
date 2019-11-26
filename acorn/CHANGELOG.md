@@ -1,3 +1,9 @@
+## 6.4.0 (2019-11-26)
+
+### New features
+
+Add a static `acorn` property to the `Parser` class that contains the entire module interface, to allow plugins to access the instance of the library that they are acting on.
+
 ## 6.3.0 (2019-08-12)
 
 ### New features
