@@ -628,6 +628,18 @@ pp.readEscapedChar = function(inTemplate) {
   case 10: // ' \n'
     if (this.options.locations) { this.lineStart = this.pos; ++this.curLine }
     return ""
+  case 56:
+  case 57:
+    if (inTemplate) {
+      const codePos = this.pos - 1
+
+      this.invalidStringToken(
+        codePos,
+        "Octal literal in template string"
+      )
+
+      return null
+    }
   default:
     if (ch >= 48 && ch <= 55) {
       let octalStr = this.input.substr(this.pos - 1, 3).match(/^[0-7]+/)[0]
