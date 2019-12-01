@@ -635,7 +635,7 @@ pp.readEscapedChar = function(inTemplate) {
 
       this.invalidStringToken(
         codePos,
-        "Octal literal in template string"
+        "Invalid escape sequence in template string"
       )
 
       return null
