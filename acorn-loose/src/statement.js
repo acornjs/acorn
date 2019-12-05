@@ -358,6 +358,13 @@ lp.parseExport = function() {
   let node = this.startNode()
   this.next()
   if (this.eat(tt.star)) {
+    if (this.options.ecmaVersion >= 11) {
+      if (this.eatContextual("as")) {
+        node.exported = this.parseExprAtom()
+      } else {
+        node.exported = null
+      }
+    }
     node.source = this.eatContextual("from") ? this.parseExprAtom() : this.dummyString()
     return this.finishNode(node, "ExportAllDeclaration")
   }
