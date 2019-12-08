@@ -447,7 +447,6 @@ pp.readNumber = function(startsWithDot) {
   if (!startsWithDot && this.readInt(10) === null) this.raise(start, "Invalid number")
   let octal = this.pos - start >= 2 && this.input.charCodeAt(start) === 48
   if (octal && this.strict) this.raise(start, "Invalid number")
-  if (octal && /[89]/.test(this.input.slice(start, this.pos))) octal = false
   let next = this.input.charCodeAt(this.pos)
   if (!octal && !startsWithDot && this.options.ecmaVersion >= 11 && next === 110) {
     let str = this.input.slice(start, this.pos)
@@ -456,6 +455,7 @@ pp.readNumber = function(startsWithDot) {
     if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
     return this.finishToken(tt.num, val)
   }
+  if (octal && /[89]/.test(this.input.slice(start, this.pos))) octal = false
   if (next === 46 && !octal) { // '.'
     ++this.pos
     this.readInt(10)
