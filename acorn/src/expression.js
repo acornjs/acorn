@@ -546,6 +546,7 @@ pp.parseParenArrowList = function(startPos, startLoc, exprList) {
 const empty = []
 
 pp.parseNew = function() {
+  if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword new")
   let node = this.startNode()
   let meta = this.parseIdent(true)
   if (this.options.ecmaVersion >= 6 && this.eat(tt.dot)) {
@@ -929,7 +930,7 @@ pp.parseIdent = function(liberal, isBinding) {
   } else {
     this.unexpected()
   }
-  this.next()
+  this.next(!!liberal)
   this.finishNode(node, "Identifier")
   if (!liberal) {
     this.checkUnreserved(node)
