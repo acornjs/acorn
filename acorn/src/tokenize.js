@@ -28,7 +28,9 @@ const pp = Parser.prototype
 
 // Move to the next token
 
-pp.next = function() {
+pp.next = function(ignoreEscapeSequenceInKeyword) {
+  if (!ignoreEscapeSequenceInKeyword && this.type.keyword && this.containsEsc)
+    this.raiseRecoverable(this.start, "Escape sequence in keyword " + this.type.keyword)
   if (this.options.onToken)
     this.options.onToken(new Token(this))
 
@@ -719,7 +721,6 @@ pp.readWord = function() {
   let word = this.readWord1()
   let type = tt.name
   if (this.keywords.test(word)) {
-    if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword " + word)
     type = keywordTypes[word]
   }
   return this.finishToken(type, word)
