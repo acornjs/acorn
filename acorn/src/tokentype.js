@@ -108,6 +108,7 @@ export const types = {
   star: binop("*", 10),
   slash: binop("/", 10),
   starstar: new TokenType("**", {beforeExpr: true}),
+  coalesce: binop("??", 1),
 
   // Keyword token types.
   _break: kw("break"),

@@ -183,11 +183,20 @@ pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
   if (prec != null && (!noIn || this.type !== tt._in)) {
     if (prec > minPrec) {
       let logical = this.type === tt.logicalOR || this.type === tt.logicalAND
+      let coalesce = this.type === tt.coalesce
+      if (coalesce) {
+        // Handle the precedence of `tt.coalesce` as equal to the range of logical expressions.
+        // In other words, `node.right` shouldn't contain logical expressions in order to check the mixed error.
+        prec = tt.logicalAND.binop
+      }
       let op = this.value
       this.next()
       let startPos = this.start, startLoc = this.startLoc
       let right = this.parseExprOp(this.parseMaybeUnary(null, false), startPos, startLoc, prec, noIn)
-      let node = this.buildBinary(leftStartPos, leftStartLoc, left, right, op, logical)
+      let node = this.buildBinary(leftStartPos, leftStartLoc, left, right, op, logical || coalesce)
+      if ((logical && this.type === tt.coalesce) || (coalesce && (this.type === tt.logicalOR || this.type === tt.logicalAND))) {
+        this.raiseRecoverable(this.start, "Logical expressions and coalesce expressions cannot be mixed. Wrap either by parentheses")
+      }
       return this.parseExprOp(node, leftStartPos, leftStartLoc, minPrec, noIn)
     }
   }

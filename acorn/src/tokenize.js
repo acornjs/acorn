@@ -289,6 +289,14 @@ pp.readToken_eq_excl = function(code) { // '=!'
   return this.finishOp(code === 61 ? tt.eq : tt.prefix, 1)
 }
 
+pp.readToken_question = function() { // '?'
+  if (this.options.ecmaVersion >= 11) {
+    let next = this.input.charCodeAt(this.pos + 1)
+    if (next === 63) return this.finishOp(tt.coalesce, 2)
+  }
+  return this.finishOp(tt.question, 1)
+}
+
 pp.getTokenFromCode = function(code) {
   switch (code) {
   // The interpretation of a dot depends on whether it is followed
@@ -306,7 +314,6 @@ pp.getTokenFromCode = function(code) {
   case 123: ++this.pos; return this.finishToken(tt.braceL)
   case 125: ++this.pos; return this.finishToken(tt.braceR)
   case 58: ++this.pos; return this.finishToken(tt.colon)
-  case 63: ++this.pos; return this.finishToken(tt.question)
 
   case 96: // '`'
     if (this.options.ecmaVersion < 6) break
@@ -355,6 +362,9 @@ pp.getTokenFromCode = function(code) {
 
   case 61: case 33: // '=!'
     return this.readToken_eq_excl(code)
+
+  case 63: // '?'
+    return this.readToken_question()
 
   case 126: // '~'
     return this.finishOp(tt.prefix, 1)
