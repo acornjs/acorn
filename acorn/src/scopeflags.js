@@ -14,7 +14,7 @@ export function functionFlags(async, generator) {
   return SCOPE_FUNCTION | (async ? SCOPE_ASYNC : 0) | (generator ? SCOPE_GENERATOR : 0)
 }
 
-// Used in checkLVal and declareName to determine the type of a binding
+// Used in checkLVal* and declareName to determine the type of a binding
 export const
     BIND_NONE = 0, // Not a binding
     BIND_VAR = 1, // Var-style binding

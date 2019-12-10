@@ -241,7 +241,7 @@ pp.parseForStatement = function(node) {
       } else node.await = awaitAt > -1
     }
     this.toAssignable(init, false, refDestructuringErrors)
-    this.checkLVal(init)
+    this.checkLValPattern(init)
     return this.parseForIn(node, init)
   } else {
     this.checkExpressionErrors(refDestructuringErrors, true)
@@ -342,7 +342,7 @@ pp.parseTryStatement = function(node) {
       clause.param = this.parseBindingAtom()
       let simple = clause.param.type === "Identifier"
       this.enterScope(simple ? SCOPE_SIMPLE_CATCH : 0)
-      this.checkLVal(clause.param, simple ? BIND_SIMPLE_CATCH : BIND_LEXICAL)
+      this.checkLValPattern(clause.param, simple ? BIND_SIMPLE_CATCH : BIND_LEXICAL)
       this.expect(tt.parenR)
     } else {
       if (this.options.ecmaVersion < 10) this.unexpected()
@@ -471,8 +471,6 @@ pp.parseForIn = function(node, init) {
         isForIn ? "for-in" : "for-of"
       } loop variable declaration may not have an initializer`
     )
-  } else if (init.type === "AssignmentPattern") {
-    this.raise(init.start, "Invalid left-hand side in for-loop")
   }
   node.left = init
   node.right = isForIn ? this.parseExpression() : this.parseMaybeAssign()
@@ -508,7 +506,7 @@ pp.parseVar = function(node, isFor, kind) {
 
 pp.parseVarId = function(decl, kind) {
   decl.id = this.parseBindingAtom()
-  this.checkLVal(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false)
+  this.checkLValPattern(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false)
 }
 
 const FUNC_STATEMENT = 1, FUNC_HANGING_STATEMENT = 2, FUNC_NULLABLE_ID = 4
@@ -534,7 +532,7 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
       // subject to Annex B semantics (BIND_FUNCTION). Otherwise, the binding
       // mode depends on properties of the current scope (see
       // treatFunctionsAsVar).
-      this.checkLVal(node.id, (this.strict || node.generator || node.async) ? this.treatFunctionsAsVar ? BIND_VAR : BIND_LEXICAL : BIND_FUNCTION)
+      this.checkLValSimple(node.id, (this.strict || node.generator || node.async) ? this.treatFunctionsAsVar ? BIND_VAR : BIND_LEXICAL : BIND_FUNCTION)
   }
 
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
@@ -655,7 +653,7 @@ pp.parseClassId = function(node, isStatement) {
   if (this.type === tt.name) {
     node.id = this.parseIdent()
     if (isStatement)
-      this.checkLVal(node.id, BIND_LEXICAL, false)
+      this.checkLValSimple(node.id, BIND_LEXICAL, false)
   } else {
     if (isStatement === true)
       this.unexpected()
@@ -815,7 +813,7 @@ pp.parseImportSpecifiers = function() {
     // import defaultObj, { x, y as z } from '...'
     let node = this.startNode()
     node.local = this.parseIdent()
-    this.checkLVal(node.local, BIND_LEXICAL)
+    this.checkLValSimple(node.local, BIND_LEXICAL)
     nodes.push(this.finishNode(node, "ImportDefaultSpecifier"))
     if (!this.eat(tt.comma)) return nodes
   }
@@ -824,7 +822,7 @@ pp.parseImportSpecifiers = function() {
     this.next()
     this.expectContextual("as")
     node.local = this.parseIdent()
-    this.checkLVal(node.local, BIND_LEXICAL)
+    this.checkLValSimple(node.local, BIND_LEXICAL)
     nodes.push(this.finishNode(node, "ImportNamespaceSpecifier"))
     return nodes
   }
@@ -843,7 +841,7 @@ pp.parseImportSpecifiers = function() {
       this.checkUnreserved(node.imported)
       node.local = node.imported
     }
-    this.checkLVal(node.local, BIND_LEXICAL)
+    this.checkLValSimple(node.local, BIND_LEXICAL)
     nodes.push(this.finishNode(node, "ImportSpecifier"))
   }
   return nodes
