@@ -131,13 +131,18 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   if (this.type.isAssign) {
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
-    node.left = this.type === tt.eq ? this.toAssignable(left, false, refDestructuringErrors) : left
+    if (this.type === tt.eq)
+      left = this.toAssignable(left, false, refDestructuringErrors)
     if (!ownDestructuringErrors) {
       refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.doubleProto = -1
     }
-    if (refDestructuringErrors.shorthandAssign >= node.left.start)
+    if (refDestructuringErrors.shorthandAssign >= left.start)
       refDestructuringErrors.shorthandAssign = -1 // reset because shorthand default was used correctly
-    this.checkLVal(left)
+    if (this.type === tt.eq)
+      this.checkLValPattern(left)
+    else
+      this.checkLValSimple(left)
+    node.left = left
     this.next()
     node.right = this.parseMaybeAssign(noIn)
     return this.finishNode(node, "AssignmentExpression")
@@ -228,7 +233,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     this.next()
     node.argument = this.parseMaybeUnary(null, true)
     this.checkExpressionErrors(refDestructuringErrors, true)
-    if (update) this.checkLVal(node.argument)
+    if (update) this.checkLValSimple(node.argument)
     else if (this.strict && node.operator === "delete" &&
              node.argument.type === "Identifier")
       this.raiseRecoverable(node.start, "Deleting local variable in strict mode")
@@ -242,7 +247,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
       node.operator = this.value
       node.prefix = false
       node.argument = expr
-      this.checkLVal(expr)
+      this.checkLValSimple(expr)
       this.next()
       expr = this.finishNode(node, "UpdateExpression")
     }
@@ -900,7 +905,7 @@ pp.parseFunctionBody = function(node, isArrowFunction, isMethod) {
     // if a let/const declaration in the function clashes with one of the params.
     this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && !isMethod && this.isSimpleParamList(node.params))
     // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
-    if (this.strict && node.id) this.checkLVal(node.id, BIND_OUTSIDE)
+    if (this.strict && node.id) this.checkLValSimple(node.id, BIND_OUTSIDE)
     node.body = this.parseBlock(false, undefined, useStrict && !oldStrict)
     node.expression = false
     this.adaptDirectivePrologue(node.body.body)
@@ -921,7 +926,7 @@ pp.isSimpleParamList = function(params) {
 pp.checkParams = function(node, allowDuplicates) {
   let nameHash = {}
   for (let param of node.params)
-    this.checkLVal(param, BIND_VAR, allowDuplicates ? null : nameHash)
+    this.checkLValInnerPattern(param, BIND_VAR, allowDuplicates ? null : nameHash)
 }
 
 // Parses a comma-separated list of expressions, and returns them as
