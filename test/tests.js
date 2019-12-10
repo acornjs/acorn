@@ -19745,7 +19745,7 @@ test("for (var x in list) process(x);", {
     }
   }
 });
-testFail("var x; for (x = 0 in list) process(x);", "Invalid left-hand side in for-loop (1:12)", { ecmaVersion: 6 })
+testFail("var x; for (x = 0 in list) process(x);", "Assigning to rvalue (1:12)")
 testFail("'use strict'; for (var x = 0 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:19)")
 testFail("for (var [x] = 0 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
 testFail("for (var {x} = 0 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
@@ -29432,6 +29432,7 @@ testFail("function x () { new.ta\\u0072get }", "'new.target' must not contain es
 testFail("class X { st\\u0061tic y() {} }", "Unexpected token (1:22)", {ecmaVersion: 6})
 
 testFail("(x=1)=2", "Parenthesized pattern (1:0)")
+testFail("(x=1)=2", "Assigning to rvalue (1:1)", {ecmaVersion: 6})
 
 test("(foo = [])[0] = 4;", {})
 
