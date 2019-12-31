@@ -962,6 +962,6 @@ pp.parseAwait = function() {
 
   let node = this.startNode()
   this.next()
-  node.argument = this.parseMaybeUnary(null, true)
+  node.argument = this.parseMaybeUnary(null, false)
   return this.finishNode(node, "AwaitExpression")
 }
