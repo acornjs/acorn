@@ -44,9 +44,11 @@ pp.checkPropClash = function(prop, propHash, refDestructuringErrors) {
   if (this.options.ecmaVersion >= 6) {
     if (name === "__proto__" && kind === "init") {
       if (propHash.proto) {
-        if (refDestructuringErrors && refDestructuringErrors.doubleProto < 0) refDestructuringErrors.doubleProto = key.start
-        // Backwards-compat kludge. Can be removed in version 6.0
-        else this.raiseRecoverable(key.start, "Redefinition of __proto__ property")
+        if (refDestructuringErrors) {
+          if (refDestructuringErrors.doubleProto < 0)
+            refDestructuringErrors.doubleProto = key.start
+          // Backwards-compat kludge. Can be removed in version 6.0
+        } else this.raiseRecoverable(key.start, "Redefinition of __proto__ property")
       }
       propHash.proto = true
     }
