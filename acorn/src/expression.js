@@ -113,12 +113,11 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     else this.exprAllowed = false
   }
 
-  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1, oldShorthandAssign = -1
+  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1
   if (refDestructuringErrors) {
     oldParenAssign = refDestructuringErrors.parenthesizedAssign
     oldTrailingComma = refDestructuringErrors.trailingComma
-    oldShorthandAssign = refDestructuringErrors.shorthandAssign
-    refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.shorthandAssign = -1
+    refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = -1
   } else {
     refDestructuringErrors = new DestructuringErrors
     ownDestructuringErrors = true
@@ -133,8 +132,11 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
     node.left = this.type === tt.eq ? this.toAssignable(left, false, refDestructuringErrors) : left
-    if (!ownDestructuringErrors) DestructuringErrors.call(refDestructuringErrors)
-    refDestructuringErrors.shorthandAssign = -1 // reset because shorthand default was used correctly
+    if (!ownDestructuringErrors) {
+      refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.doubleProto = -1
+    }
+    if (refDestructuringErrors.shorthandAssign >= node.left.start)
+      refDestructuringErrors.shorthandAssign = -1 // reset because shorthand default was used correctly
     this.checkLVal(left)
     this.next()
     node.right = this.parseMaybeAssign(noIn)
@@ -144,7 +146,6 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   }
   if (oldParenAssign > -1) refDestructuringErrors.parenthesizedAssign = oldParenAssign
   if (oldTrailingComma > -1) refDestructuringErrors.trailingComma = oldTrailingComma
-  if (oldShorthandAssign > -1) refDestructuringErrors.shorthandAssign = oldShorthandAssign
   return left
 }
 
@@ -249,8 +250,8 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
 pp.parseExprSubscripts = function(refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
   let expr = this.parseExprAtom(refDestructuringErrors)
-  let skipArrowSubscripts = expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")"
-  if (this.checkExpressionErrors(refDestructuringErrors) || skipArrowSubscripts) return expr
+  if (expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")")
+    return expr
   let result = this.parseSubscripts(expr, startPos, startLoc)
   if (refDestructuringErrors && result.type === "MemberExpression") {
     if (refDestructuringErrors.parenthesizedAssign >= result.start) refDestructuringErrors.parenthesizedAssign = -1

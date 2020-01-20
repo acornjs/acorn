@@ -16513,4 +16513,6 @@ test("function *f2() { () => yield / 1 }", {}, {ecmaVersion: 6})
 
 test("({ a = 42, b: c.d } = e)", {}, {ecmaVersion: 6})
 
+testFail("({ a = 42, b: c = d })", "Shorthand property assignments are valid only in destructuring patterns (1:5)", {ecmaVersion: 6})
+
 test("({ __proto__: x, __proto__: y, __proto__: z }) => {}", {}, {ecmaVersion: 6})
