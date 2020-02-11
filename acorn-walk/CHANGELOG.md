@@ -1,3 +1,9 @@
+## 7.1.0 (2020-02-11)
+
+### New features
+
+Add a TypeScript definition file for the library.
+
 ## 7.0.0 (2017-08-12)
 
 ### New features
