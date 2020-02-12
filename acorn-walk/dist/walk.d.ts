@@ -1,21 +1,23 @@
+import acorn from 'acorn';
+
 declare module "acorn-walk" {
-  type NodeType  = import("estree").Node["type"];
+  type NodeType  = acorn.Node["type"];
   type DiscriminateUnion<T, K extends keyof T, V extends T[K] = T[K]> = T extends Record<K, V> ? T : never;
-  type NarrowNode<K extends NodeType> = DiscriminateUnion<import("estree").Node, "type", K>;
+  type NarrowNode<K extends NodeType> = DiscriminateUnion<acorn.Node, "type", K>;
   
   type FullWalkerCallback<TState> = (
-      node: import("estree").Node,
+      node: acorn.Node,
       state: TState,
       type: NodeType
   ) => void;
 
   type FullAncestorWalkerCallback<TState> = (
-      node: import("estree").Node,
-      state: TState | import("estree").Node[],
-      ancestors: import("estree").Node[],
+      node: acorn.Node,
+      state: TState | acorn.Node[],
+      ancestors: acorn.Node[],
       type: NodeType
   ) => void;
-  type WalkerCallback<TState> = (node: import("estree").Node, state: TState) => void;
+  type WalkerCallback<TState> = (node: acorn.Node, state: TState) => void;
 
   type SimpleWalkerFn<K extends NodeType, TState> = (
       node: NarrowNode<K>,
@@ -24,8 +26,8 @@ declare module "acorn-walk" {
   
   type AncestorWalkerFn<K extends NodeType, TState> = (
       node: NarrowNode<K>,
-      state: TState| import("estree").Node[],
-      ancestors: import("estree").Node[]
+      state: TState| acorn.Node[],
+      ancestors: acorn.Node[]
   ) => void;
 
   type RecursiveWalkerFn<K extends NodeType, TState> = (
@@ -46,7 +48,7 @@ declare module "acorn-walk" {
       [Type in Types]: RecursiveWalkerFn<Type, TState>
   };
 
-  type FindPredicate = (type: NodeType, node: import("estree").Node) => boolean;
+  type FindPredicate = (type: NodeType, node: acorn.Node) => boolean;
 
   interface Found<Type extends NodeType, TState> {
       node: NarrowNode<Type>,
@@ -54,35 +56,35 @@ declare module "acorn-walk" {
   }
 
   export function simple<TState, K extends NodeType>(
-      node: import("estree").Node,
+      node: acorn.Node,
       visitors: SimpleVisitors<K, TState>,
       base?: RecursiveVisitors<NodeType, TState>,
       state?: TState
   ): void;
 
   export function ancestor<TState, K extends NodeType>(
-      node: import("estree").Node,
+      node: acorn.Node,
       visitors: AncestorVisitors<K, TState>,
       base?: RecursiveVisitors<NodeType, TState>,
       state?: TState
   ): void;
 
   export function recursive<TState, K extends NodeType>(
-      node: import("estree").Node,
+      node: acorn.Node,
       state: TState,
       functions: RecursiveVisitors<K, TState>,
       base?: RecursiveVisitors<NodeType, TState>
   ): void;
 
   export function full<TState>(
-      node: import("estree").Node,
+      node: acorn.Node,
       callback: FullWalkerCallback<TState>,
       base?: RecursiveVisitors<NodeType, TState>,
       state?: TState
   ): void;
 
   export function fullAncestor<TState>(
-      node: import("estree").Node,
+      node: acorn.Node,
       callback: FullAncestorWalkerCallback<TState>,
       base?: RecursiveVisitors<NodeType, TState>,
       state?: TState
@@ -94,7 +96,7 @@ declare module "acorn-walk" {
   ): RecursiveVisitors<NodeType, TState>;
 
   export function findNodeAt<TState, K extends NodeType>(
-      node: import("estree").Node,
+      node: acorn.Node,
       start: number | undefined,
       end: number | undefined,
       type: K,
@@ -103,7 +105,7 @@ declare module "acorn-walk" {
   ): Found<K, TState> | undefined;
 
   export function findNodeAt<TState>(
-      node: import("estree").Node,
+      node: acorn.Node,
       start: number | undefined,
       end: number | undefined,
       type?: FindPredicate,
