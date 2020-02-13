@@ -1,9 +1,7 @@
 import acorn from 'acorn';
 
 declare module "acorn-walk" {
-  type NodeType  = acorn.Node["type"];
-  type DiscriminateUnion<T, K extends keyof T, V extends T[K] = T[K]> = T extends Record<K, V> ? T : never;
-  type NarrowNode<K extends NodeType> = DiscriminateUnion<acorn.Node, "type", K>;
+  type NodeType = acorn.Node["type"];
   
   type FullWalkerCallback<TState> = (
       node: acorn.Node,
@@ -20,18 +18,18 @@ declare module "acorn-walk" {
   type WalkerCallback<TState> = (node: acorn.Node, state: TState) => void;
 
   type SimpleWalkerFn<K extends NodeType, TState> = (
-      node: NarrowNode<K>,
+      node: acorn.Node,
       state: TState
   ) => void;
   
   type AncestorWalkerFn<K extends NodeType, TState> = (
-      node: NarrowNode<K>,
+      node: acorn.Node,
       state: TState| acorn.Node[],
       ancestors: acorn.Node[]
   ) => void;
 
   type RecursiveWalkerFn<K extends NodeType, TState> = (
-      node: NarrowNode<K>,
+      node: acorn.Node,
       state: TState,
       callback: WalkerCallback<TState>
   ) => void;
@@ -51,7 +49,7 @@ declare module "acorn-walk" {
   type FindPredicate = (type: NodeType, node: acorn.Node) => boolean;
 
   interface Found<Type extends NodeType, TState> {
-      node: NarrowNode<Type>,
+      node: acorn.Node,
       state: TState
   }
 
