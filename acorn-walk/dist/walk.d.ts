@@ -94,7 +94,7 @@ declare module "acorn-walk" {
   export function findNodeAt<TState>(
     node: Node,
     start: number | undefined,
-    end: number | undefined,
+    end?: number | undefined,
     type?: FindPredicate,
     base?: RecursiveVisitors<TState>,
     state?: TState
