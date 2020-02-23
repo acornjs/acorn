@@ -36,6 +36,7 @@ import "./statement"
 import "./expression"
 
 export {LooseParser} from "./state"
+export {isDummy} from "./parseutil"
 
 defaultOptions.tabSize = 4
 

@@ -1,5 +1,6 @@
 import {tokTypes as tt, Token, isNewLine, SourceLocation, getLineInfo, lineBreakG} from "acorn"
 import {LooseParser} from "./state"
+import {dummyValue} from "./parseutil"
 
 const lp = LooseParser.prototype
 
@@ -73,7 +74,7 @@ lp.readToken = function() {
         throw e
       }
       this.resetTo(pos)
-      if (replace === true) replace = {start: pos, end: pos, type: tt.name, value: "✖"}
+      if (replace === true) replace = {start: pos, end: pos, type: tt.name, value: dummyValue}
       if (replace) {
         if (this.options.locations)
           replace.loc = new SourceLocation(
