@@ -60,3 +60,7 @@ take the **`LooseParser`** class exported by the module, and call its
 static `extend` method with one or more plugins to get a customized
 parser class. The class has a static `parse` method that acts like the
 top-level `parse` method.
+
+**isDummy**`(node)` takes a `Node` and returns `true` if it is a dummy node
+inserted by the parser. The function performs a simple equality check on the
+node's name.
