@@ -1,3 +1,15 @@
+## 7.1.1 (2020-03-01)
+
+### Bug fixes
+
+Treat `\8` and `\9` as invalid escapes in template strings.
+
+Allow unicode escapes in property names that are keywords.
+
+Don't error on an exponential operator expression as argument to `await`.
+
+More carefully check for valid UTF16 surrogate pairs in regexp validator.
+
 ## 7.1.0 (2019-09-24)
 
 ### Bug fixes
