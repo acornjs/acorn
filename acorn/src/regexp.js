@@ -152,7 +152,7 @@ pp.regexp_pattern = function(state) {
     if (state.eat(0x29 /* ) */)) {
       state.raise("Unmatched ')'")
     }
-    if (state.eat(0x5D /* [ */) || state.eat(0x7D /* } */)) {
+    if (state.eat(0x5D /* ] */) || state.eat(0x7D /* } */)) {
       state.raise("Lone quantifier brackets")
     }
   }
@@ -837,7 +837,7 @@ pp.regexp_eatCharacterClass = function(state) {
   if (state.eat(0x5B /* [ */)) {
     state.eat(0x5E /* ^ */)
     this.regexp_classRanges(state)
-    if (state.eat(0x5D /* [ */)) {
+    if (state.eat(0x5D /* ] */)) {
       return true
     }
     // Unreachable since it threw "unterminated regular expression" error before.
@@ -885,7 +885,7 @@ pp.regexp_eatClassAtom = function(state) {
   }
 
   const ch = state.current()
-  if (ch !== 0x5D /* [ */) {
+  if (ch !== 0x5D /* ] */) {
     state.lastIntValue = ch
     state.advance()
     return true
