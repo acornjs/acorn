@@ -50,7 +50,8 @@ export class RegExpValidationState {
     if (!this.switchU || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l) {
       return c
     }
-    return (c << 10) + s.charCodeAt(i + 1) - 0x35FDC00
+    const next = s.charCodeAt(i + 1)
+    return next >= 0xDC00 && next <= 0xDFFF ? (c << 10) + next - 0x35FDC00 : c
   }
 
   nextIndex(i) {
@@ -59,8 +60,9 @@ export class RegExpValidationState {
     if (i >= l) {
       return l
     }
-    const c = s.charCodeAt(i)
-    if (!this.switchU || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l) {
+    let c = s.charCodeAt(i), next
+    if (!this.switchU || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l ||
+        (next = s.charCodeAt(i + 1)) < 0xDC00 || next > 0xDFFF) {
       return i + 1
     }
     return i + 2
