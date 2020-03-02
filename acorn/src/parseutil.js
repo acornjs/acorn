@@ -18,9 +18,9 @@ pp.strictDirective = function(start) {
       skipWhiteSpace.lastIndex = start + match[0].length
       let spaceAfter = skipWhiteSpace.exec(this.input), end = spaceAfter.index + spaceAfter[0].length
       let next = this.input.charAt(end)
-      return next == ";" || next == "}" ||
+      return next === ";" || next === "}" ||
         (lineBreak.test(spaceAfter[0]) &&
-         !(/[(`\.\[+\-\/*%<>=,?^&]/.test(next) || next == "!" && this.input.charAt(end + 1) == "="))
+         !(/[(`.[+\-/*%<>=,?^&]/.test(next) || next === "!" && this.input.charAt(end + 1) === "="))
     }
     start += match[0].length
 
