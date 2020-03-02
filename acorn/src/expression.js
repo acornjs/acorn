@@ -838,16 +838,14 @@ pp.parseFunctionBody = function(node, isArrowFunction, isMethod) {
     // Add the params to varDeclaredNames to ensure that an error is thrown
     // if a let/const declaration in the function clashes with one of the params.
     this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && !isMethod && this.isSimpleParamList(node.params))
-    node.body = this.parseBlock(false)
+    // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
+    if (this.strict && node.id) this.checkLVal(node.id, BIND_OUTSIDE)
+    node.body = this.parseBlock(false, undefined, useStrict && !oldStrict)
     node.expression = false
     this.adaptDirectivePrologue(node.body.body)
     this.labels = oldLabels
   }
   this.exitScope()
-
-  // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
-  if (this.strict && node.id) this.checkLVal(node.id, BIND_OUTSIDE)
-  this.strict = oldStrict
 }
 
 pp.isSimpleParamList = function(params) {

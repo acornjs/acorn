@@ -418,14 +418,16 @@ pp.parseExpressionStatement = function(node, expr) {
 // strict"` declarations when `allowStrict` is true (used for
 // function bodies).
 
-pp.parseBlock = function(createNewLexicalScope = true, node = this.startNode()) {
+pp.parseBlock = function(createNewLexicalScope = true, node = this.startNode(), exitStrict) {
   node.body = []
   this.expect(tt.braceL)
   if (createNewLexicalScope) this.enterScope(0)
-  while (!this.eat(tt.braceR)) {
+  while (this.type !== tt.braceR) {
     let stmt = this.parseStatement(null)
     node.body.push(stmt)
   }
+  if (exitStrict) this.strict = false
+  this.next()
   if (createNewLexicalScope) this.exitScope()
   return this.finishNode(node, "BlockStatement")
 }
@@ -578,7 +580,7 @@ pp.parseClass = function(node, isStatement) {
   let hadConstructor = false
   classBody.body = []
   this.expect(tt.braceL)
-  while (!this.eat(tt.braceR)) {
+  while (this.type !== tt.braceR) {
     const element = this.parseClassElement(node.superClass !== null)
     if (element) {
       classBody.body.push(element)
@@ -588,8 +590,9 @@ pp.parseClass = function(node, isStatement) {
       }
     }
   }
-  node.body = this.finishNode(classBody, "ClassBody")
   this.strict = oldStrict
+  this.next()
+  node.body = this.finishNode(classBody, "ClassBody")
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
