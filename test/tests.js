@@ -29464,3 +29464,16 @@ test("/**/ --> comment\n", {})
 test("x.class++", {})
 
 testFail("½", "Unexpected character '½' (1:0)")
+
+// Ignore use-strict strings that aren't a stand-along expression
+test("'use strict'.foo; 05", {}, {ecmaVersion: 6})
+test("'use strict'\n.foo; 05", {}, {ecmaVersion: 6})
+test("\"use strict\"(foo); 05", {}, {ecmaVersion: 6})
+test("'use strict'`foo`; 05", {}, {ecmaVersion: 6})
+test("'use strict'\n+ 10; 05", {}, {ecmaVersion: 6})
+test("'use strict'\n!=10; 05", {}, {ecmaVersion: 6})
+
+// Don't ignore those that are, even with semicolon insertion
+testFail("\"use strict\"\nfoo\n05", "Invalid number (3:0)", {ecmaVersion: 6})
+testFail("\"use strict\"\n;(foo)\n05", "Invalid number (3:0)", {ecmaVersion: 6})
+testFail("'use strict'\n!blah; 05", "Invalid number (2:7)", {ecmaVersion: 6})
