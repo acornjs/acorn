@@ -1,3 +1,9 @@
+## 6.4.1 (2020-03-09)
+
+### Bug fixes
+
+More carefully check for valid UTF16 surrogate pairs in regexp validator.
+
 ## 7.1.1 (2020-03-01)
 
 ### Bug fixes
