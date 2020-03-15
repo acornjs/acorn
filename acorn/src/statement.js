@@ -676,6 +676,14 @@ pp.parseExport = function(node, exports) {
   this.next()
   // export * from '...'
   if (this.eat(tt.star)) {
+    if (this.options.ecmaVersion >= 11) {
+      if (this.eatContextual("as")) {
+        node.exported = this.parseIdent(true)
+        this.checkExport(exports, node.exported.name, this.lastTokStart)
+      } else {
+        node.exported = null
+      }
+    }
     this.expectContextual("from")
     if (this.type !== tt.string) this.unexpected()
     node.source = this.parseExprAtom()

@@ -16,6 +16,7 @@
   require("./tests-optional-catch-binding.js");
   require("./tests-bigint.js");
   require("./tests-dynamic-import.js");
+  require("./tests-export-all-as-ns-from-source.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")
 
