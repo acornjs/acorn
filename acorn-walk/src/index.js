@@ -354,7 +354,7 @@ base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
 }
 base.ExportAllDeclaration = (node, st, c) => {
   if (node.exported)
-    c(node.exported, st, "Pattern")
+    c(node.exported, st)
   c(node.source, st, "Expression")
 }
 base.ImportDeclaration = (node, st, c) => {
