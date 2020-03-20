@@ -262,7 +262,8 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
   let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
-      this.lastTokEnd === base.end && !this.canInsertSemicolon() && this.input.slice(base.start, base.end) === "async"
+      this.lastTokEnd === base.end && !this.canInsertSemicolon() && base.end - base.start === 5 &&
+      this.potentialArrowAt === base.start
   while (true) {
     let element = this.parseSubscript(base, startPos, startLoc, noCalls, maybeAsyncArrow)
     if (element === base || element.type === "ArrowFunctionExpression") return element
