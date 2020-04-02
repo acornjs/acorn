@@ -40,49 +40,49 @@ export class RegExpValidationState {
 
   // If u flag is given, this returns the code point at the index (it combines a surrogate pair).
   // Otherwise, this returns the code unit of the index (can be a part of a surrogate pair).
-  at(i) {
+  at(i, forceU = false) {
     const s = this.source
     const l = s.length
     if (i >= l) {
       return -1
     }
     const c = s.charCodeAt(i)
-    if (!this.switchU || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l) {
+    if (!(forceU || this.switchU) || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l) {
       return c
     }
     const next = s.charCodeAt(i + 1)
     return next >= 0xDC00 && next <= 0xDFFF ? (c << 10) + next - 0x35FDC00 : c
   }
 
-  nextIndex(i) {
+  nextIndex(i, forceU = false) {
     const s = this.source
     const l = s.length
     if (i >= l) {
       return l
     }
     let c = s.charCodeAt(i), next
-    if (!this.switchU || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l ||
+    if (!(forceU || this.switchU) || c <= 0xD7FF || c >= 0xE000 || i + 1 >= l ||
         (next = s.charCodeAt(i + 1)) < 0xDC00 || next > 0xDFFF) {
       return i + 1
     }
     return i + 2
   }
 
-  current() {
-    return this.at(this.pos)
+  current(forceU = false) {
+    return this.at(this.pos, forceU)
   }
 
-  lookahead() {
-    return this.at(this.nextIndex(this.pos))
+  lookahead(forceU = false) {
+    return this.at(this.nextIndex(this.pos, forceU), forceU)
   }
 
-  advance() {
-    this.pos = this.nextIndex(this.pos)
+  advance(forceU = false) {
+    this.pos = this.nextIndex(this.pos, forceU)
   }
 
-  eat(ch) {
-    if (this.current() === ch) {
-      this.advance()
+  eat(ch, forceU = false) {
+    if (this.current(forceU) === ch) {
+      this.advance(forceU)
       return true
     }
     return false
@@ -418,9 +418,9 @@ pp.regexp_eatExtendedPatternCharacter = function(state) {
   return false
 }
 
-// GroupSpecifier[U] ::
+// GroupSpecifier ::
 //   [empty]
-//   `?` GroupName[?U]
+//   `?` GroupName
 pp.regexp_groupSpecifier = function(state) {
   if (state.eat(0x3F /* ? */)) {
     if (this.regexp_eatGroupName(state)) {
@@ -434,8 +434,8 @@ pp.regexp_groupSpecifier = function(state) {
   }
 }
 
-// GroupName[U] ::
-//   `<` RegExpIdentifierName[?U] `>`
+// GroupName ::
+//   `<` RegExpIdentifierName `>`
 // Note: this updates `state.lastStringValue` property with the eaten name.
 pp.regexp_eatGroupName = function(state) {
   state.lastStringValue = ""
@@ -448,9 +448,9 @@ pp.regexp_eatGroupName = function(state) {
   return false
 }
 
-// RegExpIdentifierName[U] ::
-//   RegExpIdentifierStart[?U]
-//   RegExpIdentifierName[?U] RegExpIdentifierPart[?U]
+// RegExpIdentifierName ::
+//   RegExpIdentifierStart
+//   RegExpIdentifierName RegExpIdentifierPart
 // Note: this updates `state.lastStringValue` property with the eaten name.
 pp.regexp_eatRegExpIdentifierName = function(state) {
   state.lastStringValue = ""
@@ -464,17 +464,18 @@ pp.regexp_eatRegExpIdentifierName = function(state) {
   return false
 }
 
-// RegExpIdentifierStart[U] ::
+// RegExpIdentifierStart ::
 //   UnicodeIDStart
 //   `$`
 //   `_`
-//   `\` RegExpUnicodeEscapeSequence[?U]
+//   `\` RegExpUnicodeEscapeSequence[+U]
 pp.regexp_eatRegExpIdentifierStart = function(state) {
   const start = state.pos
-  let ch = state.current()
-  state.advance()
+  const forceU = this.options.ecmaVersion >= 11
+  let ch = state.current(forceU)
+  state.advance(forceU)
 
-  if (ch === 0x5C /* \ */ && this.regexp_eatRegExpUnicodeEscapeSequence(state)) {
+  if (ch === 0x5C /* \ */ && this.regexp_eatRegExpUnicodeEscapeSequence(state, forceU)) {
     ch = state.lastIntValue
   }
   if (isRegExpIdentifierStart(ch)) {
@@ -489,19 +490,20 @@ function isRegExpIdentifierStart(ch) {
   return isIdentifierStart(ch, true) || ch === 0x24 /* $ */ || ch === 0x5F /* _ */
 }
 
-// RegExpIdentifierPart[U] ::
+// RegExpIdentifierPart ::
 //   UnicodeIDContinue
 //   `$`
 //   `_`
-//   `\` RegExpUnicodeEscapeSequence[?U]
+//   `\` RegExpUnicodeEscapeSequence[+U]
 //   <ZWNJ>
 //   <ZWJ>
 pp.regexp_eatRegExpIdentifierPart = function(state) {
   const start = state.pos
-  let ch = state.current()
-  state.advance()
+  const forceU = this.options.ecmaVersion >= 11
+  let ch = state.current(forceU)
+  state.advance(forceU)
 
-  if (ch === 0x5C /* \ */ && this.regexp_eatRegExpUnicodeEscapeSequence(state)) {
+  if (ch === 0x5C /* \ */ && this.regexp_eatRegExpUnicodeEscapeSequence(state, forceU)) {
     ch = state.lastIntValue
   }
   if (isRegExpIdentifierPart(ch)) {
@@ -571,7 +573,7 @@ pp.regexp_eatCharacterEscape = function(state) {
     this.regexp_eatCControlLetter(state) ||
     this.regexp_eatZero(state) ||
     this.regexp_eatHexEscapeSequence(state) ||
-    this.regexp_eatRegExpUnicodeEscapeSequence(state) ||
+    this.regexp_eatRegExpUnicodeEscapeSequence(state, false) ||
     (!state.switchU && this.regexp_eatLegacyOctalEscapeSequence(state)) ||
     this.regexp_eatIdentityEscape(state)
   )
@@ -644,13 +646,14 @@ function isControlLetter(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-RegExpUnicodeEscapeSequence
-pp.regexp_eatRegExpUnicodeEscapeSequence = function(state) {
+pp.regexp_eatRegExpUnicodeEscapeSequence = function(state, forceU = false) {
   const start = state.pos
+  const switchU = forceU || state.switchU
 
   if (state.eat(0x75 /* u */)) {
     if (this.regexp_eatFixedHexDigits(state, 4)) {
       const lead = state.lastIntValue
-      if (state.switchU && lead >= 0xD800 && lead <= 0xDBFF) {
+      if (switchU && lead >= 0xD800 && lead <= 0xDBFF) {
         const leadSurrogateEnd = state.pos
         if (state.eat(0x5C /* \ */) && state.eat(0x75 /* u */) && this.regexp_eatFixedHexDigits(state, 4)) {
           const trail = state.lastIntValue
@@ -665,7 +668,7 @@ pp.regexp_eatRegExpUnicodeEscapeSequence = function(state) {
       return true
     }
     if (
-      state.switchU &&
+      switchU &&
       state.eat(0x7B /* { */) &&
       this.regexp_eatHexDigits(state) &&
       state.eat(0x7D /* } */) &&
@@ -673,7 +676,7 @@ pp.regexp_eatRegExpUnicodeEscapeSequence = function(state) {
     ) {
       return true
     }
-    if (state.switchU) {
+    if (switchU) {
       state.raise("Invalid unicode escape")
     }
     state.pos = start
