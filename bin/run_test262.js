@@ -11,7 +11,6 @@ const unsupportedFeatures = [
   "class-static-fields-public",
   "class-static-methods-private",
   "coalesce-expression",
-  "import.meta",
   "numeric-separator-literal",
   "optional-chaining",
   "top-level-await"

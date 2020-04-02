@@ -427,10 +427,18 @@ pp.parseExprAtom = function(refDestructuringErrors) {
 
 pp.parseExprImport = function() {
   const node = this.startNode()
-  this.next() // skip `import`
+
+  // Consume `import` as an identifier for `import.meta`.
+  // Because `this.parseIdent(true)` doesn't check escape sequences, it needs the check of `this.containsEsc`.
+  if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword import")
+  const meta = this.parseIdent(true)
+
   switch (this.type) {
   case tt.parenL:
     return this.parseDynamicImport(node)
+  case tt.dot:
+    node.meta = meta
+    return this.parseImportMeta(node)
   default:
     this.unexpected()
   }
@@ -453,6 +461,22 @@ pp.parseDynamicImport = function(node) {
   }
 
   return this.finishNode(node, "ImportExpression")
+}
+
+pp.parseImportMeta = function(node) {
+  this.next() // skip `.`
+
+  const containsEsc = this.containsEsc
+  node.property = this.parseIdent(true)
+
+  if (node.property.name !== "meta")
+    this.raiseRecoverable(node.property.start, "The only valid meta property for import is import.meta")
+  if (containsEsc)
+    this.raiseRecoverable(node.start, "'import.meta' must not contain escaped characters")
+  if (this.options.sourceType !== "module")
+    this.raiseRecoverable(node.start, "Cannot use 'import.meta' outside a module")
+
+  return this.finishNode(node, "MetaProperty")
 }
 
 pp.parseLiteral = function(value) {
