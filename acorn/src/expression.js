@@ -470,7 +470,7 @@ pp.parseImportMeta = function(node) {
   node.property = this.parseIdent(true)
 
   if (node.property.name !== "meta")
-    this.raiseRecoverable(node.property.start, "The only valid meta property for import is import.meta")
+    this.raiseRecoverable(node.property.start, "The only valid meta property for import is 'import.meta'")
   if (containsEsc)
     this.raiseRecoverable(node.start, "'import.meta' must not contain escaped characters")
   if (this.options.sourceType !== "module")
@@ -581,10 +581,12 @@ pp.parseNew = function() {
     node.meta = meta
     let containsEsc = this.containsEsc
     node.property = this.parseIdent(true)
-    if (node.property.name !== "target" || containsEsc)
-      this.raiseRecoverable(node.property.start, "The only valid meta property for new is new.target")
+    if (node.property.name !== "target")
+      this.raiseRecoverable(node.property.start, "The only valid meta property for new is 'new.target'")
+    if (containsEsc)
+      this.raiseRecoverable(node.start, "'new.target' must not contain escaped characters")
     if (!this.inNonArrowFunction())
-      this.raiseRecoverable(node.start, "new.target can only be used in functions")
+      this.raiseRecoverable(node.start, "'new.target' can only be used in functions")
     return this.finishNode(node, "MetaProperty")
   }
   let startPos = this.start, startLoc = this.startLoc, isImport = this.type === tt._import

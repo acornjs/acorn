@@ -204,7 +204,7 @@ test(
   { ecmaVersion: 11 }
 );
 
-testFail('function failsParse() { return import.then(); }', 'The only valid meta property for import is import.meta (1:38)', {
+testFail('function failsParse() { return import.then(); }', 'The only valid meta property for import is \'import.meta\' (1:38)', {
   ecmaVersion: 11,
   loose: false
 });
