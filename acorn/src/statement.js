@@ -122,7 +122,7 @@ pp.parseStatement = function(context, topLevel, exports) {
       skipWhiteSpace.lastIndex = this.pos
       let skip = skipWhiteSpace.exec(this.input)
       let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
-      if (nextCh === 40) // '('
+      if (nextCh === 40 || nextCh === 46) // '(' or '.'
         return this.parseExpressionStatement(node, this.parseExpression())
     }
 
