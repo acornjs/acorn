@@ -10,7 +10,6 @@ const unsupportedFeatures = [
   "class-static-fields-private",
   "class-static-fields-public",
   "class-static-methods-private",
-  "coalesce-expression",
   "numeric-separator-literal",
   "optional-chaining",
   "top-level-await"

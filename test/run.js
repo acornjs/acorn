@@ -19,6 +19,7 @@
   require("./tests-dynamic-import.js");
   require("./tests-export-all-as-ns-from-source.js");
   require("./tests-import-meta.js");
+  require("./tests-nullish-coalescing.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")
 

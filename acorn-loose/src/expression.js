@@ -102,7 +102,7 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
         let rightStart = this.storeCurrentPos()
         node.right = this.parseExprOp(this.parseMaybeUnary(false), rightStart, prec, noIn, indent, line)
       }
-      this.finishNode(node, /&&|\|\|/.test(node.operator) ? "LogicalExpression" : "BinaryExpression")
+      this.finishNode(node, /&&|\|\||\?\?/.test(node.operator) ? "LogicalExpression" : "BinaryExpression")
       return this.parseExprOp(node, start, minPrec, noIn, indent, line)
     }
   }
