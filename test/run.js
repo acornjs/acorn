@@ -12,10 +12,13 @@
   require("./tests-async-iteration.js");
   require("./tests-regexp.js");
   require("./tests-regexp-2018.js");
+  require("./tests-regexp-2020.js");
   require("./tests-json-superset.js");
   require("./tests-optional-catch-binding.js");
   require("./tests-bigint.js");
   require("./tests-dynamic-import.js");
+  require("./tests-export-all-as-ns-from-source.js");
+  require("./tests-import-meta.js");
   require("./tests-nullish-coalescing.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")

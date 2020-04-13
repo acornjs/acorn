@@ -44,9 +44,11 @@ pp.checkPropClash = function(prop, propHash, refDestructuringErrors) {
   if (this.options.ecmaVersion >= 6) {
     if (name === "__proto__" && kind === "init") {
       if (propHash.proto) {
-        if (refDestructuringErrors && refDestructuringErrors.doubleProto < 0) refDestructuringErrors.doubleProto = key.start
-        // Backwards-compat kludge. Can be removed in version 6.0
-        else this.raiseRecoverable(key.start, "Redefinition of __proto__ property")
+        if (refDestructuringErrors) {
+          if (refDestructuringErrors.doubleProto < 0)
+            refDestructuringErrors.doubleProto = key.start
+          // Backwards-compat kludge. Can be removed in version 6.0
+        } else this.raiseRecoverable(key.start, "Redefinition of __proto__ property")
       }
       propHash.proto = true
     }
@@ -111,12 +113,11 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     else this.exprAllowed = false
   }
 
-  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1, oldShorthandAssign = -1
+  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1
   if (refDestructuringErrors) {
     oldParenAssign = refDestructuringErrors.parenthesizedAssign
     oldTrailingComma = refDestructuringErrors.trailingComma
-    oldShorthandAssign = refDestructuringErrors.shorthandAssign
-    refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.shorthandAssign = -1
+    refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = -1
   } else {
     refDestructuringErrors = new DestructuringErrors
     ownDestructuringErrors = true
@@ -131,8 +132,11 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
     let node = this.startNodeAt(startPos, startLoc)
     node.operator = this.value
     node.left = this.type === tt.eq ? this.toAssignable(left, false, refDestructuringErrors) : left
-    if (!ownDestructuringErrors) DestructuringErrors.call(refDestructuringErrors)
-    refDestructuringErrors.shorthandAssign = -1 // reset because shorthand default was used correctly
+    if (!ownDestructuringErrors) {
+      refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.doubleProto = -1
+    }
+    if (refDestructuringErrors.shorthandAssign >= node.left.start)
+      refDestructuringErrors.shorthandAssign = -1 // reset because shorthand default was used correctly
     this.checkLVal(left)
     this.next()
     node.right = this.parseMaybeAssign(noIn)
@@ -142,7 +146,6 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   }
   if (oldParenAssign > -1) refDestructuringErrors.parenthesizedAssign = oldParenAssign
   if (oldTrailingComma > -1) refDestructuringErrors.trailingComma = oldTrailingComma
-  if (oldShorthandAssign > -1) refDestructuringErrors.shorthandAssign = oldShorthandAssign
   return left
 }
 
@@ -256,8 +259,8 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
 pp.parseExprSubscripts = function(refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
   let expr = this.parseExprAtom(refDestructuringErrors)
-  let skipArrowSubscripts = expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")"
-  if (this.checkExpressionErrors(refDestructuringErrors) || skipArrowSubscripts) return expr
+  if (expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")")
+    return expr
   let result = this.parseSubscripts(expr, startPos, startLoc)
   if (refDestructuringErrors && result.type === "MemberExpression") {
     if (refDestructuringErrors.parenthesizedAssign >= result.start) refDestructuringErrors.parenthesizedAssign = -1
@@ -268,7 +271,8 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
   let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
-      this.lastTokEnd === base.end && !this.canInsertSemicolon() && this.input.slice(base.start, base.end) === "async"
+      this.lastTokEnd === base.end && !this.canInsertSemicolon() && base.end - base.start === 5 &&
+      this.potentialArrowAt === base.start
   while (true) {
     let element = this.parseSubscript(base, startPos, startLoc, noCalls, maybeAsyncArrow)
     if (element === base || element.type === "ArrowFunctionExpression") return element
@@ -432,10 +436,18 @@ pp.parseExprAtom = function(refDestructuringErrors) {
 
 pp.parseExprImport = function() {
   const node = this.startNode()
-  this.next() // skip `import`
+
+  // Consume `import` as an identifier for `import.meta`.
+  // Because `this.parseIdent(true)` doesn't check escape sequences, it needs the check of `this.containsEsc`.
+  if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword import")
+  const meta = this.parseIdent(true)
+
   switch (this.type) {
   case tt.parenL:
     return this.parseDynamicImport(node)
+  case tt.dot:
+    node.meta = meta
+    return this.parseImportMeta(node)
   default:
     this.unexpected()
   }
@@ -458,6 +470,22 @@ pp.parseDynamicImport = function(node) {
   }
 
   return this.finishNode(node, "ImportExpression")
+}
+
+pp.parseImportMeta = function(node) {
+  this.next() // skip `.`
+
+  const containsEsc = this.containsEsc
+  node.property = this.parseIdent(true)
+
+  if (node.property.name !== "meta")
+    this.raiseRecoverable(node.property.start, "The only valid meta property for import is 'import.meta'")
+  if (containsEsc)
+    this.raiseRecoverable(node.start, "'import.meta' must not contain escaped characters")
+  if (this.options.sourceType !== "module")
+    this.raiseRecoverable(node.start, "Cannot use 'import.meta' outside a module")
+
+  return this.finishNode(node, "MetaProperty")
 }
 
 pp.parseLiteral = function(value) {
@@ -562,10 +590,12 @@ pp.parseNew = function() {
     node.meta = meta
     let containsEsc = this.containsEsc
     node.property = this.parseIdent(true)
-    if (node.property.name !== "target" || containsEsc)
-      this.raiseRecoverable(node.property.start, "The only valid meta property for new is new.target")
+    if (node.property.name !== "target")
+      this.raiseRecoverable(node.property.start, "The only valid meta property for new is 'new.target'")
+    if (containsEsc)
+      this.raiseRecoverable(node.start, "'new.target' must not contain escaped characters")
     if (!this.inNonArrowFunction())
-      this.raiseRecoverable(node.start, "new.target can only be used in functions")
+      this.raiseRecoverable(node.start, "'new.target' can only be used in functions")
     return this.finishNode(node, "MetaProperty")
   }
   let startPos = this.start, startLoc = this.startLoc, isImport = this.type === tt._import
@@ -844,16 +874,14 @@ pp.parseFunctionBody = function(node, isArrowFunction, isMethod) {
     // Add the params to varDeclaredNames to ensure that an error is thrown
     // if a let/const declaration in the function clashes with one of the params.
     this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && !isMethod && this.isSimpleParamList(node.params))
-    node.body = this.parseBlock(false)
+    // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
+    if (this.strict && node.id) this.checkLVal(node.id, BIND_OUTSIDE)
+    node.body = this.parseBlock(false, undefined, useStrict && !oldStrict)
     node.expression = false
     this.adaptDirectivePrologue(node.body.body)
     this.labels = oldLabels
   }
   this.exitScope()
-
-  // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
-  if (this.strict && node.id) this.checkLVal(node.id, BIND_OUTSIDE)
-  this.strict = oldStrict
 }
 
 pp.isSimpleParamList = function(params) {
@@ -971,6 +999,6 @@ pp.parseAwait = function() {
 
   let node = this.startNode()
   this.next()
-  node.argument = this.parseMaybeUnary(null, true)
+  node.argument = this.parseMaybeUnary(null, false)
   return this.finishNode(node, "AwaitExpression")
 }

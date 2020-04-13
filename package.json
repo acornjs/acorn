@@ -44,6 +44,6 @@
     "test262": "git+https://github.com/tc39/test262.git#09380a4ae412e986ea39eb7163f5a6b3e5b04bbc",
     "test262-parser-runner": "^0.5.0",
     "test262-stream": "^1.2.1",
-    "unicode-12.0.0": "^0.7.9"
+    "unicode-13.0.0": "^0.8.0"
   }
 }

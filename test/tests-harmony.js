@@ -14781,10 +14781,10 @@ test("function foo() { new.target; }", {
   sourceType: "script"
 }, {ecmaVersion: 6});
 
-testFail("new.prop", "The only valid meta property for new is new.target (1:4)", {ecmaVersion: 6});
-testFail("new.target", "new.target can only be used in functions (1:0)", {ecmaVersion: 6});
+testFail("new.prop", "The only valid meta property for new is 'new.target' (1:4)", {ecmaVersion: 6});
+testFail("new.target", "'new.target' can only be used in functions (1:0)", {ecmaVersion: 6});
 test("function x() { return () => new.target }", {}, {ecmaVersion: 6});
-testFail("let y = () => new.target", "new.target can only be used in functions (1:14)", {ecmaVersion: 6});
+testFail("let y = () => new.target", "'new.target' can only be used in functions (1:14)", {ecmaVersion: 6});
 
 test("export default function foo() {} false", {
   body: [
@@ -16512,3 +16512,11 @@ test("let x = 1; x = 2", {}, {ecmaVersion: 6})
 test("function *f2() { () => yield / 1 }", {}, {ecmaVersion: 6})
 
 test("({ a = 42, b: c.d } = e)", {}, {ecmaVersion: 6})
+
+testFail("({ a = 42, b: c = d })", "Shorthand property assignments are valid only in destructuring patterns (1:5)", {ecmaVersion: 6})
+
+test("({ __proto__: x, __proto__: y, __proto__: z }) => {}", {}, {ecmaVersion: 6})
+
+// Don't parse first token after a class or strict function as strict
+test("class x {}\n05", {}, {ecmaVersion: 6})
+test("function x() { 'use strict' }\n05", {}, {ecmaVersion: 6})

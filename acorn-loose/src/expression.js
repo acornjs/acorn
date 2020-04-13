@@ -310,10 +310,13 @@ lp.parseExprAtom = function() {
 
 lp.parseExprImport = function() {
   const node = this.startNode()
-  this.next() // skip `import`
+  const meta = this.parseIdent(true)
   switch (this.tok.type) {
   case tt.parenL:
     return this.parseDynamicImport(node)
+  case tt.dot:
+    node.meta = meta
+    return this.parseImportMeta(node)
   default:
     node.name = "import"
     return this.finishNode(node, "Identifier")
@@ -323,6 +326,12 @@ lp.parseExprImport = function() {
 lp.parseDynamicImport = function(node) {
   node.source = this.parseExprList(tt.parenR)[0] || this.dummyString()
   return this.finishNode(node, "ImportExpression")
+}
+
+lp.parseImportMeta = function(node) {
+  this.next() // skip '.'
+  node.property = this.parseIdent(true)
+  return this.finishNode(node, "MetaProperty")
 }
 
 lp.parseNew = function() {

@@ -1,4 +1,5 @@
 import {Parser, SourceLocation, tokTypes as tt, Node, lineBreak, isNewLine} from "acorn"
+import {dummyValue} from "./parseutil"
 
 function noop() {}
 
@@ -63,13 +64,13 @@ export class LooseParser {
 
   dummyIdent() {
     let dummy = this.dummyNode("Identifier")
-    dummy.name = "✖"
+    dummy.name = dummyValue
     return dummy
   }
 
   dummyString() {
     let dummy = this.dummyNode("Literal")
-    dummy.value = dummy.raw = "✖"
+    dummy.value = dummy.raw = dummyValue
     return dummy
   }
 

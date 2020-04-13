@@ -29428,7 +29428,7 @@ test("(\\u0061sync ())", {
 }, {ecmaVersion: 8})
 testFail("({ \\u0061sync x() { await x } })", "Unexpected token (1:14)", {ecmaVersion: 8})
 testFail("for (x \\u006ff y) {}", "Unexpected token (1:7)", {ecmaVersion: 6})
-testFail("function x () { new.ta\\u0072get }", "The only valid meta property for new is new.target (1:20)", {ecmaVersion: 6})
+testFail("function x () { new.ta\\u0072get }", "'new.target' must not contain escaped characters (1:16)", {ecmaVersion: 6})
 testFail("class X { st\\u0061tic y() {} }", "Unexpected token (1:22)", {ecmaVersion: 6})
 
 testFail("(x=1)=2", "Parenthesized pattern (1:0)")
@@ -29464,3 +29464,16 @@ test("/**/ --> comment\n", {})
 test("x.class++", {})
 
 testFail("½", "Unexpected character '½' (1:0)")
+
+// Ignore use-strict strings that aren't a stand-along expression
+test("'use strict'.foo; 05", {}, {ecmaVersion: 6})
+test("'use strict'\n.foo; 05", {}, {ecmaVersion: 6})
+test("\"use strict\"(foo); 05", {}, {ecmaVersion: 6})
+test("'use strict'`foo`; 05", {}, {ecmaVersion: 6})
+test("'use strict'\n+ 10; 05", {}, {ecmaVersion: 6})
+test("'use strict'\n!=10; 05", {}, {ecmaVersion: 6})
+
+// Don't ignore those that are, even with semicolon insertion
+testFail("\"use strict\"\nfoo\n05", "Invalid number (3:0)", {ecmaVersion: 6})
+testFail("\"use strict\"\n;(foo)\n05", "Invalid number (3:0)", {ecmaVersion: 6})
+testFail("'use strict'\n!blah; 05", "Invalid number (2:7)", {ecmaVersion: 6})
