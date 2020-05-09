@@ -1,3 +1,19 @@
+## 7.2.0 (2020-05-09)
+
+### Bug fixes
+
+Fix precedence issue in parsing of async arrow functions.
+
+### New features
+
+Add support for nullish coalescing.
+
+Add support for `import.meta`.
+
+Support `export * as ...` syntax.
+
+Upgrade to Unicode 13.
+
 ## 6.4.1 (2020-03-09)
 
 ### Bug fixes
