@@ -1,2 +1,2 @@
-import acorn from "./acorn.js";
+import * as acorn from "./acorn";
 export = acorn;
