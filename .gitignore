@@ -4,7 +4,9 @@
 /.tern-port
 /local
 /bin/_acorn.js
-/acorn/dist
+/acorn/dist/*
 /acorn-loose/dist
 /acorn-walk/dist
 /yarn.lock
+!/acorn/dist/acorn.d.ts
+!/acorn/dist/acorn.mjs.d.ts
