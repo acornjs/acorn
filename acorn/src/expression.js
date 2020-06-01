@@ -739,7 +739,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
   } else if (!isPattern && !containsEsc &&
              this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
              (prop.key.name === "get" || prop.key.name === "set") &&
-             (this.type !== tt.comma && this.type !== tt.braceR)) {
+             (this.type !== tt.comma && this.type !== tt.braceR && this.type !== tt.eq)) {
     if (isGenerator || isAsync) this.unexpected()
     prop.kind = prop.key.name
     this.parsePropertyName(prop)
