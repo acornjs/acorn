@@ -70,6 +70,7 @@ export const types = {
   colon: new TokenType(":", beforeExpr),
   dot: new TokenType("."),
   question: new TokenType("?", beforeExpr),
+  questionDot: new TokenType("?."),
   arrow: new TokenType("=>", beforeExpr),
   template: new TokenType("template"),
   invalidTemplate: new TokenType("invalidTemplate"),

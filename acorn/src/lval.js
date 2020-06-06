@@ -73,6 +73,10 @@ pp.toAssignable = function(node, isBinding, refDestructuringErrors) {
       this.toAssignable(node.expression, isBinding, refDestructuringErrors)
       break
 
+    case "ChainExpression":
+      this.raiseRecoverable(node.start, "Optional chaining cannot appear in left-hand side")
+      break
+
     case "MemberExpression":
       if (!isBinding) break
 
@@ -199,6 +203,10 @@ pp.checkLVal = function(expr, bindingType = BIND_NONE, checkClashes) {
       checkClashes[expr.name] = true
     }
     if (bindingType !== BIND_NONE && bindingType !== BIND_OUTSIDE) this.declareName(expr.name, bindingType, expr.start)
+    break
+
+  case "ChainExpression":
+    this.raiseRecoverable(expr.start, "Optional chaining cannot appear in left-hand side")
     break
 
   case "MemberExpression":

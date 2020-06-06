@@ -292,6 +292,10 @@ pp.readToken_eq_excl = function(code) { // '=!'
 pp.readToken_question = function() { // '?'
   if (this.options.ecmaVersion >= 11) {
     let next = this.input.charCodeAt(this.pos + 1)
+    if (next === 46) {
+      let next2 = this.input.charCodeAt(this.pos + 2)
+      if (next2 < 48 || next2 > 57) return this.finishOp(tt.questionDot, 2)
+    }
     if (next === 63) return this.finishOp(tt.coalesce, 2)
   }
   return this.finishOp(tt.question, 1)

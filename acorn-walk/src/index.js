@@ -192,7 +192,7 @@ base.Program = base.BlockStatement = (node, st, c) => {
 }
 base.Statement = skipThrough
 base.EmptyStatement = ignore
-base.ExpressionStatement = base.ParenthesizedExpression =
+base.ExpressionStatement = base.ParenthesizedExpression = base.ChainExpression =
   (node, st, c) => c(node.expression, st, "Expression")
 base.IfStatement = (node, st, c) => {
   c(node.test, st, "Expression")
