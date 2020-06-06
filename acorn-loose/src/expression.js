@@ -159,17 +159,23 @@ lp.parseExprSubscripts = function() {
 }
 
 lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
+  const optionalSupported = this.options.ecmaVersion >= 11
+  let optionalChained = false
   for (;;) {
     if (this.curLineStart !== line && this.curIndent <= startIndent && this.tokenStartsLine()) {
       if (this.tok.type === tt.dot && this.curIndent === startIndent)
         --startIndent
       else
-        return base
+        break
     }
 
     let maybeAsyncArrow = base.type === "Identifier" && base.name === "async" && !this.canInsertSemicolon()
+    let optional = optionalSupported && this.eat(tt.questionDot)
+    if (optional) {
+      optionalChained = true
+    }
 
-    if (this.eat(tt.dot)) {
+    if ((optional && this.tok.type !== tt.parenL && this.tok.type !== tt.bracketL && this.tok.type !== tt.backQuote) || this.eat(tt.dot)) {
       let node = this.startNodeAt(start)
       node.object = base
       if (this.curLineStart !== line && this.curIndent <= startIndent && this.tokenStartsLine())
@@ -177,6 +183,9 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
       else
         node.property = this.parsePropertyAccessor() || this.dummyIdent()
       node.computed = false
+      if (optionalSupported) {
+        node.optional = optional
+      }
       base = this.finishNode(node, "MemberExpression")
     } else if (this.tok.type === tt.bracketL) {
       this.pushCx()
@@ -185,6 +194,9 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
       node.object = base
       node.property = this.parseExpression()
       node.computed = true
+      if (optionalSupported) {
+        node.optional = optional
+      }
       this.popCx()
       this.expect(tt.bracketR)
       base = this.finishNode(node, "MemberExpression")
@@ -195,6 +207,9 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
       let node = this.startNodeAt(start)
       node.callee = base
       node.arguments = exprList
+      if (optionalSupported) {
+        node.optional = optional
+      }
       base = this.finishNode(node, "CallExpression")
     } else if (this.tok.type === tt.backQuote) {
       let node = this.startNodeAt(start)
@@ -202,9 +217,16 @@ lp.parseSubscripts = function(base, start, noCalls, startIndent, line) {
       node.quasi = this.parseTemplate()
       base = this.finishNode(node, "TaggedTemplateExpression")
     } else {
-      return base
+      break
     }
   }
+
+  if (optionalChained) {
+    const chainNode = this.startNodeAt(start)
+    chainNode.expression = base
+    base = this.finishNode(chainNode, "ChainExpression")
+  }
+  return base
 }
 
 lp.parseExprAtom = function() {
