@@ -1,3 +1,13 @@
+## 7.3.0 (2020-06-11)
+
+### Bug fixes
+
+Fix a bug that caused parsing of object patterns with a property named `set` that had a default value to fail.
+
+### New features
+
+Add support for optional chaining (`?.`).
+
 ## 7.2.0 (2020-05-09)
 
 ### Bug fixes
