@@ -1,3 +1,9 @@
+## 7.3.1 (2020-06-11)
+
+### Bug fixes
+
+Make the string in the `version` export match the actual library version.
+
 ## 7.3.0 (2020-06-11)
 
 ### Bug fixes
