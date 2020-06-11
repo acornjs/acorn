@@ -1,3 +1,17 @@
+## 7.1.0 (2020-06-11)
+
+### Bug fixes
+
+Fix various issues in regexp validation.
+
+### New features
+
+Add support for `import.meta`.
+
+Add support for optional chaining (`?.`) and nullish coalescing (`??`).
+
+Support `export * as ns from "source"`.
+
 ## 7.0.0 (2019-08-12)
 
 ### Breaking changes

@@ -4,7 +4,7 @@
   "homepage": "https://github.com/acornjs/acorn",
   "main": "dist/acorn-loose.js",
   "module": "dist/acorn-loose.mjs",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "engines": {"node": ">=0.4.0"},
   "dependencies": {
     "acorn": "^7.0.0"
