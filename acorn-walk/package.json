@@ -5,7 +5,7 @@
   "main": "dist/walk.js",
   "types": "dist/walk.d.ts",
   "module": "dist/walk.mjs",
-  "version": "7.1.1",
+  "version": "7.2.0",
   "engines": {"node": ">=0.4.0"},
   "maintainers": [
     {

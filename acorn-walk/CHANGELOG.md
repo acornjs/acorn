@@ -1,3 +1,13 @@
+## 7.2.0 (2020-06-17)
+
+### New features
+
+Support optional chaining and nullish coalescing.
+
+Support `import.meta`.
+
+Add support for `export * as ns from "source"`.
+
 ## 7.1.1 (2020-02-13)
 
 ### Bug fixes
