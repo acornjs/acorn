@@ -425,21 +425,58 @@ pp.readRegexp = function() {
 // were read, the integer value otherwise. When `len` is given, this
 // will return `null` unless the integer has exactly `len` digits.
 
-pp.readInt = function(radix, len) {
-  let start = this.pos, total = 0
-  for (let i = 0, e = len == null ? Infinity : len; i < e; ++i) {
+pp.readInt = function(radix, len, maybeLegacyOctalNumericLiteral) {
+  // `len` is used for character escape sequences. In that case, disallow separators.
+  const allowSeparators = this.options.ecmaVersion >= 12 && len === undefined
+
+  // `maybeLegacyOctalNumericLiteral` is true if it doesn't have prefix (0x,0o,0b)
+  // and isn't fraction part nor exponent part. In that case, if the first digit
+  // is zero then disallow separators.
+  const isLegacyOctalNumericLiteral = maybeLegacyOctalNumericLiteral && this.input.charCodeAt(this.pos) === 48
+
+  let start = this.pos, total = 0, lastCode = 0
+  for (let i = 0, e = len == null ? Infinity : len; i < e; ++i, ++this.pos) {
     let code = this.input.charCodeAt(this.pos), val
+
+    if (allowSeparators && code === 95) {
+      if (isLegacyOctalNumericLiteral) this.raiseRecoverable(this.pos, "Numeric separator is not allowed in legacy octal numeric literals")
+      if (lastCode === 95) this.raiseRecoverable(this.pos, "Numeric separator must be exactly one underscore")
+      if (i === 0) this.raiseRecoverable(this.pos, "Numeric separator is not allowed at the first of digits")
+      lastCode = code
+      continue
+    }
+
     if (code >= 97) val = code - 97 + 10 // a
     else if (code >= 65) val = code - 65 + 10 // A
     else if (code >= 48 && code <= 57) val = code - 48 // 0-9
     else val = Infinity
     if (val >= radix) break
-    ++this.pos
+    lastCode = code
     total = total * radix + val
   }
+
+  if (allowSeparators && lastCode === 95) this.raiseRecoverable(this.pos - 1, "Numeric separator is not allowed at the last of digits")
   if (this.pos === start || len != null && this.pos - start !== len) return null
 
   return total
+}
+
+function stringToNumber(str, isLegacyOctalNumericLiteral) {
+  if (isLegacyOctalNumericLiteral) {
+    return parseInt(str, 8)
+  }
+
+  // `parseFloat(value)` stops parsing at the first numeric separator then returns a wrong value.
+  return parseFloat(str.replace(/_/g, ""))
+}
+
+function stringToBigInt(str) {
+  if (typeof BigInt !== "function") {
+    return null
+  }
+
+  // `BigInt(value)` throws syntax error if the string contains numeric separators.
+  return BigInt(str.replace(/_/g, ""))
 }
 
 pp.readRadixNumber = function(radix) {
@@ -448,7 +485,7 @@ pp.readRadixNumber = function(radix) {
   let val = this.readInt(radix)
   if (val == null) this.raise(this.start + 2, "Expected number in radix " + radix)
   if (this.options.ecmaVersion >= 11 && this.input.charCodeAt(this.pos) === 110) {
-    val = typeof BigInt !== "undefined" ? BigInt(this.input.slice(start, this.pos)) : null
+    val = stringToBigInt(this.input.slice(start, this.pos))
     ++this.pos
   } else if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
   return this.finishToken(tt.num, val)
@@ -458,13 +495,12 @@ pp.readRadixNumber = function(radix) {
 
 pp.readNumber = function(startsWithDot) {
   let start = this.pos
-  if (!startsWithDot && this.readInt(10) === null) this.raise(start, "Invalid number")
+  if (!startsWithDot && this.readInt(10, undefined, true) === null) this.raise(start, "Invalid number")
   let octal = this.pos - start >= 2 && this.input.charCodeAt(start) === 48
   if (octal && this.strict) this.raise(start, "Invalid number")
   let next = this.input.charCodeAt(this.pos)
   if (!octal && !startsWithDot && this.options.ecmaVersion >= 11 && next === 110) {
-    let str = this.input.slice(start, this.pos)
-    let val = typeof BigInt !== "undefined" ? BigInt(str) : null
+    let val = stringToBigInt(this.input.slice(start, this.pos))
     ++this.pos
     if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
     return this.finishToken(tt.num, val)
@@ -482,8 +518,7 @@ pp.readNumber = function(startsWithDot) {
   }
   if (isIdentifierStart(this.fullCharCodeAtPos())) this.raise(this.pos, "Identifier directly after number")
 
-  let str = this.input.slice(start, this.pos)
-  let val = octal ? parseInt(str, 8) : parseFloat(str)
+  let val = stringToNumber(this.input.slice(start, this.pos), octal)
   return this.finishToken(tt.num, val)
 }
 
