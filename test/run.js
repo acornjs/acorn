@@ -22,6 +22,7 @@
   require("./tests-nullish-coalescing.js");
   require("./tests-optional-chaining.js");
   require("./tests-logical-assignment-operators.js");
+  require("./tests-numeric-separators.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")
 
