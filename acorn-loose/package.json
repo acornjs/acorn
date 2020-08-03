@@ -4,6 +4,10 @@
   "homepage": "https://github.com/acornjs/acorn",
   "main": "dist/acorn-loose.js",
   "module": "dist/acorn-loose.mjs",
+  "exports": {
+    "import": "./dist/acorn-loose.mjs",
+    "require": "./dist/acorn-loose.js"
+  },
   "version": "7.1.0",
   "engines": {"node": ">=0.4.0"},
   "dependencies": {
