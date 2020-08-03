@@ -12,6 +12,7 @@
         "new-parens": "off",
         "no-case-declarations": "off",
         "no-cond-assign": "off",
+        "no-console": ["error", { allow: ["warn", "error"] }],
         "no-fallthrough": "off",
         "no-labels": "off",
         "no-mixed-operators": "off",

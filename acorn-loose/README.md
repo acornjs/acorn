@@ -52,7 +52,7 @@ on the `acorn` package, because it uses the same tokenizer.
 
 ```javascript
 var acornLoose = require("acorn-loose");
-console.log(acornLoose.parse("1 / * 4 )[2]"));
+console.log(acornLoose.parse("1 / * 4 )[2]", {ecmaVersion: 2020}));
 ```
 
 Like the regular parser, the loose parser supports plugins. You can
