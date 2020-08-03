@@ -1,3 +1,11 @@
+## 7.4.0 (2020-08-03)
+
+### New features
+
+Add support for logical assignment operators.
+
+Add support for numeric separators.
+
 ## 7.3.1 (2020-06-11)
 
 ### Bug fixes
