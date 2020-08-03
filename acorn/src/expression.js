@@ -624,7 +624,7 @@ pp.parseNew = function() {
       this.raiseRecoverable(node.property.start, "The only valid meta property for new is 'new.target'")
     if (containsEsc)
       this.raiseRecoverable(node.start, "'new.target' must not contain escaped characters")
-    if (!this.inNonArrowFunction())
+    if (!this.inNonArrowFunction)
       this.raiseRecoverable(node.start, "'new.target' can only be used in functions")
     return this.finishNode(node, "MetaProperty")
   }
