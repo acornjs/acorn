@@ -98,9 +98,7 @@ export class Parser {
   get allowSuper() { return (this.currentThisScope().flags & SCOPE_SUPER) > 0 }
   get allowDirectSuper() { return (this.currentThisScope().flags & SCOPE_DIRECT_SUPER) > 0 }
   get treatFunctionsAsVar() { return this.treatFunctionsAsVarInScope(this.currentScope()) }
-
-  // Switch to a getter for 7.0.0.
-  inNonArrowFunction() { return (this.currentThisScope().flags & SCOPE_FUNCTION) > 0 }
+  get inNonArrowFunction() { return (this.currentThisScope().flags & SCOPE_FUNCTION) > 0 }
 
   static extend(...plugins) {
     let cls = this
