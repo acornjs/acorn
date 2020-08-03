@@ -6,8 +6,8 @@
   "types": "dist/walk.d.ts",
   "module": "dist/walk.mjs",
   "exports": {
-    "import": "./dist/acorn-walk.mjs",
-    "require": "./dist/acorn-walk.js"
+    "import": "./dist/walk.mjs",
+    "require": "./dist/walk.js"
   },
   "version": "7.2.0",
   "engines": {"node": ">=0.4.0"},
