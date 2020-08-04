@@ -10,7 +10,6 @@ const unsupportedFeatures = [
   "class-static-fields-private",
   "class-static-fields-public",
   "class-static-methods-private",
-  "logical-assignment-operators",
 ];
 
 run(
