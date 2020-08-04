@@ -1,5 +1,3 @@
-language/literals/string/legacy-non-octal-escape-sequence-8-strict.js (strict mode)
-
 language/expressions/await/await-BindingIdentifier-in-global.js (default)
 language/expressions/await/await-BindingIdentifier-in-global.js (strict mode)
 language/expressions/await/await-in-global.js (default)

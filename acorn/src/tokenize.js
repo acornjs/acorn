@@ -694,6 +694,12 @@ pp.readEscapedChar = function(inTemplate) {
     return ""
   case 56:
   case 57:
+    if (this.strict) {
+      this.invalidStringToken(
+        this.pos - 1,
+        "Invalid escape sequence"
+      )
+    }
     if (inTemplate) {
       const codePos = this.pos - 1
 
