@@ -40,6 +40,6 @@ export {isDummy} from "./parseutil"
 
 defaultOptions.tabSize = 4
 
-export function parse(input, options) {
+export function parse(input, options = defaultOptions) {
   return LooseParser.parse(input, options)
 }
