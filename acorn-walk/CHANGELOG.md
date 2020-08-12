@@ -1,3 +1,9 @@
+## 8.0.0 (2020-08-12)
+
+### New features
+
+The package can now be loaded directly as an ECMAScript module in node 13+.
+
 ## 7.2.0 (2020-06-17)
 
 ### New features
