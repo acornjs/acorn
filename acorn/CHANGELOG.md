@@ -1,3 +1,9 @@
+## 8.0.1 (2020-08-12)
+
+### Bug fixes
+
+Provide the correct value in the `version` export.
+
 ## 8.0.0 (2020-08-12)
 
 ### Bug fixes
