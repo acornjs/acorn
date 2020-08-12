@@ -787,13 +787,13 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
       this.awaitIdentPos = startPos
     prop.kind = "init"
     if (isPattern) {
-      prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
+      prop.value = this.parseMaybeDefault(startPos, startLoc, this.copyNode(prop.key))
     } else if (this.type === tt.eq && refDestructuringErrors) {
       if (refDestructuringErrors.shorthandAssign < 0)
         refDestructuringErrors.shorthandAssign = this.start
-      prop.value = this.parseMaybeDefault(startPos, startLoc, prop.key)
+      prop.value = this.parseMaybeDefault(startPos, startLoc, this.copyNode(prop.key))
     } else {
-      prop.value = prop.key
+      prop.value = this.copyNode(prop.key)
     }
     prop.shorthand = true
   } else this.unexpected()
