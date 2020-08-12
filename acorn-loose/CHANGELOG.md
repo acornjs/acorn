@@ -1,3 +1,13 @@
+## 8.0.0 (2020-08-12)
+
+### New features
+
+The package can now be loaded directly as an ECMAScript module in node 13+.
+
+### Breaking changes
+
+The `ecmaVersion` option is now required. For the moment, omitting it will still work with a warning, but that will change in a future release.
+
 ## 7.1.0 (2020-06-11)
 
 ### Bug fixes

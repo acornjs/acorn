@@ -8,10 +8,10 @@
     "import": "./dist/acorn-loose.mjs",
     "require": "./dist/acorn-loose.js"
   },
-  "version": "7.1.0",
+  "version": "8.0.0",
   "engines": {"node": ">=0.4.0"},
   "dependencies": {
-    "acorn": "^7.0.0"
+    "acorn": "^8.0.0"
   },
   "maintainers": [
     {
