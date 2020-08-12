@@ -5,6 +5,10 @@
   "main": "dist/walk.js",
   "types": "dist/walk.d.ts",
   "module": "dist/walk.mjs",
+  "exports": {
+    "import": "./dist/acorn-walk.mjs",
+    "require": "./dist/acorn-walk.js"
+  },
   "version": "7.2.0",
   "engines": {"node": ">=0.4.0"},
   "maintainers": [
