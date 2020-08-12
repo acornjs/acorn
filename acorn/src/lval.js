@@ -1,7 +1,7 @@
-import {types as tt} from "./tokentype"
-import {Parser} from "./state"
-import {has} from "./util"
-import {BIND_NONE, BIND_OUTSIDE, BIND_LEXICAL} from "./scopeflags"
+import {types as tt} from "./tokentype.js"
+import {Parser} from "./state.js"
+import {has} from "./util.js"
+import {BIND_NONE, BIND_OUTSIDE, BIND_LEXICAL} from "./scopeflags.js"
 
 const pp = Parser.prototype
 

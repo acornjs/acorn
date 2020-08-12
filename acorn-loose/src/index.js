@@ -30,13 +30,13 @@
 // tangle.
 
 import {defaultOptions} from "acorn"
-import {LooseParser} from "./state"
-import "./tokenize"
-import "./statement"
-import "./expression"
+import {LooseParser} from "./state.js"
+import "./tokenize.js"
+import "./statement.js"
+import "./expression.js"
 
-export {LooseParser} from "./state"
-export {isDummy} from "./parseutil"
+export {LooseParser} from "./state.js"
+export {isDummy} from "./parseutil.js"
 
 defaultOptions.tabSize = 4
 

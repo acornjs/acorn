@@ -14,22 +14,22 @@
 //
 // [walk]: util/walk.js
 
-import {Parser} from "./state"
-import "./parseutil"
-import "./statement"
-import "./lval"
-import "./expression"
-import "./location"
-import "./scope"
+import {Parser} from "./state.js"
+import "./parseutil.js"
+import "./statement.js"
+import "./lval.js"
+import "./expression.js"
+import "./location.js"
+import "./scope.js"
 
-import {defaultOptions} from "./options"
-import {Position, SourceLocation, getLineInfo} from "./locutil"
-import {Node} from "./node"
-import {TokenType, types as tokTypes, keywords as keywordTypes} from "./tokentype"
-import {TokContext, types as tokContexts} from "./tokencontext"
-import {isIdentifierChar, isIdentifierStart} from "./identifier"
-import {Token} from "./tokenize"
-import {isNewLine, lineBreak, lineBreakG, nonASCIIwhitespace} from "./whitespace"
+import {defaultOptions} from "./options.js"
+import {Position, SourceLocation, getLineInfo} from "./locutil.js"
+import {Node} from "./node.js"
+import {TokenType, types as tokTypes, keywords as keywordTypes} from "./tokentype.js"
+import {TokContext, types as tokContexts} from "./tokencontext.js"
+import {isIdentifierChar, isIdentifierStart} from "./identifier.js"
+import {Token} from "./tokenize.js"
+import {isNewLine, lineBreak, lineBreakG, nonASCIIwhitespace} from "./whitespace.js"
 
 export const version = "7.4.0"
 export {

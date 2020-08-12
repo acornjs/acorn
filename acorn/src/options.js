@@ -1,5 +1,5 @@
-import {has, isArray} from "./util"
-import {SourceLocation} from "./locutil"
+import {has, isArray} from "./util.js"
+import {SourceLocation} from "./locutil.js"
 
 // A second optional argument can be given to further configure
 // the parser process. These options are recognized:

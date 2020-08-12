@@ -16,11 +16,11 @@
 //
 // [opp]: http://en.wikipedia.org/wiki/Operator-precedence_parser
 
-import {types as tt} from "./tokentype"
-import {Parser} from "./state"
-import {DestructuringErrors} from "./parseutil"
-import {lineBreak} from "./whitespace"
-import {functionFlags, SCOPE_ARROW, SCOPE_SUPER, SCOPE_DIRECT_SUPER, BIND_OUTSIDE, BIND_VAR} from "./scopeflags"
+import {types as tt} from "./tokentype.js"
+import {Parser} from "./state.js"
+import {DestructuringErrors} from "./parseutil.js"
+import {lineBreak} from "./whitespace.js"
+import {functionFlags, SCOPE_ARROW, SCOPE_SUPER, SCOPE_DIRECT_SUPER, BIND_OUTSIDE, BIND_VAR} from "./scopeflags.js"
 
 const pp = Parser.prototype
 

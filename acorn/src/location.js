@@ -1,5 +1,5 @@
-import {Parser} from "./state"
-import {Position, getLineInfo} from "./locutil"
+import {Parser} from "./state.js"
+import {Position, getLineInfo} from "./locutil.js"
 
 const pp = Parser.prototype
 
