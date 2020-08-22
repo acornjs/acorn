@@ -7,12 +7,12 @@ export default {
       file: "acorn/dist/acorn.js",
       format: "umd",
       name: "acorn",
-      sourceMap: true
+      sourcemap: true
     },
     {
       file: "acorn/dist/acorn.mjs",
       format: "es",
-      sourceMap: true
+      sourcemap: true
     }
   ],
   plugins: [
