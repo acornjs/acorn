@@ -2,11 +2,11 @@ export as namespace acorn
 export = acorn
 
 declare namespace acorn {
-  function parse(input: string, options?: Options): Node
+  function parse(input: string, options: Options): Node
 
-  function parseExpressionAt(input: string, pos?: number, options?: Options): Node
+  function parseExpressionAt(input: string, pos: number, options: Options): Node
 
-  function tokenizer(input: string, options?: Options): {
+  function tokenizer(input: string, options: Options): {
     getToken(): Token
     [Symbol.iterator](): Iterator<Token>
   }
@@ -37,9 +37,9 @@ declare namespace acorn {
   class Parser {
     constructor(options: Options, input: string, startPos?: number)
     parse(this: Parser): Node
-    static parse(this: typeof Parser, input: string, options?: Options): Node
-    static parseExpressionAt(this: typeof Parser, input: string, pos: number, options?: Options): Node
-    static tokenizer(this: typeof Parser, input: string, options?: Options): {
+    static parse(this: typeof Parser, input: string, options: Options): Node
+    static parseExpressionAt(this: typeof Parser, input: string, pos: number, options: Options): Node
+    static tokenizer(this: typeof Parser, input: string, options: Options): {
       getToken(): Token
       [Symbol.iterator](): Iterator<Token>
     }
