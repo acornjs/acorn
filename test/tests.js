@@ -29478,3 +29478,9 @@ test("'use strict'\n!=10; 05", {}, {ecmaVersion: 6})
 testFail("\"use strict\"\nfoo\n05", "Invalid number (3:0)", {ecmaVersion: 6})
 testFail("\"use strict\"\n;(foo)\n05", "Invalid number (3:0)", {ecmaVersion: 6})
 testFail("'use strict'\n!blah; 05", "Invalid number (2:7)", {ecmaVersion: 6})
+
+// Make sure a slash after an anonymous function/class in a for spec is treated as division
+test("for (; function () {} / 1;);", {}, {ecmaVersion: 6})
+test("for (; class {} / 1;);", {}, {ecmaVersion: 6})
+test("for (;; function () {} / 1);", {}, {ecmaVersion: 6})
+test("for (;; class {} / 1);", {}, {ecmaVersion: 6})
