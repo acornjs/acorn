@@ -1,8 +1,5 @@
 language: node_js
 sudo: false
-arch:
-  - AMD64
-  - ppc64le
 cache: npm
 matrix:
   include:
