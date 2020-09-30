@@ -1,8 +1,8 @@
 language: node_js
 sudo: false
 arch:
-  - ppc64le
   - AMD64
+  - ppc64le
 cache: npm
 matrix:
   include:
@@ -12,6 +12,18 @@ matrix:
   - node_js: '10'
     env: TEST_SUITE=test262
   - node_js: '12'
+#power_jobs
+  - node_js: '6'
+    arch: ppc64le
+  - node_js: '8'
+    arch: ppc64le
+  - node_js: '10'
+    arch: ppc64le
+  - node_js: '10'
+    env: TEST_SUITE=test262
+    arch: ppc64le
+  - node_js: '12'
+    arch: ppc64le
 script: >
   if [ "$TEST_SUITE" != "test262" ]; then
     npm test
