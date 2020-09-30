@@ -1,3 +1,11 @@
+## 8.0.2 (2020-09-30)
+
+### Bug fixes
+
+Make the TypeScript types reflect the current allowed values for `ecmaVersion`.
+
+Fix another regexp/division tokenizer issue.
+
 ## 8.0.1 (2020-08-12)
 
 ### Bug fixes
