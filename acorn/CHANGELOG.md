@@ -1,3 +1,9 @@
+## 8.0.3 (2020-10-02)
+
+### Bug fixes
+
+Fix a wasteful loop during `Parser` creation when setting `ecmaVersion` to `"latest"`.
+
 ## 8.0.2 (2020-09-30)
 
 ### Bug fixes
