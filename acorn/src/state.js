@@ -12,8 +12,7 @@ export class Parser {
     this.keywords = wordsRegexp(keywords[options.ecmaVersion >= 6 ? 6 : options.sourceType === "module" ? "5module" : 5])
     let reserved = ""
     if (options.allowReserved !== true) {
-      for (let v = options.ecmaVersion;; v--)
-        if (reserved = reservedWords[v]) break
+      reserved = reservedWords[options.ecmaVersion >= 6 ? 6 : options.ecmaVersion === 5 ? 5 : 3]
       if (options.sourceType === "module") reserved += " await"
     }
     this.reservedWords = wordsRegexp(reserved)
