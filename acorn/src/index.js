@@ -31,7 +31,7 @@ import {isIdentifierChar, isIdentifierStart} from "./identifier"
 import {Token} from "./tokenize"
 import {isNewLine, lineBreak, lineBreakG, nonASCIIwhitespace} from "./whitespace"
 
-export const version = "6.4.0"
+export const version = "6.4.2"
 export {
   Parser,
   defaultOptions,
