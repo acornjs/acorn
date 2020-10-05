@@ -3524,6 +3524,6 @@ test("({ async delete() {} })", {}, {ecmaVersion: 8})
 
 testFail("abc: async function a() {}", "Unexpected token (1:5)", {ecmaVersion: 8})
 
-test("(async() => { await 4 ** 2 })()", {}, {ecmaVersion: 8})
+testFail("(async() => { await 4 ** 2 })()", "Unexpected token (1:22)", {ecmaVersion: 8})
 
 testFail("4 + async() => 2", "Unexpected token (1:12)", {ecmaVersion: 8, loose: false})
