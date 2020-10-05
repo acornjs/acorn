@@ -1,3 +1,11 @@
+## 8.0.4 (2020-10-05)
+
+### Bug fixes
+
+Make `await x ** y` an error, following the spec.
+
+Fix potentially exponential regular expression.
+
 ## 8.0.3 (2020-10-02)
 
 ### Bug fixes
