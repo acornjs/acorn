@@ -8,7 +8,7 @@
     "import": "./dist/acorn-loose.mjs",
     "require": "./dist/acorn-loose.js"
   },
-  "version": "8.0.0",
+  "version": "8.0.1",
   "engines": {"node": ">=0.4.0"},
   "dependencies": {
     "acorn": "^8.0.0"

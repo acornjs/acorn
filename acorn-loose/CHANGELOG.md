@@ -1,3 +1,9 @@
+## 8.0.1 (2020-10-11)
+
+### Bug fixes
+
+Allow `for await` at the top level.
+
 ## 8.0.0 (2020-08-12)
 
 ### New features
