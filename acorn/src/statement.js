@@ -16,7 +16,7 @@ const pp = Parser.prototype
 // to its body instead of creating a new node.
 
 pp.parseTopLevel = function(node) {
-  let exports = {}
+  let exports = Object.create(null)
   if (!node.body) node.body = []
   while (this.type !== tt.eof) {
     let stmt = this.parseStatement(null, true, exports)
