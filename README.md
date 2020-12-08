@@ -1,6 +1,6 @@
 # Acorn
 
-[![Build Status](https://travis-ci.org/acornjs/acorn.svg?branch=master)](https://travis-ci.org/acornjs/acorn)
+[![Build Status](https://github.com/acornjs/acorn/workflows/ci/badge.svg)](https://github.com/acornjs/acorn/actions)
 [![NPM version](https://img.shields.io/npm/v/acorn.svg)](https://www.npmjs.com/package/acorn)
 [![CDNJS](https://img.shields.io/cdnjs/v/acorn.svg)](https://cdnjs.com/libraries/acorn)  
 

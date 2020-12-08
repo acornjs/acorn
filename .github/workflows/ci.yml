@@ -1,0 +1,13 @@
+name: ci
+on: [push]
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build and test
+    steps:
+      - uses: actions/checkout@v1
+      - uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
+      - run: npm test
+      - run: npm run test:test262
