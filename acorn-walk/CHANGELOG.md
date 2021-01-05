@@ -1,3 +1,9 @@
+## 8.0.0 (2021-01-05)
+
+### Bug fixes
+
+Fix a bug where `full` and `fullAncestor` would skip nodes with overridden types.
+
 ## 8.0.0 (2020-08-12)
 
 ### New features
