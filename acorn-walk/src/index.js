@@ -69,10 +69,14 @@ class Found {
 // A full walk triggers the callback on each node
 export function full(node, callback, baseVisitor, state, override) {
   if (!baseVisitor) baseVisitor = base
+  let last
   ;(function c(node, st, override) {
     let type = override || node.type
     baseVisitor[type](node, st, c)
-    if (!override) callback(node, st, type)
+    if (last != node) {
+      callback(node, st, type)
+      last = node
+    }
   })(node, state, override)
 }
 
@@ -80,13 +84,16 @@ export function full(node, callback, baseVisitor, state, override) {
 // the callback on each node
 export function fullAncestor(node, callback, baseVisitor, state) {
   if (!baseVisitor) baseVisitor = base
-  let ancestors = []
+  let ancestors = [], last
   ;(function c(node, st, override) {
     let type = override || node.type
     let isNew = node !== ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
     baseVisitor[type](node, st, c)
-    if (!override) callback(node, st || ancestors, ancestors, type)
+    if (last != node) {
+      callback(node, st || ancestors, ancestors, type)
+      last = node
+    }
     if (isNew) ancestors.pop()
   })(node, state)
 }
