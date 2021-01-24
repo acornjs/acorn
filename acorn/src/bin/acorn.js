@@ -18,6 +18,7 @@ for (let i = 2; i < process.argv.length; ++i) {
   else if (arg === "--" && !infile && i + 2 === process.argv.length) forceFile = infile = process.argv[++i]
   else if (arg === "--locations") options.locations = true
   else if (arg === "--allow-hash-bang") options.allowHashBang = true
+  else if (arg === "--allow-await-outside-function") options.allowAwaitOutsideFunction = true
   else if (arg === "--silent") silent = true
   else if (arg === "--compact") compact = true
   else if (arg === "--help") help(0)
