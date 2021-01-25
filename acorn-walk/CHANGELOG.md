@@ -1,3 +1,9 @@
+## 8.0.2 (2021-01-25)
+
+### Bug fixes
+
+Adjust package.json to work with Node 12.16.0 and 13.0-13.6.
+
 ## 8.0.0 (2021-01-05)
 
 ### Bug fixes
