@@ -8,7 +8,7 @@ const options = {}
 function help(status) {
   const print = (status === 0) ? console.log : console.error
   print("usage: " + basename(process.argv[1]) + " [--ecma3|--ecma5|--ecma6|--ecma7|--ecma8|--ecma9|...|--ecma2015|--ecma2016|--ecma2017|--ecma2018|...]")
-  print("        [--tokenize] [--locations] [---allow-hash-bang] [--compact] [--silent] [--module] [--help] [--] [infile]")
+  print("        [--tokenize] [--locations] [---allow-hash-bang] [--allow-await-outside-function] [--compact] [--silent] [--module] [--help] [--] [infile]")
   process.exit(status)
 }
 
@@ -18,6 +18,7 @@ for (let i = 2; i < process.argv.length; ++i) {
   else if (arg === "--" && !infile && i + 2 === process.argv.length) forceFile = infile = process.argv[++i]
   else if (arg === "--locations") options.locations = true
   else if (arg === "--allow-hash-bang") options.allowHashBang = true
+  else if (arg === "--allow-await-outside-function") options.allowAwaitOutsideFunction = true
   else if (arg === "--silent") silent = true
   else if (arg === "--compact") compact = true
   else if (arg === "--help") help(0)

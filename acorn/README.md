@@ -250,6 +250,9 @@ options:
 - `--allow-hash-bang`: If the code starts with the characters #! (as
   in a shellscript), the first line will be treated as a comment.
 
+- `--allow-await-outside-function`: Allows top-level `await` expressions.
+  See the `allowAwaitOutsideFunction` option for more information.
+
 - `--compact`: No whitespace is used in the AST output.
 
 - `--silent`: Do not output the AST, just return the exit status.
