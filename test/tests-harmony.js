@@ -16572,3 +16572,52 @@ test("const myFn = ({ set = '' }) => {};", {
     }
   ]
 }, {ecmaVersion: 6})
+
+
+test("[[...[], 0].x] = []", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "AssignmentExpression",
+        operator: "=",
+        left: {
+          type: "ArrayPattern",
+          elements: [
+            {
+              type: "MemberExpression",
+              object: {
+                type: "ArrayExpression",
+                elements: [
+                  {
+                    type: "SpreadElement",
+                    argument: {
+                      type: "ArrayExpression",
+                      elements: []
+                    }
+                  },
+                  {
+                    type: "Literal",
+                    value: 0,
+                    raw: "0"
+                  }
+                ]
+              },
+              property: {
+                type: "Identifier",
+                name: "x"
+              },
+              computed: false
+            }
+          ]
+        },
+        right: {
+          type: "ArrayExpression",
+          elements: []
+        }
+      }
+    }
+  ],
+  sourceType: "script"
+}, {ecmaVersion: 6})

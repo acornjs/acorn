@@ -270,6 +270,7 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
   if (refDestructuringErrors && result.type === "MemberExpression") {
     if (refDestructuringErrors.parenthesizedAssign >= result.start) refDestructuringErrors.parenthesizedAssign = -1
     if (refDestructuringErrors.parenthesizedBind >= result.start) refDestructuringErrors.parenthesizedBind = -1
+    if (refDestructuringErrors.trailingComma >= result.start) refDestructuringErrors.trailingComma = -1
   }
   return result
 }
