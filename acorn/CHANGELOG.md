@@ -1,3 +1,15 @@
+## 8.1.0 (2021-03-09)
+
+### Bug fixes
+
+Fix a spurious error in nested destructuring arrays.
+
+### New features
+
+Expose `allowAwaitOutsideFunction` in CLI interface.
+
+Make `allowImportExportAnywhere` also apply to `import.meta`.
+
 ## 8.0.5 (2021-01-25)
 
 ### Bug fixes
