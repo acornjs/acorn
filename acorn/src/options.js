@@ -33,7 +33,8 @@ export const defaultOptions = {
   // error.
   allowReturnOutsideFunction: false,
   // When enabled, import/export statements are not constrained to
-  // appearing at the top of the program.
+  // appearing at the top of the program, and an import.meta expression
+  // in a script isn't considered an error.
   allowImportExportEverywhere: false,
   // When enabled, await identifiers are allowed to appear at the top-level scope,
   // but they are still not allowed in non-async functions.
