@@ -513,7 +513,7 @@ pp.parseImportMeta = function(node) {
     this.raiseRecoverable(node.property.start, "The only valid meta property for import is 'import.meta'")
   if (containsEsc)
     this.raiseRecoverable(node.start, "'import.meta' must not contain escaped characters")
-  if (this.options.sourceType !== "module")
+  if (this.options.sourceType !== "module" && !this.options.allowImportExportEverywhere)
     this.raiseRecoverable(node.start, "Cannot use 'import.meta' outside a module")
 
   return this.finishNode(node, "MetaProperty")

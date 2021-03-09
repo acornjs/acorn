@@ -90,8 +90,10 @@ required):
 
 - **allowImportExportEverywhere**: By default, `import` and `export`
   declarations can only appear at a program's top level. Setting this
-  option to `true` allows them anywhere where a statement is allowed.
-  
+  option to `true` allows them anywhere where a statement is allowed,
+  and also allows `import.meta` expressions to appear in scripts
+  (when `sourceType` is not `"module"`).
+
 - **allowAwaitOutsideFunction**: By default, `await` expressions can
   only appear inside `async` functions. Setting this option to
   `true` allows to have top-level `await` expressions. They are

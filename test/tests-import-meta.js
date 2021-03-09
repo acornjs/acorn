@@ -41,6 +41,41 @@ test(
 );
 
 test(
+  "import.meta",
+  {
+    "type": "Program",
+    "start": 0,
+    "end": 11,
+    "body": [
+      {
+        "type": "ExpressionStatement",
+        "start": 0,
+        "end": 11,
+        "expression": {
+          "type": "MetaProperty",
+          "start": 0,
+          "end": 11,
+          "meta": {
+            "type": "Identifier",
+            "start": 0,
+            "end": 6,
+            "name": "import"
+          },
+          "property": {
+            "type": "Identifier",
+            "start": 7,
+            "end": 11,
+            "name": "meta"
+          }
+        }
+      }
+    ],
+    "sourceType": "script"
+  },
+  { ecmaVersion: 11, sourceType: "script", allowImportExportEverywhere: true }
+);
+
+test(
   "import.meta.url",
   {
     "type": "Program",
