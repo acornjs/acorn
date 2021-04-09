@@ -6,13 +6,11 @@ export default {
     {
       file: "acorn-walk/dist/walk.js",
       format: "umd",
-      name: "acorn.walk",
-      sourcemap: true
+      name: "acorn.walk"
     },
     {
       file: "acorn-walk/dist/walk.mjs",
-      format: "es",
-      sourcemap: true
+      format: "es"
     }
   ],
   plugins: [

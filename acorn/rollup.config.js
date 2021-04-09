@@ -6,13 +6,11 @@ export default {
     {
       file: "acorn/dist/acorn.js",
       format: "umd",
-      name: "acorn",
-      sourcemap: true
+      name: "acorn"
     },
     {
       file: "acorn/dist/acorn.mjs",
-      format: "es",
-      sourcemap: true
+      format: "es"
     }
   ],
   plugins: [

@@ -7,14 +7,12 @@ export default {
       file: "acorn-loose/dist/acorn-loose.js",
       format: "umd",
       name: "acorn.loose",
-      sourcemap: true,
       external: ["acorn"],
       globals: {acorn: "acorn"}
     },
     {
       file: "acorn-loose/dist/acorn-loose.mjs",
       format: "es",
-      sourcemap: true,
       external: ["acorn"],
       globals: {acorn: "acorn"}
     }
