@@ -1,3 +1,9 @@
+## 8.1.1 (2021-04-12)
+
+### Various
+
+Stop shipping source maps in the NPM package.
+
 ## 8.1.0 (2021-03-09)
 
 ### Bug fixes
