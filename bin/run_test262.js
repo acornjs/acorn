@@ -10,6 +10,8 @@ const unsupportedFeatures = [
   "class-static-fields-private",
   "class-static-fields-public",
   "class-static-methods-private",
+  "regexp-match-indices",
+  "arbitrary-module-namespace-names"
 ];
 
 run(
