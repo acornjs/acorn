@@ -314,6 +314,20 @@ pp.readToken_question = function() { // '?'
   return this.finishOp(tt.question, 1)
 }
 
+pp.readToken_numberSign = function() { // '#'
+  const ecmaVersion = this.options.ecmaVersion
+  let code = "#"
+  if (ecmaVersion >= 13) {
+    ++this.pos
+    code = this.fullCharCodeAtPos()
+    if (isIdentifierStart(code, true) || code === 92 /* '\' */) {
+      return this.finishToken(tt.privateId, this.readWord1())
+    }
+  }
+
+  this.raise(this.pos, "Unexpected character '" + codePointToString(code) + "'")
+}
+
 pp.getTokenFromCode = function(code) {
   switch (code) {
   // The interpretation of a dot depends on whether it is followed
@@ -385,6 +399,9 @@ pp.getTokenFromCode = function(code) {
 
   case 126: // '~'
     return this.finishOp(tt.prefix, 1)
+
+  case 35: // '#'
+    return this.readToken_numberSign()
   }
 
   this.raise(this.pos, "Unexpected character '" + codePointToString(code) + "'")

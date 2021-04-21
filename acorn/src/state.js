@@ -83,6 +83,11 @@ export class Parser {
 
     // For RegExp validation
     this.regexpState = null
+
+    // The stack of private names.
+    // Each element has two properties: 'declared' and 'used'.
+    // When it exited from the outermost class definition, all used private names must be declared.
+    this.privateNameStack = []
   }
 
   parse() {
@@ -94,7 +99,10 @@ export class Parser {
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
   get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 }
   get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 }
-  get allowSuper() { return (this.currentThisScope().flags & SCOPE_SUPER) > 0 }
+  get allowSuper() {
+    const {flags, inClassFieldInit} = this.currentThisScope()
+    return (flags & SCOPE_SUPER) > 0 || inClassFieldInit
+  }
   get allowDirectSuper() { return (this.currentThisScope().flags & SCOPE_DIRECT_SUPER) > 0 }
   get treatFunctionsAsVar() { return this.treatFunctionsAsVarInScope(this.currentScope()) }
   get inNonArrowFunction() { return (this.currentThisScope().flags & SCOPE_FUNCTION) > 0 }
