@@ -56,6 +56,7 @@ export const types = {
   regexp: new TokenType("regexp", startsExpr),
   string: new TokenType("string", startsExpr),
   name: new TokenType("name", startsExpr),
+  privateId: new TokenType("privateId", startsExpr),
   eof: new TokenType("eof"),
 
   // Punctuation token types.

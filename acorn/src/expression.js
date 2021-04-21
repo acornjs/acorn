@@ -237,6 +237,9 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     else if (this.strict && node.operator === "delete" &&
              node.argument.type === "Identifier")
       this.raiseRecoverable(node.start, "Deleting local variable in strict mode")
+    else if (node.operator === "delete" && node.argument.type === "MemberExpression" &&
+             node.argument.property.type === "PrivateIdentifier")
+      this.raiseRecoverable(node.start, "Private fields can not be deleted")
     else sawUnary = true
     expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
   } else {
@@ -307,9 +310,15 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow,
   if (computed || (optional && this.type !== tt.parenL && this.type !== tt.backQuote) || this.eat(tt.dot)) {
     let node = this.startNodeAt(startPos, startLoc)
     node.object = base
-    node.property = computed ? this.parseExpression() : this.parseIdent(this.options.allowReserved !== "never")
+    if (computed) {
+      node.property = this.parseExpression()
+      this.expect(tt.bracketR)
+    } else if (this.type === tt.privateId && base.type !== "Super") {
+      node.property = this.parsePrivateIdent()
+    } else {
+      node.property = this.parseIdent(this.options.allowReserved !== "never")
+    }
     node.computed = !!computed
-    if (computed) this.expect(tt.bracketR)
     if (optionalSupported) {
       node.optional = optional
     }
@@ -964,6 +973,8 @@ pp.checkUnreserved = function({start, end, name}) {
     this.raiseRecoverable(start, "Cannot use 'yield' as identifier inside a generator")
   if (this.inAsync && name === "await")
     this.raiseRecoverable(start, "Cannot use 'await' as identifier inside an async function")
+  if (this.currentThisScope().inClassFieldInit && name === "arguments")
+    this.raiseRecoverable(start, "Cannot use 'arguments' in class field initializer")
   if (this.keywords.test(name))
     this.raise(start, `Unexpected keyword '${name}'`)
   if (this.options.ecmaVersion < 6 &&
@@ -1005,6 +1016,26 @@ pp.parseIdent = function(liberal, isBinding) {
     if (node.name === "await" && !this.awaitIdentPos)
       this.awaitIdentPos = node.start
   }
+  return node
+}
+
+pp.parsePrivateIdent = function() {
+  const node = this.startNode()
+  if (this.type === tt.privateId) {
+    node.name = this.value
+  } else {
+    this.unexpected()
+  }
+  this.next()
+  this.finishNode(node, "PrivateIdentifier")
+
+  // For validating existence
+  if (this.privateNameStack.length === 0) {
+    this.raise(node.start, `Private field '#${node.name}' must be declared in an enclosing class`)
+  } else {
+    this.privateNameStack[this.privateNameStack.length - 1].used.push(node)
+  }
+
   return node
 }
 

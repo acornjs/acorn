@@ -12,6 +12,8 @@ class Scope {
     this.lexical = []
     // A list of lexically-declared FunctionDeclaration names in the current lexical scope
     this.functions = []
+    // A switch to disallow the identifier reference 'arguments'
+    this.inClassFieldInit = false
   }
 }
 

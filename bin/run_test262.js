@@ -4,18 +4,13 @@ const run = require("test262-parser-runner")
 const parse = require("../acorn").parse
 
 const unsupportedFeatures = [
-  "class-fields-private",
-  "class-fields-public",
-  "class-methods-private",
-  "class-static-fields-private",
-  "class-static-fields-public",
-  "class-static-methods-private",
   "regexp-match-indices",
-  "arbitrary-module-namespace-names"
+  "arbitrary-module-namespace-names",
+  "class-fields-private-in"
 ];
 
 run(
-  (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: 12, allowHashBang: true, allowAwaitOutsideFunction: sourceType === "module"}),
+  (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: 13, allowHashBang: true, allowAwaitOutsideFunction: sourceType === "module"}),
   {
     testsDirectory: path.dirname(require.resolve("test262/package.json")),
     skip: test => (test.attrs.features && unsupportedFeatures.some(f => test.attrs.features.includes(f))),

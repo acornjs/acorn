@@ -574,7 +574,8 @@ pp.parseClass = function(node, isStatement) {
 
   this.parseClassId(node, isStatement)
   this.parseClassSuper(node)
-  let classBody = this.startNode()
+  const privateNameMap = this.enterClassBody()
+  const classBody = this.startNode()
   let hadConstructor = false
   classBody.body = []
   this.expect(tt.braceL)
@@ -585,33 +586,46 @@ pp.parseClass = function(node, isStatement) {
       if (element.type === "MethodDefinition" && element.kind === "constructor") {
         if (hadConstructor) this.raise(element.start, "Duplicate constructor in the same class")
         hadConstructor = true
+      } else if (element.key.type === "PrivateIdentifier" && isPrivateNameConflicted(privateNameMap, element)) {
+        this.raiseRecoverable(element.key.start, `Identifier '#${element.key.name}' has already been declared`)
       }
     }
   }
   this.strict = oldStrict
   this.next()
   node.body = this.finishNode(classBody, "ClassBody")
+  this.exitClassBody()
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 
 pp.parseClassElement = function(constructorAllowsSuper) {
   if (this.eat(tt.semi)) return null
 
-  let method = this.startNode()
+  let node = this.startNode()
+
   const tryContextual = (k, noLineBreak = false) => {
     const start = this.start, startLoc = this.startLoc
-    if (!this.eatContextual(k)) return false
-    if (this.type !== tt.parenL && (!noLineBreak || !this.canInsertSemicolon())) return true
-    if (method.key) this.unexpected()
-    method.computed = false
-    method.key = this.startNodeAt(start, startLoc)
-    method.key.name = k
-    this.finishNode(method.key, "Identifier")
+    if (node.key || !this.eatContextual(k)) return false
+    if (
+      (this.type === tt.name ||
+      this.type === tt.privateId ||
+      this.type === tt.num ||
+      this.type === tt.string ||
+      this.type === tt.bracketL ||
+      this.type === tt.star) &&
+      !(noLineBreak && this.canInsertSemicolon())
+    ) {
+      return true
+    }
+    node.computed = false
+    node.key = this.startNodeAt(start, startLoc)
+    node.key.name = k
+    this.finishNode(node.key, "Identifier")
     return false
   }
 
-  method.kind = "method"
-  method.static = tryContextual("static")
+  node.static = tryContextual("static")
+  let kind = "method"
   let isGenerator = this.eat(tt.star)
   let isAsync = false
   if (!isGenerator) {
@@ -619,37 +633,83 @@ pp.parseClassElement = function(constructorAllowsSuper) {
       isAsync = true
       isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
     } else if (tryContextual("get")) {
-      method.kind = "get"
+      kind = "get"
     } else if (tryContextual("set")) {
-      method.kind = "set"
+      kind = "set"
     }
   }
-  if (!method.key) this.parsePropertyName(method)
-  let {key} = method
-  let allowsDirectSuper = false
-  if (!method.computed && !method.static && (key.type === "Identifier" && key.name === "constructor" ||
-      key.type === "Literal" && key.value === "constructor")) {
-    if (method.kind !== "method") this.raise(key.start, "Constructor can't have get/set modifier")
-    if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
-    if (isAsync) this.raise(key.start, "Constructor can't be an async method")
-    method.kind = "constructor"
-    allowsDirectSuper = constructorAllowsSuper
-  } else if (method.static && key.type === "Identifier" && key.name === "prototype") {
-    this.raise(key.start, "Classes may not have a static property named prototype")
+  if (!node.key) this.parseClassElementName(node)
+
+  if (this.options.ecmaVersion < 13 || this.type === tt.parenL || kind !== "method" || isGenerator || isAsync) {
+    const isConstructor = !node.static && checkKeyName(node, "constructor")
+    const allowsDirectSuper = isConstructor && constructorAllowsSuper
+    // Couldn't move this check into the 'parseClassMethod' method for backward compatibility.
+    if (isConstructor && kind !== "method") this.raise(node.key.start, "Constructor can't have get/set modifier")
+    node.kind = isConstructor ? "constructor" : kind
+    this.parseClassMethod(node, isGenerator, isAsync, allowsDirectSuper)
+  } else {
+    this.parseClassField(node)
   }
-  this.parseClassMethod(method, isGenerator, isAsync, allowsDirectSuper)
-  if (method.kind === "get" && method.value.params.length !== 0)
-    this.raiseRecoverable(method.value.start, "getter should have no params")
-  if (method.kind === "set" && method.value.params.length !== 1)
-    this.raiseRecoverable(method.value.start, "setter should have exactly one param")
-  if (method.kind === "set" && method.value.params[0].type === "RestElement")
-    this.raiseRecoverable(method.value.params[0].start, "Setter cannot use rest params")
-  return method
+
+  return node
+}
+
+pp.parseClassElementName = function(element) {
+  if (this.type === tt.privateId) {
+    if (this.value === "constructor") {
+      this.raise(this.start, "Classes can't have an element named '#constructor'")
+    }
+    element.computed = false
+    element.key = this.parsePrivateIdent()
+  } else {
+    this.parsePropertyName(element)
+  }
 }
 
 pp.parseClassMethod = function(method, isGenerator, isAsync, allowsDirectSuper) {
-  method.value = this.parseMethod(isGenerator, isAsync, allowsDirectSuper)
+  // Check key and flags
+  const key = method.key
+  if (method.kind === "constructor") {
+    if (isGenerator) this.raise(key.start, "Constructor can't be a generator")
+    if (isAsync) this.raise(key.start, "Constructor can't be an async method")
+  } else if (method.static && checkKeyName(method, "prototype")) {
+    this.raise(key.start, "Classes may not have a static property named prototype")
+  }
+
+  // Parse value
+  const value = method.value = this.parseMethod(isGenerator, isAsync, allowsDirectSuper)
+
+  // Check value
+  if (method.kind === "get" && value.params.length !== 0)
+    this.raiseRecoverable(value.start, "getter should have no params")
+  if (method.kind === "set" && value.params.length !== 1)
+    this.raiseRecoverable(value.start, "setter should have exactly one param")
+  if (method.kind === "set" && value.params[0].type === "RestElement")
+    this.raiseRecoverable(value.params[0].start, "Setter cannot use rest params")
+
   return this.finishNode(method, "MethodDefinition")
+}
+
+pp.parseClassField = function(field) {
+  if (checkKeyName(field, "constructor")) {
+    this.raise(field.key.start, "Classes can't have a field named 'constructor'")
+  } else if (field.static && checkKeyName(field, "prototype")) {
+    this.raise(field.key.start, "Classes can't have a static field named 'prototype'")
+  }
+
+  if (this.eat(tt.eq)) {
+    // To raise SyntaxError if 'arguments' exists in the initializer.
+    const scope = this.currentThisScope()
+    const inClassFieldInit = scope.inClassFieldInit
+    scope.inClassFieldInit = true
+    field.value = this.parseMaybeAssign()
+    scope.inClassFieldInit = inClassFieldInit
+  } else {
+    field.value = null
+  }
+  this.semicolon()
+
+  return this.finishNode(field, "PropertyDefinition")
 }
 
 pp.parseClassId = function(node, isStatement) {
@@ -666,6 +726,62 @@ pp.parseClassId = function(node, isStatement) {
 
 pp.parseClassSuper = function(node) {
   node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts() : null
+}
+
+pp.enterClassBody = function() {
+  const element = {declared: Object.create(null), used: []}
+  this.privateNameStack.push(element)
+  return element.declared
+}
+
+pp.exitClassBody = function() {
+  const {declared, used} = this.privateNameStack.pop()
+  const len = this.privateNameStack.length
+  const parent = len === 0 ? null : this.privateNameStack[len - 1]
+  for (let i = 0; i < used.length; ++i) {
+    const id = used[i]
+    if (!has(declared, id.name)) {
+      if (parent) {
+        parent.used.push(id)
+      } else {
+        this.raiseRecoverable(id.start, `Private field '#${id.name}' must be declared in an enclosing class`)
+      }
+    }
+  }
+}
+
+function isPrivateNameConflicted(privateNameMap, element) {
+  const name = element.key.name
+  const curr = privateNameMap[name]
+
+  let next = "true"
+  if (element.type === "MethodDefinition" && (element.kind === "get" || element.kind === "set")) {
+    next = (element.static ? "s" : "i") + element.kind
+  }
+
+  // `class { get #a(){}; static set #a(_){} }` is also conflict.
+  if (
+    curr === "iget" && next === "iset" ||
+    curr === "iset" && next === "iget" ||
+    curr === "sget" && next === "sset" ||
+    curr === "sset" && next === "sget"
+  ) {
+    privateNameMap[name] = "true"
+    return false
+  } else if (!curr) {
+    privateNameMap[name] = next
+    return false
+  } else {
+    return true
+  }
+}
+
+function checkKeyName(node, name) {
+  const {computed, key} = node
+  return !computed && (
+    key.type === "Identifier" && key.name === name ||
+    key.type === "Literal" && key.value === name
+  )
 }
 
 // Parses module export declaration.
