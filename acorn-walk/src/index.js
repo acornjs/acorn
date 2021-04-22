@@ -365,7 +365,7 @@ base.ImportDeclaration = (node, st, c) => {
 base.ImportExpression = (node, st, c) => {
   c(node.source, st, "Expression")
 }
-base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.Literal = ignore
+base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.PrivateIdentifier = base.Literal = ignore
 
 base.TaggedTemplateExpression = (node, st, c) => {
   c(node.tag, st, "Expression")
@@ -381,7 +381,7 @@ base.ClassBody = (node, st, c) => {
   for (let elt of node.body)
     c(elt, st)
 }
-base.MethodDefinition = base.Property = (node, st, c) => {
+base.MethodDefinition = base.PropertyDefinition = base.Property = (node, st, c) => {
   if (node.computed) c(node.key, st, "Expression")
-  c(node.value, st, "Expression")
+  if (node.value) c(node.value, st, "Expression")
 }
