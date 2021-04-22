@@ -282,47 +282,52 @@ lp.parseClass = function(isStatement) {
   if (this.curIndent + 1 < indent) { indent = this.curIndent; line = this.curLineStart }
   while (!this.closes(tt.braceR, indent, line)) {
     if (this.semicolon()) continue
-    let method = this.startNode(), isGenerator, isAsync
+    let element = this.startNode(), isGenerator, isAsync, kind = "method"
     if (this.options.ecmaVersion >= 6) {
-      method.static = false
+      element.static = false
       isGenerator = this.eat(tt.star)
     }
-    this.parsePropertyName(method)
-    if (isDummy(method.key)) { if (isDummy(this.parseMaybeAssign())) this.next(); this.eat(tt.comma); continue }
-    if (method.key.type === "Identifier" && !method.computed && method.key.name === "static" &&
-        (this.tok.type !== tt.parenL && this.tok.type !== tt.braceL)) {
-      method.static = true
+    this.parseClassElementName(element)
+    if (isDummy(element.key)) { if (isDummy(this.parseMaybeAssign())) this.next(); this.eat(tt.comma); continue }
+    if (element.key.type === "Identifier" && !element.computed && element.key.name === "static" &&
+        this.tok.type !== tt.parenL && this.tok.type !== tt.braceL && this.tok.type !== tt.eq &&
+        this.tok.type !== tt.semi) {
+      element.static = true
       isGenerator = this.eat(tt.star)
-      this.parsePropertyName(method)
+      this.parseClassElementName(element)
     } else {
-      method.static = false
+      element.static = false
     }
-    if (!method.computed &&
-        method.key.type === "Identifier" && method.key.name === "async" && this.tok.type !== tt.parenL &&
-        !this.canInsertSemicolon()) {
+    if (!element.computed &&
+        element.key.type === "Identifier" && element.key.name === "async" && this.tok.type !== tt.parenL &&
+        this.tok.type !== tt.eq && this.tok.type !== tt.semi && !this.canInsertSemicolon()) {
       isAsync = true
       isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
-      this.parsePropertyName(method)
+      this.parseClassElementName(element)
     } else {
       isAsync = false
     }
-    if (this.options.ecmaVersion >= 5 && method.key.type === "Identifier" &&
-        !method.computed && (method.key.name === "get" || method.key.name === "set") &&
-        this.tok.type !== tt.parenL && this.tok.type !== tt.braceL) {
-      method.kind = method.key.name
-      this.parsePropertyName(method)
-      method.value = this.parseMethod(false)
-    } else {
-      if (!method.computed && !method.static && !isGenerator && !isAsync && (
-        method.key.type === "Identifier" && method.key.name === "constructor" ||
-          method.key.type === "Literal" && method.key.value === "constructor")) {
-        method.kind = "constructor"
-      } else {
-        method.kind = "method"
-      }
-      method.value = this.parseMethod(isGenerator, isAsync)
+    if (this.options.ecmaVersion >= 5 && element.key.type === "Identifier" &&
+        !element.computed && (element.key.name === "get" || element.key.name === "set") &&
+        this.tok.type !== tt.parenL && this.tok.type !== tt.braceL && this.tok.type !== tt.eq &&
+        this.tok.type !== tt.semi) {
+      kind = element.key.name
+      this.parseClassElementName(element)
+    } else if (!element.computed && !element.static && !isGenerator && !isAsync &&
+               (element.key.type === "Identifier" && element.key.name === "constructor" ||
+                 element.key.type === "Literal" && element.key.value === "constructor")) {
+      kind = "constructor"
     }
-    node.body.body.push(this.finishNode(method, "MethodDefinition"))
+    if (this.options.ecmaVersion < 13 || this.tok.type === tt.parenL || kind !== "method" || isGenerator || isAsync) {
+      element.kind = kind
+      element.value = this.parseMethod(isGenerator, isAsync)
+      this.finishNode(element, "MethodDefinition")
+    } else {
+      element.value = this.eat(tt.eq) ? this.parseMaybeAssign() : null
+      this.semicolon()
+      this.finishNode(element, "PropertyDefinition")
+    }
+    node.body.body.push(element)
   }
   this.popCx()
   if (!this.eat(tt.braceR)) {
@@ -334,6 +339,15 @@ lp.parseClass = function(isStatement) {
   this.semicolon()
   this.finishNode(node.body, "ClassBody")
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
+}
+
+lp.parseClassElementName = function(element) {
+  if (this.tok.type === tt.privateId) {
+    element.computed = false
+    element.key = this.parsePrivateIdent()
+  } else {
+    this.parsePropertyName(element)
+  }
 }
 
 lp.parseFunction = function(node, isStatement, isAsync) {
