@@ -1755,6 +1755,9 @@ test("class C { #𩸽 }", {
   "sourceType": "script"
 }, {ecmaVersion: 13})
 
+// old ecma version
+testFail("class C { #aaa }", "Unexpected character '#' (1:10)", {ecmaVersion: 12})
+
 // Unexpected character
 testFail("class C { # aaa }", "Unexpected character ' ' (1:11)", {ecmaVersion: 13})
 testFail("class C { #+aaa }", "Unexpected character '+' (1:11)", {ecmaVersion: 13})

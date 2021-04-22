@@ -316,7 +316,7 @@ pp.readToken_question = function() { // '?'
 
 pp.readToken_numberSign = function() { // '#'
   const ecmaVersion = this.options.ecmaVersion
-  let code = "#"
+  let code = 35 // '#'
   if (ecmaVersion >= 13) {
     ++this.pos
     code = this.fullCharCodeAtPos()
