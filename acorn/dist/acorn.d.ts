@@ -88,6 +88,7 @@ declare namespace acorn {
     regexp: TokenType
     string: TokenType
     name: TokenType
+    privateId: TokenType
     eof: TokenType
     bracketL: TokenType
     bracketR: TokenType
