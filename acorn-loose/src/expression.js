@@ -507,6 +507,7 @@ lp.parsePropertyName = function(prop) {
 
 lp.parsePropertyAccessor = function() {
   if (this.tok.type === tt.name || this.tok.type.keyword) return this.parseIdent()
+  if (this.tok.type === tt.privateId) return this.parsePrivateIdent()
 }
 
 lp.parseIdent = function() {
@@ -516,6 +517,13 @@ lp.parseIdent = function() {
   this.next()
   node.name = name
   return this.finishNode(node, "Identifier")
+}
+
+lp.parsePrivateIdent = function() {
+  const node = this.startNode()
+  node.name = this.tok.value
+  this.next()
+  return this.finishNode(node, "PrivateIdentifier")
 }
 
 lp.initFunction = function(node) {

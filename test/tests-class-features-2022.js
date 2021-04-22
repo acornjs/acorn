@@ -466,7 +466,63 @@ test("class C { aaa\nbbb }", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 13})
+}, {ecmaVersion: 13, loose: false})
+// loose parser requires indentation.
+test("class C { aaa\n bbb }", {
+  "type": "Program",
+  "start": 0,
+  "end": 20,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 20,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 20,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 13,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 10,
+              "end": 13,
+              "name": "aaa"
+            },
+            "value": null
+          },
+          {
+            "type": "PropertyDefinition",
+            "start": 15,
+            "end": 18,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 15,
+              "end": 18,
+              "name": "bbb"
+            },
+            "value": null
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13, loose: true})
 
 test("class C { aaa=()=>0 }", {
   "type": "Program",
@@ -1051,76 +1107,148 @@ test("class C { static\nget\nfoo(){} }", {
 
 // ASI
 test("class C { async\nget(){} }", {
-    "type": "Program",
-    "start": 0,
-    "end": 25,
-    "body": [
-      {
-        "type": "ClassDeclaration",
-        "start": 0,
+  "type": "Program",
+  "start": 0,
+  "end": 25,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 25,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
         "end": 25,
-        "id": {
-          "type": "Identifier",
-          "start": 6,
-          "end": 7,
-          "name": "C"
-        },
-        "superClass": null,
-        "body": {
-          "type": "ClassBody",
-          "start": 8,
-          "end": 25,
-          "body": [
-            {
-              "type": "PropertyDefinition",
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 15,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
               "start": 10,
               "end": 15,
-              "static": false,
-              "computed": false,
-              "key": {
-                "type": "Identifier",
-                "start": 10,
-                "end": 15,
-                "name": "async"
-              },
-              "value": null
+              "name": "async"
             },
-            {
-              "type": "MethodDefinition",
+            "value": null
+          },
+          {
+            "type": "MethodDefinition",
+            "start": 16,
+            "end": 23,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
               "start": 16,
+              "end": 19,
+              "name": "get"
+            },
+            "kind": "method",
+            "value": {
+              "type": "FunctionExpression",
+              "start": 19,
               "end": 23,
-              "static": false,
-              "computed": false,
-              "key": {
-                "type": "Identifier",
-                "start": 16,
-                "end": 19,
-                "name": "get"
-              },
-              "kind": "method",
-              "value": {
-                "type": "FunctionExpression",
-                "start": 19,
+              "id": null,
+              "expression": false,
+              "generator": false,
+              "async": false,
+              "params": [],
+              "body": {
+                "type": "BlockStatement",
+                "start": 21,
                 "end": 23,
-                "id": null,
-                "expression": false,
-                "generator": false,
-                "async": false,
-                "params": [],
-                "body": {
-                  "type": "BlockStatement",
-                  "start": 21,
-                  "end": 23,
-                  "body": []
-                }
+                "body": []
               }
             }
-          ]
-        }
+          }
+        ]
       }
-    ],
-    "sourceType": "script"
-  }, {ecmaVersion: 13})
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13, loose: false})
+// loose parser requires indentation.
+test("class C { async\n get(){} }", {
+  "type": "Program",
+  "start": 0,
+  "end": 26,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 26,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 26,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 15,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 10,
+              "end": 15,
+              "name": "async"
+            },
+            "value": null
+          },
+          {
+            "type": "MethodDefinition",
+            "start": 17,
+            "end": 24,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 17,
+              "end": 20,
+              "name": "get"
+            },
+            "kind": "method",
+            "value": {
+              "type": "FunctionExpression",
+              "start": 20,
+              "end": 24,
+              "id": null,
+              "expression": false,
+              "generator": false,
+              "async": false,
+              "params": [],
+              "body": {
+                "type": "BlockStatement",
+                "start": 22,
+                "end": 24,
+                "body": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13, loose: true})
 
 // old ecma version
 testFail("class C { aaa }", "Unexpected token (1:14)", {ecmaVersion: 12})
@@ -1478,7 +1606,63 @@ test("class C { #aaa\n#bbb }", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 13})
+}, {ecmaVersion: 13, loose: false})
+// loose parser requires indentation.
+test("class C { #aaa\n #bbb }", {
+  "type": "Program",
+  "start": 0,
+  "end": 22,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 22,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 22,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 14,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "PrivateIdentifier",
+              "start": 10,
+              "end": 14,
+              "name": "aaa"
+            },
+            "value": null
+          },
+          {
+            "type": "PropertyDefinition",
+            "start": 16,
+            "end": 20,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "PrivateIdentifier",
+              "start": 16,
+              "end": 20,
+              "name": "bbb"
+            },
+            "value": null
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13, loose: true})
 
 test("class C { #aaa = 0 }", {
   "type": "Program",
@@ -1528,11 +1712,61 @@ test("class C { #aaa = 0 }", {
   "sourceType": "script"
 }, {ecmaVersion: 13})
 
+// Surrogate pair in private identifier
+test("class C { #𩸽 }", {
+  "type": "Program",
+  "start": 0,
+  "end": 15,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 15,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 15,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 13,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "PrivateIdentifier",
+              "start": 10,
+              "end": 13,
+              "name": "𩸽"
+            },
+            "value": null
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13})
+
+// Unexpected character
+testFail("class C { # aaa }", "Unexpected character ' ' (1:11)", {ecmaVersion: 13})
+testFail("class C { #+aaa }", "Unexpected character '+' (1:11)", {ecmaVersion: 13})
+testFail("class C { #👍 }", "Unexpected character '👍' (1:11)", {ecmaVersion: 13})
+
 // #constructor
 testFail("class C { #constructor }", "Classes can't have an element named '#constructor' (1:10)", {ecmaVersion: 13})
 testFail("class C { static #constructor }", "Classes can't have an element named '#constructor' (1:17)", {ecmaVersion: 13})
 
 // duplicate
+test("class C { a; #a }", {}, {ecmaVersion: 13})
+test("class C { #a; a }", {}, {ecmaVersion: 13})
 testFail("class C { #a; #a }", "Identifier '#a' has already been declared (1:14)", {ecmaVersion: 13})
 testFail("class C { #a; static #a }", "Identifier '#a' has already been declared (1:21)", {ecmaVersion: 13})
 testFail("class C { static #a; #a }", "Identifier '#a' has already been declared (1:21)", {ecmaVersion: 13})
@@ -2249,7 +2483,7 @@ test("class C { static\nasync\n#aaa(){} }", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 13})
+}, {ecmaVersion: 13, loose: false})
 test("class C { static\nasync\n*\n#aaa(){} }", {
   "type": "Program",
   "start": 0,
@@ -2320,7 +2554,150 @@ test("class C { static\nasync\n*\n#aaa(){} }", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 13})
+}, {ecmaVersion: 13, loose: false})
+// loose parser requires indentation.
+test("class C { static\n async\n #aaa(){} }", {
+  "type": "Program",
+  "start": 0,
+  "end": 35,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 35,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 35,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 23,
+            "static": true,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 18,
+              "end": 23,
+              "name": "async"
+            },
+            "value": null
+          },
+          {
+            "type": "MethodDefinition",
+            "start": 25,
+            "end": 33,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "PrivateIdentifier",
+              "start": 25,
+              "end": 29,
+              "name": "aaa"
+            },
+            "kind": "method",
+            "value": {
+              "type": "FunctionExpression",
+              "start": 29,
+              "end": 33,
+              "id": null,
+              "params": [],
+              "generator": false,
+              "expression": false,
+              "async": false,
+              "body": {
+                "type": "BlockStatement",
+                "start": 31,
+                "end": 33,
+                "body": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13, loose: true})
+test("class C { static\n async\n *\n #aaa(){} }", {
+  "type": "Program",
+  "start": 0,
+  "end": 38,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 38,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 38,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 23,
+            "static": true,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 18,
+              "end": 23,
+              "name": "async"
+            },
+            "value": null
+          },
+          {
+            "type": "MethodDefinition",
+            "start": 25,
+            "end": 36,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "PrivateIdentifier",
+              "start": 28,
+              "end": 32,
+              "name": "aaa"
+            },
+            "kind": "method",
+            "value": {
+              "type": "FunctionExpression",
+              "start": 32,
+              "end": 36,
+              "id": null,
+              "params": [],
+              "generator": true,
+              "expression": false,
+              "async": false,
+              "body": {
+                "type": "BlockStatement",
+                "start": 34,
+                "end": 36,
+                "body": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13, loose: true})
 
 // duplicate
 testFail("class C { #a(){} #a }", "Identifier '#a' has already been declared (1:17)", {ecmaVersion: 13})
