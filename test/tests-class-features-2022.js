@@ -1463,6 +1463,7 @@ test("async function f() { class C { aaa = await } }", {
   ],
   "sourceType": "script"
 }, {ecmaVersion: 13})
+testFail("async function f() { class C { aaa = await } }", "Cannot use keyword 'await' outside an async function (1:37)", {ecmaVersion: 13, sourceType: "module"})
 
 // `yield` is keyword in strict mode
 testFail("function* f() { class C { aaa = yield } }", "The keyword 'yield' is reserved (1:32)", {ecmaVersion: 13})
