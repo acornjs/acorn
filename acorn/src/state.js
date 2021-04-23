@@ -105,7 +105,10 @@ export class Parser {
   }
   get allowDirectSuper() { return (this.currentThisScope().flags & SCOPE_DIRECT_SUPER) > 0 }
   get treatFunctionsAsVar() { return this.treatFunctionsAsVarInScope(this.currentScope()) }
-  get inNonArrowFunction() { return (this.currentThisScope().flags & SCOPE_FUNCTION) > 0 }
+  get inNonArrowFunction() {
+    const {flags, inClassFieldInit} = this.currentThisScope()
+    return (flags & SCOPE_FUNCTION) > 0 || inClassFieldInit
+  }
 
   static extend(...plugins) {
     let cls = this
