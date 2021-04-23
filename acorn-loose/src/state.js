@@ -21,6 +21,7 @@ export class LooseParser {
     this.curLineStart = 0
     this.nextLineStart = this.lineEnd(this.curLineStart) + 1
     this.inAsync = false
+    this.inGenerator = false
     this.inFunction = false
   }
 

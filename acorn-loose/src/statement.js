@@ -323,7 +323,16 @@ lp.parseClass = function(isStatement) {
       element.value = this.parseMethod(isGenerator, isAsync)
       this.finishNode(element, "MethodDefinition")
     } else {
-      element.value = this.eat(tt.eq) ? this.parseMaybeAssign() : null
+      if (this.eat(tt.eq)) {
+        const oldInAsync = this.inAsync, oldInGenerator = this.inGenerator
+        this.inAsync = false
+        this.inGenerator = false
+        element.value = this.parseMaybeAssign()
+        this.inAsync = oldInAsync
+        this.inGenerator = oldInGenerator
+      } else {
+        element.value = null
+      }
       this.semicolon()
       this.finishNode(element, "PropertyDefinition")
     }
@@ -351,7 +360,7 @@ lp.parseClassElementName = function(element) {
 }
 
 lp.parseFunction = function(node, isStatement, isAsync) {
-  let oldInAsync = this.inAsync, oldInFunction = this.inFunction
+  let oldInAsync = this.inAsync, oldInGenerator = this.inGenerator, oldInFunction = this.inFunction
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6) {
     node.generator = this.eat(tt.star)
@@ -362,11 +371,13 @@ lp.parseFunction = function(node, isStatement, isAsync) {
   if (this.tok.type === tt.name) node.id = this.parseIdent()
   else if (isStatement === true) node.id = this.dummyIdent()
   this.inAsync = node.async
+  this.inGenerator = node.generator
   this.inFunction = true
   node.params = this.parseFunctionParams()
   node.body = this.parseBlock()
   this.toks.adaptDirectivePrologue(node.body.body)
   this.inAsync = oldInAsync
+  this.inGenerator = oldInGenerator
   this.inFunction = oldInFunction
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }

@@ -1250,6 +1250,79 @@ test("class C { async\n get(){} }", {
   "sourceType": "script"
 }, {ecmaVersion: 13, loose: true})
 
+// `await` is reference
+test("async function f() { class C { aaa = await } }", {
+  "type": "Program",
+  "start": 0,
+  "end": 46,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 46,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 16,
+        "name": "f"
+      },
+      "params": [],
+      "generator": false,
+      "expression": false,
+      "async": true,
+      "body": {
+        "type": "BlockStatement",
+        "start": 19,
+        "end": 46,
+        "body": [
+          {
+            "type": "ClassDeclaration",
+            "start": 21,
+            "end": 44,
+            "id": {
+              "type": "Identifier",
+              "start": 27,
+              "end": 28,
+              "name": "C"
+            },
+            "superClass": null,
+            "body": {
+              "type": "ClassBody",
+              "start": 29,
+              "end": 44,
+              "body": [
+                {
+                  "type": "PropertyDefinition",
+                  "start": 31,
+                  "end": 42,
+                  "static": false,
+                  "computed": false,
+                  "key": {
+                    "type": "Identifier",
+                    "start": 31,
+                    "end": 34,
+                    "name": "aaa"
+                  },
+                  "value": {
+                    "type": "Identifier",
+                    "start": 37,
+                    "end": 42,
+                    "name": "await"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13})
+
+// `yield` is keyword in strict mode
+testFail("function* f() { class C { aaa = yield } }", "The keyword 'yield' is reserved (1:32)", {ecmaVersion: 13})
+
 // old ecma version
 testFail("class C { aaa }", "Unexpected token (1:14)", {ecmaVersion: 12})
 

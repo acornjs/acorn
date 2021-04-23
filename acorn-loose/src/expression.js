@@ -42,7 +42,8 @@ lp.parseParenExpression = function() {
 }
 
 lp.parseMaybeAssign = function(noIn) {
-  if (this.toks.isContextual("yield")) {
+  // `yield` should be an identifier reference if it's not in generator functions.
+  if (this.inGenerator && this.toks.isContextual("yield")) {
     let node = this.startNode()
     this.next()
     if (this.semicolon() || this.canInsertSemicolon() || (this.tok.type !== tt.star && !this.tok.type.startsExpr)) {
@@ -580,28 +581,31 @@ lp.parseFunctionParams = function(params) {
 }
 
 lp.parseMethod = function(isGenerator, isAsync) {
-  let node = this.startNode(), oldInAsync = this.inAsync, oldInFunction = this.inFunction
+  let node = this.startNode(), oldInAsync = this.inAsync, oldInGenerator = this.inGenerator, oldInFunction = this.inFunction
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
     node.generator = !!isGenerator
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
   this.inAsync = node.async
+  this.inGenerator = node.generator
   this.inFunction = true
   node.params = this.parseFunctionParams()
   node.body = this.parseBlock()
   this.toks.adaptDirectivePrologue(node.body.body)
   this.inAsync = oldInAsync
+  this.inGenerator = oldInGenerator
   this.inFunction = oldInFunction
   return this.finishNode(node, "FunctionExpression")
 }
 
 lp.parseArrowExpression = function(node, params, isAsync) {
-  let oldInAsync = this.inAsync, oldInFunction = this.inFunction
+  let oldInAsync = this.inAsync, oldInGenerator = this.inGenerator, oldInFunction = this.inFunction
   this.initFunction(node)
   if (this.options.ecmaVersion >= 8)
     node.async = !!isAsync
   this.inAsync = node.async
+  this.inGenerator = false
   this.inFunction = true
   node.params = this.toAssignableList(params, true)
   node.expression = this.tok.type !== tt.braceL
@@ -612,6 +616,7 @@ lp.parseArrowExpression = function(node, params, isAsync) {
     this.toks.adaptDirectivePrologue(node.body.body)
   }
   this.inAsync = oldInAsync
+  this.inGenerator = oldInGenerator
   this.inFunction = oldInFunction
   return this.finishNode(node, "ArrowFunctionExpression")
 }
