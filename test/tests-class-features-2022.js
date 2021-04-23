@@ -1323,6 +1323,65 @@ test("async function f() { class C { aaa = await } }", {
 // `yield` is keyword in strict mode
 testFail("function* f() { class C { aaa = yield } }", "The keyword 'yield' is reserved (1:32)", {ecmaVersion: 13})
 
+// new.target
+test("class C { a = new.target }", {
+  "type": "Program",
+  "start": 0,
+  "end": 26,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 26,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 26,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 24,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 10,
+              "end": 11,
+              "name": "a"
+            },
+            "value": {
+              "type": "MetaProperty",
+              "start": 14,
+              "end": 24,
+              "meta": {
+                "type": "Identifier",
+                "start": 14,
+                "end": 17,
+                "name": "new"
+              },
+              "property": {
+                "type": "Identifier",
+                "start": 18,
+                "end": 24,
+                "name": "target"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13})
+
 // old ecma version
 testFail("class C { aaa }", "Unexpected token (1:14)", {ecmaVersion: 12})
 
