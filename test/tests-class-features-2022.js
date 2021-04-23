@@ -3671,6 +3671,13 @@ test("class C { #aaa; f(f) { f()?.#aaa } }", {
 // super
 testFail("class C extends Base { f() { return super.#aaa } }", "Unexpected token (1:42)", {ecmaVersion: 13})
 
+// delete
+test("class C { #aaa; f() { delete this.#aaa.foo } }", {}, {ecmaVersion: 13})
+test("class C { #aaa; f() { delete this.#aaa?.foo } }", {}, {ecmaVersion: 13})
+testFail("class C { #aaa; f() { delete this.#aaa } }", "Private fields can not be deleted (1:22)", {ecmaVersion: 13})
+testFail("class C { #aaa; f() { delete obj?.#aaa } }", "Private fields can not be deleted (1:22)", {ecmaVersion: 13})
+testFail("class C { #aaa; f() { delete obj?.p.#aaa } }", "Private fields can not be deleted (1:22)", {ecmaVersion: 13})
+
 // unexpected token
 testFail("const obj = #aaa", "Unexpected token (1:12)", {ecmaVersion: 13})
 testFail("const obj = { #aaa }", "Unexpected token (1:14)", {ecmaVersion: 13})

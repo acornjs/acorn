@@ -237,8 +237,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     else if (this.strict && node.operator === "delete" &&
              node.argument.type === "Identifier")
       this.raiseRecoverable(node.start, "Deleting local variable in strict mode")
-    else if (node.operator === "delete" && node.argument.type === "MemberExpression" &&
-             node.argument.property.type === "PrivateIdentifier")
+    else if (node.operator === "delete" && isPrivateFieldAccess(node.argument))
       this.raiseRecoverable(node.start, "Private fields can not be deleted")
     else sawUnary = true
     expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
@@ -260,6 +259,13 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     return this.buildBinary(startPos, startLoc, expr, this.parseMaybeUnary(null, false), "**", false)
   else
     return expr
+}
+
+function isPrivateFieldAccess(node) {
+  return (
+    node.type === "MemberExpression" && node.property.type === "PrivateIdentifier" ||
+    node.type === "ChainExpression" && isPrivateFieldAccess(node.expression)
+  )
 }
 
 // Parse call, dot, and `[]`-subscript expressions.
