@@ -1250,6 +1250,150 @@ test("class C { async\n get(){} }", {
   "sourceType": "script"
 }, {ecmaVersion: 13, loose: true})
 
+// ASI; star after get/set
+test("class C { get\n *foo(){} }", {
+  "type": "Program",
+  "start": 0,
+  "end": 25,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 25,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 25,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 13,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 10,
+              "end": 13,
+              "name": "get"
+            },
+            "value": null
+          },
+          {
+            "type": "MethodDefinition",
+            "start": 15,
+            "end": 23,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 16,
+              "end": 19,
+              "name": "foo"
+            },
+            "kind": "method",
+            "value": {
+              "type": "FunctionExpression",
+              "start": 19,
+              "end": 23,
+              "id": null,
+              "expression": false,
+              "generator": true,
+              "async": false,
+              "params": [],
+              "body": {
+                "type": "BlockStatement",
+                "start": 21,
+                "end": 23,
+                "body": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13})
+test("class C { set\n *foo(){} }", {
+  "type": "Program",
+  "start": 0,
+  "end": 25,
+  "body": [
+    {
+      "type": "ClassDeclaration",
+      "start": 0,
+      "end": 25,
+      "id": {
+        "type": "Identifier",
+        "start": 6,
+        "end": 7,
+        "name": "C"
+      },
+      "superClass": null,
+      "body": {
+        "type": "ClassBody",
+        "start": 8,
+        "end": 25,
+        "body": [
+          {
+            "type": "PropertyDefinition",
+            "start": 10,
+            "end": 13,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 10,
+              "end": 13,
+              "name": "set"
+            },
+            "value": null
+          },
+          {
+            "type": "MethodDefinition",
+            "start": 15,
+            "end": 23,
+            "static": false,
+            "computed": false,
+            "key": {
+              "type": "Identifier",
+              "start": 16,
+              "end": 19,
+              "name": "foo"
+            },
+            "kind": "method",
+            "value": {
+              "type": "FunctionExpression",
+              "start": 19,
+              "end": 23,
+              "id": null,
+              "expression": false,
+              "generator": true,
+              "async": false,
+              "params": [],
+              "body": {
+                "type": "BlockStatement",
+                "start": 21,
+                "end": 23,
+                "body": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 13})
+
 // `await` is reference
 test("async function f() { class C { aaa = await } }", {
   "type": "Program",

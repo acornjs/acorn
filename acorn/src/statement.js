@@ -601,46 +601,57 @@ pp.parseClass = function(node, isStatement) {
 pp.parseClassElement = function(constructorAllowsSuper) {
   if (this.eat(tt.semi)) return null
 
-  let node = this.startNode()
-
-  const tryContextual = (k, noLineBreak = false) => {
-    const start = this.start, startLoc = this.startLoc
-    if (node.key || !this.eatContextual(k)) return false
-    if (
-      (this.type === tt.name ||
-      this.type === tt.privateId ||
-      this.type === tt.num ||
-      this.type === tt.string ||
-      this.type === tt.bracketL ||
-      this.type === tt.star) &&
-      !(noLineBreak && this.canInsertSemicolon())
-    ) {
-      return true
-    }
-    node.computed = false
-    node.key = this.startNodeAt(start, startLoc)
-    node.key.name = k
-    this.finishNode(node.key, "Identifier")
-    return false
-  }
-
-  node.static = tryContextual("static")
-  let kind = "method"
-  let isGenerator = this.eat(tt.star)
+  const ecmaVersion = this.options.ecmaVersion
+  const node = this.startNode()
+  let keyName = ""
+  let isGenerator = false
   let isAsync = false
-  if (!isGenerator) {
-    if (this.options.ecmaVersion >= 8 && tryContextual("async", true)) {
-      isAsync = true
-      isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
-    } else if (tryContextual("get")) {
-      kind = "get"
-    } else if (tryContextual("set")) {
-      kind = "set"
+  let kind = "method"
+
+  // Parse modifiers
+  node.static = false
+  if (this.eatContextual("static")) {
+    if (this.isClassElementNameStart() || this.type === tt.star) {
+      node.static = true
+    } else {
+      keyName = "static"
     }
   }
-  if (!node.key) this.parseClassElementName(node)
+  if (!keyName && ecmaVersion >= 8 && this.eatContextual("async")) {
+    if ((this.isClassElementNameStart() || this.type === tt.star) && !this.canInsertSemicolon()) {
+      isAsync = true
+    } else {
+      keyName = "async"
+    }
+  }
+  if (!keyName && (ecmaVersion >= 9 || !isAsync) && this.eat(tt.star)) {
+    isGenerator = true
+  }
+  if (!keyName && !isAsync && !isGenerator) {
+    const lastValue = this.value
+    if (this.eatContextual("get") || this.eatContextual("set")) {
+      if (this.isClassElementNameStart()) {
+        kind = lastValue
+      } else {
+        keyName = lastValue
+      }
+    }
+  }
 
-  if (this.options.ecmaVersion < 13 || this.type === tt.parenL || kind !== "method" || isGenerator || isAsync) {
+  // Parse element name
+  if (keyName) {
+    // 'async', 'get', 'set', or 'static' were not a keyword contextually.
+    // The last token is any of those. Make it the element name.
+    node.computed = false
+    node.key = this.startNodeAt(this.lastTokStart, this.lastTokStartLoc)
+    node.key.name = keyName
+    this.finishNode(node.key, "Identifier")
+  } else {
+    this.parseClassElementName(node)
+  }
+
+  // Parse element value
+  if (ecmaVersion < 13 || this.type === tt.parenL || kind !== "method" || isGenerator || isAsync) {
     const isConstructor = !node.static && checkKeyName(node, "constructor")
     const allowsDirectSuper = isConstructor && constructorAllowsSuper
     // Couldn't move this check into the 'parseClassMethod' method for backward compatibility.
@@ -652,6 +663,16 @@ pp.parseClassElement = function(constructorAllowsSuper) {
   }
 
   return node
+}
+
+pp.isClassElementNameStart = function() {
+  return (
+    this.type === tt.name ||
+    this.type === tt.privateId ||
+    this.type === tt.num ||
+    this.type === tt.string ||
+    this.type === tt.bracketL
+  )
 }
 
 pp.parseClassElementName = function(element) {
