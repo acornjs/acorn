@@ -1,3 +1,9 @@
+## 8.2.0 (2021-04-24)
+
+### New features
+
+Add support for ES2022 class fields and private methods.
+
 ## 8.1.1 (2021-04-12)
 
 ### Various
