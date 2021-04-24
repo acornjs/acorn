@@ -3848,3 +3848,4 @@ testFail("function F() { obj.#aaa }", "Private field '#aaa' must be declared in 
 test("class Outer { #outer; Inner = class { #inner; f(obj) { obj.#outer + this.#inner } }; }", {}, {ecmaVersion: 13})
 test("class Outer { Inner = class { f(obj) { obj.#outer + this.#inner } #inner; }; #outer; }", {}, {ecmaVersion: 13})
 testFail("class Outer { Inner = class { f(obj) { obj.#nonexist } #inner; }; #outer; }", "Private field '#nonexist' must be declared in an enclosing class (1:43)", {ecmaVersion: 13})
+test("class C { static delete() {} }", {}, {ecmaVersion: 13})

@@ -671,7 +671,8 @@ pp.isClassElementNameStart = function() {
     this.type === tt.privateId ||
     this.type === tt.num ||
     this.type === tt.string ||
-    this.type === tt.bracketL
+    this.type === tt.bracketL ||
+    this.type.keyword
   )
 }
 
