@@ -1,3 +1,9 @@
+## 8.1.0 (2021-04-24)
+
+### New features
+
+Support node types for class fields and private methods.
+
 ## 8.0.2 (2021-01-25)
 
 ### Bug fixes
