@@ -15,10 +15,10 @@
     ],
     "./package.json": "./package.json"
   },
-  "version": "8.0.2",
+  "version": "8.1.0",
   "engines": {"node": ">=0.4.0"},
   "dependencies": {
-    "acorn": "^8.0.0"
+    "acorn": "^8.2.0"
   },
   "maintainers": [
     {
