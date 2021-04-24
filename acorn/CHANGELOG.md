@@ -1,3 +1,9 @@
+## 8.2.1 (2021-04-24)
+
+### Bug fixes
+
+Fix a regression introduced in 8.2.0 where static or async class methods with keyword names fail to parse.
+
 ## 8.2.0 (2021-04-24)
 
 ### New features
