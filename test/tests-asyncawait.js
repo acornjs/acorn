@@ -3526,4 +3526,16 @@ testFail("abc: async function a() {}", "Unexpected token (1:5)", {ecmaVersion: 8
 
 testFail("(async() => { await 4 ** 2 })()", "Unexpected token (1:22)", {ecmaVersion: 8})
 
+test("(async() => { await (4 ** 2) })()", {}, {ecmaVersion: 8})
+
+testFail("async() => (await 1 ** 3)", "Unexpected token (1:20)", {ecmaVersion: 8})
+
+test("async() => (await (1 ** 3))", {}, {ecmaVersion: 8})
+
+testFail("async() => await 5 ** 6", "Unexpected token (1:19)", {ecmaVersion: 8})
+
+test("async() => await (5 ** 6)", {}, {ecmaVersion: 8})
+
+testFail("async() => await (5) ** 6", "Unexpected token (1:21)", {ecmaVersion: 8})
+
 testFail("4 + async() => 2", "Unexpected token (1:12)", {ecmaVersion: 8, loose: false})

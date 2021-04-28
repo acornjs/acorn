@@ -221,7 +221,7 @@ pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
 
 // Parse unary operators, both prefix and postfix.
 
-pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
+pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec) {
   let startPos = this.start, startLoc = this.startLoc, expr
   if (this.isContextual("await") && (this.inAsync || (!this.inFunction && this.options.allowAwaitOutsideFunction))) {
     expr = this.parseAwait()
@@ -231,7 +231,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     node.operator = this.value
     node.prefix = true
     this.next()
-    node.argument = this.parseMaybeUnary(null, true)
+    node.argument = this.parseMaybeUnary(null, true, update)
     this.checkExpressionErrors(refDestructuringErrors, true)
     if (update) this.checkLValSimple(node.argument)
     else if (this.strict && node.operator === "delete" &&
@@ -255,10 +255,14 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary) {
     }
   }
 
-  if (!sawUnary && this.eat(tt.starstar))
-    return this.buildBinary(startPos, startLoc, expr, this.parseMaybeUnary(null, false), "**", false)
-  else
+  if (!incDec && this.eat(tt.starstar)) {
+    if (sawUnary)
+      this.unexpected(this.lastTokStart)
+    else
+      return this.buildBinary(startPos, startLoc, expr, this.parseMaybeUnary(null, false), "**", false)
+  } else {
     return expr
+  }
 }
 
 function isPrivateFieldAccess(node) {
