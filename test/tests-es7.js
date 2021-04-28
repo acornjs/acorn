@@ -228,6 +228,8 @@ testFail("~3 ** 2;", "Unexpected token (1:3)", { ecmaVersion: 7 });
 testFail("!1 ** 2;", "Unexpected token (1:3)", { ecmaVersion: 7 });
 testFail("-2** 2;", "Unexpected token (1:2)", { ecmaVersion: 7 });
 testFail("+2** 2;", "Unexpected token (1:2)", { ecmaVersion: 7 });
+testFail("-(i--) ** 2", "Unexpected token (1:7)", {ecmaVersion: 7});
+testFail("+(i--) ** 2", "Unexpected token (1:7)", {ecmaVersion: 7});
 
 // make sure base operand check doesn't affect other operators
 test("-a * 5", {
