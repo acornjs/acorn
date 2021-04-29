@@ -1,3 +1,9 @@
+## 8.2.2 (2021-04-29)
+
+### Bug fixes
+
+Fix a bug where a class field initialized to an async arrow function wouldn't allow await inside it. Same issue existed for generator arrow functions with yield.
+
 ## 8.2.1 (2021-04-24)
 
 ### Bug fixes
