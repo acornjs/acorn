@@ -97,8 +97,8 @@ export class Parser {
   }
 
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
-  get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 && !this.currentThisScope().inClassFieldInit }
-  get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 && !this.currentThisScope().inClassFieldInit }
+  get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 && !this.currentVarScope().inClassFieldInit }
+  get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 && !this.currentVarScope().inClassFieldInit }
   get allowSuper() {
     const {flags, inClassFieldInit} = this.currentThisScope()
     return (flags & SCOPE_SUPER) > 0 || inClassFieldInit
