@@ -1992,3 +1992,9 @@ test("({async})", {}, { "ecmaVersion": 9 })
 test("({async: true})", {}, { "ecmaVersion": 9 })
 
 testFail("({async\n    foo() { }})", "Unexpected token (2:4)", { "ecmaVersion": 9 })
+
+// #1031
+test("async () => { for await (async of []); }", {}, {ecmaVersion: 9})
+test("for (async of => {}; i < 10; ++i) {}", {}, {ecmaVersion: 9})
+testFail("for (async of [1]) {}", "Unexpected token (1:14)", {ecmaVersion: 9})
+

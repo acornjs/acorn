@@ -124,8 +124,10 @@ pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) 
   }
 
   let startPos = this.start, startLoc = this.startLoc
-  if (this.type === tt.parenL || this.type === tt.name)
+  if (this.type === tt.parenL || this.type === tt.name) {
     this.potentialArrowAt = this.start
+    this.potentialArrowInForAwait = forInit === "await"
+  }
   let left = this.parseMaybeConditional(forInit, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
@@ -414,7 +416,8 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     if (canBeArrow && !this.canInsertSemicolon()) {
       if (this.eat(tt.arrow))
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false)
-      if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name && !containsEsc) {
+      if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name && !containsEsc &&
+          (!this.potentialArrowInForAwait || this.value !== "of" || this.containsEsc)) {
         id = this.parseIdent(false)
         if (this.canInsertSemicolon() || !this.eat(tt.arrow))
           this.unexpected()
