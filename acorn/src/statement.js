@@ -233,7 +233,7 @@ pp.parseForStatement = function(node) {
     return this.parseFor(node, init)
   }
   let refDestructuringErrors = new DestructuringErrors
-  let init = this.parseExpression(true, refDestructuringErrors)
+  let init = this.parseExpression(awaitAt > -1 ? "await" : true, refDestructuringErrors)
   if (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
     if (this.options.ecmaVersion >= 9) {
       if (this.type === tt._in) {

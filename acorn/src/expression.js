@@ -90,13 +90,13 @@ pp.checkPropClash = function(prop, propHash, refDestructuringErrors) {
 // and object pattern might appear (so it's possible to raise
 // delayed syntax error at correct position).
 
-pp.parseExpression = function(noIn, refDestructuringErrors) {
+pp.parseExpression = function(forInit, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseMaybeAssign(noIn, refDestructuringErrors)
+  let expr = this.parseMaybeAssign(forInit, refDestructuringErrors)
   if (this.type === tt.comma) {
     let node = this.startNodeAt(startPos, startLoc)
     node.expressions = [expr]
-    while (this.eat(tt.comma)) node.expressions.push(this.parseMaybeAssign(noIn, refDestructuringErrors))
+    while (this.eat(tt.comma)) node.expressions.push(this.parseMaybeAssign(forInit, refDestructuringErrors))
     return this.finishNode(node, "SequenceExpression")
   }
   return expr
@@ -105,9 +105,9 @@ pp.parseExpression = function(noIn, refDestructuringErrors) {
 // Parse an assignment expression. This includes applications of
 // operators like `+=`.
 
-pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
+pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) {
   if (this.isContextual("yield")) {
-    if (this.inGenerator) return this.parseYield(noIn)
+    if (this.inGenerator) return this.parseYield(forInit)
     // The tokenizer will assume an expression is allowed after
     // `yield`, but this isn't that kind of yield
     else this.exprAllowed = false
@@ -126,7 +126,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
   let startPos = this.start, startLoc = this.startLoc
   if (this.type === tt.parenL || this.type === tt.name)
     this.potentialArrowAt = this.start
-  let left = this.parseMaybeConditional(noIn, refDestructuringErrors)
+  let left = this.parseMaybeConditional(forInit, refDestructuringErrors)
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
     let node = this.startNodeAt(startPos, startLoc)
@@ -144,7 +144,7 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
       this.checkLValSimple(left)
     node.left = left
     this.next()
-    node.right = this.parseMaybeAssign(noIn)
+    node.right = this.parseMaybeAssign(forInit)
     return this.finishNode(node, "AssignmentExpression")
   } else {
     if (ownDestructuringErrors) this.checkExpressionErrors(refDestructuringErrors, true)
@@ -156,16 +156,16 @@ pp.parseMaybeAssign = function(noIn, refDestructuringErrors, afterLeftParse) {
 
 // Parse a ternary conditional (`?:`) operator.
 
-pp.parseMaybeConditional = function(noIn, refDestructuringErrors) {
+pp.parseMaybeConditional = function(forInit, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseExprOps(noIn, refDestructuringErrors)
+  let expr = this.parseExprOps(forInit, refDestructuringErrors)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
   if (this.eat(tt.question)) {
     let node = this.startNodeAt(startPos, startLoc)
     node.test = expr
     node.consequent = this.parseMaybeAssign()
     this.expect(tt.colon)
-    node.alternate = this.parseMaybeAssign(noIn)
+    node.alternate = this.parseMaybeAssign(forInit)
     return this.finishNode(node, "ConditionalExpression")
   }
   return expr
@@ -173,11 +173,11 @@ pp.parseMaybeConditional = function(noIn, refDestructuringErrors) {
 
 // Start the precedence parser.
 
-pp.parseExprOps = function(noIn, refDestructuringErrors) {
+pp.parseExprOps = function(forInit, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
   let expr = this.parseMaybeUnary(refDestructuringErrors, false)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
-  return expr.start === startPos && expr.type === "ArrowFunctionExpression" ? expr : this.parseExprOp(expr, startPos, startLoc, -1, noIn)
+  return expr.start === startPos && expr.type === "ArrowFunctionExpression" ? expr : this.parseExprOp(expr, startPos, startLoc, -1, forInit)
 }
 
 // Parse binary operators with the operator precedence parsing
@@ -186,9 +186,9 @@ pp.parseExprOps = function(noIn, refDestructuringErrors) {
 // defer further parser to one of its callers when it encounters an
 // operator that has a lower precedence than the set it is parsing.
 
-pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
+pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, forInit) {
   let prec = this.type.binop
-  if (prec != null && (!noIn || this.type !== tt._in)) {
+  if (prec != null && (!forInit || this.type !== tt._in)) {
     if (prec > minPrec) {
       let logical = this.type === tt.logicalOR || this.type === tt.logicalAND
       let coalesce = this.type === tt.coalesce
@@ -200,12 +200,12 @@ pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, noIn) {
       let op = this.value
       this.next()
       let startPos = this.start, startLoc = this.startLoc
-      let right = this.parseExprOp(this.parseMaybeUnary(null, false), startPos, startLoc, prec, noIn)
+      let right = this.parseExprOp(this.parseMaybeUnary(null, false), startPos, startLoc, prec, forInit)
       let node = this.buildBinary(leftStartPos, leftStartLoc, left, right, op, logical || coalesce)
       if ((logical && this.type === tt.coalesce) || (coalesce && (this.type === tt.logicalOR || this.type === tt.logicalAND))) {
         this.raiseRecoverable(this.start, "Logical expressions and coalesce expressions cannot be mixed. Wrap either by parentheses")
       }
-      return this.parseExprOp(node, leftStartPos, leftStartLoc, minPrec, noIn)
+      return this.parseExprOp(node, leftStartPos, leftStartLoc, minPrec, forInit)
     }
   }
   return left
@@ -1051,7 +1051,7 @@ pp.parsePrivateIdent = function() {
 
 // Parses yield expression inside generator.
 
-pp.parseYield = function(noIn) {
+pp.parseYield = function(forInit) {
   if (!this.yieldPos) this.yieldPos = this.start
 
   let node = this.startNode()
@@ -1061,7 +1061,7 @@ pp.parseYield = function(noIn) {
     node.argument = null
   } else {
     node.delegate = this.eat(tt.star)
-    node.argument = this.parseMaybeAssign(noIn)
+    node.argument = this.parseMaybeAssign(forInit)
   }
   return this.finishNode(node, "YieldExpression")
 }
