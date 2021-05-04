@@ -1,3 +1,11 @@
+## 8.2.3 (2021-05-04)
+
+### Bug fixes
+
+Fix an issue where the library couldn't parse 'for (async of ...)'.
+
+Fix a bug in UTF-16 decoding that would read characters incorrectly in some circumstances.
+
 ## 8.2.2 (2021-04-29)
 
 ### Bug fixes
