@@ -1,3 +1,9 @@
+## 8.2.4 (2021-05-04)
+
+### Bug fixes
+
+Fix spec conformity in corner case 'for await (async of ...)'.
+
 ## 8.2.3 (2021-05-04)
 
 ### Bug fixes
