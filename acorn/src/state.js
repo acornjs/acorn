@@ -65,6 +65,7 @@ export class Parser {
 
     // Used to signify the start of a potential arrow function
     this.potentialArrowAt = -1
+    this.forbidAsyncOfArrow = false
 
     // Positions to delayed-check that yield/await does not exist in default parameters.
     this.yieldPos = this.awaitPos = this.awaitIdentPos = 0
