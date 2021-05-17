@@ -9,5 +9,5 @@ jobs:
       - uses: bahmutov/npm-install@v1
         with:
           useLockFile: false
-      - run: npm test
+      - run: npm 
       - run: npm run test:test262
