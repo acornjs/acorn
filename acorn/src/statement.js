@@ -42,13 +42,14 @@ pp.isLet = function(context) {
   // Statement) is allowed here. If context is not empty then only a Statement
   // is allowed. However, `let [` is an explicit negative lookahead for
   // ExpressionStatement, so special-case it first.
-  if (nextCh === 91) return true // '['
+  if (nextCh === 91 || nextCh === 92 || nextCh > 0xd7ff && nextCh < 0xdc00) return true // '[', '/', astral
   if (context) return false
 
   if (nextCh === 123) return true // '{'
   if (isIdentifierStart(nextCh, true)) {
     let pos = next + 1
-    while (isIdentifierChar(this.input.charCodeAt(pos), true)) ++pos
+    while (isIdentifierChar(nextCh = this.input.charCodeAt(pos), true)) ++pos
+    if (nextCh === 92 || nextCh > 0xd7ff && nextCh < 0xdc00) return true
     let ident = this.input.slice(next, pos)
     if (!keywordRelationalOperator.test(ident)) return true
   }

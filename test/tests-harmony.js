@@ -16618,3 +16618,9 @@ test("[[...[], 0].x] = []", {
   ],
   sourceType: "script"
 }, {ecmaVersion: 6})
+
+// #1036
+test("let \u0061;", {}, {ecmaVersion: 6})
+test("let in\u0061;", {}, {ecmaVersion: 6})
+test("let in𝐬𝐭𝐚𝐧𝐜𝐞𝐨𝐟;", {}, {ecmaVersion: 6})
+test("let 𝐢𝐧;", {}, {ecmaVersion: 6})
