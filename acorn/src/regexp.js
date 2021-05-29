@@ -8,7 +8,7 @@ const pp = Parser.prototype
 export class RegExpValidationState {
   constructor(parser) {
     this.parser = parser
-    this.validFlags = `gim${parser.options.ecmaVersion >= 6 ? "uy" : ""}${parser.options.ecmaVersion >= 9 ? "s" : ""}`
+    this.validFlags = `gim${parser.options.ecmaVersion >= 6 ? "uy" : ""}${parser.options.ecmaVersion >= 9 ? "s" : ""}${parser.options.ecmaVersion >= 13 ? "d" : ""}`
     this.unicodeProperties = UNICODE_PROPERTY_VALUES[parser.options.ecmaVersion >= 12 ? 12 : parser.options.ecmaVersion]
     this.source = ""
     this.flags = ""
