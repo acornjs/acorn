@@ -94,8 +94,9 @@ required):
   and also allows `import.meta` expressions to appear in scripts
   (when `sourceType` is not `"module"`).
 
-- **allowAwaitOutsideFunction**: By default, `await` expressions can
-  only appear inside `async` functions. Setting this option to
+- **allowAwaitOutsideFunction**: If `false`, `await` expressions can
+  only appear inside `async` functions. Defaults to `true` for
+  `ecmaVersion` 2022 and later, `false` for lower versions. Setting this option to
   `true` allows to have top-level `await` expressions. They are
   still not allowed in non-`async` functions, though.
 
