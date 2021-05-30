@@ -36,9 +36,10 @@ export const defaultOptions = {
   // appearing at the top of the program, and an import.meta expression
   // in a script isn't considered an error.
   allowImportExportEverywhere: false,
+  // By default, await identifiers are allowed to appear at the top-level scope only if ecmaVersion >= 2022.
   // When enabled, await identifiers are allowed to appear at the top-level scope,
   // but they are still not allowed in non-async functions.
-  allowAwaitOutsideFunction: false,
+  allowAwaitOutsideFunction: null,
   // When enabled, hashbang directive in the beginning of file
   // is allowed and treated as a line comment.
   allowHashBang: false,
@@ -114,6 +115,8 @@ export function getOptions(opts) {
 
   if (options.allowReserved == null)
     options.allowReserved = options.ecmaVersion < 5
+  if (options.allowAwaitOutsideFunction == null)
+    options.allowAwaitOutsideFunction = options.ecmaVersion >= 13
 
   if (isArray(options.onToken)) {
     let tokens = options.onToken
