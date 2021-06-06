@@ -110,5 +110,5 @@ declare module "acorn-walk" {
 
   export const findNodeAfter: typeof findNodeAround;
 
-  export const base: object;
+  export const base: RecursiveVisitors<any>;
 }
