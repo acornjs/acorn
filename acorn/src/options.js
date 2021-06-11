@@ -41,6 +41,9 @@ export const defaultOptions = {
   // When enabled, await identifiers are allowed to appear at the top-level scope,
   // but they are still not allowed in non-async functions.
   allowAwaitOutsideFunction: null,
+  // When enabled, super identifiers are not constrained to
+  // appearing in methods and do not raise an error when they appear elsewhere.
+  allowSuperOutsideMethod: null,
   // When enabled, hashbang directive in the beginning of file
   // is allowed and treated as a line comment.
   allowHashBang: false,
