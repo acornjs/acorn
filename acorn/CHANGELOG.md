@@ -1,3 +1,9 @@
+## 8.4.0 (2021-06-11)
+
+### New features
+
+A new option, `allowSuperOutsideMethod`, can be used to suppress the error when `super` is used in the wrong context.
+
 ## 8.3.0 (2021-05-31)
 
 ### New features
