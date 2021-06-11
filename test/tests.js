@@ -26966,6 +26966,7 @@ test("a.in / b", {
 // A number of slash-disambiguation corner cases
 test("return {} / 2", {}, {allowReturnOutsideFunction: true});
 test("return\n{}\n/foo/", {}, {allowReturnOutsideFunction: true});
+test("function f() {super.foo()}", {}, {allowSuperOutsideMethod: true, allowReserved: true});
 test("+{} / 2", {});
 test("{}\n/foo/", {});
 test("x++\n{}\n/foo/", {});

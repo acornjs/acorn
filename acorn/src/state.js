@@ -102,7 +102,7 @@ export class Parser {
   get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 && !this.currentVarScope().inClassFieldInit }
   get allowSuper() {
     const {flags, inClassFieldInit} = this.currentThisScope()
-    return (flags & SCOPE_SUPER) > 0 || inClassFieldInit
+    return (flags & SCOPE_SUPER) > 0 || inClassFieldInit || this.options.allowSuperOutsideMethod
   }
   get allowDirectSuper() { return (this.currentThisScope().flags & SCOPE_DIRECT_SUPER) > 0 }
   get treatFunctionsAsVar() { return this.treatFunctionsAsVarInScope(this.currentScope()) }

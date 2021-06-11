@@ -20,6 +20,7 @@ declare namespace acorn {
     allowReturnOutsideFunction?: boolean
     allowImportExportEverywhere?: boolean
     allowAwaitOutsideFunction?: boolean
+    allowSuperOutsideMethod?: boolean
     allowHashBang?: boolean
     locations?: boolean
     onToken?: ((token: Token) => any) | Token[]

@@ -101,6 +101,9 @@ required):
   `true` allows to have top-level `await` expressions. They are
   still not allowed in non-`async` functions, though.
 
+- **allowSuperOutsideMethod**: By default, `super` outside a method
+  raises an error. Set this to `true` to accept such code.
+
 - **allowHashBang**: When this is enabled (off by default), if the
   code starts with the characters `#!` (as in a shellscript), the
   first line will be treated as a comment.
