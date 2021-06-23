@@ -119,8 +119,6 @@ export function getOptions(opts) {
 
   if (options.allowReserved == null)
     options.allowReserved = options.ecmaVersion < 5
-  if (options.allowAwaitOutsideFunction == null)
-    options.allowAwaitOutsideFunction = options.ecmaVersion >= 13
 
   if (isArray(options.onToken)) {
     let tokens = options.onToken

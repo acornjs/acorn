@@ -59,7 +59,7 @@ test("await 1", {
       }
     }
   ]
-}, {ecmaVersion: 13})
+}, {ecmaVersion: 13, sourceType: "module"})
 testFail("function foo() {return await 1}", "Unexpected token (1:29)", {ecmaVersion: 13})
 testFail("await 1", "Unexpected token (1:6)", {
   allowAwaitOutsideFunction: false,

@@ -4,7 +4,10 @@ import {lineBreak, skipWhiteSpace} from "./whitespace.js"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier.js"
 import {has} from "./util.js"
 import {DestructuringErrors} from "./parseutil.js"
-import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION} from "./scopeflags.js"
+import {
+  functionFlags, SCOPE_SIMPLE_CATCH, SCOPE_CLASS, BIND_SIMPLE_CATCH,
+  BIND_LEXICAL, BIND_VAR, BIND_FUNCTION
+} from "./scopeflags.js"
 
 const pp = Parser.prototype
 
@@ -209,7 +212,7 @@ pp.parseDoStatement = function(node) {
 
 pp.parseForStatement = function(node) {
   this.next()
-  let awaitAt = (this.options.ecmaVersion >= 9 && (this.inAsync || (!this.inFunction && this.options.allowAwaitOutsideFunction)) && this.eatContextual("await")) ? this.lastTokStart : -1
+  let awaitAt = (this.options.ecmaVersion >= 9 && this.canAwait && this.eatContextual("await")) ? this.lastTokStart : -1
   this.labels.push(loopLabel)
   this.enterScope(0)
   this.expect(tt.parenL)
@@ -581,6 +584,7 @@ pp.parseClass = function(node, isStatement) {
   let hadConstructor = false
   classBody.body = []
   this.expect(tt.braceL)
+  this.enterScope(SCOPE_CLASS)
   while (this.type !== tt.braceR) {
     const element = this.parseClassElement(node.superClass !== null)
     if (element) {
@@ -597,6 +601,7 @@ pp.parseClass = function(node, isStatement) {
   this.next()
   node.body = this.finishNode(classBody, "ClassBody")
   this.exitClassBody()
+  this.exitScope()
   return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression")
 }
 

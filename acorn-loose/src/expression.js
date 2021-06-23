@@ -113,8 +113,8 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
 lp.parseMaybeUnary = function(sawUnary) {
   let start = this.storeCurrentPos(), expr
   if (this.options.ecmaVersion >= 8 && this.toks.isContextual("await") &&
-    (this.inAsync || (!this.inFunction && this.options.allowAwaitOutsideFunction))
-  ) {
+      (this.inAsync || (this.toks.inModule && this.options.ecmaVersion >= 13) ||
+       (!this.inFunction && this.options.allowAwaitOutsideFunction))) {
     expr = this.parseAwait()
     sawUnary = true
   } else if (this.tok.type.prefix) {

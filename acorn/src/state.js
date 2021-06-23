@@ -3,7 +3,10 @@ import {types as tt} from "./tokentype.js"
 import {lineBreak} from "./whitespace.js"
 import {getOptions} from "./options.js"
 import {wordsRegexp} from "./util.js"
-import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER} from "./scopeflags.js"
+import {
+  SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_CLASS, SCOPE_GENERATOR,
+  SCOPE_SUPER, SCOPE_DIRECT_SUPER
+} from "./scopeflags.js"
 
 export class Parser {
   constructor(options, input, startPos) {
@@ -100,6 +103,14 @@ export class Parser {
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
   get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 && !this.currentVarScope().inClassFieldInit }
   get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 && !this.currentVarScope().inClassFieldInit }
+  get canAwait() {
+    for (let i = this.scopeStack.length - 1; i >= 0; i--) {
+      let {flags} = this.scopeStack[i]
+      if (flags & SCOPE_FUNCTION) return (flags & SCOPE_ASYNC) > 0
+      if (flags & SCOPE_CLASS) return false
+    }
+    return (this.inModule && this.options.ecmaVersion >= 13) || this.options.allowAwaitOutsideFunction
+  }
   get allowSuper() {
     const {flags, inClassFieldInit} = this.currentThisScope()
     return (flags & SCOPE_SUPER) > 0 || inClassFieldInit || this.options.allowSuperOutsideMethod

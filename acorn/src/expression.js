@@ -225,7 +225,7 @@ pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
 
 pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec) {
   let startPos = this.start, startLoc = this.startLoc, expr
-  if (this.isContextual("await") && (this.inAsync || (!this.inFunction && this.options.allowAwaitOutsideFunction))) {
+  if (this.isContextual("await") && this.canAwait) {
     expr = this.parseAwait()
     sawUnary = true
   } else if (this.type.prefix) {
