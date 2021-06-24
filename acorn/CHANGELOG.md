@@ -1,3 +1,9 @@
+## 8.4.1 (2021-06-24)
+
+### Bug fixes
+
+Fix a bug where `allowAwaitOutsideFunction` would allow `await` in class field initializers, and setting `ecmaVersion` to 13 or higher would allow top-level await in non-module sources.
+
 ## 8.4.0 (2021-06-11)
 
 ### New features
