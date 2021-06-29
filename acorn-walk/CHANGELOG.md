@@ -1,3 +1,9 @@
+## 8.1.1 (2021-06-29)
+
+### Bug fixes
+
+Include `base` in the type declarations.
+
 ## 8.1.0 (2021-04-24)
 
 ### New features
