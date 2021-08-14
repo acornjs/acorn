@@ -234,14 +234,16 @@ pp.parseForStatement = function(node) {
     if (awaitAt > -1) this.unexpected(awaitAt)
     return this.parseFor(node, init)
   }
+  let startsWithLet = this.isContextual("let"), isForOf = false
   let refDestructuringErrors = new DestructuringErrors
   let init = this.parseExpression(awaitAt > -1 ? "await" : true, refDestructuringErrors)
-  if (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
+  if (this.type === tt._in || (isForOf = this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
     if (this.options.ecmaVersion >= 9) {
       if (this.type === tt._in) {
         if (awaitAt > -1) this.unexpected(awaitAt)
       } else node.await = awaitAt > -1
     }
+    if (startsWithLet && isForOf) this.raise(init.start, "The left-hand side of a for-of loop may not start with 'let'.")
     this.toAssignable(init, false, refDestructuringErrors)
     this.checkLValPattern(init)
     return this.parseForIn(node, init)

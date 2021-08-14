@@ -19751,6 +19751,11 @@ testFail("for (var [x] = 0 in list) process(x);", "for-in loop variable declarat
 testFail("for (var {x} = 0 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
 testFail("for (var x = 42 in list) process(x);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
 
+testFail("for (let.bar of list);", "The left-hand side of a for-of loop may not start with 'let'. (1:5)", { ecmaVersion: 6 })
+testFail("for (let().bar of list);", "The left-hand side of a for-of loop may not start with 'let'. (1:5)", { ecmaVersion: 6 })
+testFail("for (let``.bar of list);", "The left-hand side of a for-of loop may not start with 'let'. (1:5)", { ecmaVersion: 6 })
+testFail("'use strict'; for (let in list);", "The keyword 'let' is reserved (1:19)")
+
 test("for (var x = 42 in list) process(x);", {
   type: "Program",
   body: [
