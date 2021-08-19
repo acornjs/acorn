@@ -166,7 +166,10 @@ lp.parseStatement = function() {
     return this.finishNode(node, "WithStatement")
 
   case tt.braceL:
-    return this.parseBlock()
+    if (this.toks.isBlock()) return this.parseBlock()
+    node.expression = this.parseExpression()
+    this.semicolon()
+    return this.finishNode(node, "ExpressionStatement")
 
   case tt.semi:
     this.next()

@@ -29490,3 +29490,126 @@ test("for (; function () {} / 1;);", {}, {ecmaVersion: 6})
 test("for (; class {} / 1;);", {}, {ecmaVersion: 6})
 test("for (;; function () {} / 1);", {}, {ecmaVersion: 6})
 test("for (;; class {} / 1);", {}, {ecmaVersion: 6})
+
+test("{ foo: bar }", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "ObjectExpression"
+      }
+    }
+  ]
+})
+
+test("{ foo: bar, baz: qux }", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "ObjectExpression"
+      }
+    }
+  ]
+})
+
+test("{ foo }", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "ObjectExpression"
+      }
+    }
+  ]
+}, {ecmaVersion: 6})
+
+test("{ foo: while (bar) { continue } }", {
+  type: "Program",
+  body: [
+    {
+      type: "BlockStatement",
+      body: [
+        {
+          type: "LabeledStatement",
+          body: {
+            type: "WhileStatement"
+          }
+        }
+      ]
+    }
+  ]
+})
+
+test("{ foo: for (;;) { break } }", {
+  type: "Program",
+  body: [
+    {
+      type: "BlockStatement",
+      body: [
+        {
+          type: "LabeledStatement",
+          body: {
+            type: "ForStatement"
+          }
+        }
+      ]
+    }
+  ]
+})
+
+test("{ foo: do { continue } while (bar) }", {
+  type: "Program",
+  body: [
+    {
+      type: "BlockStatement",
+      body: [
+        {
+          type: "LabeledStatement",
+          body: {
+            type: "DoWhileStatement"
+          }
+        }
+      ]
+    }
+  ]
+})
+
+test("{ foo: do continue; while (bar) }", {
+  type: "Program",
+  body: [
+    {
+      type: "BlockStatement",
+      body: [
+        {
+          type: "LabeledStatement",
+          body: {
+            type: "DoWhileStatement"
+          }
+        }
+      ]
+    }
+  ]
+})
+
+test("{ [foo] = bar }", {
+  type: "Program",
+  body: [
+    {
+      type: "BlockStatement",
+      body: [
+        {
+          type: "ExpressionStatement",
+          expression: {
+            type: "AssignmentExpression"
+          }
+        }
+      ]
+    }
+  ]
+}, {ecmaVersion: 6})
+
+testFail("{ [foo]: bar }", "Unexpected token (1:7)", {ecmaVersion: 6}) // TODO

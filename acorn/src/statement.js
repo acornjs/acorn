@@ -56,6 +56,44 @@ pp.isLet = function(context) {
   return false
 }
 
+// Check if curly braces enclose a block of statements or an object.
+// { foo: bar } is an object.
+// { foo } is an object with a shorthand property.
+// { foo: while (bar) { baz } } is a block with a labeled loop.
+pp.isBlock = function() {
+  skipWhiteSpace.lastIndex = this.pos
+  let skip = skipWhiteSpace.exec(this.input)
+  let pos = this.pos + skip[0].length
+  let identStart = pos
+  let nextCh = this.input.charCodeAt(pos++)
+  if (nextCh === 91) { // '['
+    if (this.options.ecmaVersion < 6) return true
+    // TODO: handle computed object properties, e.g. { ["foo" + 0]: 123 }
+    return true
+  }
+
+  if (!isIdentifierStart(nextCh, true)) return true
+  while (isIdentifierChar(nextCh = this.input.charCodeAt(pos), true)) pos++
+  let ident = this.input.slice(identStart, pos)
+  skipWhiteSpace.lastIndex = pos
+  skip = skipWhiteSpace.exec(this.input)
+  pos += skip[0].length
+  nextCh = this.input.charCodeAt(pos++)
+  if (nextCh === 125) // '}'
+    return this.options.ecmaVersion < 6 || this.keywords.test(ident)
+  if (nextCh !== 58) return true // ':'
+
+  skipWhiteSpace.lastIndex = pos
+  skip = skipWhiteSpace.exec(this.input)
+  pos += skip[0].length
+  identStart = pos
+  nextCh = this.input.charCodeAt(pos++)
+  if (!isIdentifierStart(nextCh, true)) return false
+  while (isIdentifierChar(nextCh = this.input.charCodeAt(pos), true)) pos++
+  ident = this.input.slice(identStart, pos)
+  return ident === 'do' || ident === 'for' || ident === 'while' || ident === 'switch'
+}
+
 // check 'async [no LineTerminator here] function'
 // - 'async /*foo*/ function' is OK.
 // - 'async /*\n*/ function' is invalid.
@@ -116,7 +154,7 @@ pp.parseStatement = function(context, topLevel, exports) {
     return this.parseVarStatement(node, kind)
   case tt._while: return this.parseWhileStatement(node)
   case tt._with: return this.parseWithStatement(node)
-  case tt.braceL: return this.parseBlock(true, node)
+  case tt.braceL: return this.isBlock() ? this.parseBlock(true, node) : this.parseExpressionStatement(node, this.parseExpression())
   case tt.semi: return this.parseEmptyStatement(node)
   case tt._export:
   case tt._import:
