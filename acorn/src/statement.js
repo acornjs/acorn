@@ -229,7 +229,7 @@ pp.parseForStatement = function(node) {
           if (awaitAt > -1) this.unexpected(awaitAt)
         } else node.await = awaitAt > -1
       }
-      return this.parseForIn(node, init)
+      return this.parseForInOf(node, init)
     }
     if (awaitAt > -1) this.unexpected(awaitAt)
     return this.parseFor(node, init)
@@ -246,7 +246,7 @@ pp.parseForStatement = function(node) {
     if (startsWithLet && isForOf) this.raise(init.start, "The left-hand side of a for-of loop may not start with 'let'.")
     this.toAssignable(init, false, refDestructuringErrors)
     this.checkLValPattern(init)
-    return this.parseForIn(node, init)
+    return this.parseForInOf(node, init)
   } else {
     this.checkExpressionErrors(refDestructuringErrors, true)
   }
@@ -456,7 +456,7 @@ pp.parseFor = function(node, init) {
 // Parse a `for`/`in` and `for`/`of` loop, which are almost
 // same from parser's perspective.
 
-pp.parseForIn = function(node, init) {
+pp.parseForInOf = function(node, init) {
   const isForIn = this.type === tt._in
   this.next()
 

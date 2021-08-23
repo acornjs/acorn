@@ -177,7 +177,7 @@ pp.parseMaybeConditional = function(forInit, refDestructuringErrors) {
 
 pp.parseExprOps = function(forInit, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseMaybeUnary(refDestructuringErrors, false)
+  let expr = this.parseMaybeUnary(refDestructuringErrors, false, false, forInit)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
   return expr.start === startPos && expr.type === "ArrowFunctionExpression" ? expr : this.parseExprOp(expr, startPos, startLoc, -1, forInit)
 }
@@ -202,7 +202,7 @@ pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, forInit) {
       let op = this.value
       this.next()
       let startPos = this.start, startLoc = this.startLoc
-      let right = this.parseExprOp(this.parseMaybeUnary(null, false), startPos, startLoc, prec, forInit)
+      let right = this.parseExprOp(this.parseMaybeUnary(null, false, false, forInit), startPos, startLoc, prec, forInit)
       let node = this.buildBinary(leftStartPos, leftStartLoc, left, right, op, logical || coalesce)
       if ((logical && this.type === tt.coalesce) || (coalesce && (this.type === tt.logicalOR || this.type === tt.logicalAND))) {
         this.raiseRecoverable(this.start, "Logical expressions and coalesce expressions cannot be mixed. Wrap either by parentheses")
@@ -223,7 +223,7 @@ pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
 
 // Parse unary operators, both prefix and postfix.
 
-pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec) {
+pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec, forInit) {
   let startPos = this.start, startLoc = this.startLoc, expr
   if (this.isContextual("await") && this.canAwait) {
     expr = this.parseAwait()
@@ -244,7 +244,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec) {
     else sawUnary = true
     expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
   } else {
-    expr = this.parseExprSubscripts(refDestructuringErrors)
+    expr = this.parseExprSubscripts(refDestructuringErrors, forInit)
     if (this.checkExpressionErrors(refDestructuringErrors)) return expr
     while (this.type.postfix && !this.canInsertSemicolon()) {
       let node = this.startNodeAt(startPos, startLoc)
@@ -276,9 +276,9 @@ function isPrivateFieldAccess(node) {
 
 // Parse call, dot, and `[]`-subscript expressions.
 
-pp.parseExprSubscripts = function(refDestructuringErrors) {
+pp.parseExprSubscripts = function(refDestructuringErrors, forInit) {
   let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseExprAtom(refDestructuringErrors)
+  let expr = this.parseExprAtom(refDestructuringErrors, forInit)
   if (expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")")
     return expr
   let result = this.parseSubscripts(expr, startPos, startLoc)
@@ -291,16 +291,13 @@ pp.parseExprSubscripts = function(refDestructuringErrors) {
 }
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
-  let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
-      this.lastTokEnd === base.end && !this.canInsertSemicolon() && base.end - base.start === 5 &&
-      this.potentialArrowAt === base.start
   let optionalChained = false
 
   while (true) {
-    let element = this.parseSubscript(base, startPos, startLoc, noCalls, maybeAsyncArrow, optionalChained)
+    let element = this.parseSubscript(base, startPos, startLoc, noCalls, optionalChained)
 
     if (element.optional) optionalChained = true
-    if (element === base || element.type === "ArrowFunctionExpression") {
+    if (element === base) {
       if (optionalChained) {
         const chainNode = this.startNodeAt(startPos, startLoc)
         chainNode.expression = element
@@ -313,7 +310,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls) {
   }
 }
 
-pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow, optionalChained) {
+pp.parseSubscript = function(base, startPos, startLoc, noCalls, optionalChained) {
   let optionalSupported = this.options.ecmaVersion >= 11
   let optional = optionalSupported && this.eat(tt.questionDot)
   if (noCalls && optional) this.raise(this.lastTokStart, "Optional chaining cannot appear in the callee of new expressions")
@@ -336,25 +333,9 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow,
     }
     base = this.finishNode(node, "MemberExpression")
   } else if (!noCalls && this.eat(tt.parenL)) {
-    let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
-    this.yieldPos = 0
-    this.awaitPos = 0
-    this.awaitIdentPos = 0
+    let refDestructuringErrors = new DestructuringErrors
     let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
-    if (maybeAsyncArrow && !optional && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
-      this.checkPatternErrors(refDestructuringErrors, false)
-      this.checkYieldAwaitInDefaultParams()
-      if (this.awaitIdentPos > 0)
-        this.raise(this.awaitIdentPos, "Cannot use 'await' as identifier inside an async function")
-      this.yieldPos = oldYieldPos
-      this.awaitPos = oldAwaitPos
-      this.awaitIdentPos = oldAwaitIdentPos
-      return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, true)
-    }
     this.checkExpressionErrors(refDestructuringErrors, true)
-    this.yieldPos = oldYieldPos || this.yieldPos
-    this.awaitPos = oldAwaitPos || this.awaitPos
-    this.awaitIdentPos = oldAwaitIdentPos || this.awaitIdentPos
     let node = this.startNodeAt(startPos, startLoc)
     node.callee = base
     node.arguments = exprList
@@ -379,7 +360,7 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow,
 // `new`, or an expression wrapped in punctuation like `()`, `[]`,
 // or `{}`.
 
-pp.parseExprAtom = function(refDestructuringErrors) {
+pp.parseExprAtom = function(refDestructuringErrors, forInit) {
   // If a division operator appears in an expression position, the
   // tokenizer got confused, and we force it to read a regexp instead.
   if (this.type === tt.slash) this.readRegexp()
@@ -409,22 +390,7 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     return this.finishNode(node, "ThisExpression")
 
   case tt.name:
-    let startPos = this.start, startLoc = this.startLoc, containsEsc = this.containsEsc
-    let id = this.parseIdent(false)
-    if (this.options.ecmaVersion >= 8 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
-      return this.parseFunction(this.startNodeAt(startPos, startLoc), 0, false, true)
-    if (canBeArrow && !this.canInsertSemicolon()) {
-      if (this.eat(tt.arrow))
-        return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false)
-      if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name && !containsEsc &&
-          (!this.potentialArrowInForAwait || this.value !== "of" || this.containsEsc)) {
-        id = this.parseIdent(false)
-        if (this.canInsertSemicolon() || !this.eat(tt.arrow))
-          this.unexpected()
-        return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], true)
-      }
-    }
-    return id
+    return this.parseIdentAndDistinguishFucntionExpr(forInit)
 
   case tt.regexp:
     let value = this.value
@@ -443,7 +409,7 @@ pp.parseExprAtom = function(refDestructuringErrors) {
     return this.finishNode(node, "Literal")
 
   case tt.parenL:
-    let start = this.start, expr = this.parseParenAndDistinguishExpression(canBeArrow)
+    let start = this.start, expr = this.parseParenAndDistinguishExpression(canBeArrow, forInit)
     if (refDestructuringErrors) {
       if (refDestructuringErrors.parenthesizedAssign < 0 && !this.isSimpleAssignTarget(expr))
         refDestructuringErrors.parenthesizedAssign = start
@@ -557,7 +523,61 @@ pp.parseParenExpression = function() {
   return val
 }
 
-pp.parseParenAndDistinguishExpression = function(canBeArrow) {
+pp.parseIdentAndDistinguishFucntionExpr = function(forInit) {
+  let startPos = this.start, startLoc = this.startLoc, containsEsc = this.containsEsc, canBeArrow = this.potentialArrowAt === this.start
+  let id = this.parseIdent(false)
+
+  if (this.options.ecmaVersion >= 8 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
+    return this.parseFunction(this.startNodeAt(startPos, startLoc), 0, false, true)
+  
+  if (canBeArrow && !this.canInsertSemicolon()) {
+    if (this.eat(tt.arrow))
+      return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false, forInit)
+
+    if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name && !containsEsc &&
+        (!this.potentialArrowInForAwait || this.value !== "of" || this.containsEsc)) {
+      id = this.parseIdent(false)
+      if (this.canInsertSemicolon() || !this.eat(tt.arrow))
+        this.unexpected()
+      return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], true, forInit)
+    }
+
+    // There are two possible cases:
+    // 1. An async arrow function exprssion
+    // 2. A call expression
+    if (this.options.ecmaVersion >= 8 && id.name === "async" && !containsEsc && this.eat(tt.parenL)) {
+      let refDestructuringErrors = new DestructuringErrors, oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
+      this.yieldPos = 0
+      this.awaitPos = 0
+      this.awaitIdentPos = 0
+      let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
+      if (!this.canInsertSemicolon() && this.eat(tt.arrow)) {
+        this.checkPatternErrors(refDestructuringErrors, false)
+        this.checkYieldAwaitInDefaultParams()
+        if (this.awaitIdentPos > 0)
+          this.raise(this.awaitIdentPos, "Cannot use 'await' as identifier inside an async function")
+        this.yieldPos = oldYieldPos
+        this.awaitPos = oldAwaitPos
+        this.awaitIdentPos = oldAwaitIdentPos
+        return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, true, forInit)
+      }
+      this.checkExpressionErrors(refDestructuringErrors, true)
+      this.yieldPos = oldYieldPos
+      this.awaitPos = oldAwaitPos
+      this.awaitIdentPos = oldAwaitIdentPos
+      let node = this.startNodeAt(startPos, startLoc)
+      node.callee = id
+      node.arguments = exprList
+      if (this.options.ecmaVersion >= 11)
+        node.optional = false
+      return this.finishNode(node, "CallExpression")
+    }
+  }
+
+  return id
+}
+
+pp.parseParenAndDistinguishExpression = function(canBeArrow, forInit) {
   let startPos = this.start, startLoc = this.startLoc, val, allowTrailingComma = this.options.ecmaVersion >= 8
   if (this.options.ecmaVersion >= 6) {
     this.next()
@@ -590,7 +610,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
       this.checkYieldAwaitInDefaultParams()
       this.yieldPos = oldYieldPos
       this.awaitPos = oldAwaitPos
-      return this.parseParenArrowList(startPos, startLoc, exprList)
+      return this.parseParenArrowList(startPos, startLoc, exprList, forInit)
     }
 
     if (!exprList.length || lastIsComma) this.unexpected(this.lastTokStart)
@@ -623,8 +643,8 @@ pp.parseParenItem = function(item) {
   return item
 }
 
-pp.parseParenArrowList = function(startPos, startLoc, exprList) {
-  return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList)
+pp.parseParenArrowList = function(startPos, startLoc, exprList, forInit) {
+  return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, false, forInit)
 }
 
 // New's precedence is slightly tricky. It must allow its argument to
@@ -878,7 +898,7 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
 
 // Parse arrow function expression with given parameters.
 
-pp.parseArrowExpression = function(node, params, isAsync) {
+pp.parseArrowExpression = function(node, params, isAsync, forInit) {
   let oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
 
   this.enterScope(functionFlags(isAsync, false) | SCOPE_ARROW)
@@ -890,7 +910,10 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   this.awaitIdentPos = 0
 
   node.params = this.toAssignableList(params, true)
-  this.parseFunctionBody(node, true, false)
+  if (this.type !== tt.braceL)
+    this.parseArrowFunctionExpressionBody(node, forInit)
+  else
+    this.parseFunctionBody(node, true, false)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
@@ -898,42 +921,41 @@ pp.parseArrowExpression = function(node, params, isAsync) {
   return this.finishNode(node, "ArrowFunctionExpression")
 }
 
+pp.parseArrowFunctionExpressionBody= function(node, forInit) {
+  node.body = this.parseMaybeAssign(forInit)
+  node.expression = true
+  this.checkParams(node, false)
+  this.exitScope()
+}
+
 // Parse function body and check parameters.
 
 pp.parseFunctionBody = function(node, isArrowFunction, isMethod) {
-  let isExpression = isArrowFunction && this.type !== tt.braceL
   let oldStrict = this.strict, useStrict = false
-
-  if (isExpression) {
-    node.body = this.parseMaybeAssign()
-    node.expression = true
-    this.checkParams(node, false)
-  } else {
-    let nonSimple = this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params)
-    if (!oldStrict || nonSimple) {
-      useStrict = this.strictDirective(this.end)
-      // If this is a strict mode function, verify that argument names
-      // are not repeated, and it does not try to bind the words `eval`
-      // or `arguments`.
-      if (useStrict && nonSimple)
-        this.raiseRecoverable(node.start, "Illegal 'use strict' directive in function with non-simple parameter list")
-    }
-    // Start a new scope with regard to labels and the `inFunction`
-    // flag (restore them to their old value afterwards).
-    let oldLabels = this.labels
-    this.labels = []
-    if (useStrict) this.strict = true
-
-    // Add the params to varDeclaredNames to ensure that an error is thrown
-    // if a let/const declaration in the function clashes with one of the params.
-    this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && !isMethod && this.isSimpleParamList(node.params))
-    // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
-    if (this.strict && node.id) this.checkLValSimple(node.id, BIND_OUTSIDE)
-    node.body = this.parseBlock(false, undefined, useStrict && !oldStrict)
-    node.expression = false
-    this.adaptDirectivePrologue(node.body.body)
-    this.labels = oldLabels
+  let nonSimple = this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params)
+  if (!oldStrict || nonSimple) {
+    useStrict = this.strictDirective(this.end)
+    // If this is a strict mode function, verify that argument names
+    // are not repeated, and it does not try to bind the words `eval`
+    // or `arguments`.
+    if (useStrict && nonSimple)
+      this.raiseRecoverable(node.start, "Illegal 'use strict' directive in function with non-simple parameter list")
   }
+  // Start a new scope with regard to labels and the `inFunction`
+  // flag (restore them to their old value afterwards).
+  let oldLabels = this.labels
+  this.labels = []
+  if (useStrict) this.strict = true
+
+  // Add the params to varDeclaredNames to ensure that an error is thrown
+  // if a let/const declaration in the function clashes with one of the params.
+  this.checkParams(node, !oldStrict && !useStrict && !isArrowFunction && !isMethod && this.isSimpleParamList(node.params))
+  // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
+  if (this.strict && node.id) this.checkLValSimple(node.id, BIND_OUTSIDE)
+  node.body = this.parseBlock(false, undefined, useStrict && !oldStrict)
+  node.expression = false
+  this.adaptDirectivePrologue(node.body.body)
+  this.labels = oldLabels
   this.exitScope()
 }
 

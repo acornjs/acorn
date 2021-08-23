@@ -19756,6 +19756,260 @@ testFail("for (let().bar of list);", "The left-hand side of a for-of loop may no
 testFail("for (let``.bar of list);", "The left-hand side of a for-of loop may not start with 'let'. (1:5)", { ecmaVersion: 6 })
 testFail("'use strict'; for (let in list);", "The keyword 'let' is reserved (1:19)")
 
+testFail("for (let a = b => b in c;;);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
+testFail("for (let a = b => c => d in e;;);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
+testFail("for (var a = b => c in d;;);", "Unexpected token (1:24)", { ecmaVersion: 8 })
+testFail("for (var a = b => c => d in e;;);", "Unexpected token (1:29)", { ecmaVersion: 8 })
+testFail("for (x => x in y;;);", "Assigning to rvalue (1:5)", { ecmaVersion: 6 })
+testFail("for (x => y => y in z;;);", "Assigning to rvalue (1:5)", { ecmaVersion: 6 })
+test("for ((a in b);;);", {
+  type: "Program",
+  start: 0,
+  end: 17,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 1,
+      column: 17
+    }
+  },
+  body: [
+    {
+      type: "ForStatement",
+      start: 0,
+      end: 17,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 17
+        }
+      },
+      init: {
+        type: "BinaryExpression",
+        start: 6,
+        end: 12,
+        loc: {
+          start: {
+            line: 1,
+            column: 6
+          },
+          end: {
+            line: 1,
+            column: 12
+          }
+        },
+        left: {
+          type: "Identifier",
+          start: 6,
+          end: 7,
+          loc: {
+            start: {
+              line: 1,
+              column: 6
+            },
+            end: {
+              line: 1,
+              column: 7
+            }
+          },
+          name: "a"
+        },
+        operator: "in",
+        right: {
+          type: "Identifier",
+          start: 11,
+          end: 12,
+          loc: {
+            start: {
+              line: 1,
+              column: 11
+            },
+            end: {
+              line: 1,
+              column: 12
+            }
+          },
+          name: "b"
+        }
+      },
+      test: null,
+      update: null,
+      body: {
+        type: "EmptyStatement",
+        start: 16,
+        end: 17,
+        loc: {
+          start: {
+            line: 1,
+            column: 16
+          },
+          end: {
+            line: 1,
+            column: 17
+          }
+        }
+      }
+    }
+  ],
+}, { locations: true })
+
+test("for (function (){ a in b };;);", {
+  type: "Program",
+  start: 0,
+  end: 30,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 1,
+      column: 30
+    }
+  },
+  body: [
+    {
+      type: "ForStatement",
+      start: 0,
+      end: 30,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 30
+        }
+      },
+      init: {
+        type: "FunctionExpression",
+        start: 5,
+        end: 26,
+        loc: {
+          start: {
+            line: 1,
+            column: 5
+          },
+          end: {
+            line: 1,
+            column: 26
+          }
+        },
+        id: null,
+        expression: false,
+        generator: false,
+        async: false,
+        params: [],
+        body: {
+          type: "BlockStatement",
+          start: 16,
+          end: 26,
+          loc: {
+            start: {
+              line: 1,
+              column: 16
+            },
+            end: {
+              line: 1,
+              column: 26
+            }
+          },
+          body: [
+            {
+              type: "ExpressionStatement",
+              start: 18,
+              end: 24,
+              loc: {
+                start: {
+                  line: 1,
+                  column: 18
+                },
+                end: {
+                  line: 1,
+                  column: 24
+                }
+              },
+              expression: {
+                type: "BinaryExpression",
+                start: 18,
+                end: 24,
+                loc: {
+                  start: {
+                    line: 1,
+                    column: 18
+                  },
+                  end: {
+                    line: 1,
+                    column: 24
+                  }
+                },
+                left: {
+                  type: "Identifier",
+                  start: 18,
+                  end: 19,
+                  loc: {
+                    start: {
+                      line: 1,
+                      column: 18
+                    },
+                    end: {
+                      line: 1,
+                      column: 19
+                    }
+                  },
+                  name: "a"
+                },
+                operator: "in",
+                right: {
+                  type: "Identifier",
+                  start: 23,
+                  end: 24,
+                  loc: {
+                    start: {
+                      line: 1,
+                      column: 23
+                    },
+                    end: {
+                      line: 1,
+                      column: 24
+                    }
+                  },
+                  name: "b"
+                }
+              }
+            }
+          ]
+        }
+      },
+      test: null,
+      update: null,
+      body: {
+        type: "EmptyStatement",
+        start: 29,
+        end: 30,
+        loc: {
+          start: {
+            line: 1,
+            column: 29
+          },
+          end: {
+            line: 1,
+            column: 30
+          }
+        }
+      }
+    }
+  ]
+}, { locations: true, ecmaVersion: 8, })
+
 test("for (var x = 42 in list) process(x);", {
   type: "Program",
   body: [
