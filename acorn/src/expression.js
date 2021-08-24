@@ -582,7 +582,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow) {
         exprList.push(this.parseMaybeAssign(false, refDestructuringErrors, this.parseParenItem))
       }
     }
-    let innerEndPos = this.start, innerEndLoc = this.startLoc
+    let innerEndPos = this.lastTokEnd, innerEndLoc = this.lastTokEndLoc
     this.expect(tt.parenR)
 
     if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {

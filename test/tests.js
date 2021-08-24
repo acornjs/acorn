@@ -29490,3 +29490,119 @@ test("for (; function () {} / 1;);", {}, {ecmaVersion: 6})
 test("for (; class {} / 1;);", {}, {ecmaVersion: 6})
 test("for (;; function () {} / 1);", {}, {ecmaVersion: 6})
 test("for (;; class {} / 1);", {}, {ecmaVersion: 6})
+
+for (const ecmaVersion of [5, 6]) {
+  test("a = (\r\n  b,\r\n  c\r\n)", {
+    type: "Program",
+    start: 0,
+    end: 19,
+    loc: {
+      start: {
+        line: 1,
+        column: 0
+      },
+      end: {
+        line: 4,
+        column: 1
+      }
+    },
+    body: [
+      {
+        type: "ExpressionStatement",
+        start: 0,
+        end: 19,
+        loc: {
+          start: {
+            line: 1,
+            column: 0
+          },
+          end: {
+            line: 4,
+            column: 1
+          }
+        },
+        expression: {
+          type: "AssignmentExpression",
+          start: 0,
+          end: 19,
+          loc: {
+            start: {
+              line: 1,
+              column: 0
+            },
+            end: {
+              line: 4,
+              column: 1
+            }
+          },
+          operator: "=",
+          left: {
+            type: "Identifier",
+            start: 0,
+            end: 1,
+            loc: {
+              start: {
+                line: 1,
+                column: 0
+              },
+              end: {
+                line: 1,
+                column: 1
+              }
+            },
+            name: "a"
+          },
+          right: {
+            type: "SequenceExpression",
+            start: 9,
+            end: 16,
+            loc: {
+              start: {
+                line: 2,
+                column: 2
+              },
+              end: {
+                line: 3,
+                column: 3
+              }
+            },
+            expressions: [
+              {
+                type: "Identifier",
+                start: 9,
+                end: 10,
+                loc: {
+                  start: {
+                    line: 2,
+                    column: 2
+                  },
+                  end: {
+                    line: 2,
+                    column: 3
+                  }
+                },
+                name: "b"
+              },
+              {
+                type: "Identifier",
+                start: 15,
+                end: 16,
+                loc: {
+                  start: {
+                    line: 3,
+                    column: 2
+                  },
+                  end: {
+                    line: 3,
+                    column: 3
+                  }
+                },
+                name: "c"
+              }
+            ]
+          }
+        }
+      }
+    ],
+  }, { ecmaVersion, locations: true })
+}
