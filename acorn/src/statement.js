@@ -521,7 +521,7 @@ const FUNC_STATEMENT = 1, FUNC_HANGING_STATEMENT = 2, FUNC_NULLABLE_ID = 4
 // `statement & FUNC_STATEMENT`).
 
 // Remove `allowExpressionBody` for 7.0.0, as it is only called with false
-pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
+pp.parseFunction = function(node, statement, allowExpressionBody, isAsync, forInit) {
   this.initFunction(node)
   if (this.options.ecmaVersion >= 9 || this.options.ecmaVersion >= 6 && !isAsync) {
     if (this.type === tt.star && (statement & FUNC_HANGING_STATEMENT))
@@ -551,7 +551,7 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync) {
     node.id = this.type === tt.name ? this.parseIdent() : null
 
   this.parseFunctionParams(node)
-  this.parseFunctionBody(node, allowExpressionBody, false)
+  this.parseFunctionBody(node, allowExpressionBody, false, forInit)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
@@ -751,7 +751,7 @@ pp.parseClassId = function(node, isStatement) {
 }
 
 pp.parseClassSuper = function(node) {
-  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts() : null
+  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts(false) : null
 }
 
 pp.enterClassBody = function() {
