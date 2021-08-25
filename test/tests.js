@@ -29606,3 +29606,27 @@ for (const ecmaVersion of [5, 6]) {
     ],
   }, { ecmaVersion, locations: true })
 }
+
+test("'\u2028'", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "Literal",
+        loc: {
+          start: {
+            line: 1,
+            column: 0
+          },
+          end: {
+            line: 2,
+            column: 1
+          }
+        }
+      }
+    }
+  ]
+}, {ecmaVersion: 2020, locations: true})
+
+testFail("'\u2029'", "Unterminated string constant (1:0)", {ecmaVersion: 5})

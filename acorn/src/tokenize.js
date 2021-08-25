@@ -586,8 +586,15 @@ pp.readString = function(quote) {
       out += this.input.slice(chunkStart, this.pos)
       out += this.readEscapedChar(false)
       chunkStart = this.pos
+    } else if (ch === 0x2028 || ch === 0x2029) {
+      if (this.options.ecmaVersion < 10) this.raise(this.start, "Unterminated string constant")
+      ++this.pos
+      if (this.options.locations) {
+        this.curLine++
+        this.lineStart = this.pos
+      }
     } else {
-      if (isNewLine(ch, this.options.ecmaVersion >= 10)) this.raise(this.start, "Unterminated string constant")
+      if (isNewLine(ch)) this.raise(this.start, "Unterminated string constant")
       ++this.pos
     }
   }
