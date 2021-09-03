@@ -4,7 +4,7 @@ import {lineBreak, skipWhiteSpace} from "./whitespace.js"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier.js"
 import {has} from "./util.js"
 import {DestructuringErrors} from "./parseutil.js"
-import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION} from "./scopeflags.js"
+import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION, SCOPE_CLASS_STATIC_BLOCK, SCOPE_SUPER} from "./scopeflags.js"
 
 const pp = Parser.prototype
 
@@ -590,7 +590,7 @@ pp.parseClass = function(node, isStatement) {
       if (element.type === "MethodDefinition" && element.kind === "constructor") {
         if (hadConstructor) this.raise(element.start, "Duplicate constructor in the same class")
         hadConstructor = true
-      } else if (element.key.type === "PrivateIdentifier" && isPrivateNameConflicted(privateNameMap, element)) {
+      } else if (element.key && element.key.type === "PrivateIdentifier" && isPrivateNameConflicted(privateNameMap, element)) {
         this.raiseRecoverable(element.key.start, `Identifier '#${element.key.name}' has already been declared`)
       }
     }
@@ -611,16 +611,21 @@ pp.parseClassElement = function(constructorAllowsSuper) {
   let isGenerator = false
   let isAsync = false
   let kind = "method"
+  let isStatic = false
 
-  // Parse modifiers
-  node.static = false
   if (this.eatContextual("static")) {
+    // Parse static init block
+    if (ecmaVersion >= 13 && this.eat(tt.braceL)) {
+      this.parseClassStaticBlock(node)
+      return node
+    }
     if (this.isClassElementNameStart() || this.type === tt.star) {
-      node.static = true
+      isStatic = true
     } else {
       keyName = "static"
     }
   }
+  node.static = isStatic
   if (!keyName && ecmaVersion >= 8 && this.eatContextual("async")) {
     if ((this.isClassElementNameStart() || this.type === tt.star) && !this.canInsertSemicolon()) {
       isAsync = true
@@ -736,6 +741,23 @@ pp.parseClassField = function(field) {
   this.semicolon()
 
   return this.finishNode(field, "PropertyDefinition")
+}
+
+pp.parseClassStaticBlock = function(node) {
+  node.body = []
+
+  let oldLabels = this.labels
+  this.labels = []
+  this.enterScope(SCOPE_CLASS_STATIC_BLOCK | SCOPE_SUPER)
+  while (this.type !== tt.braceR) {
+    let stmt = this.parseStatement(null)
+    node.body.push(stmt)
+  }
+  this.next()
+  this.exitScope()
+  this.labels = oldLabels
+
+  return this.finishNode(node, "StaticBlock")
 }
 
 pp.parseClassId = function(node, isStatement) {
