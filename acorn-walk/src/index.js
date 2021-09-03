@@ -186,7 +186,7 @@ function ignore(_node, _st, _c) {}
 
 export const base = {}
 
-base.Program = base.BlockStatement = (node, st, c) => {
+base.Program = base.BlockStatement = base.StaticBlock = (node, st, c) => {
   for (let stmt of node.body)
     c(stmt, st, "Statement")
 }

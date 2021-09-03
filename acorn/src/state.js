@@ -119,7 +119,7 @@ export class Parser {
     return (flags & (SCOPE_FUNCTION | SCOPE_CLASS_STATIC_BLOCK)) > 0 || inClassFieldInit
   }
   get inClassStaticBlock() {
-    return (this.currentScope().flags & SCOPE_CLASS_STATIC_BLOCK) > 0
+    return (this.currentVarScope().flags & SCOPE_CLASS_STATIC_BLOCK) > 0
   }
 
   static extend(...plugins) {
