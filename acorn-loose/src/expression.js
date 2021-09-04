@@ -1,6 +1,6 @@
 import {LooseParser} from "./state.js"
 import {isDummy} from "./parseutil.js"
-import {tokTypes as tt} from "acorn"
+import {tokTypes as tt, tokContexts as tokContextTypes} from "acorn"
 
 const lp = LooseParser.prototype
 
@@ -245,8 +245,10 @@ lp.parseExprAtom = function() {
     let id = this.parseIdent()
     let isAsync = false
     if (id.name === "async" && !this.canInsertSemicolon()) {
-      if (this.eat(tt._function))
+      if (this.eat(tt._function)) {
+        this.toks.overrideContext(tokContextTypes.f_expr)
         return this.parseFunction(this.startNodeAt(start), false, true)
+      }
       if (this.tok.type === tt.name) {
         id = this.parseIdent()
         isAsync = true
@@ -303,6 +305,7 @@ lp.parseExprAtom = function() {
     return this.finishNode(node, "ArrayExpression")
 
   case tt.braceL:
+    this.toks.overrideContext(tokContextTypes.b_expr)
     return this.parseObj()
 
   case tt._class:

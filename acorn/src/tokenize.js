@@ -63,10 +63,6 @@ if (typeof Symbol !== "undefined")
 // Toggle strict mode. Re-reads the next number or string to please
 // pedantic tests (`"use strict"; 010;` should fail).
 
-pp.curContext = function() {
-  return this.context[this.context.length - 1]
-}
-
 // Read a single token, updating the parser object's token-related
 // properties.
 
