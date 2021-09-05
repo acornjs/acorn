@@ -17,6 +17,7 @@
 // [opp]: http://en.wikipedia.org/wiki/Operator-precedence_parser
 
 import {types as tt} from "./tokentype.js"
+import {types as tokenCtxTypes} from "./tokencontext.js"
 import {Parser} from "./state.js"
 import {DestructuringErrors} from "./parseutil.js"
 import {lineBreak} from "./whitespace.js"
@@ -411,8 +412,10 @@ pp.parseExprAtom = function(refDestructuringErrors, forInit) {
   case tt.name:
     let startPos = this.start, startLoc = this.startLoc, containsEsc = this.containsEsc
     let id = this.parseIdent(false)
-    if (this.options.ecmaVersion >= 8 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function))
+    if (this.options.ecmaVersion >= 8 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function)) {
+      this.overrideContext(tokenCtxTypes.f_expr)
       return this.parseFunction(this.startNodeAt(startPos, startLoc), 0, false, true, forInit)
+    }
     if (canBeArrow && !this.canInsertSemicolon()) {
       if (this.eat(tt.arrow))
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false, forInit)
@@ -459,6 +462,7 @@ pp.parseExprAtom = function(refDestructuringErrors, forInit) {
     return this.finishNode(node, "ArrayExpression")
 
   case tt.braceL:
+    this.overrideContext(tokenCtxTypes.b_expr)
     return this.parseObj(false, refDestructuringErrors)
 
   case tt._function:

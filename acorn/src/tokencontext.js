@@ -35,6 +35,10 @@ pp.initialContext = function() {
   return [types.b_stat]
 }
 
+pp.curContext = function() {
+  return this.context[this.context.length - 1]
+}
+
 pp.braceIsBlock = function(prevType) {
   let parent = this.curContext()
   if (parent === types.f_expr || parent === types.f_stat)
@@ -73,6 +77,13 @@ pp.updateContext = function(prevType) {
     update.call(this, prevType)
   else
     this.exprAllowed = type.beforeExpr
+}
+
+// Used to handle egde case when token context could not be inferred correctly in tokenize phase
+pp.overrideContext = function(tokenCtx) {
+  if (this.curContext() !== tokenCtx) {
+    this.context[this.context.length - 1] = tokenCtx
+  }
 }
 
 // Token-specific context update code

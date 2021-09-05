@@ -29630,3 +29630,302 @@ test("'\u2028'", {
 }, {ecmaVersion: 2020, locations: true})
 
 testFail("'\u2029'", "Unterminated string constant (1:0)", {ecmaVersion: 5})
+
+test("weird ? true : {} / 2", {
+  type: "Program",
+  start: 0,
+  end: 21,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 1,
+      column: 21
+    }
+  },
+  body: [
+    {
+      type: "ExpressionStatement",
+      start: 0,
+      end: 21,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 21
+        }
+      },
+      expression: {
+        type: "ConditionalExpression",
+        start: 0,
+        end: 21,
+        loc: {
+          start: {
+            line: 1,
+            column: 0
+          },
+          end: {
+            line: 1,
+            column: 21
+          }
+        },
+        test: {
+          type: "Identifier",
+          start: 0,
+          end: 5,
+          loc: {
+            start: {
+              line: 1,
+              column: 0
+            },
+            end: {
+              line: 1,
+              column: 5
+            }
+          },
+          name: "weird"
+        },
+        consequent: {
+          type: "Literal",
+          start: 8,
+          end: 12,
+          loc: {
+            start: {
+              line: 1,
+              column: 8
+            },
+            end: {
+              line: 1,
+              column: 12
+            }
+          },
+          value: true,
+          raw: "true"
+        },
+        alternate: {
+          type: "BinaryExpression",
+          start: 15,
+          end: 21,
+          loc: {
+            start: {
+              line: 1,
+              column: 15
+            },
+            end: {
+              line: 1,
+              column: 21
+            }
+          },
+          left: {
+            type: "ObjectExpression",
+            start: 15,
+            end: 17,
+            loc: {
+              start: {
+                line: 1,
+                column: 15
+              },
+              end: {
+                line: 1,
+                column: 17
+              }
+            },
+            properties: []
+          },
+          operator: "/",
+          right: {
+            type: "Literal",
+            start: 20,
+            end: 21,
+            loc: {
+              start: {
+                line: 1,
+                column: 20
+              },
+              end: {
+                line: 1,
+                column: 21
+              }
+            },
+            value: 2,
+            raw: "2"
+          }
+        }
+      }
+    }
+  ]
+}, {locations: true})
+
+test(`typeof async function f(){}
+/foo/g`, {
+  type: "Program",
+  start: 0,
+  end: 34,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 2,
+      column: 6
+    }
+  },
+  body: [
+    {
+      type: "ExpressionStatement",
+      start: 0,
+      end: 34,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 2,
+          column: 6
+        }
+      },
+      expression: {
+        type: "BinaryExpression",
+        start: 0,
+        end: 34,
+        loc: {
+          start: {
+            line: 1,
+            column: 0
+          },
+          end: {
+            line: 2,
+            column: 6
+          }
+        },
+        left: {
+          type: "BinaryExpression",
+          start: 0,
+          end: 32,
+          loc: {
+            start: {
+              line: 1,
+              column: 0
+            },
+            end: {
+              line: 2,
+              column: 4
+            }
+          },
+          left: {
+            type: "UnaryExpression",
+            start: 0,
+            end: 27,
+            loc: {
+              start: {
+                line: 1,
+                column: 0
+              },
+              end: {
+                line: 1,
+                column: 27
+              }
+            },
+            operator: "typeof",
+            prefix: true,
+            argument: {
+              type: "FunctionExpression",
+              start: 7,
+              end: 27,
+              loc: {
+                start: {
+                  line: 1,
+                  column: 7
+                },
+                end: {
+                  line: 1,
+                  column: 27
+                }
+              },
+              id: {
+                type: "Identifier",
+                start: 22,
+                end: 23,
+                loc: {
+                  start: {
+                    line: 1,
+                    column: 22
+                  },
+                  end: {
+                    line: 1,
+                    column: 23
+                  }
+                },
+                name: "f"
+              },
+              expression: false,
+              generator: false,
+              async: true,
+              params: [],
+              body: {
+                type: "BlockStatement",
+                start: 25,
+                end: 27,
+                loc: {
+                  start: {
+                    line: 1,
+                    column: 25
+                  },
+                  end: {
+                    line: 1,
+                    column: 27
+                  }
+                },
+                body: []
+              }
+            }
+          },
+          operator: "/",
+          right: {
+            type: "Identifier",
+            start: 29,
+            end: 32,
+            loc: {
+              start: {
+                line: 2,
+                column: 1
+              },
+              end: {
+                line: 2,
+                column: 4
+              }
+            },
+            name: "foo"
+          }
+        },
+        operator: "/",
+        right: {
+          type: "Identifier",
+          start: 33,
+          end: 34,
+          loc: {
+            start: {
+              line: 2,
+              column: 5
+            },
+            end: {
+              line: 2,
+              column: 6
+            }
+          },
+          name: "g"
+        }
+      }
+    }
+  ]
+}, { ecmaVersion: 8, locations: true })
+
+testFail(`typeof async function f(){}
+/foo/`, "Unexpected token (2:5)", { ecmaVersion: 8, locations: true })
