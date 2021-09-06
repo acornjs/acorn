@@ -1,3 +1,9 @@
+## 8.2.0 (2021-09-06)
+
+### New features
+
+Add support for walking ES2022 class static blocks.
+
 ## 8.1.1 (2021-06-29)
 
 ### Bug fixes
