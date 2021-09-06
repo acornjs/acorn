@@ -3,7 +3,7 @@ import {types as tt} from "./tokentype.js"
 import {lineBreak} from "./whitespace.js"
 import {getOptions} from "./options.js"
 import {wordsRegexp} from "./util.js"
-import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER} from "./scopeflags.js"
+import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER, SCOPE_CLASS_STATIC_BLOCK} from "./scopeflags.js"
 
 export class Parser {
   constructor(options, input, startPos) {
@@ -103,7 +103,7 @@ export class Parser {
   get canAwait() {
     for (let i = this.scopeStack.length - 1; i >= 0; i--) {
       let scope = this.scopeStack[i]
-      if (scope.inClassFieldInit) return false
+      if (scope.inClassFieldInit || scope.flags & SCOPE_CLASS_STATIC_BLOCK) return false
       if (scope.flags & SCOPE_FUNCTION) return (scope.flags & SCOPE_ASYNC) > 0
     }
     return (this.inModule && this.options.ecmaVersion >= 13) || this.options.allowAwaitOutsideFunction
@@ -114,9 +114,12 @@ export class Parser {
   }
   get allowDirectSuper() { return (this.currentThisScope().flags & SCOPE_DIRECT_SUPER) > 0 }
   get treatFunctionsAsVar() { return this.treatFunctionsAsVarInScope(this.currentScope()) }
-  get inNonArrowFunction() {
+  get allowNewDotTarget() {
     const {flags, inClassFieldInit} = this.currentThisScope()
-    return (flags & SCOPE_FUNCTION) > 0 || inClassFieldInit
+    return (flags & (SCOPE_FUNCTION | SCOPE_CLASS_STATIC_BLOCK)) > 0 || inClassFieldInit
+  }
+  get inClassStaticBlock() {
+    return (this.currentVarScope().flags & SCOPE_CLASS_STATIC_BLOCK) > 0
   }
 
   static extend(...plugins) {

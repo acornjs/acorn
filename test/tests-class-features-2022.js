@@ -3849,3 +3849,1989 @@ test("class Outer { #outer; Inner = class { #inner; f(obj) { obj.#outer + this.#
 test("class Outer { Inner = class { f(obj) { obj.#outer + this.#inner } #inner; }; #outer; }", {}, {ecmaVersion: 13})
 testFail("class Outer { Inner = class { f(obj) { obj.#nonexist } #inner; }; #outer; }", "Private field '#nonexist' must be declared in an enclosing class (1:43)", {ecmaVersion: 13})
 test("class C { static delete() {} }", {}, {ecmaVersion: 13})
+
+// Class static block
+test(`class C {
+  static x
+  static y
+  static {
+    try {
+      const obj = doSomethingWith(this.x)
+      this.y = obj.y
+      this.z = obj.z
+    }
+    catch {
+      this.y = 0
+      this.z = 0
+    }
+  }
+}`, {
+  type: "Program",
+  start: 0,
+  end: 200,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 15,
+      column: 1
+    }
+  },
+  body: [
+    {
+      type: "ClassDeclaration",
+      start: 0,
+      end: 200,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 15,
+          column: 1
+        }
+      },
+      id: {
+        type: "Identifier",
+        start: 6,
+        end: 7,
+        loc: {
+          start: {
+            line: 1,
+            column: 6
+          },
+          end: {
+            line: 1,
+            column: 7
+          }
+        },
+        name: "C"
+      },
+      superClass: null,
+      body: {
+        type: "ClassBody",
+        start: 8,
+        end: 200,
+        loc: {
+          start: {
+            line: 1,
+            column: 8
+          },
+          end: {
+            line: 15,
+            column: 1
+          }
+        },
+        body: [
+          {
+            type: "PropertyDefinition",
+            start: 12,
+            end: 20,
+            loc: {
+              start: {
+                line: 2,
+                column: 2
+              },
+              end: {
+                line: 2,
+                column: 10
+              }
+            },
+            static: true,
+            computed: false,
+            key: {
+              type: "Identifier",
+              start: 19,
+              end: 20,
+              loc: {
+                start: {
+                  line: 2,
+                  column: 9
+                },
+                end: {
+                  line: 2,
+                  column: 10
+                }
+              },
+              name: "x"
+            },
+            value: null
+          },
+          {
+            type: "PropertyDefinition",
+            start: 23,
+            end: 31,
+            loc: {
+              start: {
+                line: 3,
+                column: 2
+              },
+              end: {
+                line: 3,
+                column: 10
+              }
+            },
+            static: true,
+            computed: false,
+            key: {
+              type: "Identifier",
+              start: 30,
+              end: 31,
+              loc: {
+                start: {
+                  line: 3,
+                  column: 9
+                },
+                end: {
+                  line: 3,
+                  column: 10
+                }
+              },
+              name: "y"
+            },
+            value: null
+          },
+          {
+            type: "StaticBlock",
+            start: 34,
+            end: 198,
+            loc: {
+              start: {
+                line: 4,
+                column: 2
+              },
+              end: {
+                line: 14,
+                column: 3
+              }
+            },
+            body: [
+              {
+                type: "TryStatement",
+                start: 47,
+                end: 194,
+                loc: {
+                  start: {
+                    line: 5,
+                    column: 4
+                  },
+                  end: {
+                    line: 13,
+                    column: 5
+                  }
+                },
+                block: {
+                  type: "BlockStatement",
+                  start: 51,
+                  end: 142,
+                  loc: {
+                    start: {
+                      line: 5,
+                      column: 8
+                    },
+                    end: {
+                      line: 9,
+                      column: 5
+                    }
+                  },
+                  body: [
+                    {
+                      type: "VariableDeclaration",
+                      start: 59,
+                      end: 94,
+                      loc: {
+                        start: {
+                          line: 6,
+                          column: 6
+                        },
+                        end: {
+                          line: 6,
+                          column: 41
+                        }
+                      },
+                      declarations: [
+                        {
+                          type: "VariableDeclarator",
+                          start: 65,
+                          end: 94,
+                          loc: {
+                            start: {
+                              line: 6,
+                              column: 12
+                            },
+                            end: {
+                              line: 6,
+                              column: 41
+                            }
+                          },
+                          id: {
+                            type: "Identifier",
+                            start: 65,
+                            end: 68,
+                            loc: {
+                              start: {
+                                line: 6,
+                                column: 12
+                              },
+                              end: {
+                                line: 6,
+                                column: 15
+                              }
+                            },
+                            name: "obj"
+                          },
+                          init: {
+                            type: "CallExpression",
+                            start: 71,
+                            end: 94,
+                            loc: {
+                              start: {
+                                line: 6,
+                                column: 18
+                              },
+                              end: {
+                                line: 6,
+                                column: 41
+                              }
+                            },
+                            callee: {
+                              type: "Identifier",
+                              start: 71,
+                              end: 86,
+                              loc: {
+                                start: {
+                                  line: 6,
+                                  column: 18
+                                },
+                                end: {
+                                  line: 6,
+                                  column: 33
+                                }
+                              },
+                              name: "doSomethingWith"
+                            },
+                            arguments: [
+                              {
+                                type: "MemberExpression",
+                                start: 87,
+                                end: 93,
+                                loc: {
+                                  start: {
+                                    line: 6,
+                                    column: 34
+                                  },
+                                  end: {
+                                    line: 6,
+                                    column: 40
+                                  }
+                                },
+                                object: {
+                                  type: "ThisExpression",
+                                  start: 87,
+                                  end: 91,
+                                  loc: {
+                                    start: {
+                                      line: 6,
+                                      column: 34
+                                    },
+                                    end: {
+                                      line: 6,
+                                      column: 38
+                                    }
+                                  }
+                                },
+                                property: {
+                                  type: "Identifier",
+                                  start: 92,
+                                  end: 93,
+                                  loc: {
+                                    start: {
+                                      line: 6,
+                                      column: 39
+                                    },
+                                    end: {
+                                      line: 6,
+                                      column: 40
+                                    }
+                                  },
+                                  name: "x"
+                                },
+                                computed: false,
+                                optional: false
+                              }
+                            ],
+                            optional: false
+                          }
+                        }
+                      ],
+                      kind: "const"
+                    },
+                    {
+                      type: "ExpressionStatement",
+                      start: 101,
+                      end: 115,
+                      loc: {
+                        start: {
+                          line: 7,
+                          column: 6
+                        },
+                        end: {
+                          line: 7,
+                          column: 20
+                        }
+                      },
+                      expression: {
+                        type: "AssignmentExpression",
+                        start: 101,
+                        end: 115,
+                        loc: {
+                          start: {
+                            line: 7,
+                            column: 6
+                          },
+                          end: {
+                            line: 7,
+                            column: 20
+                          }
+                        },
+                        operator: "=",
+                        left: {
+                          type: "MemberExpression",
+                          start: 101,
+                          end: 107,
+                          loc: {
+                            start: {
+                              line: 7,
+                              column: 6
+                            },
+                            end: {
+                              line: 7,
+                              column: 12
+                            }
+                          },
+                          object: {
+                            type: "ThisExpression",
+                            start: 101,
+                            end: 105,
+                            loc: {
+                              start: {
+                                line: 7,
+                                column: 6
+                              },
+                              end: {
+                                line: 7,
+                                column: 10
+                              }
+                            }
+                          },
+                          property: {
+                            type: "Identifier",
+                            start: 106,
+                            end: 107,
+                            loc: {
+                              start: {
+                                line: 7,
+                                column: 11
+                              },
+                              end: {
+                                line: 7,
+                                column: 12
+                              }
+                            },
+                            name: "y"
+                          },
+                          computed: false,
+                          optional: false
+                        },
+                        right: {
+                          type: "MemberExpression",
+                          start: 110,
+                          end: 115,
+                          loc: {
+                            start: {
+                              line: 7,
+                              column: 15
+                            },
+                            end: {
+                              line: 7,
+                              column: 20
+                            }
+                          },
+                          object: {
+                            type: "Identifier",
+                            start: 110,
+                            end: 113,
+                            loc: {
+                              start: {
+                                line: 7,
+                                column: 15
+                              },
+                              end: {
+                                line: 7,
+                                column: 18
+                              }
+                            },
+                            name: "obj"
+                          },
+                          property: {
+                            type: "Identifier",
+                            start: 114,
+                            end: 115,
+                            loc: {
+                              start: {
+                                line: 7,
+                                column: 19
+                              },
+                              end: {
+                                line: 7,
+                                column: 20
+                              }
+                            },
+                            name: "y"
+                          },
+                          computed: false,
+                          optional: false
+                        }
+                      }
+                    },
+                    {
+                      type: "ExpressionStatement",
+                      start: 122,
+                      end: 136,
+                      loc: {
+                        start: {
+                          line: 8,
+                          column: 6
+                        },
+                        end: {
+                          line: 8,
+                          column: 20
+                        }
+                      },
+                      expression: {
+                        type: "AssignmentExpression",
+                        start: 122,
+                        end: 136,
+                        loc: {
+                          start: {
+                            line: 8,
+                            column: 6
+                          },
+                          end: {
+                            line: 8,
+                            column: 20
+                          }
+                        },
+                        operator: "=",
+                        left: {
+                          type: "MemberExpression",
+                          start: 122,
+                          end: 128,
+                          loc: {
+                            start: {
+                              line: 8,
+                              column: 6
+                            },
+                            end: {
+                              line: 8,
+                              column: 12
+                            }
+                          },
+                          object: {
+                            type: "ThisExpression",
+                            start: 122,
+                            end: 126,
+                            loc: {
+                              start: {
+                                line: 8,
+                                column: 6
+                              },
+                              end: {
+                                line: 8,
+                                column: 10
+                              }
+                            }
+                          },
+                          property: {
+                            type: "Identifier",
+                            start: 127,
+                            end: 128,
+                            loc: {
+                              start: {
+                                line: 8,
+                                column: 11
+                              },
+                              end: {
+                                line: 8,
+                                column: 12
+                              }
+                            },
+                            name: "z"
+                          },
+                          computed: false,
+                          optional: false
+                        },
+                        right: {
+                          type: "MemberExpression",
+                          start: 131,
+                          end: 136,
+                          loc: {
+                            start: {
+                              line: 8,
+                              column: 15
+                            },
+                            end: {
+                              line: 8,
+                              column: 20
+                            }
+                          },
+                          object: {
+                            type: "Identifier",
+                            start: 131,
+                            end: 134,
+                            loc: {
+                              start: {
+                                line: 8,
+                                column: 15
+                              },
+                              end: {
+                                line: 8,
+                                column: 18
+                              }
+                            },
+                            name: "obj"
+                          },
+                          property: {
+                            type: "Identifier",
+                            start: 135,
+                            end: 136,
+                            loc: {
+                              start: {
+                                line: 8,
+                                column: 19
+                              },
+                              end: {
+                                line: 8,
+                                column: 20
+                              }
+                            },
+                            name: "z"
+                          },
+                          computed: false,
+                          optional: false
+                        }
+                      }
+                    }
+                  ]
+                },
+                handler: {
+                  type: "CatchClause",
+                  start: 147,
+                  end: 194,
+                  loc: {
+                    start: {
+                      line: 10,
+                      column: 4
+                    },
+                    end: {
+                      line: 13,
+                      column: 5
+                    }
+                  },
+                  param: null,
+                  body: {
+                    type: "BlockStatement",
+                    start: 153,
+                    end: 194,
+                    loc: {
+                      start: {
+                        line: 10,
+                        column: 10
+                      },
+                      end: {
+                        line: 13,
+                        column: 5
+                      }
+                    },
+                    body: [
+                      {
+                        type: "ExpressionStatement",
+                        start: 161,
+                        end: 171,
+                        loc: {
+                          start: {
+                            line: 11,
+                            column: 6
+                          },
+                          end: {
+                            line: 11,
+                            column: 16
+                          }
+                        },
+                        expression: {
+                          type: "AssignmentExpression",
+                          start: 161,
+                          end: 171,
+                          loc: {
+                            start: {
+                              line: 11,
+                              column: 6
+                            },
+                            end: {
+                              line: 11,
+                              column: 16
+                            }
+                          },
+                          operator: "=",
+                          left: {
+                            type: "MemberExpression",
+                            start: 161,
+                            end: 167,
+                            loc: {
+                              start: {
+                                line: 11,
+                                column: 6
+                              },
+                              end: {
+                                line: 11,
+                                column: 12
+                              }
+                            },
+                            object: {
+                              type: "ThisExpression",
+                              start: 161,
+                              end: 165,
+                              loc: {
+                                start: {
+                                  line: 11,
+                                  column: 6
+                                },
+                                end: {
+                                  line: 11,
+                                  column: 10
+                                }
+                              }
+                            },
+                            property: {
+                              type: "Identifier",
+                              start: 166,
+                              end: 167,
+                              loc: {
+                                start: {
+                                  line: 11,
+                                  column: 11
+                                },
+                                end: {
+                                  line: 11,
+                                  column: 12
+                                }
+                              },
+                              name: "y"
+                            },
+                            computed: false,
+                            optional: false
+                          },
+                          right: {
+                            type: "Literal",
+                            start: 170,
+                            end: 171,
+                            loc: {
+                              start: {
+                                line: 11,
+                                column: 15
+                              },
+                              end: {
+                                line: 11,
+                                column: 16
+                              }
+                            },
+                            value: 0,
+                            raw: "0"
+                          }
+                        }
+                      },
+                      {
+                        type: "ExpressionStatement",
+                        start: 178,
+                        end: 188,
+                        loc: {
+                          start: {
+                            line: 12,
+                            column: 6
+                          },
+                          end: {
+                            line: 12,
+                            column: 16
+                          }
+                        },
+                        expression: {
+                          type: "AssignmentExpression",
+                          start: 178,
+                          end: 188,
+                          loc: {
+                            start: {
+                              line: 12,
+                              column: 6
+                            },
+                            end: {
+                              line: 12,
+                              column: 16
+                            }
+                          },
+                          operator: "=",
+                          left: {
+                            type: "MemberExpression",
+                            start: 178,
+                            end: 184,
+                            loc: {
+                              start: {
+                                line: 12,
+                                column: 6
+                              },
+                              end: {
+                                line: 12,
+                                column: 12
+                              }
+                            },
+                            object: {
+                              type: "ThisExpression",
+                              start: 178,
+                              end: 182,
+                              loc: {
+                                start: {
+                                  line: 12,
+                                  column: 6
+                                },
+                                end: {
+                                  line: 12,
+                                  column: 10
+                                }
+                              }
+                            },
+                            property: {
+                              type: "Identifier",
+                              start: 183,
+                              end: 184,
+                              loc: {
+                                start: {
+                                  line: 12,
+                                  column: 11
+                                },
+                                end: {
+                                  line: 12,
+                                  column: 12
+                                }
+                              },
+                              name: "z"
+                            },
+                            computed: false,
+                            optional: false
+                          },
+                          right: {
+                            type: "Literal",
+                            start: 187,
+                            end: 188,
+                            loc: {
+                              start: {
+                                line: 12,
+                                column: 15
+                              },
+                              end: {
+                                line: 12,
+                                column: 16
+                              }
+                            },
+                            value: 0,
+                            raw: "0"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                finalizer: null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+},  {ecmaVersion: 13, locations: true})
+
+test(`class C {
+  static y
+  static #z
+  static {
+    const obj = {}
+    this.y = obj.y
+    this.#z = obj.z
+  }
+}`, {
+  type: "Program",
+  start: 0,
+  end: 107,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 9,
+      column: 1
+    }
+  },
+  body: [
+    {
+      type: "ClassDeclaration",
+      start: 0,
+      end: 107,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 9,
+          column: 1
+        }
+      },
+      id: {
+        type: "Identifier",
+        start: 6,
+        end: 7,
+        loc: {
+          start: {
+            line: 1,
+            column: 6
+          },
+          end: {
+            line: 1,
+            column: 7
+          }
+        },
+        name: "C"
+      },
+      superClass: null,
+      body: {
+        type: "ClassBody",
+        start: 8,
+        end: 107,
+        loc: {
+          start: {
+            line: 1,
+            column: 8
+          },
+          end: {
+            line: 9,
+            column: 1
+          }
+        },
+        body: [
+          {
+            type: "PropertyDefinition",
+            start: 12,
+            end: 20,
+            loc: {
+              start: {
+                line: 2,
+                column: 2
+              },
+              end: {
+                line: 2,
+                column: 10
+              }
+            },
+            static: true,
+            computed: false,
+            key: {
+              type: "Identifier",
+              start: 19,
+              end: 20,
+              loc: {
+                start: {
+                  line: 2,
+                  column: 9
+                },
+                end: {
+                  line: 2,
+                  column: 10
+                }
+              },
+              name: "y"
+            },
+            value: null
+          },
+          {
+            type: "PropertyDefinition",
+            start: 23,
+            end: 32,
+            loc: {
+              start: {
+                line: 3,
+                column: 2
+              },
+              end: {
+                line: 3,
+                column: 11
+              }
+            },
+            static: true,
+            computed: false,
+            key: {
+              type: "PrivateIdentifier",
+              start: 30,
+              end: 32,
+              loc: {
+                start: {
+                  line: 3,
+                  column: 9
+                },
+                end: {
+                  line: 3,
+                  column: 11
+                }
+              },
+              name: "z"
+            },
+            value: null
+          },
+          {
+            type: "StaticBlock",
+            start: 35,
+            end: 105,
+            loc: {
+              start: {
+                line: 4,
+                column: 2
+              },
+              end: {
+                line: 8,
+                column: 3
+              }
+            },
+            body: [
+              {
+                type: "VariableDeclaration",
+                start: 48,
+                end: 62,
+                loc: {
+                  start: {
+                    line: 5,
+                    column: 4
+                  },
+                  end: {
+                    line: 5,
+                    column: 18
+                  }
+                },
+                declarations: [
+                  {
+                    type: "VariableDeclarator",
+                    start: 54,
+                    end: 62,
+                    loc: {
+                      start: {
+                        line: 5,
+                        column: 10
+                      },
+                      end: {
+                        line: 5,
+                        column: 18
+                      }
+                    },
+                    id: {
+                      type: "Identifier",
+                      start: 54,
+                      end: 57,
+                      loc: {
+                        start: {
+                          line: 5,
+                          column: 10
+                        },
+                        end: {
+                          line: 5,
+                          column: 13
+                        }
+                      },
+                      name: "obj"
+                    },
+                    init: {
+                      type: "ObjectExpression",
+                      start: 60,
+                      end: 62,
+                      loc: {
+                        start: {
+                          line: 5,
+                          column: 16
+                        },
+                        end: {
+                          line: 5,
+                          column: 18
+                        }
+                      },
+                      properties: []
+                    }
+                  }
+                ],
+                kind: "const"
+              },
+              {
+                type: "ExpressionStatement",
+                start: 67,
+                end: 81,
+                loc: {
+                  start: {
+                    line: 6,
+                    column: 4
+                  },
+                  end: {
+                    line: 6,
+                    column: 18
+                  }
+                },
+                expression: {
+                  type: "AssignmentExpression",
+                  start: 67,
+                  end: 81,
+                  loc: {
+                    start: {
+                      line: 6,
+                      column: 4
+                    },
+                    end: {
+                      line: 6,
+                      column: 18
+                    }
+                  },
+                  operator: "=",
+                  left: {
+                    type: "MemberExpression",
+                    start: 67,
+                    end: 73,
+                    loc: {
+                      start: {
+                        line: 6,
+                        column: 4
+                      },
+                      end: {
+                        line: 6,
+                        column: 10
+                      }
+                    },
+                    object: {
+                      type: "ThisExpression",
+                      start: 67,
+                      end: 71,
+                      loc: {
+                        start: {
+                          line: 6,
+                          column: 4
+                        },
+                        end: {
+                          line: 6,
+                          column: 8
+                        }
+                      }
+                    },
+                    property: {
+                      type: "Identifier",
+                      start: 72,
+                      end: 73,
+                      loc: {
+                        start: {
+                          line: 6,
+                          column: 9
+                        },
+                        end: {
+                          line: 6,
+                          column: 10
+                        }
+                      },
+                      name: "y"
+                    },
+                    computed: false,
+                    optional: false
+                  },
+                  right: {
+                    type: "MemberExpression",
+                    start: 76,
+                    end: 81,
+                    loc: {
+                      start: {
+                        line: 6,
+                        column: 13
+                      },
+                      end: {
+                        line: 6,
+                        column: 18
+                      }
+                    },
+                    object: {
+                      type: "Identifier",
+                      start: 76,
+                      end: 79,
+                      loc: {
+                        start: {
+                          line: 6,
+                          column: 13
+                        },
+                        end: {
+                          line: 6,
+                          column: 16
+                        }
+                      },
+                      name: "obj"
+                    },
+                    property: {
+                      type: "Identifier",
+                      start: 80,
+                      end: 81,
+                      loc: {
+                        start: {
+                          line: 6,
+                          column: 17
+                        },
+                        end: {
+                          line: 6,
+                          column: 18
+                        }
+                      },
+                      name: "y"
+                    },
+                    computed: false,
+                    optional: false
+                  }
+                }
+              },
+              {
+                type: "ExpressionStatement",
+                start: 86,
+                end: 101,
+                loc: {
+                  start: {
+                    line: 7,
+                    column: 4
+                  },
+                  end: {
+                    line: 7,
+                    column: 19
+                  }
+                },
+                expression: {
+                  type: "AssignmentExpression",
+                  start: 86,
+                  end: 101,
+                  loc: {
+                    start: {
+                      line: 7,
+                      column: 4
+                    },
+                    end: {
+                      line: 7,
+                      column: 19
+                    }
+                  },
+                  operator: "=",
+                  left: {
+                    type: "MemberExpression",
+                    start: 86,
+                    end: 93,
+                    loc: {
+                      start: {
+                        line: 7,
+                        column: 4
+                      },
+                      end: {
+                        line: 7,
+                        column: 11
+                      }
+                    },
+                    object: {
+                      type: "ThisExpression",
+                      start: 86,
+                      end: 90,
+                      loc: {
+                        start: {
+                          line: 7,
+                          column: 4
+                        },
+                        end: {
+                          line: 7,
+                          column: 8
+                        }
+                      }
+                    },
+                    property: {
+                      type: "PrivateIdentifier",
+                      start: 91,
+                      end: 93,
+                      loc: {
+                        start: {
+                          line: 7,
+                          column: 9
+                        },
+                        end: {
+                          line: 7,
+                          column: 11
+                        }
+                      },
+                      name: "z"
+                    },
+                    computed: false,
+                    optional: false
+                  },
+                  right: {
+                    type: "MemberExpression",
+                    start: 96,
+                    end: 101,
+                    loc: {
+                      start: {
+                        line: 7,
+                        column: 14
+                      },
+                      end: {
+                        line: 7,
+                        column: 19
+                      }
+                    },
+                    object: {
+                      type: "Identifier",
+                      start: 96,
+                      end: 99,
+                      loc: {
+                        start: {
+                          line: 7,
+                          column: 14
+                        },
+                        end: {
+                          line: 7,
+                          column: 17
+                        }
+                      },
+                      name: "obj"
+                    },
+                    property: {
+                      type: "Identifier",
+                      start: 100,
+                      end: 101,
+                      loc: {
+                        start: {
+                          line: 7,
+                          column: 18
+                        },
+                        end: {
+                          line: 7,
+                          column: 19
+                        }
+                      },
+                      name: "z"
+                    },
+                    computed: false,
+                    optional: false
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+}, {ecmaVersion: 13, locations: true})
+
+test(`let zRead
+class C {
+  static #z
+  static {
+    zRead = () => this.#z
+  }
+}`, {
+  type: "Program",
+  start: 0,
+  end: 74,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 7,
+      column: 1
+    }
+  },
+  body: [
+    {
+      type: "VariableDeclaration",
+      start: 0,
+      end: 9,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 9
+        }
+      },
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          start: 4,
+          end: 9,
+          loc: {
+            start: {
+              line: 1,
+              column: 4
+            },
+            end: {
+              line: 1,
+              column: 9
+            }
+          },
+          id: {
+            type: "Identifier",
+            start: 4,
+            end: 9,
+            loc: {
+              start: {
+                line: 1,
+                column: 4
+              },
+              end: {
+                line: 1,
+                column: 9
+              }
+            },
+            name: "zRead"
+          },
+          init: null
+        }
+      ],
+      kind: "let"
+    },
+    {
+      type: "ClassDeclaration",
+      start: 10,
+      end: 74,
+      loc: {
+        start: {
+          line: 2,
+          column: 0
+        },
+        end: {
+          line: 7,
+          column: 1
+        }
+      },
+      id: {
+        type: "Identifier",
+        start: 16,
+        end: 17,
+        loc: {
+          start: {
+            line: 2,
+            column: 6
+          },
+          end: {
+            line: 2,
+            column: 7
+          }
+        },
+        name: "C"
+      },
+      superClass: null,
+      body: {
+        type: "ClassBody",
+        start: 18,
+        end: 74,
+        loc: {
+          start: {
+            line: 2,
+            column: 8
+          },
+          end: {
+            line: 7,
+            column: 1
+          }
+        },
+        body: [
+          {
+            type: "PropertyDefinition",
+            start: 22,
+            end: 31,
+            loc: {
+              start: {
+                line: 3,
+                column: 2
+              },
+              end: {
+                line: 3,
+                column: 11
+              }
+            },
+            static: true,
+            computed: false,
+            key: {
+              type: "PrivateIdentifier",
+              start: 29,
+              end: 31,
+              loc: {
+                start: {
+                  line: 3,
+                  column: 9
+                },
+                end: {
+                  line: 3,
+                  column: 11
+                }
+              },
+              name: "z"
+            },
+            value: null
+          },
+          {
+            type: "StaticBlock",
+            start: 34,
+            end: 72,
+            loc: {
+              start: {
+                line: 4,
+                column: 2
+              },
+              end: {
+                line: 6,
+                column: 3
+              }
+            },
+            body: [
+              {
+                type: "ExpressionStatement",
+                start: 47,
+                end: 68,
+                loc: {
+                  start: {
+                    line: 5,
+                    column: 4
+                  },
+                  end: {
+                    line: 5,
+                    column: 25
+                  }
+                },
+                expression: {
+                  type: "AssignmentExpression",
+                  start: 47,
+                  end: 68,
+                  loc: {
+                    start: {
+                      line: 5,
+                      column: 4
+                    },
+                    end: {
+                      line: 5,
+                      column: 25
+                    }
+                  },
+                  operator: "=",
+                  left: {
+                    type: "Identifier",
+                    start: 47,
+                    end: 52,
+                    loc: {
+                      start: {
+                        line: 5,
+                        column: 4
+                      },
+                      end: {
+                        line: 5,
+                        column: 9
+                      }
+                    },
+                    name: "zRead"
+                  },
+                  right: {
+                    type: "ArrowFunctionExpression",
+                    start: 55,
+                    end: 68,
+                    loc: {
+                      start: {
+                        line: 5,
+                        column: 12
+                      },
+                      end: {
+                        line: 5,
+                        column: 25
+                      }
+                    },
+                    id: null,
+                    expression: true,
+                    generator: false,
+                    async: false,
+                    params: [],
+                    body: {
+                      type: "MemberExpression",
+                      start: 61,
+                      end: 68,
+                      loc: {
+                        start: {
+                          line: 5,
+                          column: 18
+                        },
+                        end: {
+                          line: 5,
+                          column: 25
+                        }
+                      },
+                      object: {
+                        type: "ThisExpression",
+                        start: 61,
+                        end: 65,
+                        loc: {
+                          start: {
+                            line: 5,
+                            column: 18
+                          },
+                          end: {
+                            line: 5,
+                            column: 22
+                          }
+                        }
+                      },
+                      property: {
+                        type: "PrivateIdentifier",
+                        start: 66,
+                        end: 68,
+                        loc: {
+                          start: {
+                            line: 5,
+                            column: 23
+                          },
+                          end: {
+                            line: 5,
+                            column: 25
+                          }
+                        },
+                        name: "z"
+                      },
+                      computed: false,
+                      optional: false
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}, {ecmaVersion: 13, locations: true})
+
+test(`let zRead
+class C {
+  static #z
+  static {
+    zRead = (obj) => obj.#z
+  }
+}
+zRead(new C())`, {
+  type: "Program",
+  start: 0,
+  end: 91,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 8,
+      column: 14
+    }
+  },
+  body: [
+    {
+      type: "VariableDeclaration",
+      start: 0,
+      end: 9,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 9
+        }
+      },
+      declarations: [
+        {
+          type: "VariableDeclarator",
+          start: 4,
+          end: 9,
+          loc: {
+            start: {
+              line: 1,
+              column: 4
+            },
+            end: {
+              line: 1,
+              column: 9
+            }
+          },
+          id: {
+            type: "Identifier",
+            start: 4,
+            end: 9,
+            loc: {
+              start: {
+                line: 1,
+                column: 4
+              },
+              end: {
+                line: 1,
+                column: 9
+              }
+            },
+            name: "zRead"
+          },
+          init: null
+        }
+      ],
+      kind: "let"
+    },
+    {
+      type: "ClassDeclaration",
+      start: 10,
+      end: 76,
+      loc: {
+        start: {
+          line: 2,
+          column: 0
+        },
+        end: {
+          line: 7,
+          column: 1
+        }
+      },
+      id: {
+        type: "Identifier",
+        start: 16,
+        end: 17,
+        loc: {
+          start: {
+            line: 2,
+            column: 6
+          },
+          end: {
+            line: 2,
+            column: 7
+          }
+        },
+        name: "C"
+      },
+      superClass: null,
+      body: {
+        type: "ClassBody",
+        start: 18,
+        end: 76,
+        loc: {
+          start: {
+            line: 2,
+            column: 8
+          },
+          end: {
+            line: 7,
+            column: 1
+          }
+        },
+        body: [
+          {
+            type: "PropertyDefinition",
+            start: 22,
+            end: 31,
+            loc: {
+              start: {
+                line: 3,
+                column: 2
+              },
+              end: {
+                line: 3,
+                column: 11
+              }
+            },
+            static: true,
+            computed: false,
+            key: {
+              type: "PrivateIdentifier",
+              start: 29,
+              end: 31,
+              loc: {
+                start: {
+                  line: 3,
+                  column: 9
+                },
+                end: {
+                  line: 3,
+                  column: 11
+                }
+              },
+              name: "z"
+            },
+            value: null
+          },
+          {
+            type: "StaticBlock",
+            start: 34,
+            end: 74,
+            loc: {
+              start: {
+                line: 4,
+                column: 2
+              },
+              end: {
+                line: 6,
+                column: 3
+              }
+            },
+            body: [
+              {
+                type: "ExpressionStatement",
+                start: 47,
+                end: 70,
+                loc: {
+                  start: {
+                    line: 5,
+                    column: 4
+                  },
+                  end: {
+                    line: 5,
+                    column: 27
+                  }
+                },
+                expression: {
+                  type: "AssignmentExpression",
+                  start: 47,
+                  end: 70,
+                  loc: {
+                    start: {
+                      line: 5,
+                      column: 4
+                    },
+                    end: {
+                      line: 5,
+                      column: 27
+                    }
+                  },
+                  operator: "=",
+                  left: {
+                    type: "Identifier",
+                    start: 47,
+                    end: 52,
+                    loc: {
+                      start: {
+                        line: 5,
+                        column: 4
+                      },
+                      end: {
+                        line: 5,
+                        column: 9
+                      }
+                    },
+                    name: "zRead"
+                  },
+                  right: {
+                    type: "ArrowFunctionExpression",
+                    start: 55,
+                    end: 70,
+                    loc: {
+                      start: {
+                        line: 5,
+                        column: 12
+                      },
+                      end: {
+                        line: 5,
+                        column: 27
+                      }
+                    },
+                    id: null,
+                    expression: true,
+                    generator: false,
+                    async: false,
+                    params: [
+                      {
+                        type: "Identifier",
+                        start: 56,
+                        end: 59,
+                        loc: {
+                          start: {
+                            line: 5,
+                            column: 13
+                          },
+                          end: {
+                            line: 5,
+                            column: 16
+                          }
+                        },
+                        name: "obj"
+                      }
+                    ],
+                    body: {
+                      type: "MemberExpression",
+                      start: 64,
+                      end: 70,
+                      loc: {
+                        start: {
+                          line: 5,
+                          column: 21
+                        },
+                        end: {
+                          line: 5,
+                          column: 27
+                        }
+                      },
+                      object: {
+                        type: "Identifier",
+                        start: 64,
+                        end: 67,
+                        loc: {
+                          start: {
+                            line: 5,
+                            column: 21
+                          },
+                          end: {
+                            line: 5,
+                            column: 24
+                          }
+                        },
+                        name: "obj"
+                      },
+                      property: {
+                        type: "PrivateIdentifier",
+                        start: 68,
+                        end: 70,
+                        loc: {
+                          start: {
+                            line: 5,
+                            column: 25
+                          },
+                          end: {
+                            line: 5,
+                            column: 27
+                          }
+                        },
+                        name: "z"
+                      },
+                      computed: false,
+                      optional: false
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      type: "ExpressionStatement",
+      start: 77,
+      end: 91,
+      loc: {
+        start: {
+          line: 8,
+          column: 0
+        },
+        end: {
+          line: 8,
+          column: 14
+        }
+      },
+      expression: {
+        type: "CallExpression",
+        start: 77,
+        end: 91,
+        loc: {
+          start: {
+            line: 8,
+            column: 0
+          },
+          end: {
+            line: 8,
+            column: 14
+          }
+        },
+        callee: {
+          type: "Identifier",
+          start: 77,
+          end: 82,
+          loc: {
+            start: {
+              line: 8,
+              column: 0
+            },
+            end: {
+              line: 8,
+              column: 5
+            }
+          },
+          name: "zRead"
+        },
+        arguments: [
+          {
+            type: "NewExpression",
+            start: 83,
+            end: 90,
+            loc: {
+              start: {
+                line: 8,
+                column: 6
+              },
+              end: {
+                line: 8,
+                column: 13
+              }
+            },
+            callee: {
+              type: "Identifier",
+              start: 87,
+              end: 88,
+              loc: {
+                start: {
+                  line: 8,
+                  column: 10
+                },
+                end: {
+                  line: 8,
+                  column: 11
+                }
+              },
+              name: "C"
+            },
+            arguments: []
+          }
+        ],
+        optional: false
+      }
+    }
+  ]
+},  {ecmaVersion: 13, locations: true})
+
+testFail(`class C {
+  static #z
+  static {
+    this.#y = {}
+  }
+}`, "Private field '#y' must be declared in an enclosing class (4:9)", {ecmaVersion: 13})
+
+testFail(`let zRead
+class C {
+  static #z
+  static {
+    zRead = () => this.#y
+  }
+}` ,"Private field '#y' must be declared in an enclosing class (5:23)", {ecmaVersion: 13})

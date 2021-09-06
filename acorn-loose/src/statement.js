@@ -307,16 +307,21 @@ lp.parseClassElement = function() {
   let isGenerator = false
   let isAsync = false
   let kind = "method"
+  let isStatic = false
 
-  // Parse modifiers
-  node.static = false
   if (this.eatContextual("static")) {
+    // Parse static init block
+    if (ecmaVersion >= 13 && this.eat(tt.braceL)) {
+      this.parseClassStaticBlock(node)
+      return node
+    }
     if (this.isClassElementNameStart() || this.toks.type === tt.star) {
-      node.static = true
+      isStatic = true
     } else {
       keyName = "static"
     }
   }
+  node.static = isStatic
   if (!keyName && ecmaVersion >= 8 && this.eatContextual("async")) {
     if ((this.isClassElementNameStart() || this.toks.type === tt.star) && !this.canInsertSemicolon()) {
       isAsync = true
@@ -394,6 +399,18 @@ lp.parseClassElement = function() {
   }
 
   return node
+}
+
+lp.parseClassStaticBlock = function(node) {
+  let blockIndent = this.curIndent, line = this.curLineStart
+  node.body = []
+  this.pushCx()
+  while (!this.closes(tt.braceR, blockIndent, line, true))
+    node.body.push(this.parseStatement())
+  this.popCx()
+  this.eat(tt.braceR)
+
+  return this.finishNode(node, "StaticBlock")
 }
 
 lp.isClassElementNameStart = function() {
