@@ -1,3 +1,9 @@
+## 8.2.1 (2021-09-06)
+
+### Bug fixes
+
+Depend on the proper version of acorn.
+
 ## 8.2.0 (2021-09-06)
 
 ### New features
