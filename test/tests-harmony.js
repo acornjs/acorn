@@ -13089,7 +13089,7 @@ testFail("[v] += ary", "Assigning to rvalue (1:0)", {ecmaVersion: 6});
 
 testFail("[2] = 42", "Assigning to rvalue (1:1)", {ecmaVersion: 6});
 
-testFail("({ obj:20 }) = 42", "Parenthesized pattern (1:0)", {ecmaVersion: 6});
+testFail("({ obj:20 }) = 42", "Assigning to rvalue (1:0)", {ecmaVersion: 6});
 
 testFail("( { get x() {} } = 0)", "Object pattern can't contain getter or setter (1:8)", {ecmaVersion: 6});
 
@@ -16158,7 +16158,7 @@ testFail("'use strict'; bar: function x() {}", "Unexpected token (1:19)", {ecmaV
 testFail("'use strict'; bar: function* x() {}", "Unexpected token (1:19)", {ecmaVersion: 6})
 testFail("bar: function* x() {}", "Unexpected token (1:13)", {ecmaVersion: 6})
 
-testFail("({x, y}) = {}", "Parenthesized pattern (1:0)", {ecmaVersion: 6})
+testFail("({x, y}) = {}", "Assigning to rvalue (1:0)", {ecmaVersion: 6})
 
 test("[x, (y), {z, u: (v)}] = foo", {}, {ecmaVersion: 6})
 
