@@ -27174,7 +27174,7 @@ testFail("func() = 4",
          "Assigning to rvalue (1:0)");
 
 testFail("(1 + 1) = 10",
-         "Parenthesized pattern (1:0)");
+         "Assigning to rvalue (1:0)");
 
 testFail("1++",
          "Assigning to rvalue (1:0)");
@@ -27189,7 +27189,7 @@ testFail("--1",
          "Assigning to rvalue (1:2)");
 
 testFail("for((1 + 1) in list) process(x);",
-         "Parenthesized pattern (1:4)");
+         "Assigning to rvalue (1:4)");
 
 testFail("[",
          "Unexpected token (1:1)");
@@ -29437,7 +29437,7 @@ testFail("for (x \\u006ff y) {}", "Unexpected token (1:7)", {ecmaVersion: 6})
 testFail("function x () { new.ta\\u0072get }", "'new.target' must not contain escaped characters (1:16)", {ecmaVersion: 6})
 testFail("class X { st\\u0061tic y() {} }", "Unexpected token (1:22)", {ecmaVersion: 6})
 
-testFail("(x=1)=2", "Parenthesized pattern (1:0)")
+testFail("(x=1)=2", "Assigning to rvalue (1:0)")
 testFail("(x=1)=2", "Assigning to rvalue (1:1)", {ecmaVersion: 6})
 
 test("(foo = [])[0] = 4;", {})

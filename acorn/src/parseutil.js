@@ -127,7 +127,7 @@ pp.checkPatternErrors = function(refDestructuringErrors, isAssign) {
   if (refDestructuringErrors.trailingComma > -1)
     this.raiseRecoverable(refDestructuringErrors.trailingComma, "Comma is not permitted after the rest element")
   let parens = isAssign ? refDestructuringErrors.parenthesizedAssign : refDestructuringErrors.parenthesizedBind
-  if (parens > -1) this.raiseRecoverable(parens, "Parenthesized pattern")
+  if (parens > -1) this.raiseRecoverable(parens, isAssign ? "Assigning to rvalue" : "Parenthesized pattern")
 }
 
 pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {

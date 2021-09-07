@@ -813,6 +813,119 @@ test("({a:b,...obj}) => {}", {
   "sourceType": "script"
 }, { ecmaVersion: 9 })
 
+test("({...(obj)} = foo)", {
+  type: "Program",
+  start: 0,
+  end: 18,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 1,
+      column: 18
+    }
+  },
+  body: [
+    {
+      type: "ExpressionStatement",
+      start: 0,
+      end: 18,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 1,
+          column: 18
+        }
+      },
+      expression: {
+        type: "AssignmentExpression",
+        start: 1,
+        end: 17,
+        loc: {
+          start: {
+            line: 1,
+            column: 1
+          },
+          end: {
+            line: 1,
+            column: 17
+          }
+        },
+        operator: "=",
+        left: {
+          type: "ObjectPattern",
+          start: 1,
+          end: 11,
+          loc: {
+            start: {
+              line: 1,
+              column: 1
+            },
+            end: {
+              line: 1,
+              column: 11
+            }
+          },
+          properties: [
+            {
+              type: "RestElement",
+              start: 2,
+              end: 10,
+              loc: {
+                start: {
+                  line: 1,
+                  column: 2
+                },
+                end: {
+                  line: 1,
+                  column: 10
+                }
+              },
+              argument: {
+                type: "Identifier",
+                start: 6,
+                end: 9,
+                loc: {
+                  start: {
+                    line: 1,
+                    column: 6
+                  },
+                  end: {
+                    line: 1,
+                    column: 9
+                  }
+                },
+                name: "obj"
+              }
+            }
+          ]
+        },
+        right: {
+          type: "Identifier",
+          start: 14,
+          end: 17,
+          loc: {
+            start: {
+              line: 1,
+              column: 14
+            },
+            end: {
+              line: 1,
+              column: 17
+            }
+          },
+          name: "foo"
+        }
+      }
+    }
+  ],
+}, { ecmaVersion: 9, locations: true })
+
 testFail("let {...obj1,} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 9 })
 testFail("let {...obj1,a} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 9 })
 testFail("let {...obj1,...obj2} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 9 })
@@ -823,8 +936,7 @@ testFail("let {...[a,b]} = foo", "Unexpected token (1:8)", { ecmaVersion: 9 })
 testFail("({...obj1,} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 9 })
 testFail("({...obj1,a} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 9 })
 testFail("({...obj1,...obj2} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 9 })
-testFail("({...(obj)} = foo)", "Parenthesized pattern (1:5)", { ecmaVersion: 9 })
-testFail("({...(a,b)} = foo)", "Parenthesized pattern (1:5)", { ecmaVersion: 9 })
+testFail("({...(a,b)} = foo)", "Assigning to rvalue (1:5)", { ecmaVersion: 9 })
 testFail("({...{a,b}} = foo)", "Unexpected token (1:5)", { ecmaVersion: 9 })
 testFail("({...[a,b]} = foo)", "Unexpected token (1:5)", { ecmaVersion: 9 })
 testFail("({...obj} = foo)", "Unexpected token (1:2)", { ecmaVersion: 8 })

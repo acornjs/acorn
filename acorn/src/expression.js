@@ -750,15 +750,6 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
       }
       return this.finishNode(prop, "RestElement")
     }
-    // To disallow parenthesized identifier via `this.toAssignable()`.
-    if (this.type === tt.parenL && refDestructuringErrors) {
-      if (refDestructuringErrors.parenthesizedAssign < 0) {
-        refDestructuringErrors.parenthesizedAssign = this.start
-      }
-      if (refDestructuringErrors.parenthesizedBind < 0) {
-        refDestructuringErrors.parenthesizedBind = this.start
-      }
-    }
     // Parse argument.
     prop.argument = this.parseMaybeAssign(false, refDestructuringErrors)
     // To disallow trailing comma via `this.toAssignable()`.
