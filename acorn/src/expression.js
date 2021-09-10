@@ -215,6 +215,7 @@ pp.parseExprOp = function(left, leftStartPos, leftStartLoc, minPrec, forInit) {
 }
 
 pp.buildBinary = function(startPos, startLoc, left, right, op, logical) {
+  if (right.type === "PrivateIdentifier") this.raise(right.start, "Private identifier can only be left side of binary expression")
   let node = this.startNodeAt(startPos, startLoc)
   node.left = left
   node.operator = op
@@ -244,6 +245,11 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec, forInit)
       this.raiseRecoverable(node.start, "Private fields can not be deleted")
     else sawUnary = true
     expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
+  } else if (!sawUnary && this.type === tt.privateId) {
+    if (forInit || this.privateNameStack.length === 0) this.unexpected()
+    expr = this.parsePrivateIdent()
+    // only could be private fields in 'in', such as #x in obj
+    if (this.type !== tt._in) this.unexpected()
   } else {
     expr = this.parseExprSubscripts(refDestructuringErrors, forInit)
     if (this.checkExpressionErrors(refDestructuringErrors)) return expr

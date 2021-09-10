@@ -6,7 +6,6 @@ const parse = require("../acorn").parse
 const unsupportedFeatures = [
   "regexp-match-indices",
   "arbitrary-module-namespace-names",
-  "class-fields-private-in",
   "import-assertions"
 ];
 

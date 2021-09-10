@@ -3826,7 +3826,7 @@ testFail("class C { #aaa; f() { delete obj?.p.#aaa } }", "Private fields can not
 // unexpected token
 testFail("const obj = #aaa", "Unexpected token (1:12)", {ecmaVersion: 13})
 testFail("const obj = { #aaa }", "Unexpected token (1:14)", {ecmaVersion: 13})
-testFail("class C { #aaa; f() { #aaa } }", "Unexpected token (1:22)", {ecmaVersion: 13})
+testFail("class C { #aaa; f() { #aaa } }", "Unexpected token (1:27)", {ecmaVersion: 13})
 testFail("class C { #aaa; f() { return { #aaa: 1 } } }", "Unexpected token (1:31)", {ecmaVersion: 13})
 
 // existence check
@@ -5835,3 +5835,559 @@ class C {
     zRead = () => this.#y
   }
 }` ,"Private field '#y' must be declared in an enclosing class (5:23)", {ecmaVersion: 13})
+
+// Class fields private in
+
+test(`class C {
+  #brand;
+
+  #method() {}
+
+  get #getter() {}
+
+  static isC(obj) {
+    return #brand in obj && #method in obj && #getter in obj;
+  }
+}`, {
+  type: "Program",
+  start: 0,
+  end: 144,
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 11,
+      column: 1
+    }
+  },
+  body: [
+    {
+      type: "ClassDeclaration",
+      start: 0,
+      end: 144,
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 11,
+          column: 1
+        }
+      },
+      id: {
+        type: "Identifier",
+        start: 6,
+        end: 7,
+        loc: {
+          start: {
+            line: 1,
+            column: 6
+          },
+          end: {
+            line: 1,
+            column: 7
+          }
+        },
+        name: "C"
+      },
+      superClass: null,
+      body: {
+        type: "ClassBody",
+        start: 8,
+        end: 144,
+        loc: {
+          start: {
+            line: 1,
+            column: 8
+          },
+          end: {
+            line: 11,
+            column: 1
+          }
+        },
+        body: [
+          {
+            type: "PropertyDefinition",
+            start: 12,
+            end: 19,
+            loc: {
+              start: {
+                line: 2,
+                column: 2
+              },
+              end: {
+                line: 2,
+                column: 9
+              }
+            },
+            static: false,
+            computed: false,
+            key: {
+              type: "PrivateIdentifier",
+              start: 12,
+              end: 18,
+              loc: {
+                start: {
+                  line: 2,
+                  column: 2
+                },
+                end: {
+                  line: 2,
+                  column: 8
+                }
+              },
+              name: "brand"
+            },
+            value: null
+          },
+          {
+            type: "MethodDefinition",
+            start: 23,
+            end: 35,
+            loc: {
+              start: {
+                line: 4,
+                column: 2
+              },
+              end: {
+                line: 4,
+                column: 14
+              }
+            },
+            static: false,
+            computed: false,
+            key: {
+              type: "PrivateIdentifier",
+              start: 23,
+              end: 30,
+              loc: {
+                start: {
+                  line: 4,
+                  column: 2
+                },
+                end: {
+                  line: 4,
+                  column: 9
+                }
+              },
+              name: "method"
+            },
+            kind: "method",
+            value: {
+              type: "FunctionExpression",
+              start: 30,
+              end: 35,
+              loc: {
+                start: {
+                  line: 4,
+                  column: 9
+                },
+                end: {
+                  line: 4,
+                  column: 14
+                }
+              },
+              id: null,
+              expression: false,
+              generator: false,
+              async: false,
+              params: [],
+              body: {
+                type: "BlockStatement",
+                start: 33,
+                end: 35,
+                loc: {
+                  start: {
+                    line: 4,
+                    column: 12
+                  },
+                  end: {
+                    line: 4,
+                    column: 14
+                  }
+                },
+                body: []
+              }
+            }
+          },
+          {
+            type: "MethodDefinition",
+            start: 39,
+            end: 55,
+            loc: {
+              start: {
+                line: 6,
+                column: 2
+              },
+              end: {
+                line: 6,
+                column: 18
+              }
+            },
+            static: false,
+            computed: false,
+            key: {
+              type: "PrivateIdentifier",
+              start: 43,
+              end: 50,
+              loc: {
+                start: {
+                  line: 6,
+                  column: 6
+                },
+                end: {
+                  line: 6,
+                  column: 13
+                }
+              },
+              name: "getter"
+            },
+            kind: "get",
+            value: {
+              type: "FunctionExpression",
+              start: 50,
+              end: 55,
+              loc: {
+                start: {
+                  line: 6,
+                  column: 13
+                },
+                end: {
+                  line: 6,
+                  column: 18
+                }
+              },
+              id: null,
+              expression: false,
+              generator: false,
+              async: false,
+              params: [],
+              body: {
+                type: "BlockStatement",
+                start: 53,
+                end: 55,
+                loc: {
+                  start: {
+                    line: 6,
+                    column: 16
+                  },
+                  end: {
+                    line: 6,
+                    column: 18
+                  }
+                },
+                body: []
+              }
+            }
+          },
+          {
+            type: "MethodDefinition",
+            start: 59,
+            end: 142,
+            loc: {
+              start: {
+                line: 8,
+                column: 2
+              },
+              end: {
+                line: 10,
+                column: 3
+              }
+            },
+            static: true,
+            computed: false,
+            key: {
+              type: "Identifier",
+              start: 66,
+              end: 69,
+              loc: {
+                start: {
+                  line: 8,
+                  column: 9
+                },
+                end: {
+                  line: 8,
+                  column: 12
+                }
+              },
+              name: "isC"
+            },
+            kind: "method",
+            value: {
+              type: "FunctionExpression",
+              start: 69,
+              end: 142,
+              loc: {
+                start: {
+                  line: 8,
+                  column: 12
+                },
+                end: {
+                  line: 10,
+                  column: 3
+                }
+              },
+              id: null,
+              expression: false,
+              generator: false,
+              async: false,
+              params: [
+                {
+                  type: "Identifier",
+                  start: 70,
+                  end: 73,
+                  loc: {
+                    start: {
+                      line: 8,
+                      column: 13
+                    },
+                    end: {
+                      line: 8,
+                      column: 16
+                    }
+                  },
+                  name: "obj"
+                }
+              ],
+              body: {
+                type: "BlockStatement",
+                start: 75,
+                end: 142,
+                loc: {
+                  start: {
+                    line: 8,
+                    column: 18
+                  },
+                  end: {
+                    line: 10,
+                    column: 3
+                  }
+                },
+                body: [
+                  {
+                    type: "ReturnStatement",
+                    start: 81,
+                    end: 138,
+                    loc: {
+                      start: {
+                        line: 9,
+                        column: 4
+                      },
+                      end: {
+                        line: 9,
+                        column: 61
+                      }
+                    },
+                    argument: {
+                      type: "LogicalExpression",
+                      start: 88,
+                      end: 137,
+                      loc: {
+                        start: {
+                          line: 9,
+                          column: 11
+                        },
+                        end: {
+                          line: 9,
+                          column: 60
+                        }
+                      },
+                      left: {
+                        type: "LogicalExpression",
+                        start: 88,
+                        end: 119,
+                        loc: {
+                          start: {
+                            line: 9,
+                            column: 11
+                          },
+                          end: {
+                            line: 9,
+                            column: 42
+                          }
+                        },
+                        left: {
+                          type: "BinaryExpression",
+                          start: 88,
+                          end: 101,
+                          loc: {
+                            start: {
+                              line: 9,
+                              column: 11
+                            },
+                            end: {
+                              line: 9,
+                              column: 24
+                            }
+                          },
+                          left: {
+                            type: "PrivateIdentifier",
+                            start: 88,
+                            end: 94,
+                            loc: {
+                              start: {
+                                line: 9,
+                                column: 11
+                              },
+                              end: {
+                                line: 9,
+                                column: 17
+                              }
+                            },
+                            name: "brand"
+                          },
+                          operator: "in",
+                          right: {
+                            type: "Identifier",
+                            start: 98,
+                            end: 101,
+                            loc: {
+                              start: {
+                                line: 9,
+                                column: 21
+                              },
+                              end: {
+                                line: 9,
+                                column: 24
+                              }
+                            },
+                            name: "obj"
+                          }
+                        },
+                        operator: "&&",
+                        right: {
+                          type: "BinaryExpression",
+                          start: 105,
+                          end: 119,
+                          loc: {
+                            start: {
+                              line: 9,
+                              column: 28
+                            },
+                            end: {
+                              line: 9,
+                              column: 42
+                            }
+                          },
+                          left: {
+                            type: "PrivateIdentifier",
+                            start: 105,
+                            end: 112,
+                            loc: {
+                              start: {
+                                line: 9,
+                                column: 28
+                              },
+                              end: {
+                                line: 9,
+                                column: 35
+                              }
+                            },
+                            name: "method"
+                          },
+                          operator: "in",
+                          right: {
+                            type: "Identifier",
+                            start: 116,
+                            end: 119,
+                            loc: {
+                              start: {
+                                line: 9,
+                                column: 39
+                              },
+                              end: {
+                                line: 9,
+                                column: 42
+                              }
+                            },
+                            name: "obj"
+                          }
+                        }
+                      },
+                      operator: "&&",
+                      right: {
+                        type: "BinaryExpression",
+                        start: 123,
+                        end: 137,
+                        loc: {
+                          start: {
+                            line: 9,
+                            column: 46
+                          },
+                          end: {
+                            line: 9,
+                            column: 60
+                          }
+                        },
+                        left: {
+                          type: "PrivateIdentifier",
+                          start: 123,
+                          end: 130,
+                          loc: {
+                            start: {
+                              line: 9,
+                              column: 46
+                            },
+                            end: {
+                              line: 9,
+                              column: 53
+                            }
+                          },
+                          name: "getter"
+                        },
+                        operator: "in",
+                        right: {
+                          type: "Identifier",
+                          start: 134,
+                          end: 137,
+                          loc: {
+                            start: {
+                              line: 9,
+                              column: 57
+                            },
+                            end: {
+                              line: 9,
+                              column: 60
+                            }
+                          },
+                          name: "obj"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+},{ ecmaVersion: 13, locations: true })
+
+testFail(`class C {
+  #brand;
+
+  static isC(obj) {
+    return #brand > obj;
+  }
+}`, 'Unexpected token (5:18)', { ecmaVersion: 13 })
+
+testFail(`class C {
+  #brand;
+
+  static isC(obj) {
+    return obj >>> #brand in obj;
+  }
+}`, 'Private identifier can only be left side of binary expression (5:19)', { ecmaVersion: 13 })
+
+testFail(`class C {
+  #brand;
+
+  static isC(obj) {
+    return #brand in #brand in obj;
+  }
+}`, 'Private identifier can only be left side of binary expression (5:21)', { ecmaVersion: 13 })
