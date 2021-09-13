@@ -131,6 +131,8 @@ lp.parseMaybeUnary = function(sawUnary) {
     this.next()
     node.argument = this.parseMaybeUnary(sawUnary)
     expr = this.finishNode(node, "SpreadElement")
+  } else if (!sawUnary && this.tok.type === tt.privateId) {
+    expr = this.parsePrivateIdent()
   } else {
     expr = this.parseExprSubscripts()
     while (this.tok.type.postfix && !this.canInsertSemicolon()) {
