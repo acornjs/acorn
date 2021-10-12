@@ -36,7 +36,7 @@ A new option, `allowSuperOutsideMethod`, can be used to suppress the error when 
 
 Default `allowAwaitOutsideFunction` to true for ECMAScript 2022 an higher.
 
-Add support for the `p` ([indices](https://github.com/tc39/proposal-regexp-match-indices)) regexp flag.
+Add support for the `d` ([indices](https://github.com/tc39/proposal-regexp-match-indices)) regexp flag.
 
 ## 8.2.4 (2021-05-04)
 
