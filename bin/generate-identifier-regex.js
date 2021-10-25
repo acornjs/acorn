@@ -3,7 +3,7 @@
 // Which Unicode version should be used?
 let pkg = require('../package.json')
 let dependencies = Object.keys(pkg.devDependencies)
-let unicodeVersion = dependencies.find((name) => /^unicode-\d/.test(name))
+let unicodeVersion = dependencies.find((name) => /^@unicode\/unicode-\d/.test(name))
 
 let start = require(unicodeVersion + '/Binary_Property/ID_Start/code-points.js').filter(ch => ch > 0x7f)
 let last = -1
