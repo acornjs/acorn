@@ -368,7 +368,6 @@ pp.getTokenFromCode = function(code) {
   // often referred to. `finishOp` simply skips the amount of
   // characters it is given as second argument, and returns a token
   // of the type given by its first argument.
-
   case 47: // '/'
     return this.readToken_slash()
 
@@ -683,8 +682,8 @@ pp.readInvalidTemplateToken = function() {
       if (this.input[this.pos + 1] !== "{") {
         break
       }
-    // falls through
 
+    // falls through
     case "`":
       return this.finishToken(tt.invalidTemplate, this.input.slice(this.start, this.pos))
 
