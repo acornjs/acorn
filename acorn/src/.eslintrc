@@ -21,6 +21,7 @@
         "no-var": "error",
         "object-curly-spacing": ["error", "never"],
         "one-var": "off",
+        "prefer-const": "off",
         "quotes": ["error", "double"],
         "semi-spacing": "off",
         "space-before-function-paren": ["error", "never"]
