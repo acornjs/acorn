@@ -4,7 +4,6 @@ const run = require("test262-parser-runner")
 const parse = require("../acorn").parse
 
 const unsupportedFeatures = [
-  "regexp-match-indices",
   "arbitrary-module-namespace-names",
   "import-assertions"
 ];
