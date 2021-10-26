@@ -98,8 +98,11 @@ export class Parser {
   }
 
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
+
   get inGenerator() { return (this.currentVarScope().flags & SCOPE_GENERATOR) > 0 && !this.currentVarScope().inClassFieldInit }
+
   get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 && !this.currentVarScope().inClassFieldInit }
+
   get canAwait() {
     for (let i = this.scopeStack.length - 1; i >= 0; i--) {
       let scope = this.scopeStack[i]
@@ -108,16 +111,21 @@ export class Parser {
     }
     return (this.inModule && this.options.ecmaVersion >= 13) || this.options.allowAwaitOutsideFunction
   }
+
   get allowSuper() {
     const {flags, inClassFieldInit} = this.currentThisScope()
     return (flags & SCOPE_SUPER) > 0 || inClassFieldInit || this.options.allowSuperOutsideMethod
   }
+
   get allowDirectSuper() { return (this.currentThisScope().flags & SCOPE_DIRECT_SUPER) > 0 }
+
   get treatFunctionsAsVar() { return this.treatFunctionsAsVarInScope(this.currentScope()) }
+
   get allowNewDotTarget() {
     const {flags, inClassFieldInit} = this.currentThisScope()
     return (flags & (SCOPE_FUNCTION | SCOPE_CLASS_STATIC_BLOCK)) > 0 || inClassFieldInit
   }
+
   get inClassStaticBlock() {
     return (this.currentVarScope().flags & SCOPE_CLASS_STATIC_BLOCK) > 0
   }
