@@ -6,8 +6,7 @@ jobs:
     name: Build and test
     steps:
       - uses: actions/checkout@v2
-      - uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+      - uses: actions/setup-node@v2
+      - run: npm install
       - run: npm test
       - run: npm run test:test262
