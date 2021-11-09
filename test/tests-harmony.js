@@ -14847,6 +14847,7 @@ testFail("class A { set prop(x, y) {} }", "setter should have exactly one param 
 
 testFail("({ __proto__: 1, __proto__: 2 })", "Redefinition of __proto__ property (1:17)", {ecmaVersion: 6});
 testFail("({ '__proto__': 1, __proto__: 2 })", "Redefinition of __proto__ property (1:19)", {ecmaVersion: 6});
+testFail("({ '__proto__': 1, __proto__: 2, a: x = 1 })", "Redefinition of __proto__ property (1:19)", {ecmaVersion: 6});
 test("({ ['__proto__']: 1, __proto__: 2 })", {}, {ecmaVersion: 6});
 test("({ __proto__() { return 1 }, __proto__: 2 })", {}, {ecmaVersion: 6});
 test("({ get __proto__() { return 1 }, __proto__: 2 })", {}, {ecmaVersion: 6});

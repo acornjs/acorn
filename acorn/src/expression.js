@@ -116,10 +116,11 @@ pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) 
     else this.exprAllowed = false
   }
 
-  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1
+  let ownDestructuringErrors = false, oldParenAssign = -1, oldTrailingComma = -1, oldDoubleProto = -1
   if (refDestructuringErrors) {
     oldParenAssign = refDestructuringErrors.parenthesizedAssign
     oldTrailingComma = refDestructuringErrors.trailingComma
+    oldDoubleProto = refDestructuringErrors.doubleProto
     refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = -1
   } else {
     refDestructuringErrors = new DestructuringErrors
@@ -150,6 +151,7 @@ pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) 
     node.left = left
     this.next()
     node.right = this.parseMaybeAssign(forInit)
+    if (oldDoubleProto > -1) refDestructuringErrors.doubleProto = oldDoubleProto
     return this.finishNode(node, "AssignmentExpression")
   } else {
     if (ownDestructuringErrors) this.checkExpressionErrors(refDestructuringErrors, true)
