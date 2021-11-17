@@ -638,7 +638,7 @@ pp.parseParenItem = function(item) {
 }
 
 pp.parseParenArrowList = function(startPos, startLoc, exprList, forInit) {
-  return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, forInit)
+  return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, false, forInit)
 }
 
 // New's precedence is slightly tricky. It must allow its argument to
