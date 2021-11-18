@@ -1,3 +1,13 @@
+## 8.6.0 (2021-11-18)
+
+### Bug fixes
+
+Fix a bug where an object literal with multiple `__proto__` properties would incorrectly be accepted if a later property value held an assigment.
+
+### New features
+
+Support class private fields with the `in` operator.
+
 ## 8.5.0 (2021-09-06)
 
 ### Bug fixes
