@@ -39,9 +39,9 @@
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.1",
-    "rollup": "^2.58.3",
-    "test262": "git+https://github.com/tc39/test262.git#ba82d46238bd16c3e31b93d21d2846c81a9ccf7a",
+    "eslint-plugin-promise": "^5.2.0",
+    "rollup": "^2.60.2",
+    "test262": "git+https://github.com/tc39/test262.git#1f16a6ad0edd10e774e336d8b331471b0c3bb360",
     "test262-parser-runner": "^0.5.0",
     "test262-stream": "^1.4.0"
   }
