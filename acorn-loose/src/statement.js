@@ -461,6 +461,7 @@ lp.parseExport = function() {
       }
     }
     node.source = this.eatContextual("from") ? this.parseExprAtom() : this.dummyString()
+    this.semicolon()
     return this.finishNode(node, "ExportAllDeclaration")
   }
   if (this.eat(tt._default)) {
