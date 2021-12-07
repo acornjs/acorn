@@ -3,7 +3,7 @@ import {types as tt, keywords as keywordTypes} from "./tokentype.js"
 import {Parser} from "./state.js"
 import {SourceLocation} from "./locutil.js"
 import {RegExpValidationState} from "./regexp.js"
-import {lineBreak, lineBreakG, isNewLine, nonASCIIwhitespace} from "./whitespace.js"
+import {lineBreak, nextLineBreak, isNewLine, nonASCIIwhitespace} from "./whitespace.js"
 
 // Object type used to represent tokens. Note that normally, tokens
 // simply exist as properties on the parser object. This is only
@@ -100,11 +100,9 @@ pp.skipBlockComment = function() {
   if (end === -1) this.raise(this.pos - 2, "Unterminated comment")
   this.pos = end + 2
   if (this.options.locations) {
-    lineBreakG.lastIndex = start
-    let match
-    while ((match = lineBreakG.exec(this.input)) && match.index < this.pos) {
+    for (let nextBreak, pos = start; (nextBreak = nextLineBreak(this.input, pos, this.pos)) > -1;) {
       ++this.curLine
-      this.lineStart = match.index + match[0].length
+      pos = this.lineStart = nextBreak
     }
   }
   if (this.options.onComment)

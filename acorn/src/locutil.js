@@ -1,4 +1,4 @@
-import {lineBreakG} from "./whitespace.js"
+import {nextLineBreak} from "./whitespace.js"
 
 // These are used when `options.locations` is on, for the
 // `startLoc` and `endLoc` properties.
@@ -30,13 +30,9 @@ export class SourceLocation {
 
 export function getLineInfo(input, offset) {
   for (let line = 1, cur = 0;;) {
-    lineBreakG.lastIndex = cur
-    let match = lineBreakG.exec(input)
-    if (match && match.index < offset) {
-      ++line
-      cur = match.index + match[0].length
-    } else {
-      return new Position(line, offset - cur)
-    }
+    let nextBreak = nextLineBreak(input, cur, offset)
+    if (nextBreak < 0) return new Position(line, offset - cur)
+    ++line
+    cur = nextBreak
   }
 }
