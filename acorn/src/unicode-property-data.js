@@ -50,10 +50,9 @@ function buildUnicodeData(ecmaVersion) {
   d.nonBinary.sc = d.nonBinary.Script
   d.nonBinary.scx = d.nonBinary.Script_Extensions
 }
-buildUnicodeData(9)
-buildUnicodeData(10)
-buildUnicodeData(11)
-buildUnicodeData(12)
-buildUnicodeData(13)
+
+for (const ecmaVersion of [9, 10, 11, 12, 13]) {
+  buildUnicodeData(ecmaVersion)
+}
 
 export default data
