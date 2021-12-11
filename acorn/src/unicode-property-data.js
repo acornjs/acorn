@@ -9,11 +9,13 @@ const ecma9BinaryProperties = "ASCII ASCII_Hex_Digit AHex Alphabetic Alpha Any A
 const ecma10BinaryProperties = ecma9BinaryProperties + " Extended_Pictographic"
 const ecma11BinaryProperties = ecma10BinaryProperties
 const ecma12BinaryProperties = ecma11BinaryProperties + " EBase EComp EMod EPres ExtPict"
+const ecma13BinaryProperties = ecma12BinaryProperties
 const unicodeBinaryProperties = {
   9: ecma9BinaryProperties,
   10: ecma10BinaryProperties,
   11: ecma11BinaryProperties,
-  12: ecma12BinaryProperties
+  12: ecma12BinaryProperties,
+  13: ecma13BinaryProperties
 }
 
 // #table-unicode-general-category-values
@@ -24,11 +26,13 @@ const ecma9ScriptValues = "Adlam Adlm Ahom Ahom Anatolian_Hieroglyphs Hluw Arabi
 const ecma10ScriptValues = ecma9ScriptValues + " Dogra Dogr Gunjala_Gondi Gong Hanifi_Rohingya Rohg Makasar Maka Medefaidrin Medf Old_Sogdian Sogo Sogdian Sogd"
 const ecma11ScriptValues = ecma10ScriptValues + " Elymaic Elym Nandinagari Nand Nyiakeng_Puachue_Hmong Hmnp Wancho Wcho"
 const ecma12ScriptValues = ecma11ScriptValues + " Chorasmian Chrs Diak Dives_Akuru Khitan_Small_Script Kits Yezi Yezidi"
+const ecma13ScriptValues = ecma12ScriptValues + " Cypro_Minoan Cpmn Old_Uyghur Ougr Tangsa Tnsa Toto Vithkuqi Vith"
 const unicodeScriptValues = {
   9: ecma9ScriptValues,
   10: ecma10ScriptValues,
   11: ecma11ScriptValues,
-  12: ecma12ScriptValues
+  12: ecma12ScriptValues,
+  13: ecma13ScriptValues
 }
 
 const data = {}
@@ -50,5 +54,6 @@ buildUnicodeData(9)
 buildUnicodeData(10)
 buildUnicodeData(11)
 buildUnicodeData(12)
+buildUnicodeData(13)
 
 export default data
