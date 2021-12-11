@@ -37,7 +37,7 @@ const unicodeScriptValues = {
 
 const data = {}
 function buildUnicodeData(ecmaVersion) {
-  let d = data[ecmaVersion] = {
+  const d = data[ecmaVersion] = {
     binary: wordsRegexp(unicodeBinaryProperties[ecmaVersion] + " " + unicodeGeneralCategoryValues),
     nonBinary: {
       General_Category: wordsRegexp(unicodeGeneralCategoryValues),
