@@ -2,7 +2,7 @@ import buble from "@rollup/plugin-buble"
 
 export default {
   external: ["acorn"],
-  input: "./acorn-loose/src/index.js",
+  input: "acorn-loose/src/index.js",
   output: [
     {
       file: "acorn-loose/dist/acorn-loose.js",
