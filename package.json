@@ -25,11 +25,10 @@
     "test": "node test/run.js && node test/lint.js",
     "pretest": "npm run build:main && npm run build:loose",
     "test:test262": "node bin/run_test262.js",
-    "build": "npm run build:main && npm run build:walk && npm run build:loose && npm run build:bin",
+    "build": "npm run build:main && npm run build:walk && npm run build:loose",
     "build:main": "rollup -c acorn/rollup.config.js",
     "build:walk": "rollup -c acorn-walk/rollup.config.js",
     "build:loose": "rollup -c acorn-loose/rollup.config.js",
-    "build:bin": "rollup -c acorn/rollup.config.bin.js",
     "lint": "eslint acorn/src/ acorn-walk/src/ acorn-loose/src/"
   },
   "devDependencies": {
