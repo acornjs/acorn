@@ -2,7 +2,7 @@ import {types as tt} from "./tokentype.js"
 import {Parser} from "./state.js"
 import {lineBreak, skipWhiteSpace} from "./whitespace.js"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier.js"
-import {has} from "./util.js"
+import {hasOwn} from "./util.js"
 import {DestructuringErrors} from "./parseutil.js"
 import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION, SCOPE_CLASS_STATIC_BLOCK, SCOPE_SUPER} from "./scopeflags.js"
 
@@ -788,7 +788,7 @@ pp.exitClassBody = function() {
   const parent = len === 0 ? null : this.privateNameStack[len - 1]
   for (let i = 0; i < used.length; ++i) {
     const id = used[i]
-    if (!has(declared, id.name)) {
+    if (!hasOwn(declared, id.name)) {
       if (parent) {
         parent.used.push(id)
       } else {
@@ -901,7 +901,7 @@ pp.parseExport = function(node, exports) {
 
 pp.checkExport = function(exports, name, pos) {
   if (!exports) return
-  if (has(exports, name))
+  if (hasOwn(exports, name))
     this.raiseRecoverable(pos, "Duplicate export '" + name + "'")
   exports[name] = true
 }
