@@ -1,6 +1,6 @@
 import {types as tt} from "./tokentype.js"
 import {Parser} from "./state.js"
-import {has} from "./util.js"
+import {hasOwn} from "./util.js"
 import {BIND_NONE, BIND_OUTSIDE, BIND_LEXICAL} from "./scopeflags.js"
 
 const pp = Parser.prototype
@@ -256,7 +256,7 @@ pp.checkLValSimple = function(expr, bindingType = BIND_NONE, checkClashes) {
       if (bindingType === BIND_LEXICAL && expr.name === "let")
         this.raiseRecoverable(expr.start, "let is disallowed as a lexically bound name")
       if (checkClashes) {
-        if (has(checkClashes, expr.name))
+        if (hasOwn(checkClashes, expr.name))
           this.raiseRecoverable(expr.start, "Argument name clash")
         checkClashes[expr.name] = true
       }

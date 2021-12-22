@@ -1,4 +1,4 @@
-import {has, isArray} from "./util.js"
+import {hasOwn, isArray} from "./util.js"
 import {SourceLocation} from "./locutil.js"
 
 // A second argument must be given to configure the parser process.
@@ -103,7 +103,7 @@ export function getOptions(opts) {
   let options = {}
 
   for (let opt in defaultOptions)
-    options[opt] = opts && has(opts, opt) ? opts[opt] : defaultOptions[opt]
+    options[opt] = opts && hasOwn(opts, opt) ? opts[opt] : defaultOptions[opt]
 
   if (options.ecmaVersion === "latest") {
     options.ecmaVersion = 1e8
