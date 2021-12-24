@@ -37,25 +37,26 @@ for (let i = 2; i < process.argv.length; ++i) {
 }
 
 function run(codeList) {
-  let result = [], fileIdx = 0
-  try {
-    codeList.forEach((code, idx) => {
-      fileIdx = idx
-      if (!tokenize) {
-        result = acorn.parse(code, options)
-        options.program = result
-      } else {
-        let tokenizer = acorn.tokenizer(code, options), token
+  let result = []
+  codeList.forEach((code, idx) => {
+    try {
+      if (tokenize) {
+        let tokenizer = acorn.tokenizer(code, options),
+            token
         do {
           token = tokenizer.getToken()
           result.push(token)
         } while (token.type !== acorn.tokTypes.eof)
+      } else {
+        result = acorn.parse(code, options)
+        options.program = result
       }
-    })
-  } catch (e) {
-    console.error(fileMode ? e.message.replace(/\(\d+:\d+\)$/, m => m.slice(0, 1) + inputFilePaths[fileIdx] + " " + m.slice(1)) : e.message)
-    process.exit(1)
-  }
+    } catch (e) {
+      console.error(fileMode ? e.message.replace(/\(\d+:\d+\)$/, m => m.slice(0, 1) + inputFilePaths[idx] + " " + m.slice(1)) : e.message)
+      process.exit(1)
+    }
+  })
+
   if (!silent) console.log(JSON.stringify(result, null, compact ? null : 2))
 }
 
