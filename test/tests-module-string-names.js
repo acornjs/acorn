@@ -319,3 +319,9 @@ test(
   },
   { sourceType: "module", ecmaVersion: 13 }
 );
+
+testFail(
+  'export { "學而時習之，不亦說乎？", "吾道一以貫之。" as "忠恕。" };',
+  "A string literal cannot be used as an exported binding without `from`. (1:9)",
+  { sourceType: "module", ecmaVersion: 13 }
+);

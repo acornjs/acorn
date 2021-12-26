@@ -890,6 +890,10 @@ pp.parseExport = function(node, exports) {
         this.checkUnreserved(spec.local)
         // check if export is defined
         this.checkLocalExport(spec.local)
+
+        if (spec.local.type === "Literal") {
+          this.raise(spec.local.start, "A string literal cannot be used as an exported binding without `from`.")
+        }
       }
 
       node.source = null
