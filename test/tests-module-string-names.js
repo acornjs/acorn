@@ -211,3 +211,111 @@ test(
   },
   { sourceType: "module", ecmaVersion: 13 }
 );
+
+test(
+  'import { "foo" as bar, "default" as qux } from "module-a";',
+  {
+    type: "Program",
+    start: 0,
+    end: 58,
+    body: [
+      {
+        type: "ImportDeclaration",
+        start: 0,
+        end: 58,
+        specifiers: [
+          {
+            type: "ImportSpecifier",
+            start: 9,
+            end: 21,
+            imported: {
+              type: "Literal",
+              start: 9,
+              end: 14,
+              value: "foo",
+              raw: '"foo"',
+            },
+            local: {
+              type: "Identifier",
+              start: 18,
+              end: 21,
+              name: "bar",
+            },
+          },
+          {
+            type: "ImportSpecifier",
+            start: 23,
+            end: 39,
+            imported: {
+              type: "Literal",
+              start: 23,
+              end: 32,
+              value: "default",
+              raw: '"default"',
+            },
+            local: {
+              type: "Identifier",
+              start: 36,
+              end: 39,
+              name: "qux",
+            },
+          },
+        ],
+        source: {
+          type: "Literal",
+          start: 47,
+          end: 57,
+          value: "module-a",
+          raw: '"module-a"',
+        },
+      },
+    ],
+    sourceType: "module",
+  },
+  { sourceType: "module", ecmaVersion: 13 }
+);
+
+test(
+  'import { "default" as quotation } from "Confucius";',
+  {
+    type: "Program",
+    start: 0,
+    end: 51,
+    body: [
+      {
+        type: "ImportDeclaration",
+        start: 0,
+        end: 51,
+        specifiers: [
+          {
+            type: "ImportSpecifier",
+            start: 9,
+            end: 31,
+            imported: {
+              type: "Literal",
+              start: 9,
+              end: 18,
+              value: "default",
+              raw: '"default"',
+            },
+            local: {
+              type: "Identifier",
+              start: 22,
+              end: 31,
+              name: "quotation",
+            },
+          },
+        ],
+        source: {
+          type: "Literal",
+          start: 39,
+          end: 50,
+          value: "Confucius",
+          raw: '"Confucius"',
+        },
+      },
+    ],
+    sourceType: "module",
+  },
+  { sourceType: "module", ecmaVersion: 13 }
+);
