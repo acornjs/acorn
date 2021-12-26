@@ -25,6 +25,7 @@
   require("./tests-logical-assignment-operators.js");
   require("./tests-numeric-separators.js");
   require("./tests-class-features-2022.js");
+  require("./tests-module-string-names.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")
 
