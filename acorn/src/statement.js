@@ -2,7 +2,7 @@ import {types as tt} from "./tokentype.js"
 import {Parser} from "./state.js"
 import {lineBreak, skipWhiteSpace} from "./whitespace.js"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier.js"
-import {hasOwn} from "./util.js"
+import {hasOwn, loneSurrogate} from "./util.js"
 import {DestructuringErrors} from "./parseutil.js"
 import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION, SCOPE_CLASS_STATIC_BLOCK, SCOPE_SUPER} from "./scopeflags.js"
 
@@ -1031,9 +1031,14 @@ pp.parseImportSpecifiers = function() {
 }
 
 pp.parseModuleExportName = function() {
-  return this.options.ecmaVersion >= 13 && this.type === tt.string
-    ? this.parseLiteral(this.value)
-    : this.parseIdent(true)
+  if (this.options.ecmaVersion >= 13 && this.type === tt.string) {
+    const stringLiteral = this.parseLiteral(this.value)
+    if (loneSurrogate.test(stringLiteral.value)) {
+      this.raise(stringLiteral.start, "An export name cannot include a lone surrogate.")
+    }
+    return stringLiteral
+  }
+  return this.parseIdent(true)
 }
 
 // Set `ExpressionStatement#directive` property for directive prologues.

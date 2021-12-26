@@ -11,3 +11,5 @@ export const isArray = Array.isArray || ((obj) => (
 export function wordsRegexp(words) {
   return new RegExp("^(?:" + words.replace(/ /g, "|") + ")$")
 }
+
+export const loneSurrogate = /[\uD800-\uDFFF]/u

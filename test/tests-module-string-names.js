@@ -325,3 +325,9 @@ testFail(
   "A string literal cannot be used as an exported binding without `from`. (1:9)",
   { sourceType: "module", ecmaVersion: 13 }
 );
+
+testFail(
+  'const foo = 42; export { foo as "\ud800\udbff" }',
+  "An export name cannot include a lone surrogate. (1:32)",
+  { sourceType: "module", ecmaVersion: 13 }
+);
