@@ -530,13 +530,13 @@ lp.parseImportSpecifiers = function() {
     while (!this.closes(tt.braceR, indent + (this.curLineStart <= continuedLine ? 1 : 0), line)) {
       let elt = this.startNode()
       if (this.eat(tt.star)) {
-        elt.local = this.eatContextual("as") ? this.parseIdent() : this.dummyIdent()
+        elt.local = this.eatContextual("as") ? this.parseModuleExportName() : this.dummyIdent()
         this.finishNode(elt, "ImportNamespaceSpecifier")
       } else {
         if (this.isContextual("from")) break
-        elt.imported = this.parseIdent()
+        elt.imported = this.parseModuleExportName()
         if (isDummy(elt.imported)) break
-        elt.local = this.eatContextual("as") ? this.parseIdent() : elt.imported
+        elt.local = this.eatContextual("as") ? this.parseModuleExportName() : elt.imported
         this.finishNode(elt, "ImportSpecifier")
       }
       elts.push(elt)
@@ -557,9 +557,9 @@ lp.parseExportSpecifierList = function() {
   while (!this.closes(tt.braceR, indent + (this.curLineStart <= continuedLine ? 1 : 0), line)) {
     if (this.isContextual("from")) break
     let elt = this.startNode()
-    elt.local = this.parseIdent()
+    elt.local = this.parseModuleExportName()
     if (isDummy(elt.local)) break
-    elt.exported = this.eatContextual("as") ? this.parseIdent() : elt.local
+    elt.exported = this.eatContextual("as") ? this.parseModuleExportName() : elt.local
     this.finishNode(elt, "ExportSpecifier")
     elts.push(elt)
     this.eat(tt.comma)
@@ -567,4 +567,10 @@ lp.parseExportSpecifierList = function() {
   this.eat(tt.braceR)
   this.popCx()
   return elts
+}
+
+lp.parseModuleExportName = function() {
+  return this.options.ecmaVersion >= 13 && this.tok.type === tt.string
+    ? this.parseExprAtom()
+    : this.parseIdent()
 }
