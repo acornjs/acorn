@@ -331,3 +331,9 @@ testFail(
   "An export name cannot include a lone surrogate. (1:32)",
   { sourceType: "module", ecmaVersion: 13 }
 );
+
+testFail(
+  'const foo = 43, bar = 32; export { foo, bar as "foo" };',
+  "Duplicate export 'foo' (1:47)",
+  { sourceType: "module", ecmaVersion: 13 }
+);
