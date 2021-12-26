@@ -840,7 +840,7 @@ pp.parseExport = function(node, exports) {
   if (this.eat(tt.star)) {
     if (this.options.ecmaVersion >= 11) {
       if (this.eatContextual("as")) {
-        node.exported = this.parseIdent(true)
+        node.exported = this.parseModuleExportName()
         this.checkExport(exports, node.exported.name, this.lastTokStart)
       } else {
         node.exported = null
@@ -955,9 +955,13 @@ pp.parseExportSpecifiers = function(exports) {
     } else first = false
 
     let node = this.startNode()
-    node.local = this.parseIdent(true)
-    node.exported = this.eatContextual("as") ? this.parseIdent(true) : node.local
-    this.checkExport(exports, node.exported.name, node.exported.start)
+    node.local = this.parseModuleExportName()
+    node.exported = this.eatContextual("as") ? this.parseModuleExportName() : node.local
+    this.checkExport(
+      exports,
+      node.exported[node.exported.type === "Identifier" ? "name" : "value"],
+      node.exported.start
+    )
     nodes.push(this.finishNode(node, "ExportSpecifier"))
   }
   return nodes
@@ -1009,7 +1013,7 @@ pp.parseImportSpecifiers = function() {
     } else first = false
 
     let node = this.startNode()
-    node.imported = this.parseIdent(true)
+    node.imported = this.parseModuleExportName()
     if (this.eatContextual("as")) {
       node.local = this.parseIdent()
     } else {
@@ -1020,6 +1024,12 @@ pp.parseImportSpecifiers = function() {
     nodes.push(this.finishNode(node, "ImportSpecifier"))
   }
   return nodes
+}
+
+pp.parseModuleExportName = function() {
+  return this.options.ecmaVersion >= 13 && this.type === tt.string
+    ? this.parseLiteral(this.value)
+    : this.parseIdent(true)
 }
 
 // Set `ExpressionStatement#directive` property for directive prologues.
