@@ -31,7 +31,7 @@ import {isIdentifierChar, isIdentifierStart} from "./identifier.js"
 import {Token} from "./tokenize.js"
 import {isNewLine, lineBreak, lineBreakG, nonASCIIwhitespace} from "./whitespace.js"
 
-export const version = "8.6.0"
+export const version = "8.7.0"
 export {
   Parser,
   defaultOptions,
