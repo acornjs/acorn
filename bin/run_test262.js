@@ -5,8 +5,8 @@ const parse = require("../acorn").parse
 
 function loadList(filename) {
   return fs.readFileSync(filename, "utf8")
-      .split("\n")
-      .filter(Boolean)
+    .split("\n")
+    .filter(Boolean)
 }
 
 run(
@@ -14,10 +14,8 @@ run(
   {
     testsDirectory: path.dirname(require.resolve("test262/package.json")),
     skip: test => test.attrs.features &&
-      loadList("./bin/test262.unsupported-features").some(f => test.attrs.features.includes(f)
-    ),
+      loadList("./bin/test262.unsupported-features").some(f => test.attrs.features.includes(f)),
     whitelist: loadList("./bin/test262.whitelist")
-      .map(filename => path.sep === "/" ? filename : filename.split("/").join(path.sep)
-    )
+      .map(filename => path.sep === "/" ? filename : filename.split("/").join(path.sep))
   }
 )
