@@ -8,7 +8,6 @@ export default {
       file: "acorn-loose/dist/acorn-loose.js",
       format: "umd",
       name: "acorn.loose",
-      
       globals: {acorn: "acorn"}
     },
     {

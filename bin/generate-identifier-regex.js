@@ -1,14 +1,14 @@
-'use strict';
+"use strict"
 
 // Which Unicode version should be used?
-let pkg = require('../package.json')
+let pkg = require("../package.json")
 let dependencies = Object.keys(pkg.devDependencies)
 let unicodeVersion = dependencies.find((name) => /^@unicode\/unicode-\d/.test(name))
 
-let start = require(unicodeVersion + '/Binary_Property/ID_Start/code-points.js').filter(ch => ch > 0x7f)
+let start = require(unicodeVersion + "/Binary_Property/ID_Start/code-points.js").filter(ch => ch > 0x7f)
 let last = -1
-let cont = [0x200c, 0x200d].concat(require(unicodeVersion + '/Binary_Property/ID_Continue/code-points.js')
-    .filter(ch => ch > 0x7f && search(start, ch, last + 1) === -1))
+let cont = [0x200c, 0x200d].concat(require(unicodeVersion + "/Binary_Property/ID_Continue/code-points.js")
+  .filter(ch => ch > 0x7f && search(start, ch, last + 1) === -1))
 
 function search(arr, ch, starting) {
   for (let i = starting; arr[i] <= ch && i < arr.length; last = i++)
@@ -25,7 +25,7 @@ function generate(chars) {
   let astral = [], re = ""
   for (let i = 0, at = 0x10000; i < chars.length; i++) {
     let from = chars[i], to = from
-    while (i < chars.length - 1 && chars[i + 1] === to + 1) {i++; to++}
+    while (i < chars.length - 1 && chars[i + 1] === to + 1) { i++; to++ }
     if (to <= 0xffff) {
       if (from === to) re += esc(from)
       else if (from + 1 === to) re += esc(from) + esc(to)
@@ -47,10 +47,10 @@ let code = [
   `    const astralIdentifierCodes = ${JSON.stringify(contData.astral)}`
 ]
 
-if (process.argv.length != 3) {
+if (process.argv.length !== 3) {
   console.log(code.join("\n"))
 } else {
-  let {readFile} = require('fs')
+  let {readFile} = require("fs")
   readFile(process.argv[2], "utf8", function(err, data) {
     if (err) throw err
     for (let line of code)
