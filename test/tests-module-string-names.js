@@ -337,3 +337,6 @@ testFail(
   "Duplicate export 'foo' (1:47)",
   { sourceType: "module", ecmaVersion: 13 }
 );
+
+test('export * as "a" from "mod1"\nexport * as "b" from "mod2"', {},
+     { sourceType: "module", ecmaVersion: 13 });

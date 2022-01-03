@@ -841,7 +841,7 @@ pp.parseExport = function(node, exports) {
     if (this.options.ecmaVersion >= 11) {
       if (this.eatContextual("as")) {
         node.exported = this.parseModuleExportName()
-        this.checkExport(exports, node.exported.name, this.lastTokStart)
+        this.checkExport(exports, node.exported, this.lastTokStart)
       } else {
         node.exported = null
       }
@@ -875,7 +875,7 @@ pp.parseExport = function(node, exports) {
     if (node.declaration.type === "VariableDeclaration")
       this.checkVariableExport(exports, node.declaration.declarations)
     else
-      this.checkExport(exports, node.declaration.id.name, node.declaration.id.start)
+      this.checkExport(exports, node.declaration.id, node.declaration.id.start)
     node.specifiers = []
     node.source = null
   } else { // export { x, y as z } [from '...']
@@ -905,6 +905,8 @@ pp.parseExport = function(node, exports) {
 
 pp.checkExport = function(exports, name, pos) {
   if (!exports) return
+  if (typeof name !== "string")
+    name = name.type === "Identifier" ? name.name : name.value
   if (hasOwn(exports, name))
     this.raiseRecoverable(pos, "Duplicate export '" + name + "'")
   exports[name] = true
@@ -913,7 +915,7 @@ pp.checkExport = function(exports, name, pos) {
 pp.checkPatternExport = function(exports, pat) {
   let type = pat.type
   if (type === "Identifier")
-    this.checkExport(exports, pat.name, pat.start)
+    this.checkExport(exports, pat, pat.start)
   else if (type === "ObjectPattern")
     for (let prop of pat.properties)
       this.checkPatternExport(exports, prop)
@@ -963,7 +965,7 @@ pp.parseExportSpecifiers = function(exports) {
     node.exported = this.eatContextual("as") ? this.parseModuleExportName() : node.local
     this.checkExport(
       exports,
-      node.exported[node.exported.type === "Identifier" ? "name" : "value"],
+      node.exported,
       node.exported.start
     )
     nodes.push(this.finishNode(node, "ExportSpecifier"))
