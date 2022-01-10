@@ -3,13 +3,13 @@
 // Which Unicode version should be used?
 const fs = require("fs")
 const path = require("path")
-let pkg = require("../package.json")
-let dependencies = Object.keys(pkg.devDependencies)
-let unicodeVersion = dependencies.find((name) => /^@unicode\/unicode-\d/.test(name))
+const pkg = require("../package.json")
+const dependencies = Object.keys(pkg.devDependencies)
+const unicodeVersion = dependencies.find((name) => /^@unicode\/unicode-\d/.test(name))
 
-let start = require(unicodeVersion + "/Binary_Property/ID_Start/code-points.js").filter(ch => ch > 0x7f)
+const start = require(unicodeVersion + "/Binary_Property/ID_Start/code-points.js").filter(ch => ch > 0x7f)
 let last = -1
-let cont = [0x200c, 0x200d].concat(require(unicodeVersion + "/Binary_Property/ID_Continue/code-points.js")
+const cont = [0x200c, 0x200d].concat(require(unicodeVersion + "/Binary_Property/ID_Continue/code-points.js")
   .filter(ch => ch > 0x7f && search(start, ch, last + 1) === -1))
 
 function search(arr, ch, starting) {
@@ -19,12 +19,13 @@ function search(arr, ch, starting) {
 }
 
 function esc(code) {
-  let hex = code.toString(16)
+  const hex = code.toString(16)
   return hex.length <= 2 ? "\\x" + hex.padStart(2, "0") : "\\u" + hex.padStart(4, "0")
 }
 
 function generate(chars) {
-  let astral = [], re = ""
+  const astral = []
+  let re = ""
   for (let i = 0, at = 0x10000; i < chars.length; i++) {
     let from = chars[i], to = from
     while (i < chars.length - 1 && chars[i + 1] === to + 1) { i++; to++ }
