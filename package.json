@@ -25,6 +25,7 @@
     "build:loose": "rollup -c acorn-loose/rollup.config.js",
     "build:main": "rollup -c acorn/rollup.config.js",
     "build:walk": "rollup -c acorn-walk/rollup.config.js",
+    "generate": "node bin/generate-identifier-regex.js",
     "lint": "eslint .",
     "prepare": "npm run test",
     "pretest": "npm run build:main && npm run build:loose",

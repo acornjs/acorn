@@ -1,6 +1,8 @@
 "use strict"
 
 // Which Unicode version should be used?
+const fs = require("fs")
+const path = require("path")
 let pkg = require("../package.json")
 let dependencies = Object.keys(pkg.devDependencies)
 let unicodeVersion = dependencies.find((name) => /^@unicode\/unicode-\d/.test(name))
@@ -38,23 +40,22 @@ function generate(chars) {
   return {nonASCII: re, astral: astral}
 }
 
-let startData = generate(start), contData = generate(cont)
+const startData = generate(start), contData = generate(cont)
 
-let code = [
-  `    let nonASCIIidentifierStartChars = "${startData.nonASCII}"`,
-  `    let nonASCIIidentifierChars = "${contData.nonASCII}"`,
-  `    const astralIdentifierStartCodes = ${JSON.stringify(startData.astral)}`,
-  `    const astralIdentifierCodes = ${JSON.stringify(contData.astral)}`
-]
+const astralIdentifierStartCodes = "export default " + JSON.stringify(startData.astral).split(",").join(", ")
+const astralIdentifierCodes = "export default " + JSON.stringify(contData.astral).split(",").join(", ")
+const nonASCIIidentifierStartChars = "export default \"" + startData.nonASCII + "\""
+const nonASCIIidentifierChars = "export default \"" + contData.nonASCII + "\""
 
-if (process.argv.length !== 3) {
-  console.log(code.join("\n"))
-} else {
-  let {readFile} = require("fs")
-  readFile(process.argv[2], "utf8", function(err, data) {
-    if (err) throw err
-    for (let line of code)
-      data = data.replace(new RegExp(/.* = /.exec(line)[0] + ".*"), line)
-    process.stdout.write(data)
-  })
+const comment = "// This file was generated. Do not modify manually!"
+
+function writeGeneratedFile(filename, content) {
+  fs.writeFileSync(path.resolve("./acorn/src/generated", filename + ".js"), comment + "\n" + content + "\n", "utf8")
 }
+
+writeGeneratedFile("astralIdentifierStartCodes", astralIdentifierStartCodes)
+writeGeneratedFile("astralIdentifierCodes", astralIdentifierCodes)
+writeGeneratedFile("nonASCIIidentifierStartChars", nonASCIIidentifierStartChars)
+writeGeneratedFile("nonASCIIidentifierChars", nonASCIIidentifierChars)
+
+console.log("Done. The generated files must be committed.")
