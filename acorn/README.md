@@ -271,10 +271,3 @@ The utility spits out the syntax tree as JSON data.
 ## Existing plugins
 
  - [`acorn-jsx`](https://github.com/RReverser/acorn-jsx): Parse [Facebook JSX syntax extensions](https://github.com/facebook/jsx)
- 
-Plugins for ECMAScript proposals:
- 
- - [`acorn-stage3`](https://github.com/acornjs/acorn-stage3): Parse most stage 3 proposals, bundling:
-   - [`acorn-class-fields`](https://github.com/acornjs/acorn-class-fields): Parse [class fields proposal](https://github.com/tc39/proposal-class-fields)
-   - [`acorn-import-meta`](https://github.com/acornjs/acorn-import-meta): Parse [import.meta proposal](https://github.com/tc39/proposal-import-meta)
-   - [`acorn-private-methods`](https://github.com/acornjs/acorn-private-methods): parse [private methods, getters and setters proposal](https://github.com/tc39/proposal-private-methods)n
