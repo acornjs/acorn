@@ -16519,6 +16519,9 @@ test("({ __proto__: x, __proto__: y, __proto__: z }) => {}", {}, {ecmaVersion: 6
 test("class x {}\n05", {}, {ecmaVersion: 6})
 test("function x() { 'use strict' }\n05", {}, {ecmaVersion: 6})
 
+// Ignore strict directives before ES5
+test("'use strict'; '\\02'", {}, {ecmaVersion: 3})
+
 test("const myFn = ({ set = '' }) => {};", {
   "type": "Program",
   "body": [
