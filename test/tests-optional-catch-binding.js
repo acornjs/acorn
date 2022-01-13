@@ -1,6 +1,5 @@
-if (typeof exports != "undefined") {
+if (typeof exports !== "undefined") {
   var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
 }
 
 test("try {} catch {}", {

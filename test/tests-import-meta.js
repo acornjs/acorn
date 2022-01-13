@@ -1,8 +1,8 @@
 // Tests for ECMAScript 2020 `import.meta`
 
-if (typeof exports != 'undefined') {
-  var test = require('./driver.js').test;
-  var testFail = require('./driver.js').testFail;
+if (typeof exports !== "undefined") {
+  var test = require("./driver.js").test;
+  var testFail = require("./driver.js").testFail;
 }
 
 test(
