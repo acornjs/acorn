@@ -83,7 +83,7 @@
   };
 
   function report(state, code, message) {
-    if (state != "ok") {++stats.failed; log(code, message);}
+    if (state !== "ok") {++stats.failed; log(code, message);}
     ++stats.testsRun;
   }
 

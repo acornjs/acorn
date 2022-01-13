@@ -1,4 +1,4 @@
-if (typeof exports != "undefined") {
+if (typeof exports !== "undefined") {
   var test = require("./driver.js").test
 }
 

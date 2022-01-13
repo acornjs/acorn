@@ -29,7 +29,7 @@ exports.runTests = function(config, callback) {
     } catch(e) {
       if (!(e instanceof SyntaxError)) { console.log(e.stack); throw e; }
       if (test.error) {
-        if (test.error.charAt(0) == "~" ? e.message.indexOf(test.error.slice(1)) > -1 : e.message == test.error)
+        if (test.error.charAt(0) === "~" ? e.message.indexOf(test.error.slice(1)) > -1 : e.message === test.error)
           callback("ok", test.code);
         else
           callback("fail", test.code, "Expected error message: " + test.error + "\nGot error message: " + e.message);
@@ -61,23 +61,23 @@ exports.runTests = function(config, callback) {
   }
 };
 
-function ppJSON(v) { return v instanceof RegExp ? v.toString() : (typeof v == "bigint" ? v.toString() : JSON.stringify(v, null, 2)); }
+function ppJSON(v) { return v instanceof RegExp ? v.toString() : (typeof v === "bigint" ? v.toString() : JSON.stringify(v, null, 2)); }
 function addPath(str, pt) {
-  if (str.charAt(str.length-1) == ")")
+  if (str.charAt(str.length-1) === ")")
     return str.slice(0, str.length-1) + "/" + pt + ")";
   return str + " (" + pt + ")";
 }
 
 var misMatch = exports.misMatch = function(exp, act) {
-  if (!exp || !act || (typeof exp != "object") || (typeof act != "object")) {
-    if (exp !== act && typeof exp != "function")
+  if (!exp || !act || (typeof exp !== "object") || (typeof act !== "object")) {
+    if (exp !== act && typeof exp !== "function")
       return ppJSON(exp) + " !== " + ppJSON(act);
   } else if (exp instanceof RegExp || act instanceof RegExp) {
     var left = ppJSON(exp), right = ppJSON(act);
     if (left !== right) return left + " !== " + right;
   } else if (exp.splice) {
-    if (!act.slice) return ppJSON(exp) + " != " + ppJSON(act);
-    if (act.length != exp.length) return "array length mismatch " + exp.length + " != " + act.length;
+    if (!act.slice) return ppJSON(exp) + " !== " + ppJSON(act);
+    if (act.length != exp.length) return "array length mismatch " + exp.length + " !== " + act.length;
     for (var i = 0; i < act.length; ++i) {
       var mis = misMatch(exp[i], act[i]);
       if (mis) return addPath(mis, i);

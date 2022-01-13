@@ -1,7 +1,7 @@
 // Tests largely based on those of Esprima
 // (http://esprima.org/test/)
 
-if (typeof exports != "undefined") {
+if (typeof exports !== "undefined") {
   var driver = require("./driver.js");
   var test = driver.test, testFail = driver.testFail, testAssert = driver.testAssert;
   var acorn = require("../acorn");
@@ -29277,7 +29277,7 @@ var semicolons = []
 testAssert("var x\nreturn\n10", function() {
   var result = semicolons.join(" ");
   semicolons.length = 0;
-  if (result != "5 12 15")
+  if (result !== "5 12 15")
     return "Unexpected result for onInsertedSemicolon: " + result;
 }, {onInsertedSemicolon: function(pos) { semicolons.push(pos); },
     allowReturnOutsideFunction: true,
@@ -29287,7 +29287,7 @@ var trailingCommas = []
 testAssert("[1,2,] + {foo: 1,}", function() {
   var result = trailingCommas.join(" ");
   trailingCommas.length = 0;
-  if (result != "4 16")
+  if (result !== "4 16")
     return "Unexpected result for onTrailingComma: " + result;
 }, {onTrailingComma: function(pos) { trailingCommas.push(pos); },
     loose: false})
