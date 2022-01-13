@@ -89,16 +89,3 @@ var misMatch = exports.misMatch = function(exp, act) {
     }
   }
 };
-
-function mangle(ast) {
-  if (typeof ast != "object" || !ast) return;
-  if (ast.slice) {
-    for (var i = 0; i < ast.length; ++i) mangle(ast[i]);
-  } else {
-    var loc = ast.start && ast.end && {start: ast.start, end: ast.end};
-    if (loc) { delete ast.start; delete ast.end; }
-    for (var name in ast) if (ast.hasOwnProperty(name)) mangle(ast[name]);
-    if (loc) ast.loc = loc;
-  }
-}
-
