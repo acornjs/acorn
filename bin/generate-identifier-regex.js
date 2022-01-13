@@ -1,6 +1,5 @@
 "use strict"
 
-// Which Unicode version should be used?
 const fs = require("fs")
 const path = require("path")
 const pkg = require("../package.json")
