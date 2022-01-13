@@ -2,7 +2,6 @@
 if (typeof exports != "undefined") {
   var driver = require("./driver.js");
   var test = driver.test, testFail = driver.testFail;
-  var acorn = require("../acorn");
 }
 
 //------------------------------------------------------------------------------
