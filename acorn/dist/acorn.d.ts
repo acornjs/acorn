@@ -11,8 +11,10 @@ declare namespace acorn {
     [Symbol.iterator](): Iterator<Token>
   }
 
+  type ecmaVersion = 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 'latest'
+
   interface Options {
-    ecmaVersion: 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 'latest'
+    ecmaVersion: ecmaVersion
     sourceType?: 'script' | 'module'
     onInsertedSemicolon?: (lastTokEnd: number, lastTokEndLoc?: Position) => void
     onTrailingComma?: (lastTokEnd: number, lastTokEndLoc?: Position) => void
@@ -36,8 +38,47 @@ declare namespace acorn {
   }
 
   class Parser {
+    // state.js
+    lineStart: number;
+    options: {
+      ecmaVersion: ecmaVersion,
+      locations: object
+    };
+    curLine: number;
+    start: number;
+    end: number;
+    input: string;
+    type: TokenType;
+
+    // state.js
     constructor(options: Options, input: string, startPos?: number)
     parse(this: Parser): Node
+
+    // tokenize.js
+    next(): void;
+    nextToken(): void;
+
+    // statement.js
+    parseTopLevel(node: Node): Node;
+
+    // node.js
+    finishNode(node: Node, type: string): Node;
+    finishNodeAt(node: Node, type: string, pos: number, loc: Position): Node;
+
+    // location.js
+    raise(pos: number, message: string) : void;
+    raiseRecoverable?(pos: number, message: string) : void;
+
+    // parseutils.js
+    unexpected(pos: number) : void;
+
+    // index.js
+    static acorn: {
+      tokTypes: typeof tokTypes,
+      getLineInfo: typeof getLineInfo
+    }
+
+    // state.js
     static parse(this: typeof Parser, input: string, options: Options): Node
     static parseExpressionAt(this: typeof Parser, input: string, pos: number, options: Options): Node
     static tokenizer(this: typeof Parser, input: string, options: Options): {
