@@ -40,10 +40,7 @@ declare namespace acorn {
   class Parser {
     // state.js
     lineStart: number;
-    options: {
-      ecmaVersion: ecmaVersion,
-      locations: object
-    };
+    options: Options;
     curLine: number;
     start: number;
     end: number;
