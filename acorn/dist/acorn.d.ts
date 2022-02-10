@@ -70,10 +70,7 @@ declare namespace acorn {
     unexpected(pos: number) : void;
 
     // index.js
-    static acorn: {
-      tokTypes: typeof tokTypes,
-      getLineInfo: typeof getLineInfo
-    }
+    static acorn: typeof acorn;
 
     // state.js
     static parse(this: typeof Parser, input: string, options: Options): Node
