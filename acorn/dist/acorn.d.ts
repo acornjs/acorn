@@ -137,8 +137,10 @@ declare namespace acorn {
     colon: TokenType
     dot: TokenType
     question: TokenType
+    questionDot: TokenType
     arrow: TokenType
     template: TokenType
+    invalidTemplate: TokenType
     ellipsis: TokenType
     backQuote: TokenType
     dollarBraceL: TokenType
@@ -159,6 +161,7 @@ declare namespace acorn {
     star: TokenType
     slash: TokenType
     starstar: TokenType
+    coalesce: TokenType
     _break: TokenType
     _case: TokenType
     _catch: TokenType
