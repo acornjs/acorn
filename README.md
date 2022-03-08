@@ -8,6 +8,8 @@ A tiny, fast JavaScript parser, written completely in JavaScript.
 
 ## Community
 
+<a href="https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md"><img src="https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct.svg" width="800"></a>
+
 Acorn is open source software released under an
 [MIT license](https://github.com/acornjs/acorn/blob/master/acorn/LICENSE).
 
