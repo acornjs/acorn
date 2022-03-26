@@ -4,6 +4,7 @@ import {Parser} from "./state.js"
 import {SourceLocation} from "./locutil.js"
 import {RegExpValidationState} from "./regexp.js"
 import {lineBreak, nextLineBreak, isNewLine, nonASCIIwhitespace} from "./whitespace.js"
+import {codePointToString} from "./util"
 
 // Object type used to represent tokens. Note that normally, tokens
 // simply exist as properties on the parser object. This is only
@@ -560,13 +561,6 @@ pp.readCodePoint = function() {
     code = this.readHexChar(4)
   }
   return code
-}
-
-function codePointToString(code) {
-  // UTF-16 Decoding
-  if (code <= 0xFFFF) return String.fromCharCode(code)
-  code -= 0x10000
-  return String.fromCharCode((code >> 10) + 0xD800, (code & 1023) + 0xDC00)
 }
 
 pp.readString = function(quote) {
