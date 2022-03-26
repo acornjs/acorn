@@ -1,7 +1,7 @@
 import {isIdentifierStart, isIdentifierChar} from "./identifier.js"
 import {Parser} from "./state.js"
 import UNICODE_PROPERTY_VALUES from "./unicode-property-data.js"
-import {hasOwn} from "./util.js"
+import {hasOwn, codePointToString} from "./util.js"
 
 const pp = Parser.prototype
 
@@ -87,12 +87,6 @@ export class RegExpValidationState {
     }
     return false
   }
-}
-
-function codePointToString(ch) {
-  if (ch <= 0xFFFF) return String.fromCharCode(ch)
-  ch -= 0x10000
-  return String.fromCharCode((ch >> 10) + 0xD800, (ch & 0x03FF) + 0xDC00)
 }
 
 /**
