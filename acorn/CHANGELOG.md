@@ -1,3 +1,13 @@
+## 8.7.1 (2021-04-26)
+
+### Bug fixes
+
+Stop handling `"use strict"` directives in ECMAScript versions before 5.
+
+Fix an issue where duplicate quoted export names in `export *` syntax were incorrectly checked.
+
+Add missing type for `tokTypes`.
+
 ## 8.7.0 (2021-12-27)
 
 ### New features
