@@ -1051,6 +1051,7 @@ pp.adaptDirectivePrologue = function(statements) {
 }
 pp.isDirectiveCandidate = function(statement) {
   return (
+    this.options.ecmaVersion >= 5 &&
     statement.type === "ExpressionStatement" &&
     statement.expression.type === "Literal" &&
     typeof statement.expression.value === "string" &&
