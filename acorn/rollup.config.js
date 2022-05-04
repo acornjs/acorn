@@ -1,5 +1,6 @@
 import buble from "@rollup/plugin-buble"
 import typescript from "@rollup/plugin-typescript"
+import dts from "rollup-plugin-dts"
 
 export default [
   {
@@ -23,6 +24,18 @@ export default [
         }
       }),
       buble({transforms: {dangerousForOf: true}})
+    ]
+  },
+  {
+    input: "acorn/src/index.ts",
+    output: [
+      {
+        file: "acorn/dist/acorn.d.ts",
+        format: "es"
+      }
+    ],
+    plugins: [
+      dts()
     ]
   },
   {
