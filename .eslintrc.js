@@ -17,6 +17,16 @@ module.exports = {
       rules: {
         "no-console": "off"
       }
+    },
+    {
+      files: ["acorn/src/**/*.ts"],
+      parser: "@typescript-eslint/parser",
+      plugins: ["@typescript-eslint"],
+      rules: {
+        "import/no-unresolved": "off",
+        "no-useless-constructor": "off",
+        "@typescript-eslint/no-useless-constructor": "error"
+      }
     }
   ],
   plugins: ["eslint-plugin-import"],

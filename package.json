@@ -34,14 +34,17 @@
   },
   "devDependencies": {
     "@rollup/plugin-buble": "^0.21.3",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
     "@unicode/unicode-14.0.0": "^1.2.1",
-    "eslint": "^7.32.0",
+    "eslint": "^8.14.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
     "rollup": "^2.60.2",
     "test262": "git+https://github.com/tc39/test262.git#f0bf5dfcea7bce15eb4f7e0b0e97b2a5f3e830c5",
-    "test262-parser-runner": "^0.5.0"
+    "test262-parser-runner": "^0.5.0",
+    "typescript": "^4.6.4"
   }
 }
