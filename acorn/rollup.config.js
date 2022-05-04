@@ -1,8 +1,9 @@
 import buble from "@rollup/plugin-buble"
+import typescript from "@rollup/plugin-typescript"
 
 export default [
   {
-    input: "acorn/src/index.js",
+    input: "acorn/src/index.ts",
     output: [
       {
         file: "acorn/dist/acorn.js",
@@ -15,6 +16,12 @@ export default [
       }
     ],
     plugins: [
+      typescript({
+        compilerOptions: {
+          lib: ["es6", "dom"],
+          target: "es5"
+        }
+      }),
       buble({transforms: {dangerousForOf: true}})
     ]
   },
