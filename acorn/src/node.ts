@@ -2,7 +2,13 @@ import {Parser} from "./state.js"
 import {SourceLocation} from "./locutil.js"
 
 export class Node {
-  constructor(parser, pos, loc) {
+  type: string
+  start: number
+  end: number
+  loc?: SourceLocation
+  sourceFile?: string
+  range?: [number, number]
+  constructor(parser: Parser, pos: number, loc?: SourceLocation) {
     this.type = ""
     this.start = pos
     this.end = 0

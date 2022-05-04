@@ -1,12 +1,31 @@
 import {reservedWords, keywords} from "./identifier.js"
-import {types as tt} from "./tokentype.js"
+import {TokenType, types as tt} from "./tokentype.js"
 import {lineBreak} from "./whitespace.js"
 import {getOptions} from "./options.js"
 import {wordsRegexp} from "./util.js"
 import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER, SCOPE_CLASS_STATIC_BLOCK} from "./scopeflags.js"
+import {Options} from "./types"
+import {Node} from "./node.js"
+import {Position} from "./locutil.js"
 
 export class Parser {
-  constructor(options, input, startPos) {
+  lineStart: number
+  options: Options
+  curLine: number
+  start: number
+  end: number
+  input: string
+  type: TokenType
+  next: () => void
+  nextToken: () => void
+  parseTopLevel: (node: Node) =>Node
+  finishNode: (node: Node, type: string) => Node
+  finishNodeAt: (node: Node, type: string, pos: number, loc: Position) => Node
+  raise: (pos: number, message: string) => void
+  raiseRecoverable: (pos: number, message: string) => void
+  unexpected: (pos: number) => void
+
+  constructor(options: Options, input: string, startPos?: number) {
     this.options = options = getOptions(options)
     this.sourceFile = options.sourceFile
     this.keywords = wordsRegexp(keywords[options.ecmaVersion >= 6 ? 6 : options.sourceType === "module" ? "5module" : 5])
@@ -91,7 +110,7 @@ export class Parser {
     this.privateNameStack = []
   }
 
-  parse() {
+  parse(): Node {
     let node = this.options.program || this.startNode()
     this.nextToken()
     return this.parseTopLevel(node)
@@ -136,17 +155,20 @@ export class Parser {
     return cls
   }
 
-  static parse(input, options) {
+  static parse(input: string, options: Options) {
     return new this(options, input).parse()
   }
 
-  static parseExpressionAt(input, pos, options) {
+  static parseExpressionAt(input: string, pos: number, options: Options): Node {
     let parser = new this(options, input, pos)
     parser.nextToken()
     return parser.parseExpression()
   }
 
-  static tokenizer(input, options) {
+  static tokenizer(input: string, options: Options): {
+    getToken(): Token
+    [Symbol.iterator](): Iterator<Token>
+  } {
     return new this(options, input)
   }
 }

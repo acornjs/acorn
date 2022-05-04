@@ -22,7 +22,18 @@
 // continue jumps to that label.
 
 export class TokenType {
-  constructor(label, conf = {}) {
+  label: string
+  keyword: string
+  beforeExpr: boolean
+  startsExpr: boolean
+  isLoop: boolean
+  isAssign: boolean
+  prefix: boolean
+  postfix: boolean
+  binop: number
+  // eslint-disable-next-line no-use-before-define
+  updateContext?: (prevType: TokenType) => void
+  constructor(label: string, conf: any = {}) {
     this.label = label
     this.keyword = conf.keyword
     this.beforeExpr = !!conf.beforeExpr

@@ -53,7 +53,7 @@ function isInAstralSet(code, set) {
 
 // Test whether a given character code starts an identifier.
 
-export function isIdentifierStart(code, astral) {
+export function isIdentifierStart(code: number, astral?: boolean): boolean {
   if (code < 65) return code === 36
   if (code < 91) return true
   if (code < 97) return code === 95
@@ -65,7 +65,7 @@ export function isIdentifierStart(code, astral) {
 
 // Test whether a given character is part of an identifier.
 
-export function isIdentifierChar(code, astral) {
+export function isIdentifierChar(code: number, astral?: boolean): boolean {
   if (code < 48) return code === 36
   if (code < 58) return true
   if (code < 65) return false

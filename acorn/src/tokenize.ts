@@ -1,5 +1,5 @@
 import {isIdentifierStart, isIdentifierChar} from "./identifier.js"
-import {types as tt, keywords as keywordTypes} from "./tokentype.js"
+import {types as tt, keywords as keywordTypes, TokenType} from "./tokentype.js"
 import {Parser} from "./state.js"
 import {SourceLocation} from "./locutil.js"
 import {RegExpValidationState} from "./regexp.js"
@@ -11,7 +11,13 @@ import {codePointToString} from "./util.js"
 // used for the onToken callback and the external tokenizer.
 
 export class Token {
-  constructor(p) {
+  type: TokenType
+  value: any
+  start: number
+  end: number
+  loc?: SourceLocation
+  range?: [number, number]
+  constructor(p: Parser) {
     this.type = p.type
     this.value = p.value
     this.start = p.start
