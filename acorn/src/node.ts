@@ -25,11 +25,11 @@ export class Node {
 
 const pp = Parser.prototype
 
-pp.startNode = function() {
+pp.startNode = function(this: Parser) {
   return new Node(this, this.start, this.startLoc)
 }
 
-pp.startNodeAt = function(pos, loc) {
+pp.startNodeAt = function(this: Parser, pos, loc) {
   return new Node(this, pos, loc)
 }
 
@@ -45,17 +45,17 @@ function finishNodeAt(node, type, pos, loc) {
   return node
 }
 
-pp.finishNode = function(node, type) {
+pp.finishNode = function(this: Parser, node, type) {
   return finishNodeAt.call(this, node, type, this.lastTokEnd, this.lastTokEndLoc)
 }
 
 // Finish node at given position
 
-pp.finishNodeAt = function(node, type, pos, loc) {
+pp.finishNodeAt = function(this: Parser, node, type, pos, loc) {
   return finishNodeAt.call(this, node, type, pos, loc)
 }
 
-pp.copyNode = function(node) {
+pp.copyNode = function(this: Parser, node) {
   let newNode = new Node(this, node.start, this.startLoc)
   for (let prop in node) newNode[prop] = node[prop]
   return newNode

@@ -9,7 +9,7 @@ const pp = Parser.prototype
 // of the error message, and then raises a `SyntaxError` with that
 // message.
 
-pp.raise = function(pos, message) {
+pp.raise = function(this: Parser, pos, message) {
   let loc = getLineInfo(this.input, pos)
   message += " (" + loc.line + ":" + loc.column + ")"
   let err = new SyntaxError(message)
@@ -19,7 +19,7 @@ pp.raise = function(pos, message) {
 
 pp.raiseRecoverable = pp.raise
 
-pp.curPosition = function() {
+pp.curPosition = function(this: Parser) {
   if (this.options.locations) {
     return new Position(this.curLine, this.pos - this.lineStart)
   }

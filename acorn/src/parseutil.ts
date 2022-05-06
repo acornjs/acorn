@@ -7,7 +7,7 @@ const pp = Parser.prototype
 // ## Parser utilities
 
 const literal = /^(?:'((?:\\.|[^'\\])*?)'|"((?:\\.|[^"\\])*?)")/
-pp.strictDirective = function(start) {
+pp.strictDirective = function(this: Parser, start) {
   if (this.options.ecmaVersion < 5) return false
   for (;;) {
     // Try to find string literal.
@@ -36,7 +36,7 @@ pp.strictDirective = function(start) {
 // Predicate that tests whether the next token is of the given
 // type, and if yes, consumes it as a side effect.
 
-pp.eat = function(type) {
+pp.eat = function(this: Parser, type) {
   if (this.type === type) {
     this.next()
     return true
@@ -47,13 +47,13 @@ pp.eat = function(type) {
 
 // Tests whether parsed token is a contextual keyword.
 
-pp.isContextual = function(name) {
+pp.isContextual = function(this: Parser, name) {
   return this.type === tt.name && this.value === name && !this.containsEsc
 }
 
 // Consumes contextual keyword if possible.
 
-pp.eatContextual = function(name) {
+pp.eatContextual = function(this: Parser, name) {
   if (!this.isContextual(name)) return false
   this.next()
   return true
@@ -61,19 +61,19 @@ pp.eatContextual = function(name) {
 
 // Asserts that following token is given contextual keyword.
 
-pp.expectContextual = function(name) {
+pp.expectContextual = function(this: Parser, name) {
   if (!this.eatContextual(name)) this.unexpected()
 }
 
 // Test whether a semicolon can be inserted at the current position.
 
-pp.canInsertSemicolon = function() {
+pp.canInsertSemicolon = function(this: Parser) {
   return this.type === tt.eof ||
     this.type === tt.braceR ||
     lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
 }
 
-pp.insertSemicolon = function() {
+pp.insertSemicolon = function(this: Parser) {
   if (this.canInsertSemicolon()) {
     if (this.options.onInsertedSemicolon)
       this.options.onInsertedSemicolon(this.lastTokEnd, this.lastTokEndLoc)
@@ -84,11 +84,11 @@ pp.insertSemicolon = function() {
 // Consume a semicolon, or, failing that, see if we are allowed to
 // pretend that there is a semicolon at this position.
 
-pp.semicolon = function() {
+pp.semicolon = function(this: Parser) {
   if (!this.eat(tt.semi) && !this.insertSemicolon()) this.unexpected()
 }
 
-pp.afterTrailingComma = function(tokType, notNext) {
+pp.afterTrailingComma = function(this: Parser, tokType, notNext) {
   if (this.type === tokType) {
     if (this.options.onTrailingComma)
       this.options.onTrailingComma(this.lastTokStart, this.lastTokStartLoc)
@@ -101,13 +101,13 @@ pp.afterTrailingComma = function(tokType, notNext) {
 // Expect a token of a given type. If found, consume it, otherwise,
 // raise an unexpected token error.
 
-pp.expect = function(type) {
+pp.expect = function(this: Parser, type) {
   this.eat(type) || this.unexpected()
 }
 
 // Raise an unexpected token error.
 
-pp.unexpected = function(pos) {
+pp.unexpected = function(this: Parser, pos) {
   this.raise(pos != null ? pos : this.start, "Unexpected token")
 }
 
@@ -122,7 +122,7 @@ export class DestructuringErrors {
   }
 }
 
-pp.checkPatternErrors = function(refDestructuringErrors, isAssign) {
+pp.checkPatternErrors = function(this: Parser, refDestructuringErrors, isAssign) {
   if (!refDestructuringErrors) return
   if (refDestructuringErrors.trailingComma > -1)
     this.raiseRecoverable(refDestructuringErrors.trailingComma, "Comma is not permitted after the rest element")
@@ -130,7 +130,7 @@ pp.checkPatternErrors = function(refDestructuringErrors, isAssign) {
   if (parens > -1) this.raiseRecoverable(parens, "Parenthesized pattern")
 }
 
-pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {
+pp.checkExpressionErrors = function(this: Parser, refDestructuringErrors, andThrow) {
   if (!refDestructuringErrors) return false
   let {shorthandAssign, doubleProto} = refDestructuringErrors
   if (!andThrow) return shorthandAssign >= 0 || doubleProto >= 0
@@ -140,14 +140,14 @@ pp.checkExpressionErrors = function(refDestructuringErrors, andThrow) {
     this.raiseRecoverable(doubleProto, "Redefinition of __proto__ property")
 }
 
-pp.checkYieldAwaitInDefaultParams = function() {
+pp.checkYieldAwaitInDefaultParams = function(this: Parser) {
   if (this.yieldPos && (!this.awaitPos || this.yieldPos < this.awaitPos))
     this.raise(this.yieldPos, "Yield expression cannot be a default value")
   if (this.awaitPos)
     this.raise(this.awaitPos, "Await expression cannot be a default value")
 }
 
-pp.isSimpleAssignTarget = function(expr) {
+pp.isSimpleAssignTarget = function(this: Parser, expr) {
   if (expr.type === "ParenthesizedExpression")
     return this.isSimpleAssignTarget(expr.expression)
   return expr.type === "Identifier" || expr.type === "MemberExpression"

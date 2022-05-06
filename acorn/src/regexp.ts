@@ -95,7 +95,7 @@ export class RegExpValidationState {
  * @param {RegExpValidationState} state The state to validate RegExp.
  * @returns {void}
  */
-pp.validateRegExpFlags = function(state) {
+pp.validateRegExpFlags = function(this: Parser, state) {
   const validFlags = state.validFlags
   const flags = state.flags
 
@@ -116,7 +116,7 @@ pp.validateRegExpFlags = function(state) {
  * @param {RegExpValidationState} state The state to validate RegExp.
  * @returns {void}
  */
-pp.validateRegExpPattern = function(state) {
+pp.validateRegExpPattern = function(this: Parser, state) {
   this.regexp_pattern(state)
 
   // The goal symbol for the parse is |Pattern[~U, ~N]|. If the result of
@@ -131,7 +131,7 @@ pp.validateRegExpPattern = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Pattern
-pp.regexp_pattern = function(state) {
+pp.regexp_pattern = function(this: Parser, state) {
   state.pos = 0
   state.lastIntValue = 0
   state.lastStringValue = ""
@@ -163,7 +163,7 @@ pp.regexp_pattern = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
-pp.regexp_disjunction = function(state) {
+pp.regexp_disjunction = function(this: Parser, state) {
   this.regexp_alternative(state)
   while (state.eat(0x7C /* | */)) {
     this.regexp_alternative(state)
@@ -179,13 +179,13 @@ pp.regexp_disjunction = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Alternative
-pp.regexp_alternative = function(state) {
+pp.regexp_alternative = function(this: Parser, state) {
   while (state.pos < state.source.length && this.regexp_eatTerm(state))
     ;
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Term
-pp.regexp_eatTerm = function(state) {
+pp.regexp_eatTerm = function(this: Parser, state) {
   if (this.regexp_eatAssertion(state)) {
     // Handle `QuantifiableAssertion Quantifier` alternative.
     // `state.lastAssertionIsQuantifiable` is true if the last eaten Assertion
@@ -208,7 +208,7 @@ pp.regexp_eatTerm = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Assertion
-pp.regexp_eatAssertion = function(state) {
+pp.regexp_eatAssertion = function(this: Parser, state) {
   const start = state.pos
   state.lastAssertionIsQuantifiable = false
 
@@ -246,7 +246,7 @@ pp.regexp_eatAssertion = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Quantifier
-pp.regexp_eatQuantifier = function(state, noError = false) {
+pp.regexp_eatQuantifier = function(this: Parser, state, noError = false) {
   if (this.regexp_eatQuantifierPrefix(state, noError)) {
     state.eat(0x3F /* ? */)
     return true
@@ -255,7 +255,7 @@ pp.regexp_eatQuantifier = function(state, noError = false) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-QuantifierPrefix
-pp.regexp_eatQuantifierPrefix = function(state, noError) {
+pp.regexp_eatQuantifierPrefix = function(this: Parser, state, noError) {
   return (
     state.eat(0x2A /* * */) ||
     state.eat(0x2B /* + */) ||
@@ -263,7 +263,7 @@ pp.regexp_eatQuantifierPrefix = function(state, noError) {
     this.regexp_eatBracedQuantifier(state, noError)
   )
 }
-pp.regexp_eatBracedQuantifier = function(state, noError) {
+pp.regexp_eatBracedQuantifier = function(this: Parser, state, noError) {
   const start = state.pos
   if (state.eat(0x7B /* { */)) {
     let min = 0, max = -1
@@ -289,7 +289,7 @@ pp.regexp_eatBracedQuantifier = function(state, noError) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Atom
-pp.regexp_eatAtom = function(state) {
+pp.regexp_eatAtom = function(this: Parser, state) {
   return (
     this.regexp_eatPatternCharacters(state) ||
     state.eat(0x2E /* . */) ||
@@ -299,7 +299,7 @@ pp.regexp_eatAtom = function(state) {
     this.regexp_eatCapturingGroup(state)
   )
 }
-pp.regexp_eatReverseSolidusAtomEscape = function(state) {
+pp.regexp_eatReverseSolidusAtomEscape = function(this: Parser, state) {
   const start = state.pos
   if (state.eat(0x5C /* \ */)) {
     if (this.regexp_eatAtomEscape(state)) {
@@ -309,7 +309,7 @@ pp.regexp_eatReverseSolidusAtomEscape = function(state) {
   }
   return false
 }
-pp.regexp_eatUncapturingGroup = function(state) {
+pp.regexp_eatUncapturingGroup = function(this: Parser, state) {
   const start = state.pos
   if (state.eat(0x28 /* ( */)) {
     if (state.eat(0x3F /* ? */) && state.eat(0x3A /* : */)) {
@@ -323,7 +323,7 @@ pp.regexp_eatUncapturingGroup = function(state) {
   }
   return false
 }
-pp.regexp_eatCapturingGroup = function(state) {
+pp.regexp_eatCapturingGroup = function(this: Parser, state) {
   if (state.eat(0x28 /* ( */)) {
     if (this.options.ecmaVersion >= 9) {
       this.regexp_groupSpecifier(state)
@@ -341,7 +341,7 @@ pp.regexp_eatCapturingGroup = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ExtendedAtom
-pp.regexp_eatExtendedAtom = function(state) {
+pp.regexp_eatExtendedAtom = function(this: Parser, state) {
   return (
     state.eat(0x2E /* . */) ||
     this.regexp_eatReverseSolidusAtomEscape(state) ||
@@ -354,7 +354,7 @@ pp.regexp_eatExtendedAtom = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-InvalidBracedQuantifier
-pp.regexp_eatInvalidBracedQuantifier = function(state) {
+pp.regexp_eatInvalidBracedQuantifier = function(this: Parser, state) {
   if (this.regexp_eatBracedQuantifier(state, true)) {
     state.raise("Nothing to repeat")
   }
@@ -362,7 +362,7 @@ pp.regexp_eatInvalidBracedQuantifier = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-SyntaxCharacter
-pp.regexp_eatSyntaxCharacter = function(state) {
+pp.regexp_eatSyntaxCharacter = function(this: Parser, state) {
   const ch = state.current()
   if (isSyntaxCharacter(ch)) {
     state.lastIntValue = ch
@@ -384,7 +384,7 @@ function isSyntaxCharacter(ch) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-PatternCharacter
 // But eat eager.
-pp.regexp_eatPatternCharacters = function(state) {
+pp.regexp_eatPatternCharacters = function(this: Parser, state) {
   const start = state.pos
   let ch = 0
   while ((ch = state.current()) !== -1 && !isSyntaxCharacter(ch)) {
@@ -394,7 +394,7 @@ pp.regexp_eatPatternCharacters = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ExtendedPatternCharacter
-pp.regexp_eatExtendedPatternCharacter = function(state) {
+pp.regexp_eatExtendedPatternCharacter = function(this: Parser, state) {
   const ch = state.current()
   if (
     ch !== -1 &&
@@ -415,7 +415,7 @@ pp.regexp_eatExtendedPatternCharacter = function(state) {
 // GroupSpecifier ::
 //   [empty]
 //   `?` GroupName
-pp.regexp_groupSpecifier = function(state) {
+pp.regexp_groupSpecifier = function(this: Parser, state) {
   if (state.eat(0x3F /* ? */)) {
     if (this.regexp_eatGroupName(state)) {
       if (state.groupNames.indexOf(state.lastStringValue) !== -1) {
@@ -431,7 +431,7 @@ pp.regexp_groupSpecifier = function(state) {
 // GroupName ::
 //   `<` RegExpIdentifierName `>`
 // Note: this updates `state.lastStringValue` property with the eaten name.
-pp.regexp_eatGroupName = function(state) {
+pp.regexp_eatGroupName = function(this: Parser, state) {
   state.lastStringValue = ""
   if (state.eat(0x3C /* < */)) {
     if (this.regexp_eatRegExpIdentifierName(state) && state.eat(0x3E /* > */)) {
@@ -446,7 +446,7 @@ pp.regexp_eatGroupName = function(state) {
 //   RegExpIdentifierStart
 //   RegExpIdentifierName RegExpIdentifierPart
 // Note: this updates `state.lastStringValue` property with the eaten name.
-pp.regexp_eatRegExpIdentifierName = function(state) {
+pp.regexp_eatRegExpIdentifierName = function(this: Parser, state) {
   state.lastStringValue = ""
   if (this.regexp_eatRegExpIdentifierStart(state)) {
     state.lastStringValue += codePointToString(state.lastIntValue)
@@ -463,7 +463,7 @@ pp.regexp_eatRegExpIdentifierName = function(state) {
 //   `$`
 //   `_`
 //   `\` RegExpUnicodeEscapeSequence[+U]
-pp.regexp_eatRegExpIdentifierStart = function(state) {
+pp.regexp_eatRegExpIdentifierStart = function(this: Parser, state) {
   const start = state.pos
   const forceU = this.options.ecmaVersion >= 11
   let ch = state.current(forceU)
@@ -491,7 +491,7 @@ function isRegExpIdentifierStart(ch) {
 //   `\` RegExpUnicodeEscapeSequence[+U]
 //   <ZWNJ>
 //   <ZWJ>
-pp.regexp_eatRegExpIdentifierPart = function(state) {
+pp.regexp_eatRegExpIdentifierPart = function(this: Parser, state) {
   const start = state.pos
   const forceU = this.options.ecmaVersion >= 11
   let ch = state.current(forceU)
@@ -513,7 +513,7 @@ function isRegExpIdentifierPart(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-AtomEscape
-pp.regexp_eatAtomEscape = function(state) {
+pp.regexp_eatAtomEscape = function(this: Parser, state) {
   if (
     this.regexp_eatBackReference(state) ||
     this.regexp_eatCharacterClassEscape(state) ||
@@ -531,7 +531,7 @@ pp.regexp_eatAtomEscape = function(state) {
   }
   return false
 }
-pp.regexp_eatBackReference = function(state) {
+pp.regexp_eatBackReference = function(this: Parser, state) {
   const start = state.pos
   if (this.regexp_eatDecimalEscape(state)) {
     const n = state.lastIntValue
@@ -549,7 +549,7 @@ pp.regexp_eatBackReference = function(state) {
   }
   return false
 }
-pp.regexp_eatKGroupName = function(state) {
+pp.regexp_eatKGroupName = function(this: Parser, state) {
   if (state.eat(0x6B /* k */)) {
     if (this.regexp_eatGroupName(state)) {
       state.backReferenceNames.push(state.lastStringValue)
@@ -561,7 +561,7 @@ pp.regexp_eatKGroupName = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-CharacterEscape
-pp.regexp_eatCharacterEscape = function(state) {
+pp.regexp_eatCharacterEscape = function(this: Parser, state) {
   return (
     this.regexp_eatControlEscape(state) ||
     this.regexp_eatCControlLetter(state) ||
@@ -572,7 +572,7 @@ pp.regexp_eatCharacterEscape = function(state) {
     this.regexp_eatIdentityEscape(state)
   )
 }
-pp.regexp_eatCControlLetter = function(state) {
+pp.regexp_eatCControlLetter = function(this: Parser, state) {
   const start = state.pos
   if (state.eat(0x63 /* c */)) {
     if (this.regexp_eatControlLetter(state)) {
@@ -582,7 +582,7 @@ pp.regexp_eatCControlLetter = function(state) {
   }
   return false
 }
-pp.regexp_eatZero = function(state) {
+pp.regexp_eatZero = function(this: Parser, state) {
   if (state.current() === 0x30 /* 0 */ && !isDecimalDigit(state.lookahead())) {
     state.lastIntValue = 0
     state.advance()
@@ -592,7 +592,7 @@ pp.regexp_eatZero = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ControlEscape
-pp.regexp_eatControlEscape = function(state) {
+pp.regexp_eatControlEscape = function(this: Parser, state) {
   const ch = state.current()
   if (ch === 0x74 /* t */) {
     state.lastIntValue = 0x09 /* \t */
@@ -623,7 +623,7 @@ pp.regexp_eatControlEscape = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ControlLetter
-pp.regexp_eatControlLetter = function(state) {
+pp.regexp_eatControlLetter = function(this: Parser, state) {
   const ch = state.current()
   if (isControlLetter(ch)) {
     state.lastIntValue = ch % 0x20
@@ -640,7 +640,7 @@ function isControlLetter(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-RegExpUnicodeEscapeSequence
-pp.regexp_eatRegExpUnicodeEscapeSequence = function(state, forceU = false) {
+pp.regexp_eatRegExpUnicodeEscapeSequence = function(this: Parser, state, forceU = false) {
   const start = state.pos
   const switchU = forceU || state.switchU
 
@@ -683,7 +683,7 @@ function isValidUnicode(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-IdentityEscape
-pp.regexp_eatIdentityEscape = function(state) {
+pp.regexp_eatIdentityEscape = function(this: Parser, state) {
   if (state.switchU) {
     if (this.regexp_eatSyntaxCharacter(state)) {
       return true
@@ -706,7 +706,7 @@ pp.regexp_eatIdentityEscape = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-DecimalEscape
-pp.regexp_eatDecimalEscape = function(state) {
+pp.regexp_eatDecimalEscape = function(this: Parser, state) {
   state.lastIntValue = 0
   let ch = state.current()
   if (ch >= 0x31 /* 1 */ && ch <= 0x39 /* 9 */) {
@@ -720,7 +720,7 @@ pp.regexp_eatDecimalEscape = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClassEscape
-pp.regexp_eatCharacterClassEscape = function(state) {
+pp.regexp_eatCharacterClassEscape = function(this: Parser, state) {
   const ch = state.current()
 
   if (isCharacterClassEscape(ch)) {
@@ -762,7 +762,7 @@ function isCharacterClassEscape(ch) {
 // UnicodePropertyValueExpression ::
 //   UnicodePropertyName `=` UnicodePropertyValue
 //   LoneUnicodePropertyNameOrValue
-pp.regexp_eatUnicodePropertyValueExpression = function(state) {
+pp.regexp_eatUnicodePropertyValueExpression = function(this: Parser, state) {
   const start = state.pos
 
   // UnicodePropertyName `=` UnicodePropertyValue
@@ -784,20 +784,20 @@ pp.regexp_eatUnicodePropertyValueExpression = function(state) {
   }
   return false
 }
-pp.regexp_validateUnicodePropertyNameAndValue = function(state, name, value) {
+pp.regexp_validateUnicodePropertyNameAndValue = function(this: Parser, state, name, value) {
   if (!hasOwn(state.unicodeProperties.nonBinary, name))
     state.raise("Invalid property name")
   if (!state.unicodeProperties.nonBinary[name].test(value))
     state.raise("Invalid property value")
 }
-pp.regexp_validateUnicodePropertyNameOrValue = function(state, nameOrValue) {
+pp.regexp_validateUnicodePropertyNameOrValue = function(this: Parser, state, nameOrValue) {
   if (!state.unicodeProperties.binary.test(nameOrValue))
     state.raise("Invalid property name")
 }
 
 // UnicodePropertyName ::
 //   UnicodePropertyNameCharacters
-pp.regexp_eatUnicodePropertyName = function(state) {
+pp.regexp_eatUnicodePropertyName = function(this: Parser, state) {
   let ch = 0
   state.lastStringValue = ""
   while (isUnicodePropertyNameCharacter(ch = state.current())) {
@@ -812,7 +812,7 @@ function isUnicodePropertyNameCharacter(ch) {
 
 // UnicodePropertyValue ::
 //   UnicodePropertyValueCharacters
-pp.regexp_eatUnicodePropertyValue = function(state) {
+pp.regexp_eatUnicodePropertyValue = function(this: Parser, state) {
   let ch = 0
   state.lastStringValue = ""
   while (isUnicodePropertyValueCharacter(ch = state.current())) {
@@ -827,12 +827,12 @@ function isUnicodePropertyValueCharacter(ch) {
 
 // LoneUnicodePropertyNameOrValue ::
 //   UnicodePropertyValueCharacters
-pp.regexp_eatLoneUnicodePropertyNameOrValue = function(state) {
+pp.regexp_eatLoneUnicodePropertyNameOrValue = function(this: Parser, state) {
   return this.regexp_eatUnicodePropertyValue(state)
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClass
-pp.regexp_eatCharacterClass = function(state) {
+pp.regexp_eatCharacterClass = function(this: Parser, state) {
   if (state.eat(0x5B /* [ */)) {
     state.eat(0x5E /* ^ */)
     this.regexp_classRanges(state)
@@ -848,7 +848,7 @@ pp.regexp_eatCharacterClass = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassRanges
 // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRanges
 // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRangesNoDash
-pp.regexp_classRanges = function(state) {
+pp.regexp_classRanges = function(this: Parser, state) {
   while (this.regexp_eatClassAtom(state)) {
     const left = state.lastIntValue
     if (state.eat(0x2D /* - */) && this.regexp_eatClassAtom(state)) {
@@ -865,7 +865,7 @@ pp.regexp_classRanges = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassAtom
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassAtomNoDash
-pp.regexp_eatClassAtom = function(state) {
+pp.regexp_eatClassAtom = function(this: Parser, state) {
   const start = state.pos
 
   if (state.eat(0x5C /* \ */)) {
@@ -894,7 +894,7 @@ pp.regexp_eatClassAtom = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ClassEscape
-pp.regexp_eatClassEscape = function(state) {
+pp.regexp_eatClassEscape = function(this: Parser, state) {
   const start = state.pos
 
   if (state.eat(0x62 /* b */)) {
@@ -921,7 +921,7 @@ pp.regexp_eatClassEscape = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ClassControlLetter
-pp.regexp_eatClassControlLetter = function(state) {
+pp.regexp_eatClassControlLetter = function(this: Parser, state) {
   const ch = state.current()
   if (isDecimalDigit(ch) || ch === 0x5F /* _ */) {
     state.lastIntValue = ch % 0x20
@@ -932,7 +932,7 @@ pp.regexp_eatClassControlLetter = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-HexEscapeSequence
-pp.regexp_eatHexEscapeSequence = function(state) {
+pp.regexp_eatHexEscapeSequence = function(this: Parser, state) {
   const start = state.pos
   if (state.eat(0x78 /* x */)) {
     if (this.regexp_eatFixedHexDigits(state, 2)) {
@@ -947,7 +947,7 @@ pp.regexp_eatHexEscapeSequence = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-DecimalDigits
-pp.regexp_eatDecimalDigits = function(state) {
+pp.regexp_eatDecimalDigits = function(this: Parser, state) {
   const start = state.pos
   let ch = 0
   state.lastIntValue = 0
@@ -962,7 +962,7 @@ function isDecimalDigit(ch) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-HexDigits
-pp.regexp_eatHexDigits = function(state) {
+pp.regexp_eatHexDigits = function(this: Parser, state) {
   const start = state.pos
   let ch = 0
   state.lastIntValue = 0
@@ -991,7 +991,7 @@ function hexToInt(ch) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-LegacyOctalEscapeSequence
 // Allows only 0-377(octal) i.e. 0-255(decimal).
-pp.regexp_eatLegacyOctalEscapeSequence = function(state) {
+pp.regexp_eatLegacyOctalEscapeSequence = function(this: Parser, state) {
   if (this.regexp_eatOctalDigit(state)) {
     const n1 = state.lastIntValue
     if (this.regexp_eatOctalDigit(state)) {
@@ -1010,7 +1010,7 @@ pp.regexp_eatLegacyOctalEscapeSequence = function(state) {
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-OctalDigit
-pp.regexp_eatOctalDigit = function(state) {
+pp.regexp_eatOctalDigit = function(this: Parser, state) {
   const ch = state.current()
   if (isOctalDigit(ch)) {
     state.lastIntValue = ch - 0x30 /* 0 */
@@ -1027,7 +1027,7 @@ function isOctalDigit(ch) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Hex4Digits
 // https://www.ecma-international.org/ecma-262/8.0/#prod-HexDigit
 // And HexDigit HexDigit in https://www.ecma-international.org/ecma-262/8.0/#prod-HexEscapeSequence
-pp.regexp_eatFixedHexDigits = function(state, length) {
+pp.regexp_eatFixedHexDigits = function(this: Parser, state, length) {
   const start = state.pos
   state.lastIntValue = 0
   for (let i = 0; i < length; ++i) {

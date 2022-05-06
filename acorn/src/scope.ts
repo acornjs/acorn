@@ -19,22 +19,22 @@ class Scope {
 
 // The functions in this module keep track of declared variables in the current scope in order to detect duplicate variable names.
 
-pp.enterScope = function(flags) {
+pp.enterScope = function(this: Parser, flags) {
   this.scopeStack.push(new Scope(flags))
 }
 
-pp.exitScope = function() {
+pp.exitScope = function(this: Parser) {
   this.scopeStack.pop()
 }
 
 // The spec says:
 // > At the top level of a function, or script, function declarations are
 // > treated like var declarations rather than like lexical declarations.
-pp.treatFunctionsAsVarInScope = function(scope) {
+pp.treatFunctionsAsVarInScope = function(this: Parser, scope) {
   return (scope.flags & SCOPE_FUNCTION) || !this.inModule && (scope.flags & SCOPE_TOP)
 }
 
-pp.declareName = function(name, bindingType, pos) {
+pp.declareName = function(this: Parser, name, bindingType, pos) {
   let redeclared = false
   if (bindingType === BIND_LEXICAL) {
     const scope = this.currentScope()
@@ -69,7 +69,7 @@ pp.declareName = function(name, bindingType, pos) {
   if (redeclared) this.raiseRecoverable(pos, `Identifier '${name}' has already been declared`)
 }
 
-pp.checkLocalExport = function(id) {
+pp.checkLocalExport = function(this: Parser, id) {
   // scope.functions must be empty as Module code is always strict.
   if (this.scopeStack[0].lexical.indexOf(id.name) === -1 &&
       this.scopeStack[0].var.indexOf(id.name) === -1) {
@@ -77,11 +77,11 @@ pp.checkLocalExport = function(id) {
   }
 }
 
-pp.currentScope = function() {
+pp.currentScope = function(this: Parser) {
   return this.scopeStack[this.scopeStack.length - 1]
 }
 
-pp.currentVarScope = function() {
+pp.currentVarScope = function(this: Parser) {
   for (let i = this.scopeStack.length - 1;; i--) {
     let scope = this.scopeStack[i]
     if (scope.flags & SCOPE_VAR) return scope
@@ -89,7 +89,7 @@ pp.currentVarScope = function() {
 }
 
 // Could be useful for `this`, `new.target`, `super()`, `super.property`, and `super[property]`.
-pp.currentThisScope = function() {
+pp.currentThisScope = function(this: Parser) {
   for (let i = this.scopeStack.length - 1;; i--) {
     let scope = this.scopeStack[i]
     if (scope.flags & SCOPE_VAR && !(scope.flags & SCOPE_ARROW)) return scope

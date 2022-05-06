@@ -31,15 +31,15 @@ export const types = {
 
 const pp = Parser.prototype
 
-pp.initialContext = function() {
+pp.initialContext = function(this: Parser) {
   return [types.b_stat]
 }
 
-pp.curContext = function() {
+pp.curContext = function(this: Parser) {
   return this.context[this.context.length - 1]
 }
 
-pp.braceIsBlock = function(prevType) {
+pp.braceIsBlock = function(this: Parser, prevType) {
   let parent = this.curContext()
   if (parent === types.f_expr || parent === types.f_stat)
     return true
@@ -60,7 +60,7 @@ pp.braceIsBlock = function(prevType) {
   return !this.exprAllowed
 }
 
-pp.inGeneratorContext = function() {
+pp.inGeneratorContext = function(this: Parser) {
   for (let i = this.context.length - 1; i >= 1; i--) {
     let context = this.context[i]
     if (context.token === "function")
@@ -69,7 +69,7 @@ pp.inGeneratorContext = function() {
   return false
 }
 
-pp.updateContext = function(prevType) {
+pp.updateContext = function(this: Parser, prevType) {
   let update, type = this.type
   if (type.keyword && prevType === tt.dot)
     this.exprAllowed = false
@@ -80,7 +80,7 @@ pp.updateContext = function(prevType) {
 }
 
 // Used to handle egde case when token context could not be inferred correctly in tokenize phase
-pp.overrideContext = function(tokenCtx) {
+pp.overrideContext = function(this: Parser, tokenCtx) {
   if (this.curContext() !== tokenCtx) {
     this.context[this.context.length - 1] = tokenCtx
   }
