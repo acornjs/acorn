@@ -8,6 +8,9 @@ export class Node {
   loc?: SourceLocation
   sourceFile?: string
   range?: [number, number]
+  body: any
+  sourceType: any
+
   constructor(parser: Parser, pos: number, loc?: SourceLocation) {
     this.type = ""
     this.start = pos
