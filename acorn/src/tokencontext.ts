@@ -7,6 +7,12 @@ import {types as tt} from "./tokentype.js"
 import {lineBreak} from "./whitespace.js"
 
 export class TokContext {
+  generator: boolean
+  isExpr: boolean
+  override: undefined | ((p: Parser)=>void)
+  preserveSpace: boolean
+  token: string
+
   constructor(token: string, isExpr: boolean, preserveSpace: boolean, override?: (p: Parser) => void, generator?: any) {
     this.token = token
     this.isExpr = !!isExpr
