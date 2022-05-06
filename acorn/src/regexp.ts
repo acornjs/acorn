@@ -6,6 +6,23 @@ import {hasOwn, codePointToString} from "./util.js"
 const pp = Parser.prototype
 
 export class RegExpValidationState {
+  backReferenceNames: any
+  flags: any
+  groupNames: any
+  lastAssertionIsQuantifiable: any
+  lastIntValue: any
+  lastStringValue: any
+  maxBackReference: any
+  numCapturingParens: any
+  parser: any
+  pos: any
+  source: any
+  start: any
+  switchN: any
+  switchU: any
+  unicodeProperties: any
+  validFlags: any
+
   constructor(parser) {
     this.parser = parser
     this.validFlags = `gim${parser.options.ecmaVersion >= 6 ? "uy" : ""}${parser.options.ecmaVersion >= 9 ? "s" : ""}${parser.options.ecmaVersion >= 13 ? "d" : ""}`
