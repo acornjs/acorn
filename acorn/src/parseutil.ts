@@ -112,14 +112,11 @@ pp.unexpected = function(this: Parser, pos) {
 }
 
 export class DestructuringErrors {
-  constructor() {
-    this.shorthandAssign =
-    this.trailingComma =
-    this.parenthesizedAssign =
-    this.parenthesizedBind =
-    this.doubleProto =
-      -1
-  }
+  shorthandAssign = -1
+  trailingComma = -1
+  parenthesizedAssign = -1
+  parenthesizedBind = -1
+  doubleProto = -1
 }
 
 pp.checkPatternErrors = function(this: Parser, refDestructuringErrors, isAssign) {
