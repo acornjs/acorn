@@ -23,7 +23,7 @@ export class SourceLocation {
   start: Position
   end: Position
   source?: string | null
-  constructor(p: Parser, start: Position, end: Position) {
+  constructor(p: Parser, start: Position, end?: Position) {
     this.start = start
     this.end = end
     if (p.sourceFile !== null) this.source = p.sourceFile

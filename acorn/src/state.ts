@@ -18,14 +18,14 @@ export class Parser {
   end: number
   input: string
   type: TokenType
-  next: () => void
+  next: (ignoreEscapeSequenceInKeyword?: any) => void
   nextToken: () => void
   parseTopLevel: (node: Node) =>Node
   finishNode: (node: Node, type: string) => Node
   finishNodeAt: (node: Node, type: string, pos: number, loc: Position) => Node
   raise: (pos: number, message: string) => void
   raiseRecoverable: (pos: number, message: string) => void
-  unexpected: (pos: number) => void
+  unexpected: (pos?: number) => void
 
   adaptDirectivePrologue: any
   afterTrailingComma: any

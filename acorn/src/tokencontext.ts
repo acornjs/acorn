@@ -13,7 +13,7 @@ export class TokContext {
   preserveSpace: boolean
   token: string
 
-  constructor(token: string, isExpr: boolean, preserveSpace: boolean, override?: (p: Parser) => void, generator?: any) {
+  constructor(token: string, isExpr: boolean, preserveSpace?: boolean, override?: (p: Parser) => void, generator?: any) {
     this.token = token
     this.isExpr = !!isExpr
     this.preserveSpace = !!preserveSpace
