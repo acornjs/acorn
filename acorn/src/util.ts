@@ -1,5 +1,6 @@
 const {hasOwnProperty, toString} = Object.prototype
 
+// @ts-ignore TS does not understand that this won't fail even in <ES2022
 export const hasOwn = Object.hasOwn || ((obj, propName) => (
   hasOwnProperty.call(obj, propName)
 ))
