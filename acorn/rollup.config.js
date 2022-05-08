@@ -19,7 +19,7 @@ export default [
     plugins: [
       typescript({
         compilerOptions: {
-          lib: ["es6", "dom"],
+          lib: ["esnext", "dom"],
           target: "es5"
         }
       }),

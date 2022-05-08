@@ -35,24 +35,18 @@ const unicodeScriptValues = {
   13: ecma13ScriptValues
 }
 
-const data = {}
-function buildUnicodeData(ecmaVersion) {
-  const d = data[ecmaVersion] = {
+export default Object.fromEntries([9, 10, 11, 12, 13].map(ecmaVersion => {
+  const gc = wordsRegexp(unicodeGeneralCategoryValues)
+  const sc = wordsRegexp(unicodeScriptValues[ecmaVersion])
+  return [ecmaVersion, {
     binary: wordsRegexp(unicodeBinaryProperties[ecmaVersion] + " " + unicodeGeneralCategoryValues),
     nonBinary: {
-      General_Category: wordsRegexp(unicodeGeneralCategoryValues),
-      Script: wordsRegexp(unicodeScriptValues[ecmaVersion])
+      General_Category: gc,
+      Script: sc,
+      Script_Extensions: sc,
+      gc,
+      sc,
+      scx: sc
     }
-  }
-  d.nonBinary.Script_Extensions = d.nonBinary.Script
-
-  d.nonBinary.gc = d.nonBinary.General_Category
-  d.nonBinary.sc = d.nonBinary.Script
-  d.nonBinary.scx = d.nonBinary.Script_Extensions
-}
-
-for (const ecmaVersion of [9, 10, 11, 12, 13]) {
-  buildUnicodeData(ecmaVersion)
-}
-
-export default data
+  }]
+}))
