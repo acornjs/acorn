@@ -39,6 +39,7 @@ pp.next = function(this: Parser, ignoreEscapeSequenceInKeyword) {
   if (!ignoreEscapeSequenceInKeyword && this.type.keyword && this.containsEsc)
     this.raiseRecoverable(this.start, "Escape sequence in keyword " + this.type.keyword)
   if (this.options.onToken)
+    // @ts-ignore there might be an actual error here
     this.options.onToken(new Token(this))
 
   this.lastTokEnd = this.end
@@ -113,6 +114,7 @@ pp.skipBlockComment = function(this: Parser) {
     }
   }
   if (this.options.onComment)
+    // @ts-ignore there might be an actual error here
     this.options.onComment(true, this.input.slice(start + 2, end), start, this.pos,
                            startLoc, this.curPosition())
 }
@@ -125,6 +127,7 @@ pp.skipLineComment = function(this: Parser, startSkip) {
     ch = this.input.charCodeAt(++this.pos)
   }
   if (this.options.onComment)
+    // @ts-ignore there might be an actual error here
     this.options.onComment(false, this.input.slice(start + startSkip, this.pos), start, this.pos,
                            startLoc, this.curPosition())
 }
