@@ -1,5 +1,5 @@
 import {Parser} from "./state.js"
-import {SourceLocation} from "./locutil.js"
+import {Position, SourceLocation} from "./locutil.js"
 
 export class Node {
   type: string
@@ -11,7 +11,7 @@ export class Node {
   body: any
   sourceType: any
 
-  constructor(parser: Parser, pos: number, loc?: SourceLocation) {
+  constructor(parser: Parser, pos: number, loc?: Position) {
     this.type = ""
     this.start = pos
     this.end = 0

@@ -414,10 +414,7 @@ export class Parser {
     return parser.parseExpression()
   }
 
-  static tokenizer(input: string, options: Options): {
-    getToken(): Token
-    [Symbol.iterator](): Iterator<Token>
-  } {
+  static tokenizer(input: string, options: Options): Parser {
     return new this(options, input)
   }
 }

@@ -2,12 +2,12 @@ import {Position, SourceLocation} from "./locutil"
 import {Node} from "./node"
 import {Token} from "./tokenize"
 
-type ecmaVersion = 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | "latest"
+type ecmaVersion = 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | "latest" | 1e8
 
 interface AbstractToken {
 }
 
-interface Comment extends AbstractToken {
+export interface Comment extends AbstractToken {
   type: string
   value: string
   start: number

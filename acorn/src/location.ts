@@ -13,6 +13,7 @@ pp.raise = function(this: Parser, pos, message) {
   let loc = getLineInfo(this.input, pos)
   message += " (" + loc.line + ":" + loc.column + ")"
   let err = new SyntaxError(message)
+  // @ts-ignore this just overloads a SyntaxError instance and should not create runtime bugs
   err.pos = pos; err.loc = loc; err.raisedAt = this.pos
   throw err
 }

@@ -1,5 +1,6 @@
 import {hasOwn, isArray} from "./util.js"
 import {SourceLocation} from "./locutil.js"
+import type {Comment, Options} from "./types.js"
 
 // A second argument must be given to configure the parser process.
 // These options are recognized (only `ecmaVersion` is required):
@@ -100,7 +101,7 @@ export const defaultOptions = {
 let warnedAboutEcmaVersion = false
 
 export function getOptions(opts) {
-  let options = {}
+  let options = {} as Options
 
   for (let opt in defaultOptions)
     options[opt] = opts && hasOwn(opts, opt) ? opts[opt] : defaultOptions[opt]
@@ -132,7 +133,7 @@ export function getOptions(opts) {
 
 function pushComment(options, array) {
   return function(block, text, start, end, startLoc, endLoc) {
-    let comment = {
+    let comment: Comment = {
       type: block ? "Block" : "Line",
       value: text,
       start: start,

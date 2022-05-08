@@ -5,7 +5,7 @@ export const hasOwn = Object.hasOwn || ((obj, propName) => (
   hasOwnProperty.call(obj, propName)
 ))
 
-export const isArray = Array.isArray || ((obj) => (
+export const isArray = Array.isArray || ((obj): obj is any[] => (
   toString.call(obj) === "[object Array]"
 ))
 
