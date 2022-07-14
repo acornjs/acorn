@@ -43,6 +43,7 @@ module.exports = {
     "no-unused-labels": "error",
     "no-var": "error",
     "object-curly-spacing": ["error", "never"],
+    "object-shorthand": "off",
     "one-var": "off",
     "prefer-const": "off",
     quotes: ["error", "double"],
