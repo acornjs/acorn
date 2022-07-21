@@ -1,3 +1,15 @@
+## 8.8.0 (2022-07-21)
+
+### Bug fixes
+
+Allow parentheses around spread args in destructuring object assignment.
+
+Fix an issue where the tree contained `directive` properties in when parsing with a language version that doesn't support them.
+
+### New features
+
+Support hashbang comments by default in ECMAScript 2023 and later.
+
 ## 8.7.1 (2021-04-26)
 
 ### Bug fixes
