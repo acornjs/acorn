@@ -54,10 +54,10 @@ required):
 
 - **ecmaVersion**: Indicates the ECMAScript version to parse. Must be
   either 3, 5, 6 (or 2015), 7 (2016), 8 (2017), 9 (2018), 10 (2019),
-  11 (2020), 12 (2021), 13 (2022, partial support)
-  or `"latest"` (the latest the library supports). This influences
-  support for strict mode, the set of reserved words, and support
-  for new syntax features.
+  11 (2020), 12 (2021), 13 (2022), 14 (2023), or `"latest"` (the
+  latest the library supports). This influences support for strict
+  mode, the set of reserved words, and support for new syntax
+  features.
 
   **NOTE**: Only 'stage 4' (finalized) ECMAScript features are being
   implemented by Acorn. Other proposed new features must be
@@ -104,9 +104,9 @@ required):
 - **allowSuperOutsideMethod**: By default, `super` outside a method
   raises an error. Set this to `true` to accept such code.
 
-- **allowHashBang**: When this is enabled (off by default), if the
-  code starts with the characters `#!` (as in a shellscript), the
-  first line will be treated as a comment.
+- **allowHashBang**: When this is enabled, if the code starts with the
+  characters `#!` (as in a shellscript), the first line will be
+  treated as a comment. Defaults to true when `ecmaVersion` >= 2023.
 
 - **locations**: When `true`, each node has a `loc` object attached
   with `start` and `end` subobjects, each of which contains the
