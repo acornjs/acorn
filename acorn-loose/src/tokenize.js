@@ -89,6 +89,7 @@ lp.readToken = function() {
 
 lp.resetTo = function(pos) {
   this.toks.pos = pos
+  this.toks.containsEsc = false
   let ch = this.input.charAt(pos - 1)
   this.toks.exprAllowed = !ch || /[[{(,;:?/*=+\-~!|&%^<>]/.test(ch) ||
     /[enwfd]/.test(ch) &&
