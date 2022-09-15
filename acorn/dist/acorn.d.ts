@@ -250,7 +250,7 @@ declare namespace acorn {
     constructor(parser: Parser, pos: number, loc?: SourceLocation)
   }
 
-  export type Node =
+   type Node =
     Program |
     BreakStatement |
     ContinueStatement |
@@ -324,7 +324,7 @@ declare namespace acorn {
     ArrowFunctionExpression |
     AwaitExpression
 
-  export type Expression =
+   type Expression =
     | ArrayExpression
     | AssignmentExpression
     | BinaryExpression
@@ -350,7 +350,7 @@ declare namespace acorn {
     | YieldExpression
     | AwaitExpression
 
-  export type Statement =
+   type Statement =
     | BlockStatement
     | BreakStatement
     | ContinueStatement
@@ -377,9 +377,9 @@ declare namespace acorn {
     | ForOfStatement
     | ImportDeclaration
 
-  export type Pattern = AssignmentPattern | ArrayPattern | ObjectPattern
+   type Pattern = AssignmentPattern | ArrayPattern | ObjectPattern
 
-  export type LVal =
+   type LVal =
     | Identifier
     | MemberExpression
     | RestElement
@@ -388,14 +388,14 @@ declare namespace acorn {
     | ObjectPattern
 
 
-  export type PatternLike =
+   type PatternLike =
     | Identifier
     | RestElement
     | AssignmentPattern
     | ArrayPattern
     | ObjectPattern
 
-  export type Declaration =
+   type Declaration =
     | FunctionDeclaration
     | VariableDeclaration
     | ClassDeclaration
@@ -404,33 +404,33 @@ declare namespace acorn {
     | ExportNamedDeclaration
     | ImportDeclaration
 
-  export interface Program extends BaseNodeProps {
+   interface Program extends BaseNodeProps {
     type: 'Program'
     sourceType: Options['sourceType']
     body: Array<Statement>
   }
 
-  export interface BreakStatement extends BaseNodeProps {
+   interface BreakStatement extends BaseNodeProps {
     type: 'BreakStatement'
     label: null | Identifier
   }
 
-  export interface ContinueStatement extends BaseNodeProps {
+   interface ContinueStatement extends BaseNodeProps {
     type: 'ContinueStatement'
     label: null | Identifier
   }
 
-  export interface DebuggerStatement extends BaseNodeProps {
+   interface DebuggerStatement extends BaseNodeProps {
     type: 'DebuggerStatement'
   }
 
-  export interface DoWhileStatement extends BaseNodeProps {
+   interface DoWhileStatement extends BaseNodeProps {
     type: 'DoWhileStatement'
     body: Statement
     test: Expression
   }
 
-  export interface ForStatement extends BaseNodeProps {
+   interface ForStatement extends BaseNodeProps {
     type: 'ForStatement'
     init: VariableDeclaration | Expression | null
     test: Expression | null
@@ -438,14 +438,14 @@ declare namespace acorn {
     body: Statement
   }
 
-  export interface ForInStatement extends BaseNodeProps {
+   interface ForInStatement extends BaseNodeProps {
     type: 'ForInStatement'
     body: Statement
     left: VariableDeclaration | LVal
     right: Expression
   }
 
-  export interface ForOfStatement extends BaseNodeProps {
+   interface ForOfStatement extends BaseNodeProps {
     type: 'ForOfStatement'
     body: Statement
     left: VariableDeclaration | LVal
@@ -453,93 +453,93 @@ declare namespace acorn {
     await: boolean
   }
 
-  export interface IfStatement extends BaseNodeProps{
+   interface IfStatement extends BaseNodeProps{
     type: 'IfStatement'
     test: Expression
     consequent: Statement
     alternate: Statement | null
   }
 
-  export interface ReturnStatement extends BaseNodeProps{
+   interface ReturnStatement extends BaseNodeProps{
     type: 'ReturnStatement'
     argument: Expression | null
   }
 
-  export interface SwitchCase extends BaseNodeProps{
+   interface SwitchCase extends BaseNodeProps{
     type: 'SwitchCase'
     consequent: Array<Statement>
     test: Expression | null
   }
 
-  export interface SwitchStatement extends BaseNodeProps{
+   interface SwitchStatement extends BaseNodeProps{
     type: 'SwitchStatement'
     discriminant: Expression;
     cases: Array<SwitchCase>;
   }
 
-  export interface ThrowStatement extends BaseNodeProps{
+   interface ThrowStatement extends BaseNodeProps{
     type: 'ThrowStatement'
     argument: Expression
   }
 
-  export interface TryStatement extends BaseNodeProps{
+   interface TryStatement extends BaseNodeProps{
     type: 'TryStatement'
     block: BlockStatement
     handler: CatchClause | null
     finalizer : BlockStatement | null
   }
 
-  export interface CatchClause extends BaseNodeProps{
+   interface CatchClause extends BaseNodeProps{
     type: 'CatchClause'
     param: Identifier | ArrayPattern | ObjectPattern | null
     body: BlockStatement
   }
 
-  export interface VariableDeclaration extends BaseNodeProps{
+   interface VariableDeclaration extends BaseNodeProps{
     type: 'VariableDeclaration'
     declarations: Array<VariableDeclarator>
     kind: 'var' | 'let' | 'const'
   }
 
-  export interface VariableDeclarator extends BaseNodeProps{
+   interface VariableDeclarator extends BaseNodeProps{
     type: 'VariableDeclarator'
     id: LVal
     init: Expression | null
   }
 
-  export interface WhileStatement extends BaseNodeProps{
+   interface WhileStatement extends BaseNodeProps{
     type: 'WhileStatement'
     test: Expression
     body: Statement
   }
 
-  export interface WithStatement extends BaseNodeProps{
+   interface WithStatement extends BaseNodeProps{
     type: 'WithStatement'
     object: Expression
     body: Statement
   }
 
-  export interface EmptyStatement extends BaseNodeProps{
+   interface EmptyStatement extends BaseNodeProps{
     type: 'EmptyStatement'
   }
 
-  export interface LabeledStatement extends BaseNodeProps{
+   interface LabeledStatement extends BaseNodeProps{
     type: 'LabeledStatement'
     body: Statement
     label: Identifier
   }
 
-  export interface ExpressionStatement extends BaseNodeProps{
+   interface ExpressionStatement extends BaseNodeProps{
     type: 'ExpressionStatement'
     expression: Expression
   }
 
-  export interface BlockStatement extends BaseNodeProps{
+   interface BlockStatement extends BaseNodeProps{
     type: 'BlockStatement'
     body: Array<Statement>
   }
 
-  export interface FunctionDeclaration extends BaseNodeProps{
+   interface FunctionDeclaration extends BaseNodeProps{
     type: 'FunctionDeclaration'
     id: Identifier | null
     generator?: boolean
@@ -549,7 +549,7 @@ declare namespace acorn {
     body: BlockStatement
   }
 
-  export interface FunctionExpression extends BaseNodeProps{
+   interface FunctionExpression extends BaseNodeProps{
     type: 'FunctionExpression'
     id: Identifier | null
     generator?: boolean
@@ -559,26 +559,26 @@ declare namespace acorn {
     body: BlockStatement
   }
 
-  export interface ClassDeclaration extends BaseNodeProps{
+   interface ClassDeclaration extends BaseNodeProps{
     type: 'ClassDeclaration'
     id: Identifier | null
     superClass: Expression | null
     body: ClassBody
   }
 
-  export interface ClassExpression extends BaseNodeProps{
+   interface ClassExpression extends BaseNodeProps{
     type: 'ClassExpression'
     id: Identifier | null
     superClass: Expression | null
     body: ClassBody
   }
 
-  export interface ClassBody extends BaseNodeProps {
+   interface ClassBody extends BaseNodeProps {
     type: 'ClassBody'
     body: Array<StaticBlock | Identifier | MethodDefinition | PropertyDefinition>
   }
 
-  export interface MethodDefinition extends BaseNodeProps {
+   interface MethodDefinition extends BaseNodeProps {
     type: 'MethodDefinition'
     static: boolean
     computed: boolean
@@ -587,7 +587,7 @@ declare namespace acorn {
     value: FunctionExpression | null
   }
 
-  export interface PropertyDefinition extends BaseNodeProps {
+   interface PropertyDefinition extends BaseNodeProps {
     type: 'PropertyDefinition'
     static: boolean
     computed: boolean
@@ -595,83 +595,83 @@ declare namespace acorn {
     value: Expression | null
   }
 
-  export interface StaticBlock extends BaseNodeProps {
+   interface StaticBlock extends BaseNodeProps {
     type: 'StaticBlock'
     body: Array<Statement>
   }
 
-  export interface ExportAllDeclaration extends BaseNodeProps {
+   interface ExportAllDeclaration extends BaseNodeProps {
     type: 'ExportAllDeclaration'
     exported: Identifier | Literal | null
     source: Literal
   }
 
-  export interface ExportDefaultDeclaration extends BaseNodeProps {
+   interface ExportDefaultDeclaration extends BaseNodeProps {
     type: 'ExportDefaultDeclaration'
     declaration: FunctionDeclaration | ClassDeclaration | Expression
   }
 
-  export interface ExportNamedDeclaration extends BaseNodeProps {
+   interface ExportNamedDeclaration extends BaseNodeProps {
     type: 'ExportNamedDeclaration'
     declaration: Declaration | null
     specifiers: Array<ExportSpecifier>
     source: Literal | null
   }
 
-  export interface ExportSpecifier extends BaseNodeProps {
+   interface ExportSpecifier extends BaseNodeProps {
     type: 'ExportSpecifier'
     local: Identifier
     exported: Identifier | Literal
   }
 
-  export interface ImportDeclaration extends BaseNodeProps {
+   interface ImportDeclaration extends BaseNodeProps {
     type: 'ImportDeclaration'
     specifiers: Array<ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier>
     source: Literal
   }
 
-  export interface ImportDefaultSpecifier extends BaseNodeProps {
+   interface ImportDefaultSpecifier extends BaseNodeProps {
     type: 'ImportDefaultSpecifier'
     local: Identifier
   }
 
-  export interface ImportNamespaceSpecifier extends BaseNodeProps {
+   interface ImportNamespaceSpecifier extends BaseNodeProps {
     type: 'ImportNamespaceSpecifier'
     local: Identifier
   }
 
-  export interface ImportSpecifier extends BaseNodeProps {
+   interface ImportSpecifier extends BaseNodeProps {
     type: 'ImportSpecifier'
     local: Identifier
     imported: Identifier
   }
 
-  export interface SequenceExpression extends BaseNodeProps {
+   interface SequenceExpression extends BaseNodeProps {
     type: 'SequenceExpression'
     expressions: Array<Expression>
   }
 
-  export interface YieldExpression extends BaseNodeProps {
+   interface YieldExpression extends BaseNodeProps {
     type: 'YieldExpression'
     delegate: boolean
     argument: Expression | null
   }
 
-  export interface AssignmentExpression extends BaseNodeProps {
+   interface AssignmentExpression extends BaseNodeProps {
     type: 'AssignmentExpression'
     operator: string
     left: LVal
     right: Expression
   }
 
-  export interface ConditionalExpression extends BaseNodeProps {
+   interface ConditionalExpression extends BaseNodeProps {
     type: 'ConditionalExpression'
     test: Expression
     consequent: Expression
     alternate: Expression
   }
 
-  export interface LogicalExpression extends BaseNodeProps {
+   interface LogicalExpression extends BaseNodeProps {
     type: 'LogicalExpression'
     operator:
       | "||"
@@ -681,7 +681,7 @@ declare namespace acorn {
     right: Expression
   }
 
-  export interface BinaryExpression extends BaseNodeProps {
+   interface BinaryExpression extends BaseNodeProps {
     type: 'BinaryExpression'
     operator:
       | "+"
@@ -711,26 +711,26 @@ declare namespace acorn {
     right: Expression
   }
 
-  export interface UpdateExpression extends BaseNodeProps {
+   interface UpdateExpression extends BaseNodeProps {
     type: 'UpdateExpression'
     operator: "++" | "--"
     argument: Expression
     prefix: boolean
   }
 
-  export interface UnaryExpression extends BaseNodeProps {
+   interface UnaryExpression extends BaseNodeProps {
     type: 'UnaryExpression'
     operator: 'void' | 'throw' | 'delete' | '!' | '+' | '-' | '~' | 'typeof'
     prefix: boolean
     argument: Expression
   }
 
-  export interface ChainExpression extends BaseNodeProps {
+   interface ChainExpression extends BaseNodeProps {
     type: 'ChainExpression'
     expression: ArrowFunctionExpression
   }
 
-  export interface MemberExpression extends BaseNodeProps {
+   interface MemberExpression extends BaseNodeProps {
     type: 'MemberExpression'
     object: Expression
     property: Expression | Identifier | PrivateIdentifier
@@ -738,28 +738,28 @@ declare namespace acorn {
     optional?: boolean
   }
 
-  export interface CallExpression extends BaseNodeProps {
+   interface CallExpression extends BaseNodeProps {
     type: 'CallExpression'
     callee: Expression
     arguments: Array<Expression | SpreadElement | null>
     optional?: boolean
   }
 
-  export interface TaggedTemplateExpression extends BaseNodeProps {
+   interface TaggedTemplateExpression extends BaseNodeProps {
     type: 'TaggedTemplateExpression'
     tag: Expression
     quasi: TemplateLiteral
   }
 
-  export interface ThisExpression extends BaseNodeProps {
+   interface ThisExpression extends BaseNodeProps {
     type: 'ThisExpression'
   }
 
-  export interface Super extends BaseNodeProps {
+   interface Super extends BaseNodeProps {
     type: 'Super'
   }
 
-  export interface Literal extends BaseNodeProps {
+   interface Literal extends BaseNodeProps {
     type: 'Literal'
     value: string
     raw: string
@@ -770,39 +770,39 @@ declare namespace acorn {
     }
   }
 
-  export interface ParenthesizedExpression extends BaseNodeProps {
+   interface ParenthesizedExpression extends BaseNodeProps {
     type: 'ParenthesizedExpression'
     expression: Expression
   }
 
-  export interface ArrayExpression extends BaseNodeProps {
+   interface ArrayExpression extends BaseNodeProps {
     type: 'ArrayExpression'
     elements: Array<Expression | SpreadElement | null>
   }
 
-  export interface Identifier extends BaseNodeProps {
+   interface Identifier extends BaseNodeProps {
     type: 'Identifier'
     name: string
   }
 
-  export interface MetaProperty extends BaseNodeProps {
+   interface MetaProperty extends BaseNodeProps {
     type: 'MetaProperty'
     meta: Identifier
     property: Identifier
   }
 
-  export interface ImportExpression extends BaseNodeProps {
+   interface ImportExpression extends BaseNodeProps {
     type: 'ImportExpression'
     source: Expression
   }
 
-  export interface NewExpression extends BaseNodeProps {
+   interface NewExpression extends BaseNodeProps {
     type: 'NewExpression'
     callee: Expression
     arguments: Array<Expression | SpreadElement | null>
   }
 
-  export interface TemplateElement extends BaseNodeProps {
+   interface TemplateElement extends BaseNodeProps {
     type: 'TemplateElement'
     value: {
       raw: string
@@ -811,23 +811,23 @@ declare namespace acorn {
     tail: boolean
   }
 
-  export interface TemplateLiteral extends BaseNodeProps {
+   interface TemplateLiteral extends BaseNodeProps {
     type: 'TemplateLiteral'
     expressions: Array<Expression>
     quasis: Array<TemplateElement>
   }
 
-  export interface ObjectExpression extends BaseNodeProps {
+   interface ObjectExpression extends BaseNodeProps {
     type: 'ObjectExpression'
     properties: Array<Property | SpreadElement | RestElement>
   }
 
-  export interface SpreadElement extends BaseNodeProps {
+   interface SpreadElement extends BaseNodeProps {
     type: 'SpreadElement'
     argument: Expression
   }
 
-  export interface Property extends BaseNodeProps {
+   interface Property extends BaseNodeProps {
     type: 'Property'
     method: boolean
     shorthand: boolean
@@ -837,27 +837,27 @@ declare namespace acorn {
     value: Expression
   }
 
-  export interface PrivateIdentifier extends BaseNodeProps {
+   interface PrivateIdentifier extends BaseNodeProps {
     type: 'PrivateIdentifier'
     name: string
   }
 
-  export interface ObjectPattern extends BaseNodeProps {
+   interface ObjectPattern extends BaseNodeProps {
     type: 'ObjectPattern'
     properties: Array<Property | SpreadElement | RestElement>
   }
 
-  export interface ArrayPattern extends BaseNodeProps {
+   interface ArrayPattern extends BaseNodeProps {
     type: 'ArrayPattern'
     elements: Array<PatternLike | LVal | null>
   }
 
-  export interface RestElement extends BaseNodeProps {
+   interface RestElement extends BaseNodeProps {
     type: 'RestElement'
     argument: LVal
   }
 
-  export interface AssignmentPattern extends BaseNodeProps {
+   interface AssignmentPattern extends BaseNodeProps {
     type: 'AssignmentPattern'
     left:
       | Identifier
@@ -867,7 +867,7 @@ declare namespace acorn {
     right: Expression
   }
 
-  export interface ArrowFunctionExpression extends BaseNodeProps {
+   interface ArrowFunctionExpression extends BaseNodeProps {
     type: 'ArrowFunctionExpression'
     async: boolean
     params: Array<Identifier | Pattern | RestElement>
@@ -876,7 +876,7 @@ declare namespace acorn {
     generator?: boolean
   }
 
-  export interface AwaitExpression extends BaseNodeProps {
+   interface AwaitExpression extends BaseNodeProps {
     type: 'AwaitExpression'
     argument: Expression
   }
