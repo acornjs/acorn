@@ -10,79 +10,82 @@ interface BaseNodeProps {
   range?: [number, number]
 }
 
-type NodeType =
-  Program |
-  BreakStatement |
-  ContinueStatement |
-  DebuggerStatement |
-  DoWhileStatement |
-  ForStatement |
-  ForInStatement |
-  ForOfStatement |
-  IfStatement |
-  ReturnStatement |
-  ThrowStatement |
-  SwitchCase |
-  SwitchStatement |
-  TryStatement |
-  CatchClause |
-  VariableDeclaration |
-  VariableDeclarator |
-  WhileStatement |
-  WithStatement |
-  EmptyStatement |
-  LabeledStatement |
-  ExpressionStatement |
-  BlockStatement |
-  FunctionDeclaration |
-  FunctionExpression |
-  ClassDeclaration |
-  ClassExpression |
-  ClassBody |
-  MethodDefinition |
-  PropertyDefinition |
-  StaticBlock |
-  ExportAllDeclaration |
-  ExportSpecifier |
-  ExportNamedDeclaration |
-  ExportDefaultDeclaration |
-  ImportDeclaration |
-  ImportNamespaceSpecifier |
-  ImportDefaultSpecifier |
-  ImportSpecifier |
-  SequenceExpression |
-  YieldExpression |
-  AssignmentExpression |
-  ConditionalExpression |
-  LogicalExpression |
-  BinaryExpression |
-  UpdateExpression |
-  UnaryExpression |
-  ChainExpression |
-  MemberExpression |
-  CallExpression |
-  TaggedTemplateExpression |
-  ThisExpression |
-  Super |
-  Literal |
-  ParenthesizedExpression |
-  ArrayExpression |
-  Identifier |
-  MetaProperty |
-  ImportExpression |
-  NewExpression |
-  TemplateElement |
-  TemplateLiteral |
-  ObjectExpression |
-  SpreadElement |
-  Property |
-  PrivateIdentifier |
-  ObjectPattern |
-  ArrayPattern |
-  RestElement |
-  AssignmentPattern |
-  ArrowFunctionExpression |
-  AwaitExpression
+interface NodeTypeMap {
+  Program: Program
+  BreakStatement: BreakStatement
+  ContinueStatement: ContinueStatement
+  DebuggerStatement: DebuggerStatement
+  DoWhileStatement: DoWhileStatement
+  ForStatement: ForStatement
+  ForInStatement: ForInStatement
+  ForOfStatement: ForOfStatement
+  IfStatement: IfStatement
+  ReturnStatement: ReturnStatement
+  ThrowStatement: ThrowStatement
+  SwitchCase: SwitchCase
+  SwitchStatement: SwitchStatement
+  TryStatement: TryStatement
+  CatchClause: CatchClause
+  VariableDeclaration: VariableDeclaration
+  VariableDeclarator: VariableDeclarator
+  WhileStatement: WhileStatement
+  WithStatement: WithStatement
+  EmptyStatement: EmptyStatement
+  LabeledStatement: LabeledStatement
+  ExpressionStatement: ExpressionStatement
+  BlockStatement: BlockStatement
+  FunctionDeclaration: FunctionDeclaration
+  FunctionExpression: FunctionExpression
+  ClassDeclaration: ClassDeclaration
+  ClassExpression: ClassExpression
+  ClassBody: ClassBody
+  MethodDefinition: MethodDefinition
+  PropertyDefinition: PropertyDefinition
+  StaticBlock: StaticBlock
+  ExportAllDeclaration: ExportAllDeclaration
+  ExportSpecifier: ExportSpecifier
+  ExportNamedDeclaration: ExportNamedDeclaration
+  ExportDefaultDeclaration: ExportDefaultDeclaration
+  ImportDeclaration: ImportDeclaration
+  ImportNamespaceSpecifier: ImportNamespaceSpecifier
+  ImportDefaultSpecifier: ImportDefaultSpecifier
+  ImportSpecifier: ImportSpecifier
+  SequenceExpression: SequenceExpression
+  YieldExpression: YieldExpression
+  AssignmentExpression: AssignmentExpression
+  ConditionalExpression: ConditionalExpression
+  LogicalExpression: LogicalExpression
+  BinaryExpression: BinaryExpression
+  UpdateExpression: UpdateExpression
+  UnaryExpression: UnaryExpression
+  ChainExpression: ChainExpression
+  MemberExpression: MemberExpression
+  CallExpression: CallExpression
+  TaggedTemplateExpression: TaggedTemplateExpression
+  ThisExpression: ThisExpression
+  Super: Super
+  Literal: Literal
+  ParenthesizedExpression: ParenthesizedExpression
+  ArrayExpression: ArrayExpression
+  Identifier: Identifier
+  MetaProperty: MetaProperty
+  ImportExpression: ImportExpression
+  NewExpression: NewExpression
+  TemplateElement: TemplateElement
+  TemplateLiteral: TemplateLiteral
+  ObjectExpression: ObjectExpression
+  SpreadElement: SpreadElement
+  Property: Property
+  PrivateIdentifier: PrivateIdentifier
+  ObjectPattern: ObjectPattern
+  ArrayPattern: ArrayPattern
+  RestElement: RestElement
+  AssignmentPattern: AssignmentPattern
+  ArrowFunctionExpression: ArrowFunctionExpression
+  AwaitExpression: AwaitExpression
+}
+
+type NodeType = NodeTypeMap[keyof NodeTypeMap]
 
 type Expression =
   | ArrayExpression
@@ -699,8 +702,8 @@ declare namespace acorn {
     parseTopLevel(node: Node): Program;
 
     // node.js
-    finishNode(node: Node, type: NodeType['type']): NodeType;
-    finishNodeAt(node: Node, type: NodeType['type'], pos: number, loc: Position): NodeType;
+    finishNode<T extends NodeType['type']>(node: Node, type: T): NodeTypeMap[T];
+    finishNodeAt<T extends NodeType['type']>(node: Node, type: T, pos: number, loc: Position): NodeTypeMap[T];
 
     // location.js
     raise(pos: number, message: string) : void;
