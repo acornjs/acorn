@@ -8,8 +8,81 @@ interface BaseNodeProps {
   loc?: acorn.SourceLocation
   sourceFile?: string
   range?: [number, number]
-  constructor(parser: acorn.Parser, pos: number, loc?: acorn.SourceLocation)
 }
+
+type NodeType =
+  Program |
+  BreakStatement |
+  ContinueStatement |
+  DebuggerStatement |
+  DoWhileStatement |
+  ForStatement |
+  ForInStatement |
+  ForOfStatement |
+  IfStatement |
+  ReturnStatement |
+  ThrowStatement |
+  SwitchCase |
+  SwitchStatement |
+  TryStatement |
+  CatchClause |
+  VariableDeclaration |
+  VariableDeclarator |
+  WhileStatement |
+  WithStatement |
+  EmptyStatement |
+  LabeledStatement |
+  ExpressionStatement |
+  BlockStatement |
+  FunctionDeclaration |
+  FunctionExpression |
+  ClassDeclaration |
+  ClassExpression |
+  ClassBody |
+  MethodDefinition |
+  PropertyDefinition |
+  StaticBlock |
+  ExportAllDeclaration |
+  ExportSpecifier |
+  ExportNamedDeclaration |
+  ExportDefaultDeclaration |
+  ImportDeclaration |
+  ImportNamespaceSpecifier |
+  ImportDefaultSpecifier |
+  ImportSpecifier |
+  SequenceExpression |
+  YieldExpression |
+  AssignmentExpression |
+  ConditionalExpression |
+  LogicalExpression |
+  BinaryExpression |
+  UpdateExpression |
+  UnaryExpression |
+  ChainExpression |
+  MemberExpression |
+  CallExpression |
+  TaggedTemplateExpression |
+  ThisExpression |
+  Super |
+  Literal |
+  ParenthesizedExpression |
+  ArrayExpression |
+  Identifier |
+  MetaProperty |
+  ImportExpression |
+  NewExpression |
+  TemplateElement |
+  TemplateLiteral |
+  ObjectExpression |
+  SpreadElement |
+  Property |
+  PrivateIdentifier |
+  ObjectPattern |
+  ArrayPattern |
+  RestElement |
+  AssignmentPattern |
+  ArrowFunctionExpression |
+  AwaitExpression
 
 type Expression =
   | ArrayExpression
@@ -93,7 +166,7 @@ type Declaration =
 
 interface Program extends BaseNodeProps {
   type: 'Program'
-  sourceType: Options['sourceType']
+  sourceType: acorn.Options['sourceType']
   body: Array<Statement>
 }
 
@@ -270,7 +343,7 @@ interface MethodDefinition extends BaseNodeProps {
   static: boolean
   computed: boolean
   key: Identifier | Literal | Expression
-  kind: "get" | "set" | "method" | "constructor"
+  kind: 'get' | 'set' | 'method' | 'constructor'
   value: FunctionExpression | null
 }
 
@@ -361,9 +434,9 @@ interface ConditionalExpression extends BaseNodeProps {
 interface LogicalExpression extends BaseNodeProps {
   type: 'LogicalExpression'
   operator:
-    | "||"
-    | "&&"
-    | "??"
+    | '||'
+    | '&&'
+    | '??'
   left: Expression
   right: Expression
 }
@@ -371,36 +444,36 @@ interface LogicalExpression extends BaseNodeProps {
 interface BinaryExpression extends BaseNodeProps {
   type: 'BinaryExpression'
   operator:
-    | "+"
-    | "-"
-    | "/"
-    | "%"
-    | "*"
-    | "**"
-    | "&"
-    | "|"
-    | ">>"
-    | ">>>"
-    | "<<"
-    | "^"
-    | "=="
-    | "==="
-    | "!="
-    | "!=="
-    | "in"
-    | "instanceof"
-    | ">"
-    | "<"
-    | ">="
-    | "<="
-    | "|>"
+    | '+'
+    | '-'
+    | '/'
+    | '%'
+    | '*'
+    | '**'
+    | '&'
+    | '|'
+    | '>>'
+    | '>>>'
+    | '<<'
+    | '^'
+    | '=='
+    | '==='
+    | '!='
+    | '!=='
+    | 'in'
+    | 'instanceof'
+    | '>'
+    | '<'
+    | '>='
+    | '<='
+    | '|>'
   left: Expression
   right: Expression
 }
 
 interface UpdateExpression extends BaseNodeProps {
   type: 'UpdateExpression'
-  operator: "++" | "--"
+  operator: '++' | '--'
   argument: Expression
   prefix: boolean
 }
@@ -569,9 +642,9 @@ interface AwaitExpression extends BaseNodeProps {
 }
 
 declare namespace acorn {
-  function parse(input: string, options: Options): Node
+  function parse(input: string, options: Options): Program
 
-  function parseExpressionAt(input: string, pos: number, options: Options): Node
+  function parseExpressionAt(input: string, pos: number, options: Options): Expression
 
   function tokenizer(input: string, options: Options): {
     getToken(): Token
@@ -616,18 +689,18 @@ declare namespace acorn {
 
     // state.js
     constructor(options: Options, input: string, startPos?: number)
-    parse(this: Parser): Node
+    parse(this: Parser): Program
 
     // tokenize.js
     next(): void;
     nextToken(): void;
 
     // statement.js
-    parseTopLevel(node: Node): Node;
+    parseTopLevel(node: Node): Program;
 
     // node.js
-    finishNode(node: Node, type: string): Node;
-    finishNodeAt(node: Node, type: string, pos: number, loc: Position): Node;
+    finishNode(node: Node, type: NodeType['type']): NodeType;
+    finishNodeAt(node: Node, type: NodeType['type'], pos: number, loc: Position): NodeType;
 
     // location.js
     raise(pos: number, message: string) : void;
@@ -640,8 +713,8 @@ declare namespace acorn {
     static acorn: typeof acorn;
 
     // state.js
-    static parse(this: typeof Parser, input: string, options: Options): Node
-    static parseExpressionAt(this: typeof Parser, input: string, pos: number, options: Options): Node
+    static parse(this: typeof Parser, input: string, options: Options): Program
+    static parseExpressionAt(this: typeof Parser, input: string, pos: number, options: Options): Expression
     static tokenizer(this: typeof Parser, input: string, options: Options): {
       getToken(): Token
       [Symbol.iterator](): Iterator<Token>
@@ -660,6 +733,16 @@ declare namespace acorn {
     end: Position
     source?: string | null
     constructor(p: Parser, start: Position, end: Position)
+  }
+
+  class Node {
+    type: NodeType['type'] | ''
+    start: number
+    end: number
+    loc?: SourceLocation
+    sourceFile?: string
+    range?: [number, number]
+    constructor(parser: Parser, pos: number, loc?: SourceLocation)
   }
 
   class TokenType {
@@ -807,77 +890,4 @@ declare namespace acorn {
 
   const version: string
 
-   type Node =
-    Program |
-    BreakStatement |
-    ContinueStatement |
-    DebuggerStatement |
-    DoWhileStatement |
-    ForStatement |
-    ForInStatement |
-    ForOfStatement |
-    IfStatement |
-    ReturnStatement |
-    ThrowStatement |
-    SwitchCase |
-    SwitchStatement |
-    TryStatement |
-    CatchClause |
-    VariableDeclaration |
-    VariableDeclarator |
-    WhileStatement |
-    WithStatement |
-    EmptyStatement |
-    LabeledStatement |
-    ExpressionStatement |
-    BlockStatement |
-    FunctionDeclaration |
-    FunctionExpression |
-    ClassDeclaration |
-    ClassExpression |
-    ClassBody |
-    MethodDefinition |
-    PropertyDefinition |
-    StaticBlock |
-    ExportAllDeclaration |
-    ExportSpecifier |
-    ExportNamedDeclaration |
-    ExportDefaultDeclaration |
-    ImportDeclaration |
-    ImportNamespaceSpecifier |
-    ImportDefaultSpecifier |
-    ImportSpecifier |
-    SequenceExpression |
-    YieldExpression |
-    AssignmentExpression |
-    ConditionalExpression |
-    LogicalExpression |
-    BinaryExpression |
-    UpdateExpression |
-    UnaryExpression |
-    ChainExpression |
-    MemberExpression |
-    CallExpression |
-    TaggedTemplateExpression |
-    ThisExpression |
-    Super |
-    Literal |
-    ParenthesizedExpression |
-    ArrayExpression |
-    Identifier |
-    MetaProperty |
-    ImportExpression |
-    NewExpression |
-    TemplateElement |
-    TemplateLiteral |
-    ObjectExpression |
-    SpreadElement |
-    Property |
-    PrivateIdentifier |
-    ObjectPattern |
-    ArrayPattern |
-    RestElement |
-    AssignmentPattern |
-    ArrowFunctionExpression |
-    AwaitExpression
 }
