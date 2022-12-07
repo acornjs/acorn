@@ -68,7 +68,7 @@ const acorn = require("acorn")
 const walk = require("acorn-walk")
 
 walk.ancestor(acorn.parse("foo('hi')"), {
-  Literal(_node, _state, ancestors) {
+  Literal(_, ancestors) {
     console.log("This literal's ancestors are:", ancestors.map(n => n.type))
   }
 })
