@@ -10,7 +10,7 @@ function loadList(filename) {
 }
 
 run(
-  (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: 13, allowHashBang: true, allowAwaitOutsideFunction: sourceType === "module"}),
+  (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: "latest", allowHashBang: true, allowAwaitOutsideFunction: sourceType === "module"}),
   {
     testsDirectory: path.dirname(require.resolve("test262/package.json")),
     skip: test => test.attrs.features &&
