@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-buble": "^1.0.1",
-    "@unicode/unicode-14.0.0": "^1.3.1",
+    "@unicode/unicode-15.0.0": "^1.3.1",
     "eslint": "^8.29.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
