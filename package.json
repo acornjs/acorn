@@ -41,7 +41,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "rollup": "^2.76.0",
-    "test262": "git+https://github.com/tc39/test262.git#91a61b29acc087552e45a506837ab00a2f5e25a0",
+    "test262": "git+https://github.com/tc39/test262.git#dac69563480b9f22709fd49d61a32b3a0513b6b1",
     "test262-parser-runner": "^0.5.0"
   }
 }
