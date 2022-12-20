@@ -1,7 +1,7 @@
 import {wordsRegexp} from "./util.js"
 
-// This file contains Unicode properties extracted from the ECMAScript
-// specification. The lists are extracted like so:
+// This file contains Unicode properties extracted from the ECMAScript specification.
+// The lists are extracted like so:
 // $$('#table-binary-unicode-properties > figure > table > tbody > tr > td:nth-child(1) code').map(el => el.innerText)
 
 // #table-binary-unicode-properties
@@ -10,12 +10,15 @@ const ecma10BinaryProperties = ecma9BinaryProperties + " Extended_Pictographic"
 const ecma11BinaryProperties = ecma10BinaryProperties
 const ecma12BinaryProperties = ecma11BinaryProperties + " EBase EComp EMod EPres ExtPict"
 const ecma13BinaryProperties = ecma12BinaryProperties
+const ecma14BinaryProperties = ecma13BinaryProperties
+
 const unicodeBinaryProperties = {
   9: ecma9BinaryProperties,
   10: ecma10BinaryProperties,
   11: ecma11BinaryProperties,
   12: ecma12BinaryProperties,
-  13: ecma13BinaryProperties
+  13: ecma13BinaryProperties,
+  14: ecma14BinaryProperties
 }
 
 // #table-unicode-general-category-values
@@ -27,12 +30,15 @@ const ecma10ScriptValues = ecma9ScriptValues + " Dogra Dogr Gunjala_Gondi Gong H
 const ecma11ScriptValues = ecma10ScriptValues + " Elymaic Elym Nandinagari Nand Nyiakeng_Puachue_Hmong Hmnp Wancho Wcho"
 const ecma12ScriptValues = ecma11ScriptValues + " Chorasmian Chrs Diak Dives_Akuru Khitan_Small_Script Kits Yezi Yezidi"
 const ecma13ScriptValues = ecma12ScriptValues + " Cypro_Minoan Cpmn Old_Uyghur Ougr Tangsa Tnsa Toto Vithkuqi Vith"
+const ecma14ScriptValues = ecma13ScriptValues + " Kawi Nag_Mundari Nagm"
+
 const unicodeScriptValues = {
   9: ecma9ScriptValues,
   10: ecma10ScriptValues,
   11: ecma11ScriptValues,
   12: ecma12ScriptValues,
-  13: ecma13ScriptValues
+  13: ecma13ScriptValues,
+  14: ecma14ScriptValues
 }
 
 const data = {}
@@ -51,7 +57,7 @@ function buildUnicodeData(ecmaVersion) {
   d.nonBinary.scx = d.nonBinary.Script_Extensions
 }
 
-for (const ecmaVersion of [9, 10, 11, 12, 13]) {
+for (const ecmaVersion of [9, 10, 11, 12, 13, 14]) {
   buildUnicodeData(ecmaVersion)
 }
 
