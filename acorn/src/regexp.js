@@ -8,7 +8,7 @@ const pp = Parser.prototype
 export class RegExpValidationState {
   constructor(parser) {
     this.parser = parser
-    this.validFlags = `gim${parser.options.ecmaVersion >= 6 ? "uy" : ""}${parser.options.ecmaVersion >= 9 ? "s" : ""}${parser.options.ecmaVersion >= 13 ? "d" : ""}`
+    this.validFlags = `gim${parser.options.ecmaVersion >= 6 ? "uy" : ""}${parser.options.ecmaVersion >= 2018 ? "s" : ""}${parser.options.ecmaVersion >= 13 ? "d" : ""}`
     this.unicodeProperties = UNICODE_PROPERTY_VALUES[parser.options.ecmaVersion >= 14 ? 14 : parser.options.ecmaVersion]
     this.source = ""
     this.flags = ""
@@ -31,7 +31,7 @@ export class RegExpValidationState {
     this.source = pattern + ""
     this.flags = flags
     this.switchU = unicode && this.parser.options.ecmaVersion >= 6
-    this.switchN = unicode && this.parser.options.ecmaVersion >= 9
+    this.switchN = unicode && this.parser.options.ecmaVersion >= 2018
   }
 
   raise(message) {
@@ -124,7 +124,7 @@ pp.validateRegExpPattern = function(state) {
   // |Pattern[~U, +N]| and use this result instead. Throw a *SyntaxError*
   // exception if _P_ did not conform to the grammar, if any elements of _P_
   // were not matched by the parse, or if any Early Error conditions exist.
-  if (!state.switchN && this.options.ecmaVersion >= 9 && state.groupNames.length > 0) {
+  if (!state.switchN && this.options.ecmaVersion >= 2018 && state.groupNames.length > 0) {
     state.switchN = true
     this.regexp_pattern(state)
   }
@@ -228,7 +228,7 @@ pp.regexp_eatAssertion = function(state) {
   // Lookahead / Lookbehind
   if (state.eat(0x28 /* ( */) && state.eat(0x3F /* ? */)) {
     let lookbehind = false
-    if (this.options.ecmaVersion >= 9) {
+    if (this.options.ecmaVersion >= 2018) {
       lookbehind = state.eat(0x3C /* < */)
     }
     if (state.eat(0x3D /* = */) || state.eat(0x21 /* ! */)) {
@@ -325,7 +325,7 @@ pp.regexp_eatUncapturingGroup = function(state) {
 }
 pp.regexp_eatCapturingGroup = function(state) {
   if (state.eat(0x28 /* ( */)) {
-    if (this.options.ecmaVersion >= 9) {
+    if (this.options.ecmaVersion >= 2018) {
       this.regexp_groupSpecifier(state)
     } else if (state.current() === 0x3F /* ? */) {
       state.raise("Invalid group")
@@ -731,7 +731,7 @@ pp.regexp_eatCharacterClassEscape = function(state) {
 
   if (
     state.switchU &&
-    this.options.ecmaVersion >= 9 &&
+    this.options.ecmaVersion >= 2018 &&
     (ch === 0x50 /* P */ || ch === 0x70 /* p */)
   ) {
     state.lastIntValue = -1

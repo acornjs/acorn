@@ -31,7 +31,7 @@ const pp = Parser.prototype
 // strict mode, init properties are also not allowed to be repeated.
 
 pp.checkPropClash = function(prop, propHash, refDestructuringErrors) {
-  if (this.options.ecmaVersion >= 9 && prop.type === "SpreadElement")
+  if (this.options.ecmaVersion >= 2018 && prop.type === "SpreadElement")
     return
   if (this.options.ecmaVersion >= 6 && (prop.computed || prop.method || prop.shorthand))
     return
@@ -717,7 +717,7 @@ pp.parseTemplate = function({isTagged = false} = {}) {
 
 pp.isAsyncProp = function(prop) {
   return !prop.computed && prop.key.type === "Identifier" && prop.key.name === "async" &&
-    (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL || this.type.keyword || (this.options.ecmaVersion >= 9 && this.type === tt.star)) &&
+    (this.type === tt.name || this.type === tt.num || this.type === tt.string || this.type === tt.bracketL || this.type.keyword || (this.options.ecmaVersion >= 2018 && this.type === tt.star)) &&
     !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
 }
 
@@ -742,7 +742,7 @@ pp.parseObj = function(isPattern, refDestructuringErrors) {
 
 pp.parseProperty = function(isPattern, refDestructuringErrors) {
   let prop = this.startNode(), isGenerator, isAsync, startPos, startLoc
-  if (this.options.ecmaVersion >= 9 && this.eat(tt.ellipsis)) {
+  if (this.options.ecmaVersion >= 2018 && this.eat(tt.ellipsis)) {
     if (isPattern) {
       prop.argument = this.parseIdent(false)
       if (this.type === tt.comma) {
@@ -773,7 +773,7 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
   this.parsePropertyName(prop)
   if (!isPattern && !containsEsc && this.options.ecmaVersion >= 2017 && !isGenerator && this.isAsyncProp(prop)) {
     isAsync = true
-    isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
+    isGenerator = this.options.ecmaVersion >= 2018 && this.eat(tt.star)
     this.parsePropertyName(prop, refDestructuringErrors)
   } else {
     isAsync = false

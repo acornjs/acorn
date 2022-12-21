@@ -609,7 +609,7 @@ pp.tryReadTemplateToken = function() {
 }
 
 pp.invalidStringToken = function(position, message) {
-  if (this.inTemplateElement && this.options.ecmaVersion >= 9) {
+  if (this.inTemplateElement && this.options.ecmaVersion >= 2018) {
     throw INVALID_TEMPLATE_ESCAPE_ERROR
   } else {
     this.raise(position, message)

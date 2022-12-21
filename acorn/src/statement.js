@@ -209,7 +209,7 @@ pp.parseDoStatement = function(node) {
 
 pp.parseForStatement = function(node) {
   this.next()
-  let awaitAt = (this.options.ecmaVersion >= 9 && this.canAwait && this.eatContextual("await")) ? this.lastTokStart : -1
+  let awaitAt = (this.options.ecmaVersion >= 2018 && this.canAwait && this.eatContextual("await")) ? this.lastTokStart : -1
   this.labels.push(loopLabel)
   this.enterScope(0)
   this.expect(tt.parenL)
@@ -224,7 +224,7 @@ pp.parseForStatement = function(node) {
     this.parseVar(init, true, kind)
     this.finishNode(init, "VariableDeclaration")
     if ((this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1) {
-      if (this.options.ecmaVersion >= 9) {
+      if (this.options.ecmaVersion >= 2018) {
         if (this.type === tt._in) {
           if (awaitAt > -1) this.unexpected(awaitAt)
         } else node.await = awaitAt > -1
@@ -238,7 +238,7 @@ pp.parseForStatement = function(node) {
   let refDestructuringErrors = new DestructuringErrors
   let init = this.parseExpression(awaitAt > -1 ? "await" : true, refDestructuringErrors)
   if (this.type === tt._in || (isForOf = this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
-    if (this.options.ecmaVersion >= 9) {
+    if (this.options.ecmaVersion >= 2018) {
       if (this.type === tt._in) {
         if (awaitAt > -1) this.unexpected(awaitAt)
       } else node.await = awaitAt > -1
@@ -523,7 +523,7 @@ const FUNC_STATEMENT = 1, FUNC_HANGING_STATEMENT = 2, FUNC_NULLABLE_ID = 4
 // Remove `allowExpressionBody` for 7.0.0, as it is only called with false
 pp.parseFunction = function(node, statement, allowExpressionBody, isAsync, forInit) {
   this.initFunction(node)
-  if (this.options.ecmaVersion >= 9 || this.options.ecmaVersion >= 6 && !isAsync) {
+  if (this.options.ecmaVersion >= 2018 || this.options.ecmaVersion >= 6 && !isAsync) {
     if (this.type === tt.star && (statement & FUNC_HANGING_STATEMENT))
       this.unexpected()
     node.generator = this.eat(tt.star)

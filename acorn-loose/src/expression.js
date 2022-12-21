@@ -432,7 +432,7 @@ lp.parseObj = function() {
   if (this.curIndent + 1 < indent) { indent = this.curIndent; line = this.curLineStart }
   while (!this.closes(tt.braceR, indent, line)) {
     let prop = this.startNode(), isGenerator, isAsync, start
-    if (this.options.ecmaVersion >= 9 && this.eat(tt.ellipsis)) {
+    if (this.options.ecmaVersion >= 2018 && this.eat(tt.ellipsis)) {
       prop.argument = this.parseMaybeAssign()
       node.properties.push(this.finishNode(prop, "SpreadElement"))
       this.eat(tt.comma)
@@ -447,7 +447,7 @@ lp.parseObj = function() {
     this.parsePropertyName(prop)
     if (this.toks.isAsyncProp(prop)) {
       isAsync = true
-      isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
+      isGenerator = this.options.ecmaVersion >= 2018 && this.eat(tt.star)
       this.parsePropertyName(prop)
     } else {
       isAsync = false

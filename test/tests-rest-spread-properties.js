@@ -38,7 +38,7 @@ test("({...obj})", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({...obj1,})", {
   "type": "Program",
   "start": 0,
@@ -69,7 +69,7 @@ test("({...obj1,})", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({...obj1,...obj2})", {
   "type": "Program",
   "start": 0,
@@ -111,7 +111,7 @@ test("({...obj1,...obj2})", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({a,...obj1,b:1,...obj2,c:2})", {
   "type": "Program",
   "start": 0,
@@ -218,7 +218,7 @@ test("({a,...obj1,b:1,...obj2,c:2})", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({...(obj)})", {
   "type": "Program",
   "start": 0,
@@ -249,7 +249,7 @@ test("({...(obj)})", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({...a,b,c})", {
   "type": "Program",
   "start": 0,
@@ -322,7 +322,7 @@ test("({...a,b,c})", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({...(a,b),c})", {
   "type": "Program",
   "start": 0,
@@ -387,9 +387,9 @@ test("({...(a,b),c})", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 
-testFail("({...})", "Unexpected token (1:5)", { ecmaVersion: 9 })
+testFail("({...})", "Unexpected token (1:5)", { ecmaVersion: 2018 })
 testFail("({...obj})", "Unexpected token (1:2)", { ecmaVersion: 2017 })
 
 //------------------------------------------------------------------------------
@@ -438,7 +438,7 @@ test("({...obj} = foo)", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({a,...obj} = foo)", {
   "type": "Program",
   "start": 0,
@@ -502,7 +502,7 @@ test("({a,...obj} = foo)", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({a:b,...obj} = foo)", {
   "type": "Program",
   "start": 0,
@@ -566,7 +566,7 @@ test("({a:b,...obj} = foo)", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({...obj}) => {}", {
   "type": "Program",
   "start": 0,
@@ -614,7 +614,7 @@ test("({...obj}) => {}", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({...obj} = {}) => {}", {
   "type": "Program",
   "start": 0,
@@ -673,7 +673,7 @@ test("({...obj} = {}) => {}", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({a,...obj}) => {}", {
   "type": "Program",
   "start": 0,
@@ -742,7 +742,7 @@ test("({a,...obj}) => {}", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("({a:b,...obj}) => {}", {
   "type": "Program",
   "start": 0,
@@ -811,7 +811,7 @@ test("({a:b,...obj}) => {}", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 
 test("({...(obj)} = foo)", {
   type: "Program",
@@ -924,26 +924,26 @@ test("({...(obj)} = foo)", {
       }
     }
   ],
-}, { ecmaVersion: 9, locations: true })
+}, { ecmaVersion: 2018, locations: true })
 
-testFail("let {...obj1,} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 9 })
-testFail("let {...obj1,a} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 9 })
-testFail("let {...obj1,...obj2} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 9 })
-testFail("let {...(obj)} = foo", "Unexpected token (1:8)", { ecmaVersion: 9 })
-testFail("let {...(a,b)} = foo", "Unexpected token (1:8)", { ecmaVersion: 9 })
-testFail("let {...{a,b}} = foo", "Unexpected token (1:8)", { ecmaVersion: 9 })
-testFail("let {...[a,b]} = foo", "Unexpected token (1:8)", { ecmaVersion: 9 })
-testFail("({...obj1,} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 9 })
-testFail("({...obj1,a} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 9 })
-testFail("({...obj1,...obj2} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 9 })
-testFail("({...(a,b)} = foo)", "Assigning to rvalue (1:5)", { ecmaVersion: 9 })
-testFail("({...{a,b}} = foo)", "Unexpected token (1:5)", { ecmaVersion: 9 })
-testFail("({...[a,b]} = foo)", "Unexpected token (1:5)", { ecmaVersion: 9 })
+testFail("let {...obj1,} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 2018 })
+testFail("let {...obj1,a} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 2018 })
+testFail("let {...obj1,...obj2} = foo", "Comma is not permitted after the rest element (1:12)", { ecmaVersion: 2018 })
+testFail("let {...(obj)} = foo", "Unexpected token (1:8)", { ecmaVersion: 2018 })
+testFail("let {...(a,b)} = foo", "Unexpected token (1:8)", { ecmaVersion: 2018 })
+testFail("let {...{a,b}} = foo", "Unexpected token (1:8)", { ecmaVersion: 2018 })
+testFail("let {...[a,b]} = foo", "Unexpected token (1:8)", { ecmaVersion: 2018 })
+testFail("({...obj1,} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 2018 })
+testFail("({...obj1,a} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 2018 })
+testFail("({...obj1,...obj2} = foo)", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 2018 })
+testFail("({...(a,b)} = foo)", "Assigning to rvalue (1:5)", { ecmaVersion: 2018 })
+testFail("({...{a,b}} = foo)", "Unexpected token (1:5)", { ecmaVersion: 2018 })
+testFail("({...[a,b]} = foo)", "Unexpected token (1:5)", { ecmaVersion: 2018 })
 testFail("({...obj} = foo)", "Unexpected token (1:2)", { ecmaVersion: 2017 })
-testFail("({...(obj)}) => {}", "Parenthesized pattern (1:5)", { ecmaVersion: 9 })
-testFail("({...(a,b)}) => {}", "Parenthesized pattern (1:5)", { ecmaVersion: 9 })
-testFail("({...{a,b}}) => {}", "Unexpected token (1:5)", { ecmaVersion: 9 })
-testFail("({...[a,b]}) => {}", "Unexpected token (1:5)", { ecmaVersion: 9 })
+testFail("({...(obj)}) => {}", "Parenthesized pattern (1:5)", { ecmaVersion: 2018 })
+testFail("({...(a,b)}) => {}", "Parenthesized pattern (1:5)", { ecmaVersion: 2018 })
+testFail("({...{a,b}}) => {}", "Unexpected token (1:5)", { ecmaVersion: 2018 })
+testFail("({...[a,b]}) => {}", "Unexpected token (1:5)", { ecmaVersion: 2018 })
 testFail("({...obj}) => {}", "Unexpected token (1:2)", { ecmaVersion: 2017 })
 
 //------------------------------------------------------------------------------
@@ -1512,16 +1512,16 @@ test("const fn = ({text = \"default\", ...props}) => text + props.children", {
   "sourceType": "script"
 }, { "ecmaVersion": 9 })
 
-testFail("({get x() {}}) => {}", "Object pattern can't contain getter or setter (1:6)", { ecmaVersion: 9 })
-testFail("let {...x, ...y} = {}", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 9 })
-testFail("({...x,}) => z", "Comma is not permitted after the rest element (1:6)", { ecmaVersion: 9 })
+testFail("({get x() {}}) => {}", "Object pattern can't contain getter or setter (1:6)", { ecmaVersion: 2018 })
+testFail("let {...x, ...y} = {}", "Comma is not permitted after the rest element (1:9)", { ecmaVersion: 2018 })
+testFail("({...x,}) => z", "Comma is not permitted after the rest element (1:6)", { ecmaVersion: 2018 })
 testFail("export const { foo, ...bar } = baz;\nexport const bar = 1;\n", "Identifier 'bar' has already been declared (2:13)", {
-  ecmaVersion: 9,
+  ecmaVersion: 2018,
   sourceType: "module"
 })
-testFail("function ({...x,}) { z }", "Unexpected token (1:9)", { ecmaVersion: 9 })
-testFail("let {...{x, y}} = {}", "Unexpected token (1:8)", { ecmaVersion: 9 })
-testFail("let {...{...{x, y}}} = {}", "Unexpected token (1:8)", { ecmaVersion: 9 })
-testFail("0, {...rest, b} = {}", "Comma is not permitted after the rest element (1:11)", { ecmaVersion: 9 })
-testFail("(([a, ...b = 0]) => {})", "Rest elements cannot have a default value (1:9)", { ecmaVersion: 9 })
-testFail("(({a, ...b = 0}) => {})", "Rest elements cannot have a default value (1:9)", { ecmaVersion: 9 })
+testFail("function ({...x,}) { z }", "Unexpected token (1:9)", { ecmaVersion: 2018 })
+testFail("let {...{x, y}} = {}", "Unexpected token (1:8)", { ecmaVersion: 2018 })
+testFail("let {...{...{x, y}}} = {}", "Unexpected token (1:8)", { ecmaVersion: 2018 })
+testFail("0, {...rest, b} = {}", "Comma is not permitted after the rest element (1:11)", { ecmaVersion: 2018 })
+testFail("(([a, ...b = 0]) => {})", "Rest elements cannot have a default value (1:9)", { ecmaVersion: 2018 })
+testFail("(({a, ...b = 0}) => {})", "Rest elements cannot have a default value (1:9)", { ecmaVersion: 2018 })

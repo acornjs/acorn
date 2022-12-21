@@ -48,7 +48,7 @@ lp.parseStatement = function() {
 
   case tt._for:
     this.next() // `for` keyword
-    let isAwait = this.options.ecmaVersion >= 9 && this.eatContextual("await")
+    let isAwait = this.options.ecmaVersion >= 2018 && this.eatContextual("await")
 
     this.pushCx()
     this.expect(tt.parenL)
@@ -57,7 +57,7 @@ lp.parseStatement = function() {
     if (isLet || this.tok.type === tt._var || this.tok.type === tt._const) {
       let init = this.parseVar(this.startNode(), true, isLet ? "let" : this.tok.value)
       if (init.declarations.length === 1 && (this.tok.type === tt._in || this.isContextual("of"))) {
-        if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
+        if (this.options.ecmaVersion >= 2018 && this.tok.type !== tt._in) {
           node.await = isAwait
         }
         return this.parseForIn(node, init)
@@ -66,7 +66,7 @@ lp.parseStatement = function() {
     }
     let init = this.parseExpression(true)
     if (this.tok.type === tt._in || this.isContextual("of")) {
-      if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
+      if (this.options.ecmaVersion >= 2018 && this.tok.type !== tt._in) {
         node.await = isAwait
       }
       return this.parseForIn(node, this.toAssignable(init))

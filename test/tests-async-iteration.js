@@ -59,7 +59,7 @@ test("async function f() { for await (x of xs); }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("async function f() { for await (var x of xs); }", {
   "type": "Program",
   "start": 0,
@@ -126,7 +126,7 @@ test("async function f() { for await (var x of xs); }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("async function f() { for await (let x of xs); }", {
   "type": "Program",
   "start": 0,
@@ -193,7 +193,7 @@ test("async function f() { for await (let x of xs); }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("async function f() { for\nawait (x of xs); }", {
   "type": "Program",
   "start": 0,
@@ -246,7 +246,7 @@ test("async function f() { for\nawait (x of xs); }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("f = async function() { for await (x of xs); }", {
   "type": "Program",
   "start": 0,
@@ -311,7 +311,7 @@ test("f = async function() { for await (x of xs); }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("f = async() => { for await (x of xs); }", {
   "type": "Program",
   "start": 0,
@@ -376,7 +376,7 @@ test("f = async() => { for await (x of xs); }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("obj = { async f() { for await (x of xs); } }", {
   "type": "Program",
   "start": 0,
@@ -463,7 +463,7 @@ test("obj = { async f() { for await (x of xs); } }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("class A { async f() { for await (x of xs); } }", {
   "type": "Program",
   "start": 0,
@@ -544,7 +544,7 @@ test("class A { async f() { for await (x of xs); } }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 
 // ForOfStatement has `await:false` in `ecmaVersion:9`
 test("for (x of xs);", {
@@ -577,7 +577,7 @@ test("for (x of xs);", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 
 // ForInStatement doesn't have `await:false` in `ecmaVersion:9`
 test("for (x in xs);", {
@@ -610,7 +610,7 @@ test("for (x in xs);", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 
 // ForOfStatement doesn't have `await:false` in `ecmaVersion:8`
 test("for (x of xs);", {
@@ -645,15 +645,15 @@ test("for (x of xs);", {
   "sourceType": "script"
 }, { ecmaVersion: 2017 })
 
-testFail("for await (x of xs);", "Unexpected token (1:4)", { ecmaVersion: 9 })
-testFail("function f() { for await (x of xs); }", "Unexpected token (1:19)", { ecmaVersion: 9 })
-testFail("f = function() { for await (x of xs); }", "Unexpected token (1:21)", { ecmaVersion: 9 })
-testFail("f = () => { for await (x of xs); }", "Unexpected token (1:16)", { ecmaVersion: 9 })
-testFail("async function f() { () => { for await (x of xs); } }", "Unexpected token (1:33)", { ecmaVersion: 9 })
-testFail("async function f() { for await (x in xs); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
-testFail("async function f() { for await (;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
-testFail("async function f() { for await (x;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
-testFail("async function f() { for await (let x = 0;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
+testFail("for await (x of xs);", "Unexpected token (1:4)", { ecmaVersion: 2018 })
+testFail("function f() { for await (x of xs); }", "Unexpected token (1:19)", { ecmaVersion: 2018 })
+testFail("f = function() { for await (x of xs); }", "Unexpected token (1:21)", { ecmaVersion: 2018 })
+testFail("f = () => { for await (x of xs); }", "Unexpected token (1:16)", { ecmaVersion: 2018 })
+testFail("async function f() { () => { for await (x of xs); } }", "Unexpected token (1:33)", { ecmaVersion: 2018 })
+testFail("async function f() { for await (x in xs); }", "Unexpected token (1:25)", { ecmaVersion: 2018 })
+testFail("async function f() { for await (;;); }", "Unexpected token (1:25)", { ecmaVersion: 2018 })
+testFail("async function f() { for await (x;;); }", "Unexpected token (1:25)", { ecmaVersion: 2018 })
+testFail("async function f() { for await (let x = 0;;); }", "Unexpected token (1:25)", { ecmaVersion: 2018 })
 testFail("async function f() { for await (x of xs); }", "Unexpected token (1:25)", { ecmaVersion: 2017 })
 
 //------------------------------------------------------------------------------
@@ -722,10 +722,10 @@ test("async function* f() { await a; yield b; }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 
-testFail("async function* f() { () => await a; }", "Unexpected token (1:34)", { ecmaVersion: 9 })
-testFail("async function* f() { () => yield a; }", "Unexpected token (1:34)", { ecmaVersion: 9 })
+testFail("async function* f() { () => await a; }", "Unexpected token (1:34)", { ecmaVersion: 2018 })
+testFail("async function* f() { () => yield a; }", "Unexpected token (1:34)", { ecmaVersion: 2018 })
 
 testFail("async function* f() { await a; yield b; }", "Unexpected token (1:14)", { ecmaVersion: 2017 })
 
@@ -807,7 +807,7 @@ test("f = async function*() { await a; yield b; }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("obj = { async* f() { await a; yield b; } }", {
   "type": "Program",
   "start": 0,
@@ -904,7 +904,7 @@ test("obj = { async* f() { await a; yield b; } }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("class A { async* f() { await a; yield b; } }", {
   "type": "Program",
   "start": 0,
@@ -995,7 +995,7 @@ test("class A { async* f() { await a; yield b; } }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 test("class A { static async* f() { await a; yield b; } }", {
   "type": "Program",
   "start": 0,
@@ -1086,20 +1086,20 @@ test("class A { static async* f() { await a; yield b; } }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 2018 })
 
-testFail("f = async function*() { () => await a; }", "Unexpected token (1:36)", { ecmaVersion: 9 })
-testFail("f = async function*() { () => yield a; }", "Unexpected token (1:36)", { ecmaVersion: 9 })
-testFail("obj = { async\n* f() {} }", "Unexpected token (2:0)", { ecmaVersion: 9 })
-testFail("obj = { *async f() {}", "Unexpected token (1:15)", { ecmaVersion: 9 })
-testFail("obj = { *async* f() {}", "Unexpected token (1:14)", { ecmaVersion: 9 })
-testFail("obj = { async* f() { () => await a; } }", "Unexpected token (1:33)", { ecmaVersion: 9 })
-testFail("obj = { async* f() { () => yield a; } }", "Unexpected token (1:33)", { ecmaVersion: 9 })
-testFail("class A { async\n* f() {} }", "Unexpected token (2:0)", { ecmaVersion: 9 })
-testFail("class A { *async f() {} }", "Unexpected token (1:17)", { ecmaVersion: 9 })
-testFail("class A { *async* f() {} }", "Unexpected token (1:16)", { ecmaVersion: 9 })
-testFail("class A { async* f() { () => await a; } }", "Unexpected token (1:35)", { ecmaVersion: 9 })
-testFail("class A { async* f() { () => yield a; } }", "The keyword 'yield' is reserved (1:29)", { ecmaVersion: 9 })
+testFail("f = async function*() { () => await a; }", "Unexpected token (1:36)", { ecmaVersion: 2018 })
+testFail("f = async function*() { () => yield a; }", "Unexpected token (1:36)", { ecmaVersion: 2018 })
+testFail("obj = { async\n* f() {} }", "Unexpected token (2:0)", { ecmaVersion: 2018 })
+testFail("obj = { *async f() {}", "Unexpected token (1:15)", { ecmaVersion: 2018 })
+testFail("obj = { *async* f() {}", "Unexpected token (1:14)", { ecmaVersion: 2018 })
+testFail("obj = { async* f() { () => await a; } }", "Unexpected token (1:33)", { ecmaVersion: 2018 })
+testFail("obj = { async* f() { () => yield a; } }", "Unexpected token (1:33)", { ecmaVersion: 2018 })
+testFail("class A { async\n* f() {} }", "Unexpected token (2:0)", { ecmaVersion: 2018 })
+testFail("class A { *async f() {} }", "Unexpected token (1:17)", { ecmaVersion: 2018 })
+testFail("class A { *async* f() {} }", "Unexpected token (1:16)", { ecmaVersion: 2018 })
+testFail("class A { async* f() { () => await a; } }", "Unexpected token (1:35)", { ecmaVersion: 2018 })
+testFail("class A { async* f() { () => yield a; } }", "The keyword 'yield' is reserved (1:29)", { ecmaVersion: 2018 })
 
 testFail("f = async function*() { await a; yield b; }", "Unexpected token (1:18)", { ecmaVersion: 2017 })
 testFail("obj = { async* f() { await a; yield b; } }", "Unexpected token (1:13)", { ecmaVersion: 2017 })
@@ -1994,7 +1994,7 @@ test("({async: true})", {}, { "ecmaVersion": 9 })
 testFail("({async\n    foo() { }})", "Unexpected token (2:4)", { "ecmaVersion": 9 })
 
 // #1031
-test("async () => { for await (async of []); }", {}, {ecmaVersion: 9})
-test("for (async of => {}; i < 10; ++i) {}", {}, {ecmaVersion: 9})
-testFail("for (async of [1]) {}", "Unexpected token (1:14)", {ecmaVersion: 9})
+test("async () => { for await (async of []); }", {}, {ecmaVersion: 2018})
+test("for (async of => {}; i < 10; ++i) {}", {}, {ecmaVersion: 2018})
+testFail("for (async of [1]) {}", "Unexpected token (1:14)", {ecmaVersion: 2018})
 

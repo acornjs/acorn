@@ -15012,7 +15012,7 @@ test("/[a-z]/s", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 9});
+}, {ecmaVersion: 2018});
 
 testFail("[...x in y] = []", "Assigning to rvalue (1:4)", {ecmaVersion: 6});
 

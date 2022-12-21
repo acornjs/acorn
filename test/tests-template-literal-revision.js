@@ -33,7 +33,7 @@ test("`foo`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("`foo\\u25a0`", {
   type: "Program",
@@ -65,7 +65,7 @@ test("`foo\\u25a0`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("`foo${bar}\\u25a0`", {
   type: "Program",
@@ -114,7 +114,7 @@ test("`foo${bar}\\u25a0`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("foo`\\u25a0`", {
   type: "Program",
@@ -157,7 +157,7 @@ test("foo`\\u25a0`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("foo`foo${bar}\\u25a0`", {
   type: "Program",
@@ -217,20 +217,20 @@ test("foo`foo${bar}\\u25a0`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
-testFail("`\\unicode`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 9})
-testFail("`\\u`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 9})
-testFail("`\\u{`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 9})
-testFail("`\\u{abcdx`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 9})
-testFail("`\\u{abcdx}`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 9})
-testFail("`\\xylophone`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 9})
+testFail("`\\unicode`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 2018})
+testFail("`\\u`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 2018})
+testFail("`\\u{`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 2018})
+testFail("`\\u{abcdx`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 2018})
+testFail("`\\u{abcdx}`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 2018})
+testFail("`\\xylophone`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 2018})
 
 testFail("foo`\\unicode`", "Bad character escape sequence (1:6)", {ecmaVersion: 2017})
 testFail("foo`\\xylophone`", "Bad character escape sequence (1:6)", {ecmaVersion: 2017})
 
-testFail("foo`\\unicode", "Unterminated template (1:4)", {ecmaVersion: 9})
-testFail("foo`\\unicode\\`", "Unterminated template (1:4)", {ecmaVersion: 9})
+testFail("foo`\\unicode", "Unterminated template (1:4)", {ecmaVersion: 2018})
+testFail("foo`\\unicode\\`", "Unterminated template (1:4)", {ecmaVersion: 2018})
 
 test("foo`\\unicode`", {
   type: "Program",
@@ -273,7 +273,7 @@ test("foo`\\unicode`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("foo`foo${bar}\\unicode`", {
   type: "Program",
@@ -333,7 +333,7 @@ test("foo`foo${bar}\\unicode`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("foo`\\u`", {
   type: "Program",
@@ -376,7 +376,7 @@ test("foo`\\u`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("foo`\\u{`", {
   type: "Program",
@@ -419,7 +419,7 @@ test("foo`\\u{`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("foo`\\u{abcdx`", {
   type: "Program",
@@ -462,7 +462,7 @@ test("foo`\\u{abcdx`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("foo`\\u{abcdx}`", {
   type: "Program",
@@ -505,7 +505,7 @@ test("foo`\\u{abcdx}`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
 test("foo`\\unicode\\\\`", {
   type: "Program",
@@ -548,9 +548,9 @@ test("foo`\\unicode\\\\`", {
     }
   ],
   sourceType: "script"
-}, {ecmaVersion: 9})
+}, {ecmaVersion: 2018})
 
-test("`${ {class: 1} }`", {}, { ecmaVersion: 9 })
-test("`${ {delete: 1} }`", {}, { ecmaVersion: 9 })
-test("`${ {enum: 1} }`", {}, { ecmaVersion: 9 })
-test("`${ {function: 1} }`", {}, { ecmaVersion: 9 })
+test("`${ {class: 1} }`", {}, { ecmaVersion: 2018 })
+test("`${ {delete: 1} }`", {}, { ecmaVersion: 2018 })
+test("`${ {enum: 1} }`", {}, { ecmaVersion: 2018 })
+test("`${ {function: 1} }`", {}, { ecmaVersion: 2018 })
