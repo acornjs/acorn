@@ -7,7 +7,7 @@ if (typeof exports !== "undefined") {
 // await-top-level
 //------------------------------------------------------------------------------
 
-testFail("await 1", "Unexpected token (1:6)", {ecmaVersion: 8})
+testFail("await 1", "Unexpected token (1:6)", {ecmaVersion: 2017})
 test("await 1", {
   "type": "Program",
   "start": 0,
@@ -30,11 +30,11 @@ test("await 1", {
       }
     }
   ]
-}, {allowAwaitOutsideFunction: true, ecmaVersion: 8})
-testFail("function foo() {return await 1}", "Unexpected token (1:29)", {ecmaVersion: 8})
+}, {allowAwaitOutsideFunction: true, ecmaVersion: 2017})
+testFail("function foo() {return await 1}", "Unexpected token (1:29)", {ecmaVersion: 2017})
 testFail("function foo() {return await 1}", "Unexpected token (1:29)", {
   allowAwaitOutsideFunction: true,
-  ecmaVersion: 8
+  ecmaVersion: 2017
 })
 // ES2022
 test("await 1", {

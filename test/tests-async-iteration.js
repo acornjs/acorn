@@ -643,7 +643,7 @@ test("for (x of xs);", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 8 })
+}, { ecmaVersion: 2017 })
 
 testFail("for await (x of xs);", "Unexpected token (1:4)", { ecmaVersion: 9 })
 testFail("function f() { for await (x of xs); }", "Unexpected token (1:19)", { ecmaVersion: 9 })
@@ -654,7 +654,7 @@ testFail("async function f() { for await (x in xs); }", "Unexpected token (1:25)
 testFail("async function f() { for await (;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
 testFail("async function f() { for await (x;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
 testFail("async function f() { for await (let x = 0;;); }", "Unexpected token (1:25)", { ecmaVersion: 9 })
-testFail("async function f() { for await (x of xs); }", "Unexpected token (1:25)", { ecmaVersion: 8 })
+testFail("async function f() { for await (x of xs); }", "Unexpected token (1:25)", { ecmaVersion: 2017 })
 
 //------------------------------------------------------------------------------
 // FunctionDeclaration#await
@@ -727,7 +727,7 @@ test("async function* f() { await a; yield b; }", {
 testFail("async function* f() { () => await a; }", "Unexpected token (1:34)", { ecmaVersion: 9 })
 testFail("async function* f() { () => yield a; }", "Unexpected token (1:34)", { ecmaVersion: 9 })
 
-testFail("async function* f() { await a; yield b; }", "Unexpected token (1:14)", { ecmaVersion: 8 })
+testFail("async function* f() { await a; yield b; }", "Unexpected token (1:14)", { ecmaVersion: 2017 })
 
 //------------------------------------------------------------------------------
 // FunctionExpression#await
@@ -1101,9 +1101,9 @@ testFail("class A { *async* f() {} }", "Unexpected token (1:16)", { ecmaVersion:
 testFail("class A { async* f() { () => await a; } }", "Unexpected token (1:35)", { ecmaVersion: 9 })
 testFail("class A { async* f() { () => yield a; } }", "The keyword 'yield' is reserved (1:29)", { ecmaVersion: 9 })
 
-testFail("f = async function*() { await a; yield b; }", "Unexpected token (1:18)", { ecmaVersion: 8 })
-testFail("obj = { async* f() { await a; yield b; } }", "Unexpected token (1:13)", { ecmaVersion: 8 })
-testFail("class A { async* f() { await a; yield b; } }", "Unexpected token (1:15)", { ecmaVersion: 8 })
+testFail("f = async function*() { await a; yield b; }", "Unexpected token (1:18)", { ecmaVersion: 2017 })
+testFail("obj = { async* f() { await a; yield b; } }", "Unexpected token (1:13)", { ecmaVersion: 2017 })
+testFail("class A { async* f() { await a; yield b; } }", "Unexpected token (1:15)", { ecmaVersion: 2017 })
 
 //------------------------------------------------------------------------------
 // From https://github.com/acornjs/acorn-async-iteration/blob/fc72be2928ed0ffd46041f8c19052a9a282602ea/test/test.js

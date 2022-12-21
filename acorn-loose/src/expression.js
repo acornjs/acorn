@@ -112,7 +112,7 @@ lp.parseExprOp = function(left, start, minPrec, noIn, indent, line) {
 
 lp.parseMaybeUnary = function(sawUnary) {
   let start = this.storeCurrentPos(), expr
-  if (this.options.ecmaVersion >= 8 && this.toks.isContextual("await") &&
+  if (this.options.ecmaVersion >= 2017 && this.toks.isContextual("await") &&
       (this.inAsync || (this.toks.inModule && this.options.ecmaVersion >= 13) ||
        (!this.inFunction && this.options.allowAwaitOutsideFunction))) {
     expr = this.parseAwait()
@@ -539,7 +539,7 @@ lp.initFunction = function(node) {
     node.generator = false
     node.expression = false
   }
-  if (this.options.ecmaVersion >= 8)
+  if (this.options.ecmaVersion >= 2017)
     node.async = false
 }
 
@@ -590,7 +590,7 @@ lp.parseMethod = function(isGenerator, isAsync) {
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
     node.generator = !!isGenerator
-  if (this.options.ecmaVersion >= 8)
+  if (this.options.ecmaVersion >= 2017)
     node.async = !!isAsync
   this.inAsync = node.async
   this.inGenerator = node.generator
@@ -607,7 +607,7 @@ lp.parseMethod = function(isGenerator, isAsync) {
 lp.parseArrowExpression = function(node, params, isAsync) {
   let oldInAsync = this.inAsync, oldInGenerator = this.inGenerator, oldInFunction = this.inFunction
   this.initFunction(node)
-  if (this.options.ecmaVersion >= 8)
+  if (this.options.ecmaVersion >= 2017)
     node.async = !!isAsync
   this.inAsync = node.async
   this.inGenerator = false

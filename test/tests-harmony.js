@@ -13121,7 +13121,7 @@ testFail("for (const x = 42 in list) process(x);", "for-in loop variable declara
 testFail("for (let x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 testFail("for (const x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 testFail("for (var x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
-testFail("for (var x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 8});
+testFail("for (var x = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 2017});
 testFail("for (var {x} = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 testFail("for (var [x] = 42 of list) process(x);", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 6});
 testFail("var x; for (x = 42 of list) process(x);", "Assigning to rvalue (1:12)", {ecmaVersion: 6});
@@ -16631,8 +16631,8 @@ test("let 𝐢𝐧;", {}, {ecmaVersion: 6})
 
 testFail("for (let a = b => b in c;;);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
 testFail("for (let a = b => c => d in e;;);", "for-in loop variable declaration may not have an initializer (1:5)", { ecmaVersion: 6 })
-testFail("for (var a = b => c in d;;);", "Unexpected token (1:24)", { ecmaVersion: 8 })
-testFail("for (var a = b => c => d in e;;);", "Unexpected token (1:29)", { ecmaVersion: 8 })
+testFail("for (var a = b => c in d;;);", "Unexpected token (1:24)", { ecmaVersion: 2017 })
+testFail("for (var a = b => c => d in e;;);", "Unexpected token (1:29)", { ecmaVersion: 2017 })
 testFail("for (x => x in y;;);", "Assigning to rvalue (1:5)", { ecmaVersion: 6 })
 testFail("for (x => y => y in z;;);", "Assigning to rvalue (1:5)", { ecmaVersion: 6 })
 test("for ((a in b);;);", {
@@ -16881,4 +16881,4 @@ test("for (function (){ a in b };;);", {
       }
     }
   ]
-}, { locations: true, ecmaVersion: 8, })
+}, { locations: true, ecmaVersion: 2017, })

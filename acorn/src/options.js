@@ -6,7 +6,7 @@ import {SourceLocation} from "./locutil.js"
 
 export const defaultOptions = {
   // `ecmaVersion` indicates the ECMAScript version to parse. Must be
-  // either 3, 5, 6 (or 2015), 2016, 8 (2017), 9 (2018), 10
+  // either 3, 5, 6 (or 2015), 2016, 2017, 9 (2018), 10
   // (2019), 11 (2020), 12 (2021), 13 (2022), 14 (2023), or `"latest"`
   // (the latest version the library supports). This influences
   // support for strict mode, the set of reserved words, and support

@@ -19910,7 +19910,7 @@ test("for (var x = 42 in list) process(x);", {
       column: 36
     }
   }
-}, { ecmaVersion: 8, locations: true });
+}, { ecmaVersion: 2017, locations: true });
 
 test("for (var i = function() { return 10 in [] } in list) process(x);", {
   type: "Program",
@@ -20137,7 +20137,7 @@ test("for (var i = function() { return 10 in [] } in list) process(x);", {
       column: 64
     }
   }
-}, { ecmaVersion: 8, locations: true });
+}, { ecmaVersion: 2017, locations: true });
 
 test("while (true) { continue; }", {
   type: "Program",
@@ -29391,22 +29391,22 @@ test("08.5", {
   ]
 })
 
-test("undefined", {}, { ecmaVersion: 8 })
+test("undefined", {}, { ecmaVersion: 2017 })
 
 testFail("\\u{74}rue", "Escape sequence in keyword true (1:0)", {ecmaVersion: 6})
 testFail("export { X \\u0061s Y }", "Unexpected token (1:11)", {ecmaVersion: 2016, sourceType: "module"})
 testFail("import X fro\\u006d 'x'", "Unexpected token (1:9)", {ecmaVersion: 2016, sourceType: "module"})
 testFail("le\\u0074 x = 5", "Unexpected token (1:9)", {ecmaVersion: 6})
 testFail("(function* () { y\\u0069eld 10 })", "Cannot use 'yield' as identifier inside a generator (1:16)", {ecmaVersion: 6})
-testFail("(async function() { aw\\u0061it x })", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
-testFail("(\\u0061sync function() { await x })", "Unexpected token (1:12)", {ecmaVersion: 8})
-testFail("(\\u0061sync () => { await x })", "Unexpected token (1:15)", {ecmaVersion: 8})
-testFail("\\u0061sync x => { await x }", "Unexpected token (1:11)", {ecmaVersion: 8})
-testFail("class X { \\u0061sync x() { await x } }", "Unexpected token (1:21)", {ecmaVersion: 8})
-testFail("class X { static \\u0061sync x() { await x } }", "Unexpected token (1:28)", {ecmaVersion: 8})
+testFail("(async function() { aw\\u0061it x })", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 2017})
+testFail("(\\u0061sync function() { await x })", "Unexpected token (1:12)", {ecmaVersion: 2017})
+testFail("(\\u0061sync () => { await x })", "Unexpected token (1:15)", {ecmaVersion: 2017})
+testFail("\\u0061sync x => { await x }", "Unexpected token (1:11)", {ecmaVersion: 2017})
+testFail("class X { \\u0061sync x() { await x } }", "Unexpected token (1:21)", {ecmaVersion: 2017})
+testFail("class X { static \\u0061sync x() { await x } }", "Unexpected token (1:28)", {ecmaVersion: 2017})
 testFail("({ ge\\u0074 x() {} })", "Unexpected token (1:12)")
-testFail("export \\u0061sync function y() { await x }", "Unexpected token (1:7)", {ecmaVersion: 8, sourceType: "module"})
-testFail("export default \\u0061sync function () { await x }", "Unexpected token (1:26)", {ecmaVersion: 8, sourceType: "module"})
+testFail("export \\u0061sync function y() { await x }", "Unexpected token (1:7)", {ecmaVersion: 2017, sourceType: "module"})
+testFail("export default \\u0061sync function () { await x }", "Unexpected token (1:26)", {ecmaVersion: 2017, sourceType: "module"})
 test("(\\u0061sync ())", {
   "type": "Program",
   "start": 0,
@@ -29431,8 +29431,8 @@ test("(\\u0061sync ())", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
-testFail("({ \\u0061sync x() { await x } })", "Unexpected token (1:14)", {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
+testFail("({ \\u0061sync x() { await x } })", "Unexpected token (1:14)", {ecmaVersion: 2017})
 testFail("for (x \\u006ff y) {}", "Unexpected token (1:7)", {ecmaVersion: 6})
 testFail("function x () { new.ta\\u0072get }", "'new.target' must not contain escaped characters (1:16)", {ecmaVersion: 6})
 testFail("class X { st\\u0061tic y() {} }", "Unexpected token (1:22)", {ecmaVersion: 6})
@@ -29925,7 +29925,7 @@ test(`typeof async function f(){}
       }
     }
   ]
-}, { ecmaVersion: 8, locations: true })
+}, { ecmaVersion: 2017, locations: true })
 
 testFail(`typeof async function f(){}
-/foo/`, "Unexpected token (2:5)", { ecmaVersion: 8, locations: true })
+/foo/`, "Unexpected token (2:5)", { ecmaVersion: 2017, locations: true })

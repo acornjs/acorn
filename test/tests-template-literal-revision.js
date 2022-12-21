@@ -226,8 +226,8 @@ testFail("`\\u{abcdx`", "Bad escape sequence in untagged template literal (1:1)"
 testFail("`\\u{abcdx}`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 9})
 testFail("`\\xylophone`", "Bad escape sequence in untagged template literal (1:1)", {ecmaVersion: 9})
 
-testFail("foo`\\unicode`", "Bad character escape sequence (1:6)", {ecmaVersion: 8})
-testFail("foo`\\xylophone`", "Bad character escape sequence (1:6)", {ecmaVersion: 8})
+testFail("foo`\\unicode`", "Bad character escape sequence (1:6)", {ecmaVersion: 2017})
+testFail("foo`\\xylophone`", "Bad character escape sequence (1:6)", {ecmaVersion: 2017})
 
 testFail("foo`\\unicode", "Unterminated template (1:4)", {ecmaVersion: 9})
 testFail("foo`\\unicode\\`", "Unterminated template (1:4)", {ecmaVersion: 9})

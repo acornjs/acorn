@@ -302,7 +302,7 @@ pp.parseExprSubscripts = function(refDestructuringErrors, forInit) {
 }
 
 pp.parseSubscripts = function(base, startPos, startLoc, noCalls, forInit) {
-  let maybeAsyncArrow = this.options.ecmaVersion >= 8 && base.type === "Identifier" && base.name === "async" &&
+  let maybeAsyncArrow = this.options.ecmaVersion >= 2017 && base.type === "Identifier" && base.name === "async" &&
       this.lastTokEnd === base.end && !this.canInsertSemicolon() && base.end - base.start === 5 &&
       this.potentialArrowAt === base.start
   let optionalChained = false
@@ -351,7 +351,7 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow,
     this.yieldPos = 0
     this.awaitPos = 0
     this.awaitIdentPos = 0
-    let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
+    let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 2017, false, refDestructuringErrors)
     if (maybeAsyncArrow && !optional && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
       this.checkPatternErrors(refDestructuringErrors, false)
       this.checkYieldAwaitInDefaultParams()
@@ -422,14 +422,14 @@ pp.parseExprAtom = function(refDestructuringErrors, forInit) {
   case tt.name:
     let startPos = this.start, startLoc = this.startLoc, containsEsc = this.containsEsc
     let id = this.parseIdent(false)
-    if (this.options.ecmaVersion >= 8 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function)) {
+    if (this.options.ecmaVersion >= 2017 && !containsEsc && id.name === "async" && !this.canInsertSemicolon() && this.eat(tt._function)) {
       this.overrideContext(tokenCtxTypes.f_expr)
       return this.parseFunction(this.startNodeAt(startPos, startLoc), 0, false, true, forInit)
     }
     if (canBeArrow && !this.canInsertSemicolon()) {
       if (this.eat(tt.arrow))
         return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), [id], false, forInit)
-      if (this.options.ecmaVersion >= 8 && id.name === "async" && this.type === tt.name && !containsEsc &&
+      if (this.options.ecmaVersion >= 2017 && id.name === "async" && this.type === tt.name && !containsEsc &&
           (!this.potentialArrowInForAwait || this.value !== "of" || this.containsEsc)) {
         id = this.parseIdent(false)
         if (this.canInsertSemicolon() || !this.eat(tt.arrow))
@@ -572,7 +572,7 @@ pp.parseParenExpression = function() {
 }
 
 pp.parseParenAndDistinguishExpression = function(canBeArrow, forInit) {
-  let startPos = this.start, startLoc = this.startLoc, val, allowTrailingComma = this.options.ecmaVersion >= 8
+  let startPos = this.start, startLoc = this.startLoc, val, allowTrailingComma = this.options.ecmaVersion >= 2017
   if (this.options.ecmaVersion >= 6) {
     this.next()
 
@@ -670,7 +670,7 @@ pp.parseNew = function() {
   if (isImport && node.callee.type === "ImportExpression") {
     this.raise(startPos, "Cannot use new with import()")
   }
-  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false)
+  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 2017, false)
   else node.arguments = empty
   return this.finishNode(node, "NewExpression")
 }
@@ -771,7 +771,7 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
   }
   let containsEsc = this.containsEsc
   this.parsePropertyName(prop)
-  if (!isPattern && !containsEsc && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
+  if (!isPattern && !containsEsc && this.options.ecmaVersion >= 2017 && !isGenerator && this.isAsyncProp(prop)) {
     isAsync = true
     isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
     this.parsePropertyName(prop, refDestructuringErrors)
@@ -851,7 +851,7 @@ pp.parsePropertyName = function(prop) {
 pp.initFunction = function(node) {
   node.id = null
   if (this.options.ecmaVersion >= 6) node.generator = node.expression = false
-  if (this.options.ecmaVersion >= 8) node.async = false
+  if (this.options.ecmaVersion >= 2017) node.async = false
 }
 
 // Parse object or class method.
@@ -862,7 +862,7 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
   this.initFunction(node)
   if (this.options.ecmaVersion >= 6)
     node.generator = isGenerator
-  if (this.options.ecmaVersion >= 8)
+  if (this.options.ecmaVersion >= 2017)
     node.async = !!isAsync
 
   this.yieldPos = 0
@@ -871,7 +871,7 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
   this.enterScope(functionFlags(isAsync, node.generator) | SCOPE_SUPER | (allowDirectSuper ? SCOPE_DIRECT_SUPER : 0))
 
   this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
+  node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 2017)
   this.checkYieldAwaitInDefaultParams()
   this.parseFunctionBody(node, false, true, false)
 
@@ -888,7 +888,7 @@ pp.parseArrowExpression = function(node, params, isAsync, forInit) {
 
   this.enterScope(functionFlags(isAsync, false) | SCOPE_ARROW)
   this.initFunction(node)
-  if (this.options.ecmaVersion >= 8) node.async = !!isAsync
+  if (this.options.ecmaVersion >= 2017) node.async = !!isAsync
 
   this.yieldPos = 0
   this.awaitPos = 0

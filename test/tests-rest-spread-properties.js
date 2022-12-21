@@ -390,7 +390,7 @@ test("({...(a,b),c})", {
 }, { ecmaVersion: 9 })
 
 testFail("({...})", "Unexpected token (1:5)", { ecmaVersion: 9 })
-testFail("({...obj})", "Unexpected token (1:2)", { ecmaVersion: 8 })
+testFail("({...obj})", "Unexpected token (1:2)", { ecmaVersion: 2017 })
 
 //------------------------------------------------------------------------------
 // Rest Properties
@@ -939,12 +939,12 @@ testFail("({...obj1,...obj2} = foo)", "Comma is not permitted after the rest ele
 testFail("({...(a,b)} = foo)", "Assigning to rvalue (1:5)", { ecmaVersion: 9 })
 testFail("({...{a,b}} = foo)", "Unexpected token (1:5)", { ecmaVersion: 9 })
 testFail("({...[a,b]} = foo)", "Unexpected token (1:5)", { ecmaVersion: 9 })
-testFail("({...obj} = foo)", "Unexpected token (1:2)", { ecmaVersion: 8 })
+testFail("({...obj} = foo)", "Unexpected token (1:2)", { ecmaVersion: 2017 })
 testFail("({...(obj)}) => {}", "Parenthesized pattern (1:5)", { ecmaVersion: 9 })
 testFail("({...(a,b)}) => {}", "Parenthesized pattern (1:5)", { ecmaVersion: 9 })
 testFail("({...{a,b}}) => {}", "Unexpected token (1:5)", { ecmaVersion: 9 })
 testFail("({...[a,b]}) => {}", "Unexpected token (1:5)", { ecmaVersion: 9 })
-testFail("({...obj}) => {}", "Unexpected token (1:2)", { ecmaVersion: 8 })
+testFail("({...obj}) => {}", "Unexpected token (1:2)", { ecmaVersion: 2017 })
 
 //------------------------------------------------------------------------------
 // From https://github.com/adrianheine/acorn5-object-spread/tree/49839ac662fe34e1b4ad56767115f54747db2e7c/test

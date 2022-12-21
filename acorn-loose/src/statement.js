@@ -432,7 +432,7 @@ lp.parseFunction = function(node, isStatement, isAsync) {
   if (this.options.ecmaVersion >= 6) {
     node.generator = this.eat(tt.star)
   }
-  if (this.options.ecmaVersion >= 8) {
+  if (this.options.ecmaVersion >= 2017) {
     node.async = !!isAsync
   }
   if (this.tok.type === tt.name) node.id = this.parseIdent()

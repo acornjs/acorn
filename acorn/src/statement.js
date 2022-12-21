@@ -528,7 +528,7 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync, forIn
       this.unexpected()
     node.generator = this.eat(tt.star)
   }
-  if (this.options.ecmaVersion >= 8)
+  if (this.options.ecmaVersion >= 2017)
     node.async = !!isAsync
 
   if (statement & FUNC_STATEMENT) {
@@ -561,7 +561,7 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync, forIn
 
 pp.parseFunctionParams = function(node) {
   this.expect(tt.parenL)
-  node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
+  node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 2017)
   this.checkYieldAwaitInDefaultParams()
 }
 

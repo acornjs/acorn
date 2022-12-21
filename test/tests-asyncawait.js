@@ -36,7 +36,7 @@ test("function foo() { }", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // async == true
 test("async function foo() { }", {
@@ -67,7 +67,7 @@ test("async function foo() { }", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // a reference and a normal function declaration if there is a linebreak between 'async' and 'function'.
 test("async\nfunction foo() { }", {
@@ -109,7 +109,7 @@ test("async\nfunction foo() { }", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // export
 test("export async function foo() { }", {
@@ -147,7 +147,7 @@ test("export async function foo() { }", {
         }
     ],
     "sourceType": "module"
-}, {ecmaVersion: 8, sourceType: "module"})
+}, {ecmaVersion: 2017, sourceType: "module"})
 
 // export default
 test("export default async function() { }", {
@@ -178,10 +178,10 @@ test("export default async function() { }", {
         }
     ],
     "sourceType": "module"
-}, {ecmaVersion: 8, sourceType: "module"})
+}, {ecmaVersion: 2017, sourceType: "module"})
 
 // cannot combine with generators
-testFail("async function* foo() { }", "Unexpected token (1:14)", {ecmaVersion: 8})
+testFail("async function* foo() { }", "Unexpected token (1:14)", {ecmaVersion: 2017})
 
 // 'await' is valid as function names.
 test("async function await() { }", {
@@ -212,12 +212,12 @@ test("async function await() { }", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // cannot use 'await' inside async functions.
-testFail("async function wrap() {\nasync function await() { }\n}", "Cannot use 'await' as identifier inside an async function (2:15)", {ecmaVersion: 8})
-testFail("async function foo(await) { }", "Cannot use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 8})
-testFail("async function foo() { return {await} }", "Cannot use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 8})
+testFail("async function wrap() {\nasync function await() { }\n}", "Cannot use 'await' as identifier inside an async function (2:15)", {ecmaVersion: 2017})
+testFail("async function foo(await) { }", "Cannot use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 2017})
+testFail("async function foo() { return {await} }", "Cannot use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 2017})
 
 //-----------------------------------------------------------------------------
 // Async Function Expressions
@@ -256,7 +256,7 @@ test("(function foo() { })", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // async == true
 test("(async function foo() { })", {
@@ -292,13 +292,13 @@ test("(async function foo() { })", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // cannot insert a linebreak to between 'async' and 'function'.
-testFail("(async\nfunction foo() { })", "Unexpected token (2:0)", {ecmaVersion: 8})
+testFail("(async\nfunction foo() { })", "Unexpected token (2:0)", {ecmaVersion: 2017})
 
 // cannot combine with generators.
-testFail("(async function* foo() { })", "Unexpected token (1:15)", {ecmaVersion: 8})
+testFail("(async function* foo() { })", "Unexpected token (1:15)", {ecmaVersion: 2017})
 
 // export default
 test("export default (async function() { })", {
@@ -329,12 +329,12 @@ test("export default (async function() { })", {
         }
     ],
     "sourceType": "module"
-}, {ecmaVersion: 8, sourceType: "module"})
+}, {ecmaVersion: 2017, sourceType: "module"})
 
 // cannot use 'await' inside async functions.
-testFail("(async function await() { })", "Cannot use 'await' as identifier inside an async function (1:16)", {ecmaVersion: 8})
-testFail("(async function foo(await) { })", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
-testFail("(async function foo() { return {await} })", "Cannot use 'await' as identifier inside an async function (1:32)", {ecmaVersion: 8})
+testFail("(async function await() { })", "Cannot use 'await' as identifier inside an async function (1:16)", {ecmaVersion: 2017})
+testFail("(async function foo(await) { })", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 2017})
+testFail("(async function foo() { return {await} })", "Cannot use 'await' as identifier inside an async function (1:32)", {ecmaVersion: 2017})
 
 //-----------------------------------------------------------------------------
 // Async Arrow Function Expressions
@@ -375,7 +375,7 @@ test("a => a", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("(a) => a", {
     "type": "Program",
     "start": 0,
@@ -411,7 +411,7 @@ test("(a) => a", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // async == true
 test("async a => a", {
@@ -449,7 +449,7 @@ test("async a => a", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("async () => a", {
     "type": "Program",
     "start": 0,
@@ -478,7 +478,7 @@ test("async () => a", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("async (a, b) => a", {
     "type": "Program",
     "start": 0,
@@ -520,7 +520,7 @@ test("async (a, b) => a", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // OK even if it's an invalid syntax in the case `=>` didn't exist.
 test("async ({a = b}) => a", {
@@ -591,10 +591,10 @@ test("async ({a = b}) => a", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // syntax error if `=>` didn't exist.
-testFail("async ({a = b})", "Shorthand property assignments are valid only in destructuring patterns (1:10)", {ecmaVersion: 8})
+testFail("async ({a = b})", "Shorthand property assignments are valid only in destructuring patterns (1:10)", {ecmaVersion: 2017})
 
 // AssignmentPattern/AssignmentExpression
 test("async ({a: b = c}) => a", {
@@ -665,7 +665,7 @@ test("async ({a: b = c}) => a", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("async ({a: b = c})", {
     "type": "Program",
     "start": 0,
@@ -731,7 +731,7 @@ test("async ({a: b = c})", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // a reference and a normal arrow function if there is a linebreak between 'async' and the 1st parameter.
 test("async\na => a", {
@@ -780,14 +780,14 @@ test("async\na => a", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // 'async()' call expression and invalid '=>' token.
-testFail("async\n() => a", "Unexpected token (2:3)", {ecmaVersion: 8})
+testFail("async\n() => a", "Unexpected token (2:3)", {ecmaVersion: 2017})
 
 // cannot insert a linebreak before '=>'.
-testFail("async a\n=> a", "Unexpected token (2:0)", {ecmaVersion: 8})
-testFail("async ()\n=> a", "Unexpected token (2:0)", {ecmaVersion: 8})
+testFail("async a\n=> a", "Unexpected token (2:0)", {ecmaVersion: 2017})
+testFail("async ()\n=> a", "Unexpected token (2:0)", {ecmaVersion: 2017})
 
 // a call expression with 'await' reference.
 test("async (await)", {
@@ -821,29 +821,29 @@ test("async (await)", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // cannot use 'await' inside async functions.
-testFail("async await => 1", "Cannot use 'await' as identifier inside an async function (1:6)", {ecmaVersion: 8})
-testFail("async (await) => 1", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 8})
-testFail("async (...await) => 1", "Cannot use 'await' as identifier inside an async function (1:10)", {ecmaVersion: 8})
-testFail("async ({await}) => 1", "Cannot use 'await' as identifier inside an async function (1:8)", {ecmaVersion: 8})
-testFail("async ({a: await}) => 1", "Cannot use 'await' as identifier inside an async function (1:11)", {ecmaVersion: 8})
-test("async ({await: a}) => 1", {}, {ecmaVersion: 8})
-testFail("async ([await]) => 1", "Cannot use 'await' as identifier inside an async function (1:8)", {ecmaVersion: 8})
-testFail("async ([...await]) => 1", "Cannot use 'await' as identifier inside an async function (1:11)", {ecmaVersion: 8})
-test("async (b = {await: a}) => 1", {}, {ecmaVersion: 8})
-testFail("async (b = {await}) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
-testFail("async (b = {a: await}) => 1", "Cannot use 'await' as identifier inside an async function (1:15)", {ecmaVersion: 8})
-test("async (b = {await: a}) => 1", {}, {ecmaVersion: 8})
-testFail("async (b = [await]) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
-testFail("async (b = [...await]) => 1", "Cannot use 'await' as identifier inside an async function (1:15)", {ecmaVersion: 8})
-testFail("async (b = class await {}) => 1", "Cannot use 'await' as identifier inside an async function (1:17)", {ecmaVersion: 8})
-test("async (b = function await() {}) => 1", {}, {ecmaVersion: 8})
-test("async (b = function* await() {}) => 1", {}, {ecmaVersion: 8})
-testFail("async (b = (await) => {}) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
-testFail("async (await, b = async()) => 2", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 8})
-testFail("async (await, b = async () => {}) => 1", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 8})
+testFail("async await => 1", "Cannot use 'await' as identifier inside an async function (1:6)", {ecmaVersion: 2017})
+testFail("async (await) => 1", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 2017})
+testFail("async (...await) => 1", "Cannot use 'await' as identifier inside an async function (1:10)", {ecmaVersion: 2017})
+testFail("async ({await}) => 1", "Cannot use 'await' as identifier inside an async function (1:8)", {ecmaVersion: 2017})
+testFail("async ({a: await}) => 1", "Cannot use 'await' as identifier inside an async function (1:11)", {ecmaVersion: 2017})
+test("async ({await: a}) => 1", {}, {ecmaVersion: 2017})
+testFail("async ([await]) => 1", "Cannot use 'await' as identifier inside an async function (1:8)", {ecmaVersion: 2017})
+testFail("async ([...await]) => 1", "Cannot use 'await' as identifier inside an async function (1:11)", {ecmaVersion: 2017})
+test("async (b = {await: a}) => 1", {}, {ecmaVersion: 2017})
+testFail("async (b = {await}) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 2017})
+testFail("async (b = {a: await}) => 1", "Cannot use 'await' as identifier inside an async function (1:15)", {ecmaVersion: 2017})
+test("async (b = {await: a}) => 1", {}, {ecmaVersion: 2017})
+testFail("async (b = [await]) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 2017})
+testFail("async (b = [...await]) => 1", "Cannot use 'await' as identifier inside an async function (1:15)", {ecmaVersion: 2017})
+testFail("async (b = class await {}) => 1", "Cannot use 'await' as identifier inside an async function (1:17)", {ecmaVersion: 2017})
+test("async (b = function await() {}) => 1", {}, {ecmaVersion: 2017})
+test("async (b = function* await() {}) => 1", {}, {ecmaVersion: 2017})
+testFail("async (b = (await) => {}) => 1", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 2017})
+testFail("async (await, b = async()) => 2", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 2017})
+testFail("async (await, b = async () => {}) => 1", "Cannot use 'await' as identifier inside an async function (1:7)", {ecmaVersion: 2017})
 
 // can use 'yield' identifier outside generators.
 test("async yield => 1", {
@@ -882,7 +882,7 @@ test("async yield => 1", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 //-----------------------------------------------------------------------------
 // Async Methods (object)
@@ -938,7 +938,7 @@ test("({foo() { }})", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // async == true
 test("({async foo() { }})", {
@@ -991,7 +991,7 @@ test("({async foo() { }})", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // OK with 'async' as a method name
 test("({async() { }})", {
@@ -1044,15 +1044,15 @@ test("({async() { }})", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // invalid syntax if there is a linebreak after 'async'.
-testFail("({async\nfoo() { }})", "Unexpected token (2:0)", {ecmaVersion: 8})
+testFail("({async\nfoo() { }})", "Unexpected token (2:0)", {ecmaVersion: 2017})
 
 // cannot combine with getters/setters/generators.
-testFail("({async get foo() { }})", "Unexpected token (1:12)", {ecmaVersion: 8})
-testFail("({async set foo(value) { }})", "Unexpected token (1:12)", {ecmaVersion: 8})
-testFail("({async* foo() { }})", "Unexpected token (1:7)", {ecmaVersion: 8})
+testFail("({async get foo() { }})", "Unexpected token (1:12)", {ecmaVersion: 2017})
+testFail("({async set foo(value) { }})", "Unexpected token (1:12)", {ecmaVersion: 2017})
+testFail("({async* foo() { }})", "Unexpected token (1:7)", {ecmaVersion: 2017})
 
 // 'await' is valid as function names.
 test("({async await() { }})", {
@@ -1105,16 +1105,16 @@ test("({async await() { }})", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // cannot use 'await' inside async functions.
-test("async function wrap() {\n({async await() { }})\n}", {}, {ecmaVersion: 8})
-testFail("({async foo() { var await }})", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})
-testFail("({async foo(await) { }})", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 8})
-testFail("({async foo() { return {await} }})", "Cannot use 'await' as identifier inside an async function (1:24)", {ecmaVersion: 8})
+test("async function wrap() {\n({async await() { }})\n}", {}, {ecmaVersion: 2017})
+testFail("({async foo() { var await }})", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 2017})
+testFail("({async foo(await) { }})", "Cannot use 'await' as identifier inside an async function (1:12)", {ecmaVersion: 2017})
+testFail("({async foo() { return {await} }})", "Cannot use 'await' as identifier inside an async function (1:24)", {ecmaVersion: 2017})
 
 // invalid syntax 'async foo: 1'
-testFail("({async foo: 1})", "Unexpected token (1:11)", {ecmaVersion: 8})
+testFail("({async foo: 1})", "Unexpected token (1:11)", {ecmaVersion: 2017})
 
 //-----------------------------------------------------------------------------
 // Async Methods (class)
@@ -1176,7 +1176,7 @@ test("class A {foo() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // async == true
 test("class A {async foo() { }}", {
@@ -1235,7 +1235,7 @@ test("class A {async foo() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("class A {static async foo() { }}", {
     "type": "Program",
     "start": 0,
@@ -1292,7 +1292,7 @@ test("class A {static async foo() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // OK 'async' as a method name.
 test("class A {async() { }}", {
@@ -1351,7 +1351,7 @@ test("class A {async() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("class A {static async() { }}", {
     "type": "Program",
     "start": 0,
@@ -1408,7 +1408,7 @@ test("class A {static async() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("class A {*async() { }}", {
     "type": "Program",
     "start": 0,
@@ -1465,7 +1465,7 @@ test("class A {*async() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("class A {static* async() { }}", {
     "type": "Program",
     "start": 0,
@@ -1522,20 +1522,20 @@ test("class A {static* async() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // invalid syntax if there is a linebreak after 'async'.
-testFail("class A {async\nfoo() { }}", "Unexpected token (2:0)", {ecmaVersion: 8})
-testFail("class A {static async\nfoo() { }}", "Unexpected token (2:0)", {ecmaVersion: 8})
+testFail("class A {async\nfoo() { }}", "Unexpected token (2:0)", {ecmaVersion: 2017})
+testFail("class A {static async\nfoo() { }}", "Unexpected token (2:0)", {ecmaVersion: 2017})
 
 // cannot combine with constructors/getters/setters/generators.
-testFail("class A {async constructor() { }}", "Constructor can't be an async method (1:15)", {ecmaVersion: 8})
-testFail("class A {async get foo() { }}", "Unexpected token (1:19)", {ecmaVersion: 8})
-testFail("class A {async set foo(value) { }}", "Unexpected token (1:19)", {ecmaVersion: 8})
-testFail("class A {async* foo() { }}", "Unexpected token (1:14)", {ecmaVersion: 8})
-testFail("class A {static async get foo() { }}", "Unexpected token (1:26)", {ecmaVersion: 8})
-testFail("class A {static async set foo(value) { }}", "Unexpected token (1:26)", {ecmaVersion: 8})
-testFail("class A {static async* foo() { }}", "Unexpected token (1:21)", {ecmaVersion: 8})
+testFail("class A {async constructor() { }}", "Constructor can't be an async method (1:15)", {ecmaVersion: 2017})
+testFail("class A {async get foo() { }}", "Unexpected token (1:19)", {ecmaVersion: 2017})
+testFail("class A {async set foo(value) { }}", "Unexpected token (1:19)", {ecmaVersion: 2017})
+testFail("class A {async* foo() { }}", "Unexpected token (1:14)", {ecmaVersion: 2017})
+testFail("class A {static async get foo() { }}", "Unexpected token (1:26)", {ecmaVersion: 2017})
+testFail("class A {static async set foo(value) { }}", "Unexpected token (1:26)", {ecmaVersion: 2017})
+testFail("class A {static async* foo() { }}", "Unexpected token (1:21)", {ecmaVersion: 2017})
 
 // 'await' is valid as function names.
 test("class A {async await() { }}", {
@@ -1594,7 +1594,7 @@ test("class A {async await() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("class A {static async await() { }}", {
     "type": "Program",
     "start": 0,
@@ -1651,13 +1651,13 @@ test("class A {static async await() { }}", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // cannot use 'await' inside async functions.
-test("async function wrap() {\nclass A {async await() { }}\n}", {}, {ecmaVersion: 8})
-testFail("class A {async foo() { var await }}", "Cannot use 'await' as identifier inside an async function (1:27)", {ecmaVersion: 8})
-testFail("class A {async foo(await) { }}", "Cannot use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 8})
-testFail("class A {async foo() { return {await} }}", "Cannot use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 8})
+test("async function wrap() {\nclass A {async await() { }}\n}", {}, {ecmaVersion: 2017})
+testFail("class A {async foo() { var await }}", "Cannot use 'await' as identifier inside an async function (1:27)", {ecmaVersion: 2017})
+testFail("class A {async foo(await) { }}", "Cannot use 'await' as identifier inside an async function (1:19)", {ecmaVersion: 2017})
+testFail("class A {async foo() { return {await} }}", "Cannot use 'await' as identifier inside an async function (1:31)", {ecmaVersion: 2017})
 //-----------------------------------------------------------------------------
 // Await Expressions
 
@@ -1680,14 +1680,14 @@ test("await", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // 'await' is a keyword in modules.
-testFail("await", "Cannot use keyword 'await' outside an async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
+testFail("await", "Cannot use keyword 'await' outside an async function (1:0)", {ecmaVersion: 2017, sourceType: "module"})
 
 // Await expressions is invalid outside of async functions.
-testFail("await a", "Unexpected token (1:6)", {ecmaVersion: 8})
-testFail("await a", "Cannot use keyword 'await' outside an async function (1:0)", {ecmaVersion: 8, sourceType: "module"})
+testFail("await a", "Unexpected token (1:6)", {ecmaVersion: 2017})
+testFail("await a", "Cannot use keyword 'await' outside an async function (1:0)", {ecmaVersion: 2017, sourceType: "module"})
 
 // Await expressions in async functions.
 test("async function foo(a, b) { await a }", {
@@ -1748,7 +1748,7 @@ test("async function foo(a, b) { await a }", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("(async function foo(a) { await a })", {
     "type": "Program",
     "start": 0,
@@ -1806,7 +1806,7 @@ test("(async function foo(a) { await a })", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("(async (a) => await a)", {
     "type": "Program",
     "start": 0,
@@ -1847,7 +1847,7 @@ test("(async (a) => await a)", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("({async foo(a) { await a }})", {
     "type": "Program",
     "start": 0,
@@ -1922,7 +1922,7 @@ test("({async foo(a) { await a }})", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("(class {async foo(a) { await a }})", {
     "type": "Program",
     "start": 0,
@@ -2003,7 +2003,7 @@ test("(class {async foo(a) { await a }})", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // Await expressions are an unary expression.
 test("async function foo(a, b) { await a + await b }", {
@@ -2081,7 +2081,7 @@ test("async function foo(a, b) { await a + await b }", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // 'await + 1' is a binary expression outside of async functions.
 test("function foo() { await + 1 }", {
@@ -2137,7 +2137,7 @@ test("function foo() { await + 1 }", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // 'await + 1' is an await expression in async functions.
 test("async function foo() { await + 1 }", {
@@ -2193,23 +2193,23 @@ test("async function foo() { await + 1 }", {
         }
     ],
     "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // Await expressions need one argument.
-testFail("async function foo() { await }", "Unexpected token (1:29)", {ecmaVersion: 8})
-testFail("(async function foo() { await })", "Unexpected token (1:30)", {ecmaVersion: 8})
-testFail("async () => await", "Unexpected token (1:17)", {ecmaVersion: 8})
-testFail("({async foo() { await }})", "Unexpected token (1:22)", {ecmaVersion: 8})
-testFail("(class {async foo() { await }})", "Unexpected token (1:28)", {ecmaVersion: 8})
+testFail("async function foo() { await }", "Unexpected token (1:29)", {ecmaVersion: 2017})
+testFail("(async function foo() { await })", "Unexpected token (1:30)", {ecmaVersion: 2017})
+testFail("async () => await", "Unexpected token (1:17)", {ecmaVersion: 2017})
+testFail("({async foo() { await }})", "Unexpected token (1:22)", {ecmaVersion: 2017})
+testFail("(class {async foo() { await }})", "Unexpected token (1:28)", {ecmaVersion: 2017})
 
 // Forbid await expressions in default parameters:
-testFail("async function foo(a = await b) {}", "Await expression cannot be a default value (1:23)", {ecmaVersion: 8})
-testFail("(async function foo(a = await b) {})", "Await expression cannot be a default value (1:24)", {ecmaVersion: 8})
-testFail("async (a = await b) => {}", "Unexpected token (1:17)", {ecmaVersion: 8})
-testFail("async function wrapper() {\nasync (a = await b) => {}\n}", "Await expression cannot be a default value (2:11)", {ecmaVersion: 8})
-testFail("({async foo(a = await b) {}})", "Await expression cannot be a default value (1:16)", {ecmaVersion: 8})
-testFail("(class {async foo(a = await b) {}})", "Await expression cannot be a default value (1:22)", {ecmaVersion: 8})
-testFail("async function foo(a = class extends (await b) {}) {}", "Await expression cannot be a default value (1:38)", {ecmaVersion: 8})
+testFail("async function foo(a = await b) {}", "Await expression cannot be a default value (1:23)", {ecmaVersion: 2017})
+testFail("(async function foo(a = await b) {})", "Await expression cannot be a default value (1:24)", {ecmaVersion: 2017})
+testFail("async (a = await b) => {}", "Unexpected token (1:17)", {ecmaVersion: 2017})
+testFail("async function wrapper() {\nasync (a = await b) => {}\n}", "Await expression cannot be a default value (2:11)", {ecmaVersion: 2017})
+testFail("({async foo(a = await b) {}})", "Await expression cannot be a default value (1:16)", {ecmaVersion: 2017})
+testFail("(class {async foo(a = await b) {}})", "Await expression cannot be a default value (1:22)", {ecmaVersion: 2017})
+testFail("async function foo(a = class extends (await b) {}) {}", "Await expression cannot be a default value (1:38)", {ecmaVersion: 2017})
 
 // Allow await expressions inside functions in default parameters:
 test("async function foo(a = async function foo() { await b }) {}", {
@@ -2290,7 +2290,7 @@ test("async function foo(a = async function foo() { await b }) {}", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("async function foo(a = async () => await b) {}", {
   "type": "Program",
   "start": 0,
@@ -2352,7 +2352,7 @@ test("async function foo(a = async () => await b) {}", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("async function foo(a = {async bar() { await b }}) {}", {
   "type": "Program",
   "start": 0,
@@ -2448,7 +2448,7 @@ test("async function foo(a = {async bar() { await b }}) {}", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 test("async function foo(a = class {async bar() { await b }}) {}", {
   "type": "Program",
   "start": 0,
@@ -2550,7 +2550,7 @@ test("async function foo(a = class {async bar() { await b }}) {}", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 // Distinguish ParenthesizedExpression or ArrowFunctionExpression
 test("async function wrap() {\n(a = await b)\n}", {
@@ -2610,8 +2610,8 @@ test("async function wrap() {\n(a = await b)\n}", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
-testFail("async function wrap() {\n(a = await b) => a\n}", "Await expression cannot be a default value (2:5)", {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
+testFail("async function wrap() {\n(a = await b) => a\n}", "Await expression cannot be a default value (2:5)", {ecmaVersion: 2017})
 
 test("async function wrap() {\n({a = await b} = obj)\n}", {
   "type": "Program",
@@ -2703,8 +2703,8 @@ test("async function wrap() {\n({a = await b} = obj)\n}", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
-testFail("async function wrap() {\n({a = await b} = obj) => a\n}", "Await expression cannot be a default value (2:6)", {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
+testFail("async function wrap() {\n({a = await b} = obj) => a\n}", "Await expression cannot be a default value (2:6)", {ecmaVersion: 2017})
 
 test("function* wrap() {\nasync(a = yield b)\n}", {
   "type": "Program",
@@ -2777,8 +2777,8 @@ test("function* wrap() {\nasync(a = yield b)\n}", {
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
-testFail("function* wrap() {\nasync(a = yield b) => a\n}", "Yield expression cannot be a default value (2:10)", {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
+testFail("function* wrap() {\nasync(a = yield b) => a\n}", "Yield expression cannot be a default value (2:10)", {ecmaVersion: 2017})
 
 // https://github.com/acornjs/acorn/issues/464
 test("f = ({ w = counter(), x = counter(), y = counter(), z = counter() } = { w: null, x: 0, y: false, z: '' }) => {}", {
@@ -3081,7 +3081,7 @@ test("f = ({ w = counter(), x = counter(), y = counter(), z = counter() } = { w:
     }
   ],
   "sourceType": "script"
-}, {ecmaVersion: 8})
+}, {ecmaVersion: 2017})
 
 test("({ async: true })", {
   type: "Program",
@@ -3103,14 +3103,14 @@ test("({ async: true })", {
         }]
       }
   }]
-}, {ecmaVersion: 8});
+}, {ecmaVersion: 2017});
 
 // Tests for B.3.4 FunctionDeclarations in IfStatement Statement Clauses
-testFail("if (x) async function f() {}", "Unexpected token (1:7)", {ecmaVersion: 8})
+testFail("if (x) async function f() {}", "Unexpected token (1:7)", {ecmaVersion: 2017})
 
-testFail("(async)(a) => 12", "Unexpected token (1:11)", {ecmaVersion: 8})
+testFail("(async)(a) => 12", "Unexpected token (1:11)", {ecmaVersion: 2017})
 
-testFail("f = async ((x)) => x", "Parenthesized pattern (1:11)", {ecmaVersion: 8})
+testFail("f = async ((x)) => x", "Parenthesized pattern (1:11)", {ecmaVersion: 2017})
 
 // allow 'async' as a shorthand property in script.
 test(
@@ -3156,7 +3156,7 @@ test(
     ],
     "sourceType": "script"
   },
-  {ecmaVersion: 8}
+  {ecmaVersion: 2017}
 )
 test(
   "({async, foo})",
@@ -3222,7 +3222,7 @@ test(
     ],
     "sourceType": "script"
   },
-  {ecmaVersion: 8}
+  {ecmaVersion: 2017}
 )
 test(
   "({async = 0} = {})",
@@ -3291,7 +3291,7 @@ test(
     ],
     "sourceType": "script"
   },
-  {ecmaVersion: 8}
+  {ecmaVersion: 2017}
 )
 
 // async functions with vary names.
@@ -3349,7 +3349,7 @@ test(
     ],
     "sourceType": "script"
   },
-  {ecmaVersion: 8}
+  {ecmaVersion: 2017}
 )
 test(
   "({async 'foo'(){}})",
@@ -3405,7 +3405,7 @@ test(
     ],
     "sourceType": "script"
   },
-  {ecmaVersion: 8}
+  {ecmaVersion: 2017}
 )
 test(
   "({async 100(){}})",
@@ -3461,7 +3461,7 @@ test(
     ],
     "sourceType": "script"
   },
-  {ecmaVersion: 8}
+  {ecmaVersion: 2017}
 )
 test(
   "({async [foo](){}})",
@@ -3516,27 +3516,27 @@ test(
     ],
     "sourceType": "script"
   },
-  {ecmaVersion: 8}
+  {ecmaVersion: 2017}
 )
 
-test("({ async delete() {} })", {}, {ecmaVersion: 8})
+test("({ async delete() {} })", {}, {ecmaVersion: 2017})
 
-testFail("abc: async function a() {}", "Unexpected token (1:5)", {ecmaVersion: 8})
+testFail("abc: async function a() {}", "Unexpected token (1:5)", {ecmaVersion: 2017})
 
-testFail("(async() => { await 4 ** 2 })()", "Unexpected token (1:22)", {ecmaVersion: 8})
+testFail("(async() => { await 4 ** 2 })()", "Unexpected token (1:22)", {ecmaVersion: 2017})
 
-test("(async() => { await (4 ** 2) })()", {}, {ecmaVersion: 8})
+test("(async() => { await (4 ** 2) })()", {}, {ecmaVersion: 2017})
 
-testFail("async() => (await 1 ** 3)", "Unexpected token (1:20)", {ecmaVersion: 8})
+testFail("async() => (await 1 ** 3)", "Unexpected token (1:20)", {ecmaVersion: 2017})
 
-test("async() => (await (1 ** 3))", {}, {ecmaVersion: 8})
+test("async() => (await (1 ** 3))", {}, {ecmaVersion: 2017})
 
-testFail("async() => await 5 ** 6", "Unexpected token (1:19)", {ecmaVersion: 8})
+testFail("async() => await 5 ** 6", "Unexpected token (1:19)", {ecmaVersion: 2017})
 
-test("async() => await (5 ** 6)", {}, {ecmaVersion: 8})
+test("async() => await (5 ** 6)", {}, {ecmaVersion: 2017})
 
-testFail("async() => await (5) ** 6", "Unexpected token (1:21)", {ecmaVersion: 8})
+testFail("async() => await (5) ** 6", "Unexpected token (1:21)", {ecmaVersion: 2017})
 
-testFail("4 + async() => 2", "Unexpected token (1:12)", {ecmaVersion: 8, loose: false})
+testFail("4 + async() => 2", "Unexpected token (1:12)", {ecmaVersion: 2017, loose: false})
 
-testFail("async function𝐬 f() {}", "Unexpected token (1:17)", {ecmaVersion: 8})
+testFail("async function𝐬 f() {}", "Unexpected token (1:17)", {ecmaVersion: 2017})
