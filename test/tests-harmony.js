@@ -11362,7 +11362,7 @@ test("({ x(...[ a, b ]){} })", {
     end: {line: 1, column: 22}
   }
 }, {
-  ecmaVersion: 7,
+  ecmaVersion: 2016,
   ranges: true,
   locations: true
 });
@@ -11598,7 +11598,7 @@ test("({ x({ a: { w, x }, b: [y, z] }, ...[a, b, c]){} })", {
     end: {line: 1, column: 51}
   }
 }, {
-  ecmaVersion: 7,
+  ecmaVersion: 2016,
   ranges: true,
   locations: true
 });
@@ -12764,7 +12764,7 @@ test("var [a, ...[b, c]] = d", {
     end: {line: 1, column: 22}
   }
 }, {
-  ecmaVersion: 7,
+  ecmaVersion: 2016,
   ranges: true,
   locations: true
 });
@@ -13480,7 +13480,7 @@ testFail("({ 42 }) = obj", "Unexpected token (1:6)", {ecmaVersion: 6});
 testFail("function f(a, ...b, c)", "Comma is not permitted after the rest element (1:18)", {ecmaVersion: 6});
 
 testFail("function f(a, ...b = 0)", "Unexpected token (1:19)", {ecmaVersion: 6});
-testFail("(([a, ...b = 0]) => {})", "Rest elements cannot have a default value (1:9)", {ecmaVersion: 7});
+testFail("(([a, ...b = 0]) => {})", "Rest elements cannot have a default value (1:9)", {ecmaVersion: 2016});
 testFail("[a, ...b = 0] = []", "Rest elements cannot have a default value (1:7)", {ecmaVersion: 6});
 
 testFail("function x(...{ a }){}", "Unexpected token (1:14)", {ecmaVersion: 6});
@@ -13497,7 +13497,7 @@ testFail("([ 5 ]) => {}", "Assigning to rvalue (1:3)", {ecmaVersion: 6});
 
 testFail("({ 5 }) => {}", "Unexpected token (1:5)", {ecmaVersion: 6});
 
-testFail("(...[ 5 ]) => {}", "Unexpected token (1:6)", {ecmaVersion: 7});
+testFail("(...[ 5 ]) => {}", "Unexpected token (1:6)", {ecmaVersion: 2016});
 
 test("[...{ a }] = b", {}, {ecmaVersion: 6});
 

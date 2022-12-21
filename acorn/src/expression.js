@@ -914,7 +914,7 @@ pp.parseFunctionBody = function(node, isArrowFunction, isMethod, forInit) {
     node.expression = true
     this.checkParams(node, false)
   } else {
-    let nonSimple = this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params)
+    let nonSimple = this.options.ecmaVersion >= 2016 && !this.isSimpleParamList(node.params)
     if (!oldStrict || nonSimple) {
       useStrict = this.strictDirective(this.end)
       // If this is a strict mode function, verify that argument names

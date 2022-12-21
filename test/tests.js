@@ -29394,8 +29394,8 @@ test("08.5", {
 test("undefined", {}, { ecmaVersion: 8 })
 
 testFail("\\u{74}rue", "Escape sequence in keyword true (1:0)", {ecmaVersion: 6})
-testFail("export { X \\u0061s Y }", "Unexpected token (1:11)", {ecmaVersion: 7, sourceType: "module"})
-testFail("import X fro\\u006d 'x'", "Unexpected token (1:9)", {ecmaVersion: 7, sourceType: "module"})
+testFail("export { X \\u0061s Y }", "Unexpected token (1:11)", {ecmaVersion: 2016, sourceType: "module"})
+testFail("import X fro\\u006d 'x'", "Unexpected token (1:9)", {ecmaVersion: 2016, sourceType: "module"})
 testFail("le\\u0074 x = 5", "Unexpected token (1:9)", {ecmaVersion: 6})
 testFail("(function* () { y\\u0069eld 10 })", "Cannot use 'yield' as identifier inside a generator (1:16)", {ecmaVersion: 6})
 testFail("(async function() { aw\\u0061it x })", "Cannot use 'await' as identifier inside an async function (1:20)", {ecmaVersion: 8})

@@ -745,22 +745,22 @@ test("new foo(...a,)", {
 }, {ecmaVersion: 8})
 
 //------------------------------------------------------------------------------
-// disallow in {ecmaVersion: 7}
+// disallow in {ecmaVersion: 2016}
 
-testFail("function foo(a,) { }", "Unexpected token (1:15)", {ecmaVersion: 7})
-testFail("(function(a,) { })", "Unexpected token (1:12)", {ecmaVersion: 7})
-testFail("(a,) => a", "Unexpected token (1:3)", {ecmaVersion: 7})
-testFail("async (a,) => a", "Unexpected token (1:9)", {ecmaVersion: 7})
-testFail("({foo(a,) {}})", "Unexpected token (1:8)", {ecmaVersion: 7})
-testFail("class A {foo(a,) {}}", "Unexpected token (1:15)", {ecmaVersion: 7})
-testFail("class A {static foo(a,) {}}", "Unexpected token (1:22)", {ecmaVersion: 7})
-testFail("(class {foo(a,) {}})", "Unexpected token (1:14)", {ecmaVersion: 7})
-testFail("(class {static foo(a,) {}})", "Unexpected token (1:21)", {ecmaVersion: 7})
-testFail("export default function foo(a,) { }", "Unexpected token (1:30)", {ecmaVersion: 7, sourceType: "module"})
-testFail("export default (function foo(a,) { })", "Unexpected token (1:31)", {ecmaVersion: 7, sourceType: "module"})
-testFail("export function foo(a,) { }", "Unexpected token (1:22)", {ecmaVersion: 7, sourceType: "module"})
-testFail("foo(a,)", "Unexpected token (1:6)", {ecmaVersion: 7})
-testFail("new foo(a,)", "Unexpected token (1:10)", {ecmaVersion: 7})
+testFail("function foo(a,) { }", "Unexpected token (1:15)", {ecmaVersion: 2016})
+testFail("(function(a,) { })", "Unexpected token (1:12)", {ecmaVersion: 2016})
+testFail("(a,) => a", "Unexpected token (1:3)", {ecmaVersion: 2016})
+testFail("async (a,) => a", "Unexpected token (1:9)", {ecmaVersion: 2016})
+testFail("({foo(a,) {}})", "Unexpected token (1:8)", {ecmaVersion: 2016})
+testFail("class A {foo(a,) {}}", "Unexpected token (1:15)", {ecmaVersion: 2016})
+testFail("class A {static foo(a,) {}}", "Unexpected token (1:22)", {ecmaVersion: 2016})
+testFail("(class {foo(a,) {}})", "Unexpected token (1:14)", {ecmaVersion: 2016})
+testFail("(class {static foo(a,) {}})", "Unexpected token (1:21)", {ecmaVersion: 2016})
+testFail("export default function foo(a,) { }", "Unexpected token (1:30)", {ecmaVersion: 2016, sourceType: "module"})
+testFail("export default (function foo(a,) { })", "Unexpected token (1:31)", {ecmaVersion: 2016, sourceType: "module"})
+testFail("export function foo(a,) { }", "Unexpected token (1:22)", {ecmaVersion: 2016, sourceType: "module"})
+testFail("foo(a,)", "Unexpected token (1:6)", {ecmaVersion: 2016})
+testFail("new foo(a,)", "Unexpected token (1:10)", {ecmaVersion: 2016})
 
 //------------------------------------------------------------------------------
 // disallow after rest parameters
@@ -797,6 +797,6 @@ testFail("export function foo(,) { }", "Unexpected token (1:20)", {ecmaVersion: 
 //------------------------------------------------------------------------------
 // disallow in parens without arrow
 
-testFail("(a,)", "Unexpected token (1:3)", {ecmaVersion: 7})
+testFail("(a,)", "Unexpected token (1:3)", {ecmaVersion: 2016})
 testFail("(a,)", "Unexpected token (1:3)", {ecmaVersion: 8})
 
