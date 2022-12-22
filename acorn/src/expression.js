@@ -774,7 +774,7 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
   if (!isPattern && !containsEsc && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
     isAsync = true
     isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
-    this.parsePropertyName(prop, refDestructuringErrors)
+    this.parsePropertyName(prop)
   } else {
     isAsync = false
   }
