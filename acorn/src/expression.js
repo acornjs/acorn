@@ -1011,7 +1011,7 @@ pp.checkUnreserved = function({start, end, name}) {
 // when parsing properties), it will also convert keywords into
 // identifiers.
 
-pp.parseIdent = function(liberal, isBinding) {
+pp.parseIdent = function(liberal) {
   let node = this.startNode()
   if (this.type === tt.name) {
     node.name = this.value
