@@ -718,8 +718,6 @@ pp.readEscapedChar = function(inTemplate) {
         codePos,
         "Invalid escape sequence in template string"
       )
-
-      return null
     }
   default:
     if (ch >= 48 && ch <= 55) {
