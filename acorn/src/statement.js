@@ -773,7 +773,7 @@ pp.parseClassId = function(node, isStatement) {
 }
 
 pp.parseClassSuper = function(node) {
-  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts(false) : null
+  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts(null, false) : null
 }
 
 pp.enterClassBody = function() {
