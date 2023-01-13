@@ -10,10 +10,11 @@
     "target": "ES2020"
   },
   "include": [
-    "src/identifier.ts",
     "src/generated/astralIdentifierCodes.ts",
     "src/generated/astralIdentifierStartCodes.ts",
     "src/generated/nonASCIIidentifierChars.ts",
-    "src/generated/nonASCIIidentifierStartChars.ts"
+    "src/generated/nonASCIIidentifierStartChars.ts",
+    "src/identifier.ts",
+    "src/whitespace.ts"
   ]
 }
