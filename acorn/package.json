@@ -42,7 +42,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "prepare": "cd ..; npm run build:main"
+    "prepare": "cd ..; npm run build:main",
+    "typecheck": "tsc --noEmit",
+    "typecheck:strict": "tsc --noEmit --project tsconfig.strict.json"
   },
   "bin": {
     "acorn": "./bin/acorn"

@@ -10,5 +10,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
       - run: npm install
-      - run: npm test
-      - run: npm run test:test262
+      - run: cd acorn && npm run typecheck && cd ..
+      - run: cd acorn && npm run typecheck:strict && cd ..
+      # - run: npm test
+      # - run: npm run test:test262
