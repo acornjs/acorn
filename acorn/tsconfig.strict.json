@@ -15,6 +15,7 @@
     "src/generated/nonASCIIidentifierChars.ts",
     "src/generated/nonASCIIidentifierStartChars.ts",
     "src/identifier.ts",
+    "src/util.ts",
     "src/whitespace.ts"
   ]
 }
