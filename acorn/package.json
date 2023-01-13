@@ -42,7 +42,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "prepare": "cd ..; npm run build:main",
+    "prepare": "exit 0 && cd ..; npm run build:main",
     "typecheck": "tsc --noEmit",
     "typecheck:strict": "tsc --noEmit --project tsconfig.strict.json"
   },
