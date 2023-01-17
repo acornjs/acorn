@@ -62,6 +62,8 @@ declare namespace acorn {
     // node.js
     finishNode<T extends EstreeNode>(node: Node, type: T["type"]): T;
     finishNodeAt<T extends EstreeNode>(node: Node, type: T["type"], pos: number, loc: Position): T;
+    startNode<T extends EstreeNode>(): T
+    startNodeAt<T extends EstreeNode>(pos: number, loc: Position): T
 
     // location.js
     raise(pos: number, message: string) : void;
