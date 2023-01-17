@@ -324,6 +324,10 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls, forInit) {
   }
 }
 
+pp.shouldParseAsyncArrow = function() {
+  return !this.canInsertSemicolon() && this.eat(tt.arrow)
+}
+
 pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow, optionalChained, forInit) {
   let optionalSupported = this.options.ecmaVersion >= 11
   let optional = optionalSupported && this.eat(tt.questionDot)
@@ -352,7 +356,7 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow,
     this.awaitPos = 0
     this.awaitIdentPos = 0
     let exprList = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false, refDestructuringErrors)
-    if (maybeAsyncArrow && !optional && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
+    if (maybeAsyncArrow && !optional && this.shouldParseAsyncArrow()) {
       this.checkPatternErrors(refDestructuringErrors, false)
       this.checkYieldAwaitInDefaultParams()
       if (this.awaitIdentPos > 0)
@@ -497,8 +501,12 @@ pp.parseExprAtom = function(refDestructuringErrors, forInit, forNew) {
     }
 
   default:
-    this.unexpected()
+    return this.parseExprAtomDefault()
   }
+}
+
+pp.parseExprAtomDefault = function() {
+  this.unexpected()
 }
 
 pp.parseExprImport = function(forNew) {
@@ -570,6 +578,10 @@ pp.parseParenExpression = function() {
   return val
 }
 
+pp.shouldParseArrow = function() {
+  return !this.canInsertSemicolon()
+}
+
 pp.parseParenAndDistinguishExpression = function(canBeArrow, forInit) {
   let startPos = this.start, startLoc = this.startLoc, val, allowTrailingComma = this.options.ecmaVersion >= 8
   if (this.options.ecmaVersion >= 6) {
@@ -589,7 +601,12 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow, forInit) {
       } else if (this.type === tt.ellipsis) {
         spreadStart = this.start
         exprList.push(this.parseParenItem(this.parseRestBinding()))
-        if (this.type === tt.comma) this.raise(this.start, "Comma is not permitted after the rest element")
+        if (this.type === tt.comma) {
+          this.raise(
+            this.start,
+            "Comma is not permitted after the rest element"
+          )
+        }
         break
       } else {
         exprList.push(this.parseMaybeAssign(false, refDestructuringErrors, this.parseParenItem))
@@ -598,7 +615,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow, forInit) {
     let innerEndPos = this.lastTokEnd, innerEndLoc = this.lastTokEndLoc
     this.expect(tt.parenR)
 
-    if (canBeArrow && !this.canInsertSemicolon() && this.eat(tt.arrow)) {
+    if (canBeArrow && this.shouldParseArrow() && this.eat(tt.arrow)) {
       this.checkPatternErrors(refDestructuringErrors, false)
       this.checkYieldAwaitInDefaultParams()
       this.yieldPos = oldYieldPos
@@ -778,6 +795,23 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
   return this.finishNode(prop, "Property")
 }
 
+pp.parseGetterSetter = function(prop) {
+  prop.kind = prop.key.name
+  this.parsePropertyName(prop)
+  prop.value = this.parseMethod(false)
+  let paramCount = prop.kind === "get" ? 0 : 1
+  if (prop.value.params.length !== paramCount) {
+    let start = prop.value.start
+    if (prop.kind === "get")
+      this.raiseRecoverable(start, "getter should have no params")
+    else
+      this.raiseRecoverable(start, "setter should have exactly one param")
+  } else {
+    if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
+      this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
+  }
+}
+
 pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors, containsEsc) {
   if ((isGenerator || isAsync) && this.type === tt.colon)
     this.unexpected()
@@ -795,20 +829,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
              (prop.key.name === "get" || prop.key.name === "set") &&
              (this.type !== tt.comma && this.type !== tt.braceR && this.type !== tt.eq)) {
     if (isGenerator || isAsync) this.unexpected()
-    prop.kind = prop.key.name
-    this.parsePropertyName(prop)
-    prop.value = this.parseMethod(false)
-    let paramCount = prop.kind === "get" ? 0 : 1
-    if (prop.value.params.length !== paramCount) {
-      let start = prop.value.start
-      if (prop.kind === "get")
-        this.raiseRecoverable(start, "getter should have no params")
-      else
-        this.raiseRecoverable(start, "setter should have exactly one param")
-    } else {
-      if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
-        this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
-    }
+    this.parseGetterSetter(prop)
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
     if (isGenerator || isAsync) this.unexpected()
     this.checkUnreserved(prop.key)
@@ -1008,6 +1029,18 @@ pp.checkUnreserved = function({start, end, name}) {
 // identifiers.
 
 pp.parseIdent = function(liberal) {
+  let node = this.parseIdentNode()
+  this.next(!!liberal)
+  this.finishNode(node, "Identifier")
+  if (!liberal) {
+    this.checkUnreserved(node)
+    if (node.name === "await" && !this.awaitIdentPos)
+      this.awaitIdentPos = node.start
+  }
+  return node
+}
+
+pp.parseIdentNode = function() {
   let node = this.startNode()
   if (this.type === tt.name) {
     node.name = this.value
@@ -1019,18 +1052,11 @@ pp.parseIdent = function(liberal) {
     // But there is no chance to pop the context if the keyword is consumed as an identifier such as a property name.
     // If the previous token is a dot, this does not apply because the context-managing code already ignored the keyword
     if ((node.name === "class" || node.name === "function") &&
-        (this.lastTokEnd !== this.lastTokStart + 1 || this.input.charCodeAt(this.lastTokStart) !== 46)) {
+      (this.lastTokEnd !== this.lastTokStart + 1 || this.input.charCodeAt(this.lastTokStart) !== 46)) {
       this.context.pop()
     }
   } else {
     this.unexpected()
-  }
-  this.next(!!liberal)
-  this.finishNode(node, "Identifier")
-  if (!liberal) {
-    this.checkUnreserved(node)
-    if (node.name === "await" && !this.awaitIdentPos)
-      this.awaitIdentPos = node.start
   }
   return node
 }

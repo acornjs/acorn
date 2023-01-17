@@ -335,6 +335,16 @@ pp.parseThrowStatement = function(node) {
 
 const empty = []
 
+pp.parseCatchClauseParam = function() {
+  const param = this.parseBindingAtom()
+  let simple = param.type === "Identifier"
+  this.enterScope(simple ? SCOPE_SIMPLE_CATCH : 0)
+  this.checkLValPattern(param, simple ? BIND_SIMPLE_CATCH : BIND_LEXICAL)
+  this.expect(tt.parenR)
+
+  return param
+}
+
 pp.parseTryStatement = function(node) {
   this.next()
   node.block = this.parseBlock()
@@ -343,11 +353,7 @@ pp.parseTryStatement = function(node) {
     let clause = this.startNode()
     this.next()
     if (this.eat(tt.parenL)) {
-      clause.param = this.parseBindingAtom()
-      let simple = clause.param.type === "Identifier"
-      this.enterScope(simple ? SCOPE_SIMPLE_CATCH : 0)
-      this.checkLValPattern(clause.param, simple ? BIND_SIMPLE_CATCH : BIND_LEXICAL)
-      this.expect(tt.parenR)
+      clause.param = this.parseCatchClauseParam()
     } else {
       if (this.options.ecmaVersion < 10) this.unexpected()
       clause.param = null
@@ -363,9 +369,9 @@ pp.parseTryStatement = function(node) {
   return this.finishNode(node, "TryStatement")
 }
 
-pp.parseVarStatement = function(node, kind) {
+pp.parseVarStatement = function(node, kind, allowMissingInitializer) {
   this.next()
-  this.parseVar(node, false, kind)
+  this.parseVar(node, false, kind, allowMissingInitializer)
   this.semicolon()
   return this.finishNode(node, "VariableDeclaration")
 }
@@ -489,7 +495,7 @@ pp.parseForIn = function(node, init) {
 
 // Parse a list of variable declarations.
 
-pp.parseVar = function(node, isFor, kind) {
+pp.parseVar = function(node, isFor, kind, allowMissingInitializer) {
   node.declarations = []
   node.kind = kind
   for (;;) {
@@ -497,9 +503,9 @@ pp.parseVar = function(node, isFor, kind) {
     this.parseVarId(decl, kind)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
-    } else if (kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
+    } else if (!allowMissingInitializer && kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
       this.unexpected()
-    } else if (decl.id.type !== "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
+    } else if (!allowMissingInitializer && decl.id.type !== "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
       this.raise(this.lastTokEnd, "Complex binding patterns require an initialization value")
     } else {
       decl.init = null
@@ -588,7 +594,7 @@ pp.parseClass = function(node, isStatement) {
     if (element) {
       classBody.body.push(element)
       if (element.type === "MethodDefinition" && element.kind === "constructor") {
-        if (hadConstructor) this.raise(element.start, "Duplicate constructor in the same class")
+        if (hadConstructor) this.raiseRecoverable(element.start, "Duplicate constructor in the same class")
         hadConstructor = true
       } else if (element.key && element.key.type === "PrivateIdentifier" && isPrivateNameConflicted(privateNameMap, element)) {
         this.raiseRecoverable(element.key.start, `Identifier '#${element.key.name}' has already been declared`)
@@ -871,7 +877,7 @@ pp.parseExport = function(node, exports) {
   }
   // export var|const|let|function|class ...
   if (this.shouldParseExportStatement()) {
-    node.declaration = this.parseStatement(null)
+    node.declaration = this.parseExportDeclaration(node)
     if (node.declaration.type === "VariableDeclaration")
       this.checkVariableExport(exports, node.declaration.declarations)
     else
@@ -901,6 +907,10 @@ pp.parseExport = function(node, exports) {
     this.semicolon()
   }
   return this.finishNode(node, "ExportNamedDeclaration")
+}
+
+pp.parseExportDeclaration = function(node) {
+  return this.parseStatement(null)
 }
 
 pp.checkExport = function(exports, name, pos) {
@@ -950,6 +960,20 @@ pp.shouldParseExportStatement = function() {
 
 // Parses a comma-separated list of module exports.
 
+pp.parseExportSpecifier = function(exports) {
+  let node = this.startNode()
+  node.local = this.parseModuleExportName()
+
+  node.exported = this.eatContextual("as") ? this.parseModuleExportName() : node.local
+  this.checkExport(
+    exports,
+    node.exported,
+    node.exported.start
+  )
+
+  return this.finishNode(node, "ExportSpecifier")
+}
+
 pp.parseExportSpecifiers = function(exports) {
   let nodes = [], first = true
   // export { x, y as z } [from '...']
@@ -960,15 +984,7 @@ pp.parseExportSpecifiers = function(exports) {
       if (this.afterTrailingComma(tt.braceR)) break
     } else first = false
 
-    let node = this.startNode()
-    node.local = this.parseModuleExportName()
-    node.exported = this.eatContextual("as") ? this.parseModuleExportName() : node.local
-    this.checkExport(
-      exports,
-      node.exported,
-      node.exported.start
-    )
-    nodes.push(this.finishNode(node, "ExportSpecifier"))
+    nodes.push(this.parseExportSpecifier(exports))
   }
   return nodes
 }
@@ -977,6 +993,7 @@ pp.parseExportSpecifiers = function(exports) {
 
 pp.parseImport = function(node) {
   this.next()
+
   // import '...'
   if (this.type === tt.string) {
     node.specifiers = empty
@@ -991,6 +1008,21 @@ pp.parseImport = function(node) {
 }
 
 // Parses a comma-separated list of module imports.
+
+pp.parseImportSpecifier = function() {
+  let node = this.startNode()
+  node.imported = this.parseModuleExportName()
+
+  if (this.eatContextual("as")) {
+    node.local = this.parseIdent()
+  } else {
+    this.checkUnreserved(node.imported)
+    node.local = node.imported
+  }
+  this.checkLValSimple(node.local, BIND_LEXICAL)
+
+  return this.finishNode(node, "ImportSpecifier")
+}
 
 pp.parseImportSpecifiers = function() {
   let nodes = [], first = true
@@ -1018,16 +1050,7 @@ pp.parseImportSpecifiers = function() {
       if (this.afterTrailingComma(tt.braceR)) break
     } else first = false
 
-    let node = this.startNode()
-    node.imported = this.parseModuleExportName()
-    if (this.eatContextual("as")) {
-      node.local = this.parseIdent()
-    } else {
-      this.checkUnreserved(node.imported)
-      node.local = node.imported
-    }
-    this.checkLValSimple(node.local, BIND_LEXICAL)
-    nodes.push(this.finishNode(node, "ImportSpecifier"))
+    nodes.push(this.parseImportSpecifier())
   }
   return nodes
 }
