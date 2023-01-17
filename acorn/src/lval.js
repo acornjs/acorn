@@ -141,7 +141,7 @@ pp.parseBindingAtom = function() {
   return this.parseIdent()
 }
 
-pp.parseBindingList = function(close, allowEmpty, allowTrailingComma) {
+pp.parseBindingList = function(close, allowEmpty, allowTrailingComma, allowModifiers) {
   let elts = [], first = true
   while (!this.eat(close)) {
     if (first) first = false
@@ -158,12 +158,16 @@ pp.parseBindingList = function(close, allowEmpty, allowTrailingComma) {
       this.expect(close)
       break
     } else {
-      let elem = this.parseMaybeDefault(this.start, this.startLoc)
-      this.parseBindingListItem(elem)
-      elts.push(elem)
+      elts.push(this.parseAssignableListItem(allowModifiers))
     }
   }
   return elts
+}
+
+pp.parseAssignableListItem = function(allowModifiers) {
+  let elem = this.parseMaybeDefault(this.start, this.startLoc)
+  this.parseBindingListItem(elem)
+  return elem
 }
 
 pp.parseBindingListItem = function(param) {
