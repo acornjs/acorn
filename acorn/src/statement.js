@@ -719,7 +719,7 @@ pp.parseClassElementName = function(element) {
 }
 
 pp.parseMethodForClass = function(isGenerator, isAsync, allowsDirectSuper, isPrivate) {
-  return this.parseMethod(isGenerator, isAsync, allowsDirectSuper)
+  return this.parseMethod(isGenerator, isAsync, allowsDirectSuper, true)
 }
 
 pp.parseClassMethod = function(method, isGenerator, isAsync, allowsDirectSuper, isPrivate) {

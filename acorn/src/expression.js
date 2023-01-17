@@ -886,13 +886,13 @@ pp.initFunction = function(node) {
 
 // Parse object or class method.
 
-pp.parseFunctionBodyAndFinish = function(node, type, isArrowFunction, isMethod, forInit) {
+pp.parseFunctionBodyAndFinish = function(node, type, isArrowFunction, isMethod, forInit, inClass) {
   this.parseFunctionBody(node, Boolean(isArrowFunction), Boolean(isMethod), forInit)
 
   return this.finishNode(node, type)
 }
 
-pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
+pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper, inClass) {
   let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
 
   this.initFunction(node)
@@ -910,7 +910,7 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
   this.checkYieldAwaitInDefaultParams()
   //   this.parseFunctionBody(node, false, true, false)
-  const finishNode = this.parseFunctionBodyAndFinish(node, "FunctionExpression", false, true, false)
+  const finishNode = this.parseFunctionBodyAndFinish(node, "FunctionExpression", false, true, false, inClass)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
