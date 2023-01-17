@@ -774,7 +774,7 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
   if (!isPattern && !containsEsc && this.options.ecmaVersion >= 8 && !isGenerator && this.isAsyncProp(prop)) {
     isAsync = true
     isGenerator = this.options.ecmaVersion >= 9 && this.eat(tt.star)
-    this.parsePropertyName(prop, refDestructuringErrors)
+    this.parsePropertyName(prop)
   } else {
     isAsync = false
   }
@@ -1011,7 +1011,7 @@ pp.checkUnreserved = function({start, end, name}) {
 // when parsing properties), it will also convert keywords into
 // identifiers.
 
-pp.parseIdent = function(liberal, isBinding) {
+pp.parseIdent = function(liberal) {
   let node = this.startNode()
   if (this.type === tt.name) {
     node.name = this.value

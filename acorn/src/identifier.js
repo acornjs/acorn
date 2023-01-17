@@ -49,6 +49,7 @@ function isInAstralSet(code, set) {
     pos += set[i + 1]
     if (pos >= code) return true
   }
+  return false
 }
 
 // Test whether a given character code starts an identifier.
