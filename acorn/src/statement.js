@@ -134,7 +134,6 @@ pp.parseStatement = function(context, topLevel, exports) {
       if (!this.inModule)
         this.raise(this.start, "'import' and 'export' may appear only with 'sourceType: module'")
     }
-    this.next()
     return starttype === tt._import ? this.parseImport(node) : this.parseExport(node, exports)
 
     // If the statement does not start with a statement keyword or a
@@ -860,6 +859,8 @@ function checkKeyName(node, name) {
 // Parses module export declaration.
 
 pp.parseExport = function(node, exports) {
+  this.next()
+
   // export * from '...'
   if (this.eat(tt.star)) {
     if (this.options.ecmaVersion >= 11) {
@@ -1016,6 +1017,8 @@ pp.parseExportSpecifiers = function(exports) {
 // Parses import declaration.
 
 pp.parseImport = function(node) {
+  this.next()
+
   // import '...'
   if (this.type === tt.string) {
     node.specifiers = empty
