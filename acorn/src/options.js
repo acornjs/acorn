@@ -121,7 +121,7 @@ export function getOptions(opts) {
   if (options.allowReserved == null)
     options.allowReserved = options.ecmaVersion < 5
 
-  if (!opts || opts.allowHashBang == null)
+  if (!opts || !Object.prototype.hasOwnProperty.call(opts, "allowHashBang") || opts.allowHashBang == null)
     options.allowHashBang = options.ecmaVersion >= 14
 
   if (isArray(options.onToken)) {
