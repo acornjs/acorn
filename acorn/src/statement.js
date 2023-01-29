@@ -574,7 +574,6 @@ pp.parseFunctionParams = function(node) {
 // Parse a class declaration or literal (depending on the
 // `isStatement` parameter).
 
-
 pp.parseClass = function(node, isStatement) {
   this.next()
 

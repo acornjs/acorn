@@ -808,8 +808,7 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
   return this.finishNode(prop, "Property")
 }
 
-
-pp.parseGetterSetter = function (prop) {
+pp.parseGetterSetter = function(prop) {
   prop.kind = prop.key.name
   this.parsePropertyName(prop)
   prop.value = this.parseMethod(false)
