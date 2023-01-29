@@ -808,8 +808,22 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
   return this.finishNode(prop, "Property")
 }
 
-pp.getGetterSetterExpectedParamCount = function(prop) {
-  return prop.kind === "get" ? 0 : 1
+
+pp.parseGetterSetter = function (prop) {
+  prop.kind = prop.key.name
+  this.parsePropertyName(prop)
+  prop.value = this.parseMethod(false)
+  let paramCount = prop.kind === "get" ? 0 : 1
+  if (prop.value.params.length !== paramCount) {
+    let start = prop.value.start
+    if (prop.kind === "get")
+      this.raiseRecoverable(start, "getter should have no params")
+    else
+      this.raiseRecoverable(start, "setter should have exactly one param")
+  } else {
+    if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
+      this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
+  }
 }
 
 pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors, containsEsc) {
@@ -829,20 +843,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
              (prop.key.name === "get" || prop.key.name === "set") &&
              (this.type !== tt.comma && this.type !== tt.braceR && this.type !== tt.eq)) {
     if (isGenerator || isAsync) this.unexpected()
-    prop.kind = prop.key.name
-    this.parsePropertyName(prop)
-    prop.value = this.parseMethod(false)
-    let paramCount = this.getGetterSetterExpectedParamCount(prop)
-    if (prop.value.params.length !== paramCount) {
-      let start = prop.value.start
-      if (prop.kind === "get")
-        this.raiseRecoverable(start, "getter should have no params")
-      else
-        this.raiseRecoverable(start, "setter should have exactly one param")
-    } else {
-      if (prop.kind === "set" && prop.value.params[0].type === "RestElement")
-        this.raiseRecoverable(prop.value.params[0].start, "Setter cannot use rest params")
-    }
+    this.parseGetterSetter(prop)
   } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
     if (isGenerator || isAsync) this.unexpected()
     this.checkUnreserved(prop.key)
@@ -886,12 +887,6 @@ pp.initFunction = function(node) {
 
 // Parse object or class method.
 
-pp.parseFunctionBodyAndFinish = function(node, type, isArrowFunction, isMethod, forInit, inClass) {
-  this.parseFunctionBody(node, Boolean(isArrowFunction), Boolean(isMethod), forInit)
-
-  return this.finishNode(node, type)
-}
-
 pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper, inClass) {
   let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
 
@@ -909,13 +904,12 @@ pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper, inClass) {
   this.expect(tt.parenL)
   node.params = this.parseBindingList(tt.parenR, false, this.options.ecmaVersion >= 8)
   this.checkYieldAwaitInDefaultParams()
-  //   this.parseFunctionBody(node, false, true, false)
-  const finishNode = this.parseFunctionBodyAndFinish(node, "FunctionExpression", false, true, false, inClass)
+  this.parseFunctionBody(node, false, true, false)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.awaitIdentPos = oldAwaitIdentPos
-  return finishNode
+  return this.finishNode(node, "FunctionExpression")
 }
 
 // Parse arrow function expression with given parameters.

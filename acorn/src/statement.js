@@ -557,19 +557,12 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync, forIn
     node.id = this.type === tt.name ? this.parseIdent() : null
 
   this.parseFunctionParams(node)
-  //   this.parseFunctionBody(node, allowExpressionBody, false, forInit)
-  const finishNode = this.parseFunctionBodyAndFinish(
-    node,
-    (statement & FUNC_STATEMENT) ? "FunctionDeclaration" : "FunctionExpression",
-    allowExpressionBody,
-    false,
-    forInit
-  )
+  this.parseFunctionBody(node, allowExpressionBody, false, forInit)
 
   this.yieldPos = oldYieldPos
   this.awaitPos = oldAwaitPos
   this.awaitIdentPos = oldAwaitIdentPos
-  return finishNode
+  return this.finishNode(node, (statement & FUNC_STATEMENT) ? "FunctionDeclaration" : "FunctionExpression")
 }
 
 pp.parseFunctionParams = function(node) {
@@ -581,9 +574,6 @@ pp.parseFunctionParams = function(node) {
 // Parse a class declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.shouldCheckClassConstructorDuplicate = function() {
-  return true
-}
 
 pp.parseClass = function(node, isStatement) {
   this.next()
@@ -605,10 +595,8 @@ pp.parseClass = function(node, isStatement) {
     if (element) {
       classBody.body.push(element)
       if (element.type === "MethodDefinition" && element.kind === "constructor") {
-        if (this.shouldCheckClassConstructorDuplicate()) {
-          if (hadConstructor) this.raise(element.start, "Duplicate constructor in the same class")
-          hadConstructor = true
-        }
+        if (hadConstructor) this.raiseRecoverable(element.start, "Duplicate constructor in the same class")
+        hadConstructor = true
       } else if (element.key && element.key.type === "PrivateIdentifier" && isPrivateNameConflicted(privateNameMap, element)) {
         this.raiseRecoverable(element.key.start, `Identifier '#${element.key.name}' has already been declared`)
       }
