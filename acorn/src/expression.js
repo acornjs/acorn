@@ -390,7 +390,7 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow,
 // `new`, or an expression wrapped in punctuation like `()`, `[]`,
 // or `{}`.
 
-pp.parseExprAtom = function(refDestructuringErrors, forInit) {
+pp.parseExprAtom = function(refDestructuringErrors, forInit, forNew) {
   // If a division operator appears in an expression position, the
   // tokenizer got confused, and we force it to read a regexp instead.
   if (this.type === tt.slash) this.readRegexp()
@@ -491,7 +491,7 @@ pp.parseExprAtom = function(refDestructuringErrors, forInit) {
 
   case tt._import:
     if (this.options.ecmaVersion >= 11) {
-      return this.parseExprImport()
+      return this.parseExprImport(forNew)
     } else {
       return this.unexpected()
     }
@@ -501,7 +501,7 @@ pp.parseExprAtom = function(refDestructuringErrors, forInit) {
   }
 }
 
-pp.parseExprImport = function() {
+pp.parseExprImport = function(forNew) {
   const node = this.startNode()
 
   // Consume `import` as an identifier for `import.meta`.
@@ -509,13 +509,12 @@ pp.parseExprImport = function() {
   if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword import")
   const meta = this.parseIdent(true)
 
-  switch (this.type) {
-  case tt.parenL:
+  if (this.type == tt.parenL && !forNew) {
     return this.parseDynamicImport(node)
-  case tt.dot:
+  } else if (this.type == tt.dot) {
     node.meta = meta
     return this.parseImportMeta(node)
-  default:
+  } else {
     this.unexpected()
   }
 }
@@ -666,10 +665,7 @@ pp.parseNew = function() {
     return this.finishNode(node, "MetaProperty")
   }
   let startPos = this.start, startLoc = this.startLoc, isImport = this.type === tt._import
-  node.callee = this.parseSubscripts(this.parseExprAtom(), startPos, startLoc, true, false)
-  if (isImport && node.callee.type === "ImportExpression") {
-    this.raise(startPos, "Cannot use new with import()")
-  }
+  node.callee = this.parseSubscripts(this.parseExprAtom(null, false, true), startPos, startLoc, true, false)
   if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false)
   else node.arguments = empty
   return this.finishNode(node, "NewExpression")

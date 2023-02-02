@@ -240,7 +240,12 @@ testFail("import(source,)", 'Trailing comma is not allowed in import() (1:13)', 
   loose: false
 });
 
-testFail("new import(source)", 'Cannot use new with import() (1:4)', {
+testFail("new import(source)", 'Unexpected token (1:10)', {
+  ecmaVersion: 11,
+  loose: false
+});
+
+testFail("new import(source).foo", 'Unexpected token (1:10)', {
   ecmaVersion: 11,
   loose: false
 });
