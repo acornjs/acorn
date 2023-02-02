@@ -509,9 +509,9 @@ pp.parseExprImport = function(forNew) {
   if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword import")
   const meta = this.parseIdent(true)
 
-  if (this.type == tt.parenL && !forNew) {
+  if (this.type === tt.parenL && !forNew) {
     return this.parseDynamicImport(node)
-  } else if (this.type == tt.dot) {
+  } else if (this.type === tt.dot) {
     node.meta = meta
     return this.parseImportMeta(node)
   } else {
@@ -664,7 +664,7 @@ pp.parseNew = function() {
       this.raiseRecoverable(node.start, "'new.target' can only be used in functions and class static block")
     return this.finishNode(node, "MetaProperty")
   }
-  let startPos = this.start, startLoc = this.startLoc, isImport = this.type === tt._import
+  let startPos = this.start, startLoc = this.startLoc
   node.callee = this.parseSubscripts(this.parseExprAtom(null, false, true), startPos, startLoc, true, false)
   if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false)
   else node.arguments = empty
