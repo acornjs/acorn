@@ -964,15 +964,12 @@ pp.shouldParseExportStatement = function() {
     this.isAsyncFunction()
 }
 
-// util of import or export
-
-pp.getImportOrExportSpecifierParams = function() {
-  return []
-}
-
 // Parses a comma-separated list of module exports.
 
-pp.parseExportSpecifier = function(node, exports, isInTypeOnlyExport, isMaybeTypeOnly) {
+pp.parseExportSpecifier = function(exports) {
+  let node = this.startNode()
+  node.local = this.parseModuleExportName()
+
   node.exported = this.eatContextual("as") ? this.parseModuleExportName() : node.local
   this.checkExport(
     exports,
@@ -993,10 +990,7 @@ pp.parseExportSpecifiers = function(exports) {
       if (this.afterTrailingComma(tt.braceR)) break
     } else first = false
 
-    let node = this.startNode()
-    node.local = this.parseModuleExportName()
-    const otherParams = this.getImportOrExportSpecifierParams()
-    nodes.push(this.parseExportSpecifier(node, exports, ...otherParams))
+    nodes.push(this.parseExportSpecifier(exports))
   }
   return nodes
 }
@@ -1021,7 +1015,10 @@ pp.parseImport = function(node) {
 
 // Parses a comma-separated list of module imports.
 
-pp.parseImportSpecifier = function(node, isInTypeOnlyImport, isMaybeTypeOnly) {
+pp.parseImportSpecifier = function() {
+  let node = this.startNode()
+  node.imported = this.parseModuleExportName()
+
   if (this.eatContextual("as")) {
     node.local = this.parseIdent()
   } else {
@@ -1059,10 +1056,7 @@ pp.parseImportSpecifiers = function() {
       if (this.afterTrailingComma(tt.braceR)) break
     } else first = false
 
-    let node = this.startNode()
-    node.imported = this.parseModuleExportName()
-    const otherParams = this.getImportOrExportSpecifierParams()
-    nodes.push(this.parseImportSpecifier(node, ...otherParams))
+    nodes.push(this.parseImportSpecifier())
   }
   return nodes
 }
