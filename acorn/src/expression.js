@@ -168,10 +168,10 @@ pp.parseMaybeConditional = function(forInit, refDestructuringErrors) {
   let expr = this.parseExprOps(forInit, refDestructuringErrors)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
 
-  return this.parseConditionalExpression(expr, startPos, startLoc, forInit, refDestructuringErrors)
+  return this.parseConditional(expr, startPos, startLoc, forInit, refDestructuringErrors)
 }
 
-pp.parseConditionalExpression = function(expr, startPos, startLoc, forInit, refDestructuringErrors) {
+pp.parseConditional = function(expr, startPos, startLoc, forInit, refDestructuringErrors) {
   if (this.eat(tt.question)) {
     let node = this.startNodeAt(startPos, startLoc)
     node.test = expr
