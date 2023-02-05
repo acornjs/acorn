@@ -168,10 +168,6 @@ pp.parseMaybeConditional = function(forInit, refDestructuringErrors) {
   let expr = this.parseExprOps(forInit, refDestructuringErrors)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
 
-  return this.parseConditional(expr, startPos, startLoc, forInit, refDestructuringErrors)
-}
-
-pp.parseConditional = function(expr, startPos, startLoc, forInit, refDestructuringErrors) {
   if (this.eat(tt.question)) {
     let node = this.startNodeAt(startPos, startLoc)
     node.test = expr
@@ -886,7 +882,7 @@ pp.initFunction = function(node) {
 
 // Parse object or class method.
 
-pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper, inClass) {
+pp.parseMethod = function(isGenerator, isAsync, allowDirectSuper) {
   let node = this.startNode(), oldYieldPos = this.yieldPos, oldAwaitPos = this.awaitPos, oldAwaitIdentPos = this.awaitIdentPos
 
   this.initFunction(node)

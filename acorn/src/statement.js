@@ -653,7 +653,6 @@ pp.parseClassElement = function(constructorAllowsSuper) {
     }
   }
 
-  const isPrivate = this.type === tt.privateId
   // Parse element name
   if (keyName) {
     // 'async', 'get', 'set', or 'static' were not a keyword contextually.
@@ -673,9 +672,7 @@ pp.parseClassElement = function(constructorAllowsSuper) {
     // Couldn't move this check into the 'parseClassMethod' method for backward compatibility.
     if (isConstructor && kind !== "method") this.raise(node.key.start, "Constructor can't have get/set modifier")
     node.kind = isConstructor ? "constructor" : kind
-    if (isPrivate) {
-      this.parseClassPrivateMethod(node, isGenerator, isAsync, allowsDirectSuper)
-    } else this.parseClassMethod(node, isGenerator, isAsync, allowsDirectSuper)
+    this.parseClassMethod(node, isGenerator, isAsync, allowsDirectSuper)
   } else {
     this.parseClassField(node)
   }
@@ -706,10 +703,6 @@ pp.parseClassElementName = function(element) {
   }
 }
 
-pp.parseClassPrivateMethod = function(method, isGenerator, isAsync, allowsDirectSuper) {
-  return this.parseClassMethod(method, isGenerator, isAsync, allowsDirectSuper)
-}
-
 pp.parseClassMethod = function(method, isGenerator, isAsync, allowsDirectSuper) {
   // Check key and flags
   const key = method.key
@@ -721,7 +714,7 @@ pp.parseClassMethod = function(method, isGenerator, isAsync, allowsDirectSuper) 
   }
 
   // Parse value
-  const value = method.value = this.parseMethod(isGenerator, isAsync, allowsDirectSuper, true)
+  const value = method.value = this.parseMethod(isGenerator, isAsync, allowsDirectSuper)
 
   // Check value
   if (method.kind === "get" && value.params.length !== 0)
