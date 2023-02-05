@@ -580,10 +580,6 @@ pp.parseParenExpression = function() {
   return val
 }
 
-pp.checkCommaAfterRest = function() {
-  return this.type === tt.comma
-}
-
 pp.shouldParseArrow = function() {
   return !this.canInsertSemicolon()
 }
@@ -607,7 +603,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow, forInit) {
       } else if (this.type === tt.ellipsis) {
         spreadStart = this.start
         exprList.push(this.parseParenItem(this.parseRestBinding()))
-        if (this.checkCommaAfterRest()) {
+        if (this.type === tt.comma) {
           this.raise(
             this.start,
             "Comma is not permitted after the rest element"
