@@ -2,3 +2,4 @@ decorators
 import-assertions
 regexp-duplicate-named-groups
 regexp-v-flag
+pipeline-operator
