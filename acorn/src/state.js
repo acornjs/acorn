@@ -101,7 +101,7 @@ export class Parser {
   }
 
   hasPlugin(pluginName) {
-    return this.pluginList.indexOf(pluginName) > -1
+    return pluginList.indexOf(pluginName) > -1
   }
 
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
