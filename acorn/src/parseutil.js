@@ -152,3 +152,11 @@ pp.isSimpleAssignTarget = function(expr) {
     return this.isSimpleAssignTarget(expr.expression)
   return expr.type === "Identifier" || expr.type === "MemberExpression"
 }
+
+pp.expectPlugin = function(pluginName) {
+  if (this.hasPlugin(pluginName)) {
+    return true
+  }
+
+  this.raise(this.pos, `Missing plugin: ${pluginName}.`)
+}

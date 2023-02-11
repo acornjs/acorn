@@ -89,6 +89,9 @@ export class Parser {
     // Each element has two properties: 'declared' and 'used'.
     // When it exited from the outermost class definition, all used private names must be declared.
     this.privateNameStack = []
+
+    // Store the plugin that acorn loaded
+    this.plugins = []
   }
 
   parse() {
@@ -132,7 +135,10 @@ export class Parser {
 
   static extend(...plugins) {
     let cls = this
-    for (let i = 0; i < plugins.length; i++) cls = plugins[i](cls)
+    for (let i = 0; i < plugins.length; i++) {
+      cls.plugins.push(plugins[i].name)
+      cls = plugins[i](cls)
+    }
     return cls
   }
 
