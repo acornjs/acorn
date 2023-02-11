@@ -154,13 +154,6 @@ pp.isSimpleAssignTarget = function(expr) {
 }
 
 pp.expectPlugin = function(pluginName) {
-  if (this.hasPlugin(pluginName)) {
-    return true
-  }
-
-  this.raise(this.pos, `Missing plugin: ${pluginName}.`)
-}
-
-pp.hasPlugin = function(pluginName) {
-  return this.plugins.includes(pluginName)
+  if (this.hasPlugin(pluginName))
+    this.raise(this.pos, `Missing plugin: ${pluginName}.`)
 }

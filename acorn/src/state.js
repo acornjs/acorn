@@ -5,6 +5,9 @@ import {getOptions} from "./options.js"
 import {wordsRegexp} from "./util.js"
 import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER, SCOPE_CLASS_STATIC_BLOCK} from "./scopeflags.js"
 
+// Store the plugin that acorn loaded
+const pluginList = []
+
 export class Parser {
   constructor(options, input, startPos) {
     this.options = options = getOptions(options)
@@ -89,15 +92,16 @@ export class Parser {
     // Each element has two properties: 'declared' and 'used'.
     // When it exited from the outermost class definition, all used private names must be declared.
     this.privateNameStack = []
-
-    // Store the plugin that acorn loaded
-    this.plugins = []
   }
 
   parse() {
     let node = this.options.program || this.startNode()
     this.nextToken()
     return this.parseTopLevel(node)
+  }
+
+  hasPlugin(pluginName) {
+    return this.pluginList.indexOf(pluginName) > -1
   }
 
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
@@ -136,7 +140,7 @@ export class Parser {
   static extend(...plugins) {
     let cls = this
     for (let i = 0; i < plugins.length; i++) {
-      cls.plugins.push(plugins[i].name)
+      pluginList.push(plugins[i].name)
       cls = plugins[i](cls)
     }
     return cls
