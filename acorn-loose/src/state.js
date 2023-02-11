@@ -3,6 +3,8 @@ import {dummyValue} from "./parseutil.js"
 
 function noop() {}
 
+const pluginList = []
+
 export class LooseParser {
   constructor(input, options = {}) {
     this.toks = this.constructor.BaseParser.tokenizer(input, options)
@@ -157,9 +159,16 @@ export class LooseParser {
     return this.parseTopLevel()
   }
 
+  hasPlugin(pluginName) {
+    return pluginList.indexOf(pluginName) > -1
+  }
+
   static extend(...plugins) {
     let cls = this
-    for (let i = 0; i < plugins.length; i++) cls = plugins[i](cls)
+    for (let i = 0; i < plugins.length; i++) {
+      pluginList.push(plugins[i])
+      cls = plugins[i](cls)
+    }
     return cls
   }
 
