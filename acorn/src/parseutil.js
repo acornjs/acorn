@@ -160,3 +160,7 @@ pp.expectPlugin = function(pluginName) {
 
   this.raise(this.pos, `Missing plugin: ${pluginName}.`)
 }
+
+pp.hasPlugin = function(pluginName) {
+  return this.plugins.includes(pluginName)
+}
