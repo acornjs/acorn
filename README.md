@@ -91,3 +91,16 @@ module.exports = function noisyReadToken(Parser) {
   }
 }
 ```
+
+To support plugin check that proposal plugin can work together more convenient, it is recommended for a plugin package to export an object look like:
+
+```javascript
+module.exports = function (Parser) {
+  class PluginParser extends Parser {}
+
+  return {
+    name: "export-default-from", // whick can easily mapped to the tc39 proposal
+    method: PluginParser,
+  }
+}
+```
