@@ -100,7 +100,7 @@ module.exports = function (Parser) {
 
   return {
     name: "export-default-from", // whick can easily mapped to the tc39 proposal
-    method: PluginParser,
+    loader: PluginParser,
   }
 }
 ```
