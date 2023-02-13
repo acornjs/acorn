@@ -5,9 +5,6 @@ import {getOptions} from "./options.js"
 import {wordsRegexp} from "./util.js"
 import {SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER, SCOPE_CLASS_STATIC_BLOCK} from "./scopeflags.js"
 
-// Store the plugin that acorn loaded
-const pluginList = []
-
 export class Parser {
   constructor(options, input, startPos) {
     this.options = options = getOptions(options)
@@ -101,7 +98,7 @@ export class Parser {
   }
 
   hasPlugin(pluginName) {
-    return pluginList.indexOf(pluginName) > -1
+    return this.pluginCache.indexOf(pluginName) > -1
   }
 
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
@@ -139,10 +136,12 @@ export class Parser {
 
   static extend(...plugins) {
     let cls = this
+    let pluginCache = []
     for (let i = 0; i < plugins.length; i++) {
-      pluginList.push(plugins[i].name)
+      pluginCache.push(plugins[i].name)
       cls = plugins[i](cls)
     }
+    cls.prototype.pluginCache = pluginCache
     return cls
   }
 
