@@ -166,12 +166,11 @@ export class LooseParser {
     let pluginCache = []
     for (let i = 0; i < plugins.length; i++) {
       const pluginImpl = plugins[i](cls)
+      pluginCache.push(plugins[i].name)
+
       if (typeof pluginImpl === "object") {
-        pluginCache.push(plugins[i].name)
         cls = plugins[i].method(cls)
       } else {
-        // using the plugin export function name as plugin id
-        pluginCache.push(plugins[i].name)
         cls = plugins[i](cls)
       }
     }

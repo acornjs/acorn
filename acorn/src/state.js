@@ -138,8 +138,15 @@ export class Parser {
     let cls = this
     let pluginCache = []
     for (let i = 0; i < plugins.length; i++) {
+      const pluginImpl = plugins[i](cls)
       pluginCache.push(plugins[i].name)
-      cls = plugins[i](cls)
+
+      if (typeof pluginImpl === "object") {
+        cls = plugins[i].method(cls)
+      } else {
+        // using the plugin export function name as plugin id
+        cls = plugins[i](cls)
+      }
     }
     cls.prototype.pluginCache = pluginCache
     return cls
