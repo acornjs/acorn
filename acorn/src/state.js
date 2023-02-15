@@ -98,7 +98,7 @@ export class Parser {
   }
 
   hasPlugin(pluginName) {
-    return this.pluginCache.indexOf(pluginName) > -1
+    return this.constructor.pluginCache.indexOf(pluginName) > -1
   }
 
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
@@ -141,7 +141,7 @@ export class Parser {
       cls = plugins[i](cls)
       pluginCache.push(plugins[i].name)
     }
-    cls.prototype.pluginCache = pluginCache
+    cls.pluginCache = pluginCache
     return cls
   }
 
