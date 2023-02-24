@@ -578,7 +578,7 @@ pp.parseParenExpression = function() {
   return val
 }
 
-pp.shouldParseArrow = function() {
+pp.shouldParseArrow = function(exprList) {
   return !this.canInsertSemicolon()
 }
 
@@ -602,7 +602,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow, forInit) {
         spreadStart = this.start
         exprList.push(this.parseParenItem(this.parseRestBinding()))
         if (this.type === tt.comma) {
-          this.raise(
+          this.raiseRecoverable(
             this.start,
             "Comma is not permitted after the rest element"
           )
@@ -615,7 +615,7 @@ pp.parseParenAndDistinguishExpression = function(canBeArrow, forInit) {
     let innerEndPos = this.lastTokEnd, innerEndLoc = this.lastTokEndLoc
     this.expect(tt.parenR)
 
-    if (canBeArrow && this.shouldParseArrow() && this.eat(tt.arrow)) {
+    if (canBeArrow && this.shouldParseArrow(exprList) && this.eat(tt.arrow)) {
       this.checkPatternErrors(refDestructuringErrors, false)
       this.checkYieldAwaitInDefaultParams()
       this.yieldPos = oldYieldPos
@@ -759,7 +759,7 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
     if (isPattern) {
       prop.argument = this.parseIdent(false)
       if (this.type === tt.comma) {
-        this.raise(this.start, "Comma is not permitted after the rest element")
+        this.raiseRecoverable(this.start, "Comma is not permitted after the rest element")
       }
       return this.finishNode(prop, "RestElement")
     }
