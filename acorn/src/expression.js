@@ -328,6 +328,10 @@ pp.shouldParseAsyncArrow = function() {
   return !this.canInsertSemicolon() && this.eat(tt.arrow)
 }
 
+pp.parseSubscriptAsyncArrow = function(startPos, startLoc, exprList, forInit) {
+  return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, true, forInit)
+}
+
 pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow, optionalChained, forInit) {
   let optionalSupported = this.options.ecmaVersion >= 11
   let optional = optionalSupported && this.eat(tt.questionDot)
@@ -364,7 +368,7 @@ pp.parseSubscript = function(base, startPos, startLoc, noCalls, maybeAsyncArrow,
       this.yieldPos = oldYieldPos
       this.awaitPos = oldAwaitPos
       this.awaitIdentPos = oldAwaitIdentPos
-      return this.parseArrowExpression(this.startNodeAt(startPos, startLoc), exprList, true, forInit)
+      return this.parseSubscriptAsyncArrow(startPos, startLoc, exprList, forInit)
     }
     this.checkExpressionErrors(refDestructuringErrors, true)
     this.yieldPos = oldYieldPos || this.yieldPos
