@@ -860,19 +860,7 @@ pp.parseExport = function(node, exports) {
   }
   if (this.eat(tt._default)) { // export default ...
     this.checkExport(exports, "default", this.lastTokStart)
-    let isAsync
-    if (this.type === tt._function || (isAsync = this.isAsyncFunction())) {
-      let fNode = this.startNode()
-      this.next()
-      if (isAsync) this.next()
-      node.declaration = this.parseFunction(fNode, FUNC_STATEMENT | FUNC_NULLABLE_ID, false, isAsync)
-    } else if (this.type === tt._class) {
-      let cNode = this.startNode()
-      node.declaration = this.parseClass(cNode, "nullableID")
-    } else {
-      node.declaration = this.parseMaybeAssign()
-      this.semicolon()
-    }
+    node.declaration = this.parseExportDefaultDeclaration()
     return this.finishNode(node, "ExportDefaultDeclaration")
   }
   // export var|const|let|function|class ...
@@ -911,6 +899,23 @@ pp.parseExport = function(node, exports) {
 
 pp.parseExportDeclaration = function(node) {
   return this.parseStatement(null)
+}
+
+pp.parseExportDefaultDeclaration = function() {
+  let isAsync
+  if (this.type === tt._function || (isAsync = this.isAsyncFunction())) {
+    let fNode = this.startNode()
+    this.next()
+    if (isAsync) this.next()
+    return this.parseFunction(fNode, FUNC_STATEMENT | FUNC_NULLABLE_ID, false, isAsync)
+  } else if (this.type === tt._class) {
+    let cNode = this.startNode()
+    return this.parseClass(cNode, "nullableID")
+  } else {
+    let declaration = this.parseMaybeAssign()
+    this.semicolon()
+    return declaration
+  }
 }
 
 pp.checkExport = function(exports, name, pos) {
