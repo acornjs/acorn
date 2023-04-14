@@ -840,23 +840,27 @@ function checkKeyName(node, name) {
 
 // Parses module export declaration.
 
+pp.parseExportAllDeclaration = function(node, exports) {
+  if (this.options.ecmaVersion >= 11) {
+    if (this.eatContextual("as")) {
+      node.exported = this.parseModuleExportName()
+      this.checkExport(exports, node.exported, this.lastTokStart)
+    } else {
+      node.exported = null
+    }
+  }
+  this.expectContextual("from")
+  if (this.type !== tt.string) this.unexpected()
+  node.source = this.parseExprAtom()
+  this.semicolon()
+  return this.finishNode(node, "ExportAllDeclaration")
+}
+
 pp.parseExport = function(node, exports) {
   this.next()
   // export * from '...'
   if (this.eat(tt.star)) {
-    if (this.options.ecmaVersion >= 11) {
-      if (this.eatContextual("as")) {
-        node.exported = this.parseModuleExportName()
-        this.checkExport(exports, node.exported, this.lastTokStart)
-      } else {
-        node.exported = null
-      }
-    }
-    this.expectContextual("from")
-    if (this.type !== tt.string) this.unexpected()
-    node.source = this.parseExprAtom()
-    this.semicolon()
-    return this.finishNode(node, "ExportAllDeclaration")
+    return this.parseExportAllDeclaration(node, exports)
   }
   if (this.eat(tt._default)) { // export default ...
     this.checkExport(exports, "default", this.lastTokStart)
@@ -1029,23 +1033,31 @@ pp.parseImportSpecifier = function() {
   return this.finishNode(node, "ImportSpecifier")
 }
 
+pp.parseImportDefaultSpecifier = function() {
+  // import defaultObj, { x, y as z } from '...'
+  let node = this.startNode()
+  node.local = this.parseIdent()
+  this.checkLValSimple(node.local, BIND_LEXICAL)
+  return this.finishNode(node, "ImportDefaultSpecifier")
+}
+
+pp.parseImportNamespaceSpecifier = function() {
+  let node = this.startNode()
+  this.next()
+  this.expectContextual("as")
+  node.local = this.parseIdent()
+  this.checkLValSimple(node.local, BIND_LEXICAL)
+  return this.finishNode(node, "ImportNamespaceSpecifier")
+}
+
 pp.parseImportSpecifiers = function() {
   let nodes = [], first = true
   if (this.type === tt.name) {
-    // import defaultObj, { x, y as z } from '...'
-    let node = this.startNode()
-    node.local = this.parseIdent()
-    this.checkLValSimple(node.local, BIND_LEXICAL)
-    nodes.push(this.finishNode(node, "ImportDefaultSpecifier"))
+    nodes.push(this.parseImportDefaultSpecifier())
     if (!this.eat(tt.comma)) return nodes
   }
   if (this.type === tt.star) {
-    let node = this.startNode()
-    this.next()
-    this.expectContextual("as")
-    node.local = this.parseIdent()
-    this.checkLValSimple(node.local, BIND_LEXICAL)
-    nodes.push(this.finishNode(node, "ImportNamespaceSpecifier"))
+    nodes.push(this.parseImportNamespaceSpecifier())
     return nodes
   }
   this.expect(tt.braceL)
