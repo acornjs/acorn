@@ -8,4 +8,4 @@
 /acorn-walk/dist
 /yarn.lock
 !/acorn/dist/acorn.d.ts
-!/acorn/dist/acorn.mjs.d.ts
+!/acorn/dist/acorn.d.mts
