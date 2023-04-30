@@ -9,3 +9,5 @@
 /yarn.lock
 !/acorn/dist/acorn.d.ts
 !/acorn/dist/acorn.d.mts
+!/acorn-walk/dist/walk.d.ts
+!/acorn-walk/dist/walk.d.mts
