@@ -1,18 +1,18 @@
 const {hasOwnProperty, toString} = Object.prototype
 
-export const hasOwn = Object.hasOwn || ((obj, propName) => (
+export const hasOwn = Object.hasOwn || ((obj: object, propName: PropertyKey): boolean => (
   hasOwnProperty.call(obj, propName)
 ))
 
-export const isArray = Array.isArray || ((obj) => (
+export const isArray = Array.isArray || ((obj): obj is any[] => (
   toString.call(obj) === "[object Array]"
 ))
 
-export function wordsRegexp(words) {
+export function wordsRegexp(words: string): RegExp {
   return new RegExp("^(?:" + words.replace(/ /g, "|") + ")$")
 }
 
-export function codePointToString(code) {
+export function codePointToString(code: number): string {
   // UTF-16 Decoding
   if (code <= 0xFFFF) return String.fromCharCode(code)
   code -= 0x10000

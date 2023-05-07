@@ -41,7 +41,7 @@ const nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonAS
 // This has a complexity linear to the value of the code. The
 // assumption is that looking up astral identifier characters is
 // rare.
-function isInAstralSet(code, set) {
+function isInAstralSet(code: number, set: readonly number[]): boolean {
   let pos = 0x10000
   for (let i = 0; i < set.length; i += 2) {
     pos += set[i]
@@ -54,7 +54,7 @@ function isInAstralSet(code, set) {
 
 // Test whether a given character code starts an identifier.
 
-export function isIdentifierStart(code, astral) {
+export function isIdentifierStart(code: number, astral?: boolean): boolean {
   if (code < 65) return code === 36
   if (code < 91) return true
   if (code < 97) return code === 95
@@ -66,7 +66,7 @@ export function isIdentifierStart(code, astral) {
 
 // Test whether a given character is part of an identifier.
 
-export function isIdentifierChar(code, astral) {
+export function isIdentifierChar(code: number, astral?: boolean): boolean {
   if (code < 48) return code === 36
   if (code < 58) return true
   if (code < 65) return false

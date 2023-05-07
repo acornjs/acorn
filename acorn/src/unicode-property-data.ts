@@ -19,7 +19,7 @@ const unicodeBinaryProperties = {
   12: ecma12BinaryProperties,
   13: ecma13BinaryProperties,
   14: ecma14BinaryProperties
-}
+} as const
 
 // #table-unicode-general-category-values
 const unicodeGeneralCategoryValues = "Cased_Letter LC Close_Punctuation Pe Connector_Punctuation Pc Control Cc cntrl Currency_Symbol Sc Dash_Punctuation Pd Decimal_Number Nd digit Enclosing_Mark Me Final_Punctuation Pf Format Cf Initial_Punctuation Pi Letter L Letter_Number Nl Line_Separator Zl Lowercase_Letter Ll Mark M Combining_Mark Math_Symbol Sm Modifier_Letter Lm Modifier_Symbol Sk Nonspacing_Mark Mn Number N Open_Punctuation Ps Other C Other_Letter Lo Other_Number No Other_Punctuation Po Other_Symbol So Paragraph_Separator Zp Private_Use Co Punctuation P punct Separator Z Space_Separator Zs Spacing_Mark Mc Surrogate Cs Symbol S Titlecase_Letter Lt Unassigned Cn Uppercase_Letter Lu"
@@ -39,15 +39,42 @@ const unicodeScriptValues = {
   12: ecma12ScriptValues,
   13: ecma13ScriptValues,
   14: ecma14ScriptValues
+} as const
+
+export interface Unicode {
+  binary: RegExp,
+  nonBinary: {
+    General_Category: RegExp,
+    Script: RegExp,
+    Script_Extensions: RegExp,
+    gc: RegExp,
+    sc: RegExp,
+    scx: RegExp
+  }
 }
 
-const data = {}
-function buildUnicodeData(ecmaVersion) {
-  const d = data[ecmaVersion] = {
+export interface UnicodePropertyData {
+  9: Unicode
+  10: Unicode
+  11: Unicode
+  12: Unicode
+  13: Unicode
+  14: Unicode
+}
+
+const ecmaVersions = [9, 10, 11, 12, 13, 14] as const
+
+const data: UnicodePropertyData = {} as UnicodePropertyData // TODO
+function buildUnicodeData(ecmaVersion: typeof ecmaVersions[number]): void {
+  const d: Unicode = data[ecmaVersion] = {
     binary: wordsRegexp(unicodeBinaryProperties[ecmaVersion] + " " + unicodeGeneralCategoryValues),
     nonBinary: {
       General_Category: wordsRegexp(unicodeGeneralCategoryValues),
-      Script: wordsRegexp(unicodeScriptValues[ecmaVersion])
+      Script: wordsRegexp(unicodeScriptValues[ecmaVersion]),
+      Script_Extensions: undefined,
+      gc: undefined,
+      sc: undefined,
+      scx: undefined
     }
   }
   d.nonBinary.Script_Extensions = d.nonBinary.Script
@@ -57,7 +84,7 @@ function buildUnicodeData(ecmaVersion) {
   d.nonBinary.scx = d.nonBinary.Script_Extensions
 }
 
-for (const ecmaVersion of [9, 10, 11, 12, 13, 14]) {
+for (const ecmaVersion of ecmaVersions) {
   buildUnicodeData(ecmaVersion)
 }
 
