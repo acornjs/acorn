@@ -30,7 +30,7 @@ const ecma10ScriptValues = ecma9ScriptValues + " Dogra Dogr Gunjala_Gondi Gong H
 const ecma11ScriptValues = ecma10ScriptValues + " Elymaic Elym Nandinagari Nand Nyiakeng_Puachue_Hmong Hmnp Wancho Wcho"
 const ecma12ScriptValues = ecma11ScriptValues + " Chorasmian Chrs Diak Dives_Akuru Khitan_Small_Script Kits Yezi Yezidi"
 const ecma13ScriptValues = ecma12ScriptValues + " Cypro_Minoan Cpmn Old_Uyghur Ougr Tangsa Tnsa Toto Vithkuqi Vith"
-const ecma14ScriptValues = ecma13ScriptValues + " Kawi Nag_Mundari Nagm"
+const ecma14ScriptValues = ecma13ScriptValues + " Hrkt Katakana_Or_Hiragana Kawi Nag_Mundari Nagm Unknown Zzzz"
 
 const unicodeScriptValues = {
   9: ecma9ScriptValues,
