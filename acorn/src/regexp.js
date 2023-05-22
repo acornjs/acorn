@@ -1034,10 +1034,10 @@ pp.regexp_classSetExpression = function(state) {
   // https://tc39.es/ecma262/#prod-ClassUnion
   for (;;) {
     if (this.regexp_eatClassSetRange(state)) {
-      if (state.lastMayContainStrings) nextMayContainStrings = true
       continue
     }
     if (this.regexp_eatClassSetOperand(state)) {
+      if (state.lastMayContainStrings) nextMayContainStrings = true
       continue
     }
     break

@@ -2,7 +2,6 @@ if (typeof exports !== "undefined") {
   var test = require("./driver.js").test
   var testFail = require("./driver.js").testFail
 }
-test("/[\\p{Basic_Emoji}][^]/v", {}, { ecmaVersion: 2024 })
 
 test("/a/v", {}, { ecmaVersion: 2024 })
 testFail("/a/v", "Invalid regular expression flag (1:1)", { ecmaVersion: 2023 })
@@ -76,3 +75,10 @@ test("/[^\\q{a|b}]/v", {}, { ecmaVersion: 2024 })
 testFail("/[^\\q{}]/v", "Invalid regular expression: /[^\\q{}]/: Negated character class may contain strings (1:1)", { ecmaVersion: 2024 })
 testFail("/[^\\q{ab}]/v", "Invalid regular expression: /[^\\q{ab}]/: Negated character class may contain strings (1:1)", { ecmaVersion: 2024 })
 testFail("/[^\\q{a|bc}]/v", "Invalid regular expression: /[^\\q{a|bc}]/: Negated character class may contain strings (1:1)", { ecmaVersion: 2024 })
+test("/[^\\q{a}\\q{b}]/v", {}, { ecmaVersion: 2024 })
+testFail("/[^\\q{a}\\q{bc}]/v", "Invalid regular expression: /[^\\q{a}\\q{bc}]/: Negated character class may contain strings (1:1)", { ecmaVersion: 2024 })
+test("/[^\\q{a}&&\\q{bc}]/v", {}, { ecmaVersion: 2024 })
+test("/[^\\q{ab}&&\\q{c}]/v", {}, { ecmaVersion: 2024 })
+testFail("/[^\\q{ab}&&\\q{cd}]/v", "Invalid regular expression: /[^\\q{ab}&&\\q{cd}]/: Negated character class may contain strings (1:1)", { ecmaVersion: 2024 })
+test("/[^\\q{a}--\\q{bc}]/v", {}, { ecmaVersion: 2024 })
+testFail("/[^\\q{ab}--\\q{c}]/v", "Invalid regular expression: /[^\\q{ab}--\\q{c}]/: Negated character class may contain strings (1:1)", { ecmaVersion: 2024 })
