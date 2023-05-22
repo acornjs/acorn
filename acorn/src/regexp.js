@@ -1088,10 +1088,12 @@ pp.regexp_eatNestedClass = function(state) {
     }
     state.pos = start
   }
-  if (state.eat(0x5C /* \ */) && this.regexp_eatCharacterClassEscape(state)) {
-    return true
+  if (state.eat(0x5C /* \ */)) {
+    if (this.regexp_eatCharacterClassEscape(state)) {
+      return true
+    }
+    state.pos = start
   }
-  state.pos = start
   return false
 }
 
