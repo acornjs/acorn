@@ -8,17 +8,19 @@ const pp = Parser.prototype
 export class RegExpValidationState {
   constructor(parser) {
     this.parser = parser
-    this.validFlags = `gim${parser.options.ecmaVersion >= 6 ? "uy" : ""}${parser.options.ecmaVersion >= 9 ? "s" : ""}${parser.options.ecmaVersion >= 13 ? "d" : ""}`
+    this.validFlags = `gim${parser.options.ecmaVersion >= 6 ? "uy" : ""}${parser.options.ecmaVersion >= 9 ? "s" : ""}${parser.options.ecmaVersion >= 13 ? "d" : ""}${parser.options.ecmaVersion >= 15 ? "v" : ""}`
     this.unicodeProperties = UNICODE_PROPERTY_VALUES[parser.options.ecmaVersion >= 14 ? 14 : parser.options.ecmaVersion]
     this.source = ""
     this.flags = ""
     this.start = 0
     this.switchU = false
+    this.switchV = false
     this.switchN = false
     this.pos = 0
     this.lastIntValue = 0
     this.lastStringValue = ""
     this.lastAssertionIsQuantifiable = false
+    this.lastMayContainStrings = false
     this.numCapturingParens = 0
     this.maxBackReference = 0
     this.groupNames = []
@@ -26,12 +28,20 @@ export class RegExpValidationState {
   }
 
   reset(start, pattern, flags) {
+    const unicodeSets = flags.indexOf("v") !== -1
     const unicode = flags.indexOf("u") !== -1
     this.start = start | 0
     this.source = pattern + ""
     this.flags = flags
-    this.switchU = unicode && this.parser.options.ecmaVersion >= 6
-    this.switchN = unicode && this.parser.options.ecmaVersion >= 9
+    if (unicodeSets && this.parser.options.ecmaVersion >= 15) {
+      this.switchU = true
+      this.switchV = true
+      this.switchN = true
+    } else {
+      this.switchU = unicode && this.parser.options.ecmaVersion >= 6
+      this.switchV = false
+      this.switchN = unicode && this.parser.options.ecmaVersion >= 9
+    }
   }
 
   raise(message) {
@@ -99,6 +109,9 @@ pp.validateRegExpFlags = function(state) {
   const validFlags = state.validFlags
   const flags = state.flags
 
+  let u = false
+  let v = false
+
   for (let i = 0; i < flags.length; i++) {
     const flag = flags.charAt(i)
     if (validFlags.indexOf(flag) === -1) {
@@ -107,6 +120,11 @@ pp.validateRegExpFlags = function(state) {
     if (flags.indexOf(flag, i + 1) > -1) {
       this.raise(state.start, "Duplicate regular expression flag")
     }
+    if (flag === "u") u = true
+    if (flag === "v") v = true
+  }
+  if (this.options.ecmaVersion >= 15 && u && v) {
+    this.raise(state.start, "Invalid regular expression flag")
   }
 }
 
@@ -136,6 +154,7 @@ pp.regexp_pattern = function(state) {
   state.lastIntValue = 0
   state.lastStringValue = ""
   state.lastAssertionIsQuantifiable = false
+  state.lastMayContainStrings = false
   state.numCapturingParens = 0
   state.maxBackReference = 0
   state.groupNames.length = 0
@@ -726,13 +745,15 @@ pp.regexp_eatCharacterClassEscape = function(state) {
   if (isCharacterClassEscape(ch)) {
     state.lastIntValue = -1
     state.advance()
+    state.lastMayContainStrings = false
     return true
   }
 
+  let negate = false
   if (
     state.switchU &&
     this.options.ecmaVersion >= 9 &&
-    (ch === 0x50 /* P */ || ch === 0x70 /* p */)
+    ((negate = ch === 0x50 /* P */) || ch === 0x70 /* p */)
   ) {
     state.lastIntValue = -1
     state.advance()
@@ -741,6 +762,9 @@ pp.regexp_eatCharacterClassEscape = function(state) {
       this.regexp_eatUnicodePropertyValueExpression(state) &&
       state.eat(0x7D /* } */)
     ) {
+      if (negate && state.lastMayContainStrings) {
+        state.raise("Invalid property name")
+      }
       return true
     }
     state.raise("Invalid property name")
@@ -771,6 +795,7 @@ pp.regexp_eatUnicodePropertyValueExpression = function(state) {
     if (this.regexp_eatUnicodePropertyValue(state)) {
       const value = state.lastStringValue
       this.regexp_validateUnicodePropertyNameAndValue(state, name, value)
+      state.lastMayContainStrings = false
       return true
     }
   }
@@ -791,8 +816,15 @@ pp.regexp_validateUnicodePropertyNameAndValue = function(state, name, value) {
     state.raise("Invalid property value")
 }
 pp.regexp_validateUnicodePropertyNameOrValue = function(state, nameOrValue) {
-  if (!state.unicodeProperties.binary.test(nameOrValue))
-    state.raise("Invalid property name")
+  if (state.unicodeProperties.binary.test(nameOrValue)) {
+    state.lastMayContainStrings = false
+    return
+  }
+  if (state.switchV && state.unicodeProperties.binaryOfStrings.test(nameOrValue)) {
+    state.lastMayContainStrings = true
+    return
+  }
+  state.raise("Invalid property name")
 }
 
 // UnicodePropertyName ::
@@ -834,21 +866,50 @@ pp.regexp_eatLoneUnicodePropertyNameOrValue = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClass
 pp.regexp_eatCharacterClass = function(state) {
   if (state.eat(0x5B /* [ */)) {
-    state.eat(0x5E /* ^ */)
-    this.regexp_classRanges(state)
+    const negate = state.eat(0x5E /* ^ */)
+    this.regexp_classContents(state)
     if (state.eat(0x5D /* ] */)) {
+      if (negate && state.lastMayContainStrings) {
+        state.raise("Negated character class may contain strings")
+      }
       return true
     }
+    if (state.switchV) {
+      const start = state.pos
+      this.regexp_nonEmptyClassRanges(state)
+      const terminated = state.current() === 0x5D /* ] */
+      state.pos = start
+      if (terminated) {
+        // Make the same message as V8.
+        state.raise("Invalid character in character class")
+      }
+    }
+
     // Unreachable since it threw "unterminated regular expression" error before.
     state.raise("Unterminated character class")
   }
   return false
 }
 
+// https://tc39.es/ecma262/#prod-ClassContents
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassRanges
+pp.regexp_classContents = function(state) {
+  if (state.current() === 0x5D /* ] */) {
+    // empty
+    state.lastMayContainStrings = false
+    return
+  }
+  if (state.switchV) {
+    this.regexp_classSetExpression(state)
+  } else {
+    this.regexp_nonEmptyClassRanges(state)
+    state.lastMayContainStrings = false
+  }
+}
+
 // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRanges
 // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRangesNoDash
-pp.regexp_classRanges = function(state) {
+pp.regexp_nonEmptyClassRanges = function(state) {
   while (this.regexp_eatClassAtom(state)) {
     const left = state.lastIntValue
     if (state.eat(0x2D /* - */) && this.regexp_eatClassAtom(state)) {
@@ -917,6 +978,247 @@ pp.regexp_eatClassEscape = function(state) {
   return (
     this.regexp_eatCharacterClassEscape(state) ||
     this.regexp_eatCharacterEscape(state)
+  )
+}
+
+// https://tc39.es/ecma262/#prod-ClassSetExpression
+// https://tc39.es/ecma262/#prod-ClassUnion
+// https://tc39.es/ecma262/#prod-ClassIntersection
+// https://tc39.es/ecma262/#prod-ClassSubtraction
+pp.regexp_classSetExpression = function(state) {
+  let nextMayContainStrings = false
+  if (this.regexp_eatClassSetRange(state))
+    ;
+  else if (this.regexp_eatClassSetOperand(state)) {
+    nextMayContainStrings = state.lastMayContainStrings
+    let pos = state.pos
+    const start = pos
+    // https://tc39.es/ecma262/#prod-ClassIntersection
+    while (
+      state.eat(0x26 /* & */) && state.eat(0x26 /* & */) &&
+      state.current() !== 0x26 /* & */ &&
+      this.regexp_eatClassSetOperand(state)
+    ) {
+      if (!state.lastMayContainStrings) nextMayContainStrings = false
+      pos = state.pos
+    }
+    state.pos = pos
+    if (state.pos !== start) {
+      state.lastMayContainStrings = nextMayContainStrings
+      return
+    }
+    // https://tc39.es/ecma262/#prod-ClassSubtraction
+    while (
+      state.eat(0x2D /* - */) && state.eat(0x2D /* - */) &&
+      this.regexp_eatClassSetOperand(state)
+    ) {
+      pos = state.pos
+    }
+    state.pos = pos
+    if (state.pos !== start) {
+      state.lastMayContainStrings = nextMayContainStrings
+      return
+    }
+  } else {
+    const ch = state.current()
+    if (ch === 0x5C /* \ */ && state.lookahead() !== 0x71 /* q */) {
+      // Make the same message as V8.
+      state.raise("Invalid escape")
+    }
+    if (ch === state.lookahead() && isClassSetReservedDoublePunctuatorCharacter(ch)) {
+      // Make the same message as V8.
+      state.raise("Invalid set operation in character class")
+    }
+    state.raise("Invalid character in character class")
+  }
+  // https://tc39.es/ecma262/#prod-ClassUnion
+  for (;;) {
+    if (this.regexp_eatClassSetRange(state)) {
+      if (state.lastMayContainStrings) nextMayContainStrings = true
+      continue
+    }
+    if (this.regexp_eatClassSetOperand(state)) {
+      continue
+    }
+    break
+  }
+  state.lastMayContainStrings = nextMayContainStrings
+}
+
+// https://tc39.es/ecma262/#prod-ClassSetRange
+pp.regexp_eatClassSetRange = function(state) {
+  const start = state.pos
+  if (this.regexp_eatClassSetCharacter(state)) {
+    const left = state.lastIntValue
+    if (state.eat(0x2D /* - */) && this.regexp_eatClassSetCharacter(state)) {
+      const right = state.lastIntValue
+      if (left !== -1 && right !== -1 && left > right) {
+        state.raise("Range out of order in character class")
+      }
+      return true
+    }
+    state.pos = start
+  }
+  return false
+}
+
+// https://tc39.es/ecma262/#prod-ClassSetOperand
+pp.regexp_eatClassSetOperand = function(state) {
+  if (this.regexp_eatClassSetCharacter(state)) {
+    state.lastMayContainStrings = false
+    return true
+  }
+  return (
+    this.regexp_eatClassStringDisjunction(state) ||
+    this.regexp_eatNestedClass(state)
+  )
+}
+
+// https://tc39.es/ecma262/#prod-NestedClass
+pp.regexp_eatNestedClass = function(state) {
+  const start = state.pos
+  if (state.eat(0x5B /* [ */)) {
+    const negate = state.eat(0x5E /* ^ */)
+    this.regexp_classContents(state)
+    if (state.eat(0x5D /* ] */)) {
+      if (negate && state.lastMayContainStrings) {
+        state.raise("Negated character class may contain strings")
+      }
+      return true
+    }
+    state.pos = start
+  }
+  if (state.eat(0x5C /* \ */) && this.regexp_eatCharacterClassEscape(state)) {
+    return true
+  }
+  state.pos = start
+  return false
+}
+
+// https://tc39.es/ecma262/#prod-ClassStringDisjunction
+pp.regexp_eatClassStringDisjunction = function(state) {
+  const start = state.pos
+  if (state.eat(0x5C /* \ */)) {
+    if (state.eat(0x71 /* q */)) {
+      if (state.eat(0x7B /* { */)) {
+        this.regexp_classStringDisjunctionContents(state)
+        if (state.eat(0x7D /* } */)) {
+          return true
+        }
+      } else {
+        // Make the same message as V8.
+        state.raise("Invalid escape")
+      }
+    }
+    state.pos = start
+  }
+  return false
+}
+
+// https://tc39.es/ecma262/#prod-ClassStringDisjunctionContents
+pp.regexp_classStringDisjunctionContents = function(state) {
+  this.regexp_classString(state)
+  let nextMayContainStrings = state.lastMayContainStrings
+  while (state.eat(0x7C /* | */)) {
+    this.regexp_classString(state)
+    if (state.lastMayContainStrings) nextMayContainStrings = true
+  }
+  state.lastMayContainStrings = nextMayContainStrings
+}
+
+// https://tc39.es/ecma262/#prod-ClassString
+// https://tc39.es/ecma262/#prod-NonEmptyClassString
+pp.regexp_classString = function(state) {
+  if (!this.regexp_eatClassSetCharacter(state)) {
+    // empty
+    state.lastMayContainStrings = true
+    return
+  }
+  let nextMayContainStrings = false
+  while (this.regexp_eatClassSetCharacter(state))
+    nextMayContainStrings = true
+  state.lastMayContainStrings = nextMayContainStrings
+}
+
+// https://tc39.es/ecma262/#prod-ClassSetCharacter
+pp.regexp_eatClassSetCharacter = function(state) {
+  const start = state.pos
+  if (state.eat(0x5C /* \ */)) {
+    if (
+      this.regexp_eatCharacterEscape(state) ||
+      this.regexp_eatClassSetReservedPunctuator(state)
+    ) {
+      return true
+    }
+    if (state.eat(0x62 /* b */)) {
+      state.lastIntValue = 0x08 /* <BS> */
+      return true
+    }
+    state.pos = start
+    return false
+  }
+  const ch = state.current()
+  if (ch === state.lookahead() && isClassSetReservedDoublePunctuatorCharacter(ch)) {
+    return false
+  }
+  if (isClassSetSyntaxCharacter(ch)) {
+    return false
+  }
+  state.advance()
+  state.lastIntValue = ch
+  return true
+}
+
+// https://tc39.es/ecma262/#prod-ClassSetReservedDoublePunctuator
+function isClassSetReservedDoublePunctuatorCharacter(ch) {
+  return (
+    ch === 0x21 /* ! */ ||
+    ch >= 0x23 /* # */ && ch <= 0x26 /* & */ ||
+    ch >= 0x2A /* * */ && ch <= 0x2C /* , */ ||
+    ch === 0x2E /* . */ ||
+    ch >= 0x3A /* : */ && ch <= 0x40 /* @ */ ||
+    ch === 0x5E /* ^ */ ||
+    ch === 0x60 /* ` */ ||
+    ch === 0x7E /* ~ */
+  )
+}
+
+// https://tc39.es/ecma262/#prod-ClassSetSyntaxCharacter
+function isClassSetSyntaxCharacter(ch) {
+  return (
+    ch === 0x28 /* ( */ ||
+    ch === 0x29 /* ) */ ||
+    ch === 0x2D /* - */ ||
+    ch === 0x2F /* / */ ||
+    ch >= 0x5B /* [ */ && ch <= 0x5D /* ] */ ||
+    ch >= 0x7B /* { */ && ch <= 0x7D /* } */
+  )
+}
+
+// https://tc39.es/ecma262/#prod-ClassSetReservedPunctuator
+pp.regexp_eatClassSetReservedPunctuator = function(state) {
+  const ch = state.current()
+  if (isClassSetReservedPunctuator(ch)) {
+    state.lastIntValue = ch
+    state.advance()
+    return true
+  }
+  return false
+}
+
+// https://tc39.es/ecma262/#prod-ClassSetReservedPunctuator
+function isClassSetReservedPunctuator(ch) {
+  return (
+    ch === 0x21 /* ! */ ||
+    ch === 0x23 /* # */ ||
+    ch === 0x25 /* % */ ||
+    ch === 0x26 /* & */ ||
+    ch === 0x2C /* , */ ||
+    ch === 0x2D /* - */ ||
+    ch >= 0x3A /* : */ && ch <= 0x3E /* > */ ||
+    ch === 0x40 /* @ */ ||
+    ch === 0x60 /* ` */ ||
+    ch === 0x7E /* ~ */
   )
 }
 

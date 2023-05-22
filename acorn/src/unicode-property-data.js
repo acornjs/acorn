@@ -21,6 +21,18 @@ const unicodeBinaryProperties = {
   14: ecma14BinaryProperties
 }
 
+// #table-binary-unicode-properties-of-strings
+const ecma14BinaryPropertiesOfStrings = "Basic_Emoji Emoji_Keycap_Sequence RGI_Emoji_Modifier_Sequence RGI_Emoji_Flag_Sequence RGI_Emoji_Tag_Sequence RGI_Emoji_ZWJ_Sequence RGI_Emoji"
+
+const unicodeBinaryPropertiesOfStrings = {
+  9: "",
+  10: "",
+  11: "",
+  12: "",
+  13: "",
+  14: ecma14BinaryPropertiesOfStrings
+}
+
 // #table-unicode-general-category-values
 const unicodeGeneralCategoryValues = "Cased_Letter LC Close_Punctuation Pe Connector_Punctuation Pc Control Cc cntrl Currency_Symbol Sc Dash_Punctuation Pd Decimal_Number Nd digit Enclosing_Mark Me Final_Punctuation Pf Format Cf Initial_Punctuation Pi Letter L Letter_Number Nl Line_Separator Zl Lowercase_Letter Ll Mark M Combining_Mark Math_Symbol Sm Modifier_Letter Lm Modifier_Symbol Sk Nonspacing_Mark Mn Number N Open_Punctuation Ps Other C Other_Letter Lo Other_Number No Other_Punctuation Po Other_Symbol So Paragraph_Separator Zp Private_Use Co Punctuation P punct Separator Z Space_Separator Zs Spacing_Mark Mc Surrogate Cs Symbol S Titlecase_Letter Lt Unassigned Cn Uppercase_Letter Lu"
 
@@ -45,6 +57,7 @@ const data = {}
 function buildUnicodeData(ecmaVersion) {
   const d = data[ecmaVersion] = {
     binary: wordsRegexp(unicodeBinaryProperties[ecmaVersion] + " " + unicodeGeneralCategoryValues),
+    binaryOfStrings: wordsRegexp(unicodeBinaryPropertiesOfStrings[ecmaVersion]),
     nonBinary: {
       General_Category: wordsRegexp(unicodeGeneralCategoryValues),
       Script: wordsRegexp(unicodeScriptValues[ecmaVersion])
