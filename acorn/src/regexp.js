@@ -97,6 +97,19 @@ export class RegExpValidationState {
     }
     return false
   }
+
+  eatChars(chs, forceU = false) {
+    let pos = this.pos
+    for (const ch of chs) {
+      const current = this.at(pos, forceU)
+      if (current === -1 || current !== ch) {
+        return false
+      }
+      pos = this.nextIndex(pos, forceU)
+    }
+    this.pos = pos
+    return true
+  }
 }
 
 /**
@@ -995,7 +1008,7 @@ pp.regexp_classSetExpression = function(state) {
     const start = pos
     // https://tc39.es/ecma262/#prod-ClassIntersection
     while (
-      state.eat(0x26 /* & */) && state.eat(0x26 /* & */) &&
+      state.eatChars([0x26, 0x26] /* && */) &&
       state.current() !== 0x26 /* & */ &&
       this.regexp_eatClassSetOperand(state)
     ) {
@@ -1009,7 +1022,7 @@ pp.regexp_classSetExpression = function(state) {
     }
     // https://tc39.es/ecma262/#prod-ClassSubtraction
     while (
-      state.eat(0x2D /* - */) && state.eat(0x2D /* - */) &&
+      state.eatChars([0x2D, 0x2D] /* -- */) &&
       this.regexp_eatClassSetOperand(state)
     ) {
       pos = state.pos
@@ -1100,17 +1113,15 @@ pp.regexp_eatNestedClass = function(state) {
 // https://tc39.es/ecma262/#prod-ClassStringDisjunction
 pp.regexp_eatClassStringDisjunction = function(state) {
   const start = state.pos
-  if (state.eat(0x5C /* \ */)) {
-    if (state.eat(0x71 /* q */)) {
-      if (state.eat(0x7B /* { */)) {
-        this.regexp_classStringDisjunctionContents(state)
-        if (state.eat(0x7D /* } */)) {
-          return true
-        }
-      } else {
-        // Make the same message as V8.
-        state.raise("Invalid escape")
+  if (state.eatChars([0x5C, 0x71] /* \q */)) {
+    if (state.eat(0x7B /* { */)) {
+      this.regexp_classStringDisjunctionContents(state)
+      if (state.eat(0x7D /* } */)) {
+        return true
       }
+    } else {
+      // Make the same message as V8.
+      state.raise("Invalid escape")
     }
     state.pos = start
   }
