@@ -988,30 +988,29 @@ pp.regexp_classSetExpression = function(state) {
     // Continue with ClassUnion processing.
   } else if (result = this.regexp_eatClassSetOperand(state)) {
     mayContainStrings = result.mayContainStrings
-    let pos = state.pos
-    const start = pos
     // https://tc39.es/ecma262/#prod-ClassIntersection
-    while (
-      state.eatChars([0x26, 0x26] /* && */) &&
-      state.current() !== 0x26 /* & */ &&
-      (result = this.regexp_eatClassSetOperand(state))
-    ) {
-      if (!result.mayContainStrings) mayContainStrings = false
-      pos = state.pos
+    const start = state.pos
+    while (state.eatChars([0x26, 0x26] /* && */)) {
+      if (
+        state.current() !== 0x26 /* & */ &&
+        (result = this.regexp_eatClassSetOperand(state))
+      ) {
+        if (!result.mayContainStrings) mayContainStrings = false
+        continue
+      }
+      state.raise("Invalid character in character class")
     }
-    state.pos = pos
-    if (state.pos !== start) {
+    if (start !== state.pos) {
       return {mayContainStrings}
     }
     // https://tc39.es/ecma262/#prod-ClassSubtraction
-    while (
-      state.eatChars([0x2D, 0x2D] /* -- */) &&
-      this.regexp_eatClassSetOperand(state)
-    ) {
-      pos = state.pos
+    while (state.eatChars([0x2D, 0x2D] /* -- */)) {
+      if (this.regexp_eatClassSetOperand(state)) {
+        continue
+      }
+      state.raise("Invalid character in character class")
     }
-    state.pos = pos
-    if (state.pos !== start) {
+    if (start !== state.pos) {
       return {mayContainStrings}
     }
   } else {
