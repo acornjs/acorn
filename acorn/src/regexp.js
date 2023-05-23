@@ -987,9 +987,9 @@ pp.regexp_eatClassEscape = function(state) {
 // https://tc39.es/ecma262/#prod-ClassSubtraction
 pp.regexp_classSetExpression = function(state) {
   let nextMayContainStrings = false
-  if (this.regexp_eatClassSetRange(state))
-    ;
-  else if (this.regexp_eatClassSetOperand(state)) {
+  if (this.regexp_eatClassSetRange(state)) {
+    // Continue with ClassUnion processing.
+  } else if (this.regexp_eatClassSetOperand(state)) {
     nextMayContainStrings = state.lastMayContainStrings
     let pos = state.pos
     const start = pos
