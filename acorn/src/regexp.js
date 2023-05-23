@@ -20,7 +20,6 @@ export class RegExpValidationState {
     this.lastIntValue = 0
     this.lastStringValue = ""
     this.lastAssertionIsQuantifiable = false
-    this.lastMayContainStrings = false
     this.numCapturingParens = 0
     this.maxBackReference = 0
     this.groupNames = []
@@ -167,7 +166,6 @@ pp.regexp_pattern = function(state) {
   state.lastIntValue = 0
   state.lastStringValue = ""
   state.lastAssertionIsQuantifiable = false
-  state.lastMayContainStrings = false
   state.numCapturingParens = 0
   state.maxBackReference = 0
   state.groupNames.length = 0
@@ -758,8 +756,7 @@ pp.regexp_eatCharacterClassEscape = function(state) {
   if (isCharacterClassEscape(ch)) {
     state.lastIntValue = -1
     state.advance()
-    state.lastMayContainStrings = false
-    return true
+    return {}
   }
 
   let negate = false
@@ -770,20 +767,21 @@ pp.regexp_eatCharacterClassEscape = function(state) {
   ) {
     state.lastIntValue = -1
     state.advance()
+    let result
     if (
       state.eat(0x7B /* { */) &&
-      this.regexp_eatUnicodePropertyValueExpression(state) &&
+      (result = this.regexp_eatUnicodePropertyValueExpression(state)) &&
       state.eat(0x7D /* } */)
     ) {
-      if (negate && state.lastMayContainStrings) {
+      if (negate && result.mayContainStrings) {
         state.raise("Invalid property name")
       }
-      return true
+      return result
     }
     state.raise("Invalid property name")
   }
 
-  return false
+  return null
 }
 function isCharacterClassEscape(ch) {
   return (
@@ -808,8 +806,7 @@ pp.regexp_eatUnicodePropertyValueExpression = function(state) {
     if (this.regexp_eatUnicodePropertyValue(state)) {
       const value = state.lastStringValue
       this.regexp_validateUnicodePropertyNameAndValue(state, name, value)
-      state.lastMayContainStrings = false
-      return true
+      return {}
     }
   }
   state.pos = start
@@ -817,10 +814,9 @@ pp.regexp_eatUnicodePropertyValueExpression = function(state) {
   // LoneUnicodePropertyNameOrValue
   if (this.regexp_eatLoneUnicodePropertyNameOrValue(state)) {
     const nameOrValue = state.lastStringValue
-    this.regexp_validateUnicodePropertyNameOrValue(state, nameOrValue)
-    return true
+    return this.regexp_validateUnicodePropertyNameOrValue(state, nameOrValue)
   }
-  return false
+  return null
 }
 pp.regexp_validateUnicodePropertyNameAndValue = function(state, name, value) {
   if (!hasOwn(state.unicodeProperties.nonBinary, name))
@@ -830,12 +826,10 @@ pp.regexp_validateUnicodePropertyNameAndValue = function(state, name, value) {
 }
 pp.regexp_validateUnicodePropertyNameOrValue = function(state, nameOrValue) {
   if (state.unicodeProperties.binary.test(nameOrValue)) {
-    state.lastMayContainStrings = false
-    return
+    return {}
   }
   if (state.switchV && state.unicodeProperties.binaryOfStrings.test(nameOrValue)) {
-    state.lastMayContainStrings = true
-    return
+    return {mayContainStrings: true}
   }
   state.raise("Invalid property name")
 }
@@ -880,18 +874,18 @@ pp.regexp_eatLoneUnicodePropertyNameOrValue = function(state) {
 pp.regexp_eatCharacterClass = function(state) {
   if (state.eat(0x5B /* [ */)) {
     const negate = state.eat(0x5E /* ^ */)
-    this.regexp_classContents(state)
+    const result = this.regexp_classContents(state)
     if (state.eat(0x5D /* ] */)) {
-      if (negate && state.lastMayContainStrings) {
+      if (negate && result.mayContainStrings) {
         state.raise("Negated character class may contain strings")
       }
-      return true
+      return result
     }
 
     // Unreachable since it threw "unterminated regular expression" error before.
     state.raise("Unterminated character class")
   }
-  return false
+  return null
 }
 
 // https://tc39.es/ecma262/#prod-ClassContents
@@ -899,14 +893,13 @@ pp.regexp_eatCharacterClass = function(state) {
 pp.regexp_classContents = function(state) {
   if (state.current() === 0x5D /* ] */) {
     // empty
-    state.lastMayContainStrings = false
-    return
+    return {}
   }
   if (state.switchV) {
-    this.regexp_classSetExpression(state)
+    return this.regexp_classSetExpression(state)
   } else {
     this.regexp_nonEmptyClassRanges(state)
-    state.lastMayContainStrings = false
+    return {}
   }
 }
 
@@ -989,26 +982,26 @@ pp.regexp_eatClassEscape = function(state) {
 // https://tc39.es/ecma262/#prod-ClassIntersection
 // https://tc39.es/ecma262/#prod-ClassSubtraction
 pp.regexp_classSetExpression = function(state) {
-  let nextMayContainStrings = false
+  let mayContainStrings = false
+  let result
   if (this.regexp_eatClassSetRange(state)) {
     // Continue with ClassUnion processing.
-  } else if (this.regexp_eatClassSetOperand(state)) {
-    nextMayContainStrings = state.lastMayContainStrings
+  } else if (result = this.regexp_eatClassSetOperand(state)) {
+    mayContainStrings = result.mayContainStrings
     let pos = state.pos
     const start = pos
     // https://tc39.es/ecma262/#prod-ClassIntersection
     while (
       state.eatChars([0x26, 0x26] /* && */) &&
       state.current() !== 0x26 /* & */ &&
-      this.regexp_eatClassSetOperand(state)
+      (result = this.regexp_eatClassSetOperand(state))
     ) {
-      if (!state.lastMayContainStrings) nextMayContainStrings = false
+      if (!result.mayContainStrings) mayContainStrings = false
       pos = state.pos
     }
     state.pos = pos
     if (state.pos !== start) {
-      state.lastMayContainStrings = nextMayContainStrings
-      return
+      return {mayContainStrings}
     }
     // https://tc39.es/ecma262/#prod-ClassSubtraction
     while (
@@ -1019,8 +1012,7 @@ pp.regexp_classSetExpression = function(state) {
     }
     state.pos = pos
     if (state.pos !== start) {
-      state.lastMayContainStrings = nextMayContainStrings
-      return
+      return {mayContainStrings}
     }
   } else {
     state.raise("Invalid character in character class")
@@ -1030,13 +1022,14 @@ pp.regexp_classSetExpression = function(state) {
     if (this.regexp_eatClassSetRange(state)) {
       continue
     }
-    if (this.regexp_eatClassSetOperand(state)) {
-      if (state.lastMayContainStrings) nextMayContainStrings = true
+    const result = this.regexp_eatClassSetOperand(state)
+    if (result) {
+      if (result.mayContainStrings) mayContainStrings = true
       continue
     }
     break
   }
-  state.lastMayContainStrings = nextMayContainStrings
+  return {mayContainStrings}
 }
 
 // https://tc39.es/ecma262/#prod-ClassSetRange
@@ -1059,8 +1052,7 @@ pp.regexp_eatClassSetRange = function(state) {
 // https://tc39.es/ecma262/#prod-ClassSetOperand
 pp.regexp_eatClassSetOperand = function(state) {
   if (this.regexp_eatClassSetCharacter(state)) {
-    state.lastMayContainStrings = false
-    return true
+    return {}
   }
   return (
     this.regexp_eatClassStringDisjunction(state) ||
@@ -1073,22 +1065,23 @@ pp.regexp_eatNestedClass = function(state) {
   const start = state.pos
   if (state.eat(0x5B /* [ */)) {
     const negate = state.eat(0x5E /* ^ */)
-    this.regexp_classContents(state)
+    const result = this.regexp_classContents(state)
     if (state.eat(0x5D /* ] */)) {
-      if (negate && state.lastMayContainStrings) {
+      if (negate && result.mayContainStrings) {
         state.raise("Negated character class may contain strings")
       }
-      return true
+      return result
     }
     state.pos = start
   }
   if (state.eat(0x5C /* \ */)) {
-    if (this.regexp_eatCharacterClassEscape(state)) {
-      return true
+    const result = this.regexp_eatCharacterClassEscape(state)
+    if (result) {
+      return result
     }
     state.pos = start
   }
-  return false
+  return null
 }
 
 // https://tc39.es/ecma262/#prod-ClassStringDisjunction
@@ -1096,9 +1089,9 @@ pp.regexp_eatClassStringDisjunction = function(state) {
   const start = state.pos
   if (state.eatChars([0x5C, 0x71] /* \q */)) {
     if (state.eat(0x7B /* { */)) {
-      this.regexp_classStringDisjunctionContents(state)
+      const result = this.regexp_classStringDisjunctionContents(state)
       if (state.eat(0x7D /* } */)) {
-        return true
+        return result
       }
     } else {
       // Make the same message as V8.
@@ -1106,18 +1099,18 @@ pp.regexp_eatClassStringDisjunction = function(state) {
     }
     state.pos = start
   }
-  return false
+  return null
 }
 
 // https://tc39.es/ecma262/#prod-ClassStringDisjunctionContents
 pp.regexp_classStringDisjunctionContents = function(state) {
-  this.regexp_classString(state)
-  let nextMayContainStrings = state.lastMayContainStrings
+  const result = this.regexp_classString(state)
+  let mayContainStrings = result.mayContainStrings
   while (state.eat(0x7C /* | */)) {
-    this.regexp_classString(state)
-    if (state.lastMayContainStrings) nextMayContainStrings = true
+    const result = this.regexp_classString(state)
+    if (result.mayContainStrings) mayContainStrings = true
   }
-  state.lastMayContainStrings = nextMayContainStrings
+  return {mayContainStrings}
 }
 
 // https://tc39.es/ecma262/#prod-ClassString
@@ -1125,13 +1118,12 @@ pp.regexp_classStringDisjunctionContents = function(state) {
 pp.regexp_classString = function(state) {
   if (!this.regexp_eatClassSetCharacter(state)) {
     // empty
-    state.lastMayContainStrings = true
-    return
+    return {mayContainStrings: true}
   }
-  let nextMayContainStrings = false
+  let mayContainStrings = false
   while (this.regexp_eatClassSetCharacter(state))
-    nextMayContainStrings = true
-  state.lastMayContainStrings = nextMayContainStrings
+    mayContainStrings = true
+  return {mayContainStrings}
 }
 
 // https://tc39.es/ecma262/#prod-ClassSetCharacter
