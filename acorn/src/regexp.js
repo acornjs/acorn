@@ -887,16 +887,6 @@ pp.regexp_eatCharacterClass = function(state) {
       }
       return true
     }
-    if (state.switchV) {
-      const start = state.pos
-      this.regexp_nonEmptyClassRanges(state)
-      const terminated = state.current() === 0x5D /* ] */
-      state.pos = start
-      if (terminated) {
-        // Make the same message as V8.
-        state.raise("Invalid character in character class")
-      }
-    }
 
     // Unreachable since it threw "unterminated regular expression" error before.
     state.raise("Unterminated character class")
@@ -1033,15 +1023,6 @@ pp.regexp_classSetExpression = function(state) {
       return
     }
   } else {
-    const ch = state.current()
-    if (ch === 0x5C /* \ */ && state.lookahead() !== 0x71 /* q */) {
-      // Make the same message as V8.
-      state.raise("Invalid escape")
-    }
-    if (ch === state.lookahead() && isClassSetReservedDoublePunctuatorCharacter(ch)) {
-      // Make the same message as V8.
-      state.raise("Invalid set operation in character class")
-    }
     state.raise("Invalid character in character class")
   }
   // https://tc39.es/ecma262/#prod-ClassUnion
