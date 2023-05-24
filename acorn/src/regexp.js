@@ -749,6 +749,12 @@ pp.regexp_eatDecimalEscape = function(state) {
   return false
 }
 
+// Return values used by character set parsing methods, needed to
+// forbid negation of sets that can match strings.
+const CharSetNone = 0 // Nothing parsed
+const CharSetOk = 1 // Construct parsed, cannot contain strings
+const CharSetString = 2 // Construct parsed, can contain strings
+
 // https://www.ecma-international.org/ecma-262/8.0/#prod-CharacterClassEscape
 pp.regexp_eatCharacterClassEscape = function(state) {
   const ch = state.current()
@@ -756,7 +762,7 @@ pp.regexp_eatCharacterClassEscape = function(state) {
   if (isCharacterClassEscape(ch)) {
     state.lastIntValue = -1
     state.advance()
-    return {}
+    return CharSetOk
   }
 
   let negate = false
@@ -773,16 +779,15 @@ pp.regexp_eatCharacterClassEscape = function(state) {
       (result = this.regexp_eatUnicodePropertyValueExpression(state)) &&
       state.eat(0x7D /* } */)
     ) {
-      if (negate && result.mayContainStrings) {
-        state.raise("Invalid property name")
-      }
+      if (negate && result === CharSetString) state.raise("Invalid property name")
       return result
     }
     state.raise("Invalid property name")
   }
 
-  return null
+  return CharSetNone
 }
+
 function isCharacterClassEscape(ch) {
   return (
     ch === 0x64 /* d */ ||
@@ -806,7 +811,7 @@ pp.regexp_eatUnicodePropertyValueExpression = function(state) {
     if (this.regexp_eatUnicodePropertyValue(state)) {
       const value = state.lastStringValue
       this.regexp_validateUnicodePropertyNameAndValue(state, name, value)
-      return {}
+      return CharSetOk
     }
   }
   state.pos = start
@@ -816,21 +821,19 @@ pp.regexp_eatUnicodePropertyValueExpression = function(state) {
     const nameOrValue = state.lastStringValue
     return this.regexp_validateUnicodePropertyNameOrValue(state, nameOrValue)
   }
-  return null
+  return CharSetNone
 }
+
 pp.regexp_validateUnicodePropertyNameAndValue = function(state, name, value) {
   if (!hasOwn(state.unicodeProperties.nonBinary, name))
     state.raise("Invalid property name")
   if (!state.unicodeProperties.nonBinary[name].test(value))
     state.raise("Invalid property value")
 }
+
 pp.regexp_validateUnicodePropertyNameOrValue = function(state, nameOrValue) {
-  if (state.unicodeProperties.binary.test(nameOrValue)) {
-    return {}
-  }
-  if (state.switchV && state.unicodeProperties.binaryOfStrings.test(nameOrValue)) {
-    return {mayContainStrings: true}
-  }
+  if (state.unicodeProperties.binary.test(nameOrValue)) return CharSetOk
+  if (state.switchV && state.unicodeProperties.binaryOfStrings.test(nameOrValue)) return CharSetString
   state.raise("Invalid property name")
 }
 
@@ -845,6 +848,7 @@ pp.regexp_eatUnicodePropertyName = function(state) {
   }
   return state.lastStringValue !== ""
 }
+
 function isUnicodePropertyNameCharacter(ch) {
   return isControlLetter(ch) || ch === 0x5F /* _ */
 }
@@ -875,32 +879,22 @@ pp.regexp_eatCharacterClass = function(state) {
   if (state.eat(0x5B /* [ */)) {
     const negate = state.eat(0x5E /* ^ */)
     const result = this.regexp_classContents(state)
-    if (state.eat(0x5D /* ] */)) {
-      if (negate && result.mayContainStrings) {
-        state.raise("Negated character class may contain strings")
-      }
-      return result
-    }
-
-    // Unreachable since it threw "unterminated regular expression" error before.
-    state.raise("Unterminated character class")
+    if (!state.eat(0x5D /* ] */))
+      state.raise("Unterminated character class")
+    if (negate && result === CharSetString)
+      state.raise("Negated character class may contain strings")
+    return true
   }
-  return null
+  return false
 }
 
 // https://tc39.es/ecma262/#prod-ClassContents
 // https://www.ecma-international.org/ecma-262/8.0/#prod-ClassRanges
 pp.regexp_classContents = function(state) {
-  if (state.current() === 0x5D /* ] */) {
-    // empty
-    return {}
-  }
-  if (state.switchV) {
-    return this.regexp_classSetExpression(state)
-  } else {
-    this.regexp_nonEmptyClassRanges(state)
-    return {}
-  }
+  if (state.current() === 0x5D /* ] */) return CharSetOk
+  if (state.switchV) return this.regexp_classSetExpression(state)
+  this.regexp_nonEmptyClassRanges(state)
+  return CharSetOk
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-NonemptyClassRanges
@@ -982,53 +976,40 @@ pp.regexp_eatClassEscape = function(state) {
 // https://tc39.es/ecma262/#prod-ClassIntersection
 // https://tc39.es/ecma262/#prod-ClassSubtraction
 pp.regexp_classSetExpression = function(state) {
-  let mayContainStrings = false
-  let result
+  let result = CharSetOk, subResult
   if (this.regexp_eatClassSetRange(state)) {
     // Continue with ClassUnion processing.
-  } else if (result = this.regexp_eatClassSetOperand(state)) {
-    mayContainStrings = result.mayContainStrings
+  } else if (subResult = this.regexp_eatClassSetOperand(state)) {
+    if (subResult === CharSetString) result = CharSetString
     // https://tc39.es/ecma262/#prod-ClassIntersection
     const start = state.pos
     while (state.eatChars([0x26, 0x26] /* && */)) {
       if (
         state.current() !== 0x26 /* & */ &&
-        (result = this.regexp_eatClassSetOperand(state))
+        (subResult = this.regexp_eatClassSetOperand(state))
       ) {
-        if (!result.mayContainStrings) mayContainStrings = false
+        if (subResult !== CharSetString) result = CharSetOk
         continue
       }
       state.raise("Invalid character in character class")
     }
-    if (start !== state.pos) {
-      return {mayContainStrings}
-    }
+    if (start !== state.pos) return result
     // https://tc39.es/ecma262/#prod-ClassSubtraction
     while (state.eatChars([0x2D, 0x2D] /* -- */)) {
-      if (this.regexp_eatClassSetOperand(state)) {
-        continue
-      }
+      if (this.regexp_eatClassSetOperand(state)) continue
       state.raise("Invalid character in character class")
     }
-    if (start !== state.pos) {
-      return {mayContainStrings}
-    }
+    if (start !== state.pos) return result
   } else {
     state.raise("Invalid character in character class")
   }
   // https://tc39.es/ecma262/#prod-ClassUnion
   for (;;) {
-    if (this.regexp_eatClassSetRange(state)) {
-      continue
-    }
-    const result = this.regexp_eatClassSetOperand(state)
-    if (result) {
-      if (result.mayContainStrings) mayContainStrings = true
-      continue
-    }
-    break
+    if (this.regexp_eatClassSetRange(state)) continue
+    subResult = this.regexp_eatClassSetOperand(state)
+    if (!subResult) return result
+    if (subResult === CharSetString) result = CharSetString
   }
-  return {mayContainStrings}
 }
 
 // https://tc39.es/ecma262/#prod-ClassSetRange
@@ -1050,13 +1031,8 @@ pp.regexp_eatClassSetRange = function(state) {
 
 // https://tc39.es/ecma262/#prod-ClassSetOperand
 pp.regexp_eatClassSetOperand = function(state) {
-  if (this.regexp_eatClassSetCharacter(state)) {
-    return {}
-  }
-  return (
-    this.regexp_eatClassStringDisjunction(state) ||
-    this.regexp_eatNestedClass(state)
-  )
+  if (this.regexp_eatClassSetCharacter(state)) return CharSetOk
+  return this.regexp_eatClassStringDisjunction(state) || this.regexp_eatNestedClass(state)
 }
 
 // https://tc39.es/ecma262/#prod-NestedClass
@@ -1066,7 +1042,7 @@ pp.regexp_eatNestedClass = function(state) {
     const negate = state.eat(0x5E /* ^ */)
     const result = this.regexp_classContents(state)
     if (state.eat(0x5D /* ] */)) {
-      if (negate && result.mayContainStrings) {
+      if (negate && result === CharSetString) {
         state.raise("Negated character class may contain strings")
       }
       return result
@@ -1103,26 +1079,19 @@ pp.regexp_eatClassStringDisjunction = function(state) {
 
 // https://tc39.es/ecma262/#prod-ClassStringDisjunctionContents
 pp.regexp_classStringDisjunctionContents = function(state) {
-  const result = this.regexp_classString(state)
-  let mayContainStrings = result.mayContainStrings
+  let result = this.regexp_classString(state)
   while (state.eat(0x7C /* | */)) {
-    const result = this.regexp_classString(state)
-    if (result.mayContainStrings) mayContainStrings = true
+    if (this.regexp_classString(state) === CharSetString) result = CharSetString
   }
-  return {mayContainStrings}
+  return result
 }
 
 // https://tc39.es/ecma262/#prod-ClassString
 // https://tc39.es/ecma262/#prod-NonEmptyClassString
 pp.regexp_classString = function(state) {
-  if (!this.regexp_eatClassSetCharacter(state)) {
-    // empty
-    return {mayContainStrings: true}
-  }
-  let mayContainStrings = false
-  while (this.regexp_eatClassSetCharacter(state))
-    mayContainStrings = true
-  return {mayContainStrings}
+  let count = 0
+  while (this.regexp_eatClassSetCharacter(state)) count++
+  return count === 1 ? CharSetOk : CharSetString
 }
 
 // https://tc39.es/ecma262/#prod-ClassSetCharacter
@@ -1143,12 +1112,8 @@ pp.regexp_eatClassSetCharacter = function(state) {
     return false
   }
   const ch = state.current()
-  if (ch === state.lookahead() && isClassSetReservedDoublePunctuatorCharacter(ch)) {
-    return false
-  }
-  if (isClassSetSyntaxCharacter(ch)) {
-    return false
-  }
+  if (ch === state.lookahead() && isClassSetReservedDoublePunctuatorCharacter(ch)) return false
+  if (isClassSetSyntaxCharacter(ch)) return false
   state.advance()
   state.lastIntValue = ch
   return true
