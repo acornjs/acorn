@@ -1112,7 +1112,7 @@ pp.regexp_eatClassSetCharacter = function(state) {
     return false
   }
   const ch = state.current()
-  if (ch === state.lookahead() && isClassSetReservedDoublePunctuatorCharacter(ch)) return false
+  if (ch < 0 || ch === state.lookahead() && isClassSetReservedDoublePunctuatorCharacter(ch)) return false
   if (isClassSetSyntaxCharacter(ch)) return false
   state.advance()
   state.lastIntValue = ch
