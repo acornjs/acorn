@@ -790,7 +790,7 @@ pp.enterClassBody = function() {
 
 pp.exitClassBody = function() {
   const {declared, used} = this.privateNameStack.pop()
-  if (!this.options.checkPrivateProperties) return
+  if (!this.options.checkPrivateFields) return
   const len = this.privateNameStack.length
   const parent = len === 0 ? null : this.privateNameStack[len - 1]
   for (let i = 0; i < used.length; ++i) {

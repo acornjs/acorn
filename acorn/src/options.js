@@ -51,7 +51,7 @@ export const defaultOptions = {
   // By default, the parser will verify that private properties are
   // only used in places where they are valid and have been declared.
   // Set this to false to turn such checks off.
-  checkPrivateProperties: true,
+  checkPrivateFields: true,
   // When `locations` is on, `loc` properties holding objects with
   // `start` and `end` properties in `{line, column}` form (with
   // line being 1-based and column 0-based) will be attached to the

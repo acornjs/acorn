@@ -109,7 +109,7 @@ required):
   characters `#!` (as in a shellscript), the first line will be
   treated as a comment. Defaults to true when `ecmaVersion` >= 2023.
 
-- **checkPrivateProperties**: By default, the parser will verify that
+- **checkPrivateFields**: By default, the parser will verify that
   private properties are only used in places where they are valid and
   have been declared. Set this to false to turn such checks off.
 
