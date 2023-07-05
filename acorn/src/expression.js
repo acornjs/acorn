@@ -250,7 +250,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec, forInit)
     else sawUnary = true
     expr = this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression")
   } else if (!sawUnary && this.type === tt.privateId) {
-    if (forInit || this.privateNameStack.length === 0) this.unexpected()
+    if ((forInit || this.privateNameStack.length === 0) && this.options.checkPrivateProperties) this.unexpected()
     expr = this.parsePrivateIdent()
     // only could be private fields in 'in', such as #x in obj
     if (this.type !== tt._in) this.unexpected()
@@ -1076,10 +1076,12 @@ pp.parsePrivateIdent = function() {
   this.finishNode(node, "PrivateIdentifier")
 
   // For validating existence
-  if (this.privateNameStack.length === 0) {
-    this.raise(node.start, `Private field '#${node.name}' must be declared in an enclosing class`)
-  } else {
-    this.privateNameStack[this.privateNameStack.length - 1].used.push(node)
+  if (this.options.checkPrivateProperties) {
+    if (this.privateNameStack.length === 0) {
+      this.raise(node.start, `Private field '#${node.name}' must be declared in an enclosing class`)
+    } else {
+      this.privateNameStack[this.privateNameStack.length - 1].used.push(node)
+    }
   }
 
   return node
