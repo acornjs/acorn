@@ -949,8 +949,6 @@ pp.checkPatternExport = function(exports, pat) {
     this.checkPatternExport(exports, pat.left)
   else if (type === "RestElement")
     this.checkPatternExport(exports, pat.argument)
-  else if (type === "ParenthesizedExpression")
-    this.checkPatternExport(exports, pat.expression)
 }
 
 pp.checkVariableExport = function(exports, decls) {
