@@ -1059,6 +1059,7 @@ pp.parseIdentNode = function() {
       (this.lastTokEnd !== this.lastTokStart + 1 || this.input.charCodeAt(this.lastTokStart) !== 46)) {
       this.context.pop()
     }
+    this.type = tt.name
   } else {
     this.unexpected()
   }

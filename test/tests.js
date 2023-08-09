@@ -29929,3 +29929,40 @@ test(`typeof async function f(){}
 
 testFail(`typeof async function f(){}
 /foo/`, "Unexpected token (2:5)", { ecmaVersion: 8, locations: true })
+
+test("foo.if() / 2", {
+  type: "Program",
+  body: [
+    {
+      type: "ExpressionStatement",
+      expression: {
+        type: "BinaryExpression",
+        left: {
+          type: "CallExpression",
+          callee: {
+            type: "MemberExpression",
+            object: {
+              type: "Identifier",
+              name: "foo"
+            },
+            property: {
+              type: "Identifier",
+              name: "if"
+            },
+            computed: false
+          },
+          arguments: []
+        },
+        operator: "/",
+        right: {
+          type: "Literal",
+          value: 2,
+          raw: "2"
+        }
+      }
+    }
+  ],
+  sourceType: "script"
+}, {
+  ecmaVersion: 5
+})

@@ -519,6 +519,7 @@ lp.parsePropertyAccessor = function() {
 lp.parseIdent = function() {
   let name = this.tok.type === tt.name ? this.tok.value : this.tok.type.keyword
   if (!name) return this.dummyIdent()
+  if (this.tok.type.keyword) this.toks.type = tt.name
   let node = this.startNode()
   this.next()
   node.name = name
