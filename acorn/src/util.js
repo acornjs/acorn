@@ -8,8 +8,10 @@ export const isArray = Array.isArray || ((obj) => (
   toString.call(obj) === "[object Array]"
 ))
 
+const regexpCache = Object.create(null)
+
 export function wordsRegexp(words) {
-  return new RegExp("^(?:" + words.replace(/ /g, "|") + ")$")
+  return regexpCache[words] || (regexpCache[words] = new RegExp("^(?:" + words.replace(/ /g, "|") + ")$"))
 }
 
 export function codePointToString(code) {
