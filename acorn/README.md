@@ -204,6 +204,13 @@ option is enabled). When the token's type is `tokTypes.eof`, you
 should stop calling the method, since it will keep returning that same
 token forever.
 
+Note that tokenizing JavaScript without parsing it is, in modern
+versions of the language, not really possible due to the way syntax is
+overloaded in ways that can only be disambiguated by the parse
+context. This package applies a bunch of heuristics to try and do a
+reasonable job, but you are advised to use `parse` with the `onToken`
+option instead of this.
+
 In ES6 environment, returned result can be used as any other
 protocol-compliant iterable:
 
