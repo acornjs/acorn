@@ -16,11 +16,11 @@ export const defaultOptions = {
   // Can be either `"script"` or `"module"`. This influences global
   // strict mode and parsing of `import` and `export` declarations.
   sourceType: "script",
-  // `onInsertedSemicolon` can be a callback that will be called
-  // when a semicolon is automatically inserted. It will be passed
-  // the position of the comma as an offset, and if `locations` is
-  // enabled, it is given the location as a `{line, column}` object
-  // as second argument.
+  // `onInsertedSemicolon` can be a callback that will be called when
+  // a semicolon is automatically inserted. It will be passed the
+  // position of the inserted semicolon as an offset, and if
+  // `locations` is enabled, it is given the location as a `{line,
+  // column}` object as second argument.
   onInsertedSemicolon: null,
   // `onTrailingComma` is similar to `onInsertedSemicolon`, but for
   // trailing commas.
