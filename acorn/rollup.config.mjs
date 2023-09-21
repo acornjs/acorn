@@ -2,7 +2,7 @@ import buble from "@rollup/plugin-buble"
 import {promises as fs} from "node:fs"
 
 const copy = (from, to) => ({
-  async buildEnd() { await fs.writeFile(to, await fs.readFile(from)) }
+  async writeBundle() { await fs.writeFile(to, await fs.readFile(from)) }
 })
 
 export default [
