@@ -1,13 +1,8 @@
 .DS_Store
-**/node_modules
-!/acorn-loose/node_modules
-/.tern-port
+.tern-port
+/node_modules
 /local
 /acorn/dist
 /acorn-loose/dist
 /acorn-walk/dist
 /yarn.lock
-!/acorn/dist/acorn.d.ts
-!/acorn/dist/acorn.d.mts
-!/acorn-walk/dist/walk.d.ts
-!/acorn-walk/dist/walk.d.mts
