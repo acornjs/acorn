@@ -1,3 +1,9 @@
+## 8.11.1 (2023-10-26)
+
+### Bug fixes
+
+Fix a regression where `onToken` would receive 'name' tokens for 'new' keyword tokens.
+
 ## 8.11.0 (2023-10-26)
 
 ### Bug fixes
