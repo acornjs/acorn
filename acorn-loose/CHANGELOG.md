@@ -1,3 +1,15 @@
+## 8.4.0 (2023-10-26)
+
+### Bug fixes
+
+Fix an issue where a slash after a call to a propery named the same as some keywords would be tokenized as a regular expression.
+
+Fix a bug where the parser would raise an error when an invalid escape was included in an identifier after a keyword.
+
+### New features
+
+Use a set of new, much more precise, TypeScript types.
+
 ## 8.3.0 (2021-12-27)
 
 ### New features
