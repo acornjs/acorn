@@ -672,9 +672,12 @@ const empty = []
 pp.parseNew = function() {
   if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword new")
   let node = this.startNode()
-  let meta = this.parseIdent(true)
-  if (this.options.ecmaVersion >= 6 && this.eat(tt.dot)) {
-    node.meta = meta
+  this.next()
+  if (this.options.ecmaVersion >= 6 && this.type === tt.dot) {
+    let meta = this.startNodeAt(node.start, node.startLoc)
+    meta.name = "new"
+    node.meta = this.finishNode(meta, "Identifier")
+    this.next()
     let containsEsc = this.containsEsc
     node.property = this.parseIdent(true)
     if (node.property.name !== "target")
