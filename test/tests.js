@@ -29966,3 +29966,5 @@ test("foo.if() / 2", {
 }, {
   ecmaVersion: 5
 })
+
+test("({a: /=/})", {}, {ecmaVersion: 5})

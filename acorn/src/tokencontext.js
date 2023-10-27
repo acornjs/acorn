@@ -133,10 +133,8 @@ tt._function.updateContext = tt._class.updateContext = function(prevType) {
 }
 
 tt.colon.updateContext = function() {
-  if (this.curContext().token === "function") {
-    this.context.pop()
-    this.exprAllowed = true
-  }
+  if (this.curContext().token === "function") this.context.pop()
+  this.exprAllowed = true
 }
 
 tt.backQuote.updateContext = function() {
