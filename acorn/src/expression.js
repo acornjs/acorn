@@ -519,12 +519,14 @@ pp.parseExprImport = function(forNew) {
   // Consume `import` as an identifier for `import.meta`.
   // Because `this.parseIdent(true)` doesn't check escape sequences, it needs the check of `this.containsEsc`.
   if (this.containsEsc) this.raiseRecoverable(this.start, "Escape sequence in keyword import")
-  const meta = this.parseIdent(true)
+  this.next()
 
   if (this.type === tt.parenL && !forNew) {
     return this.parseDynamicImport(node)
   } else if (this.type === tt.dot) {
-    node.meta = meta
+    let meta = this.startNodeAt(node.start, node.loc)
+    meta.name = "import"
+    node.meta = this.finishNode(meta, "Identifier")
     return this.parseImportMeta(node)
   } else {
     this.unexpected()
