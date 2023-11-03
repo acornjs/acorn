@@ -5,7 +5,7 @@
 // parse anything as JavaScript, repairing syntax error the best it
 // can. There are circumstances in which it will raise an error and
 // give up, but they are very rare. The resulting AST will be a mostly
-// valid JavaScript AST (as per the [Mozilla parser API][api], except
+// valid JavaScript AST (as per the [ESTree spec][estree], except
 // that:
 //
 // - Return outside functions is allowed
@@ -16,7 +16,7 @@
 // - Bogus Identifier nodes with a name of `"✖"` are inserted whenever
 //   the parser got too confused to return anything meaningful.
 //
-// [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
+// [estree]: https://github.com/estree/estree
 //
 // The expected use for this is to *first* try `acorn.parse`, and only
 // if that fails switch to the loose parser. The loose parser might

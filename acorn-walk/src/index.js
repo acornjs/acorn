@@ -1,4 +1,4 @@
-// AST walker module for Mozilla Parser API compatible trees
+// AST walker module for ESTree compatible trees
 
 // A simple walk is one where you simply specify callbacks to be
 // called on specific nodes. The last two arguments are optional. A
@@ -8,7 +8,7 @@
 //         Expression: function(node) { ... }
 //     });
 //
-// to do something with all expressions. All Parser API node types
+// to do something with all expressions. All ESTree node types
 // can be used to identify node types, as well as Expression and
 // Statement, which denote categories of nodes.
 //
