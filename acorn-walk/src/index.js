@@ -174,9 +174,8 @@ export function findNodeBefore(node, pos, test, baseVisitor, state) {
 // Used to create a custom walker. Will fill in all missing node
 // type properties with the defaults.
 export function make(funcs, baseVisitor) {
-  let visitor = Object.create(baseVisitor || base)
-  for (let type in funcs) visitor[type] = funcs[type]
-  return visitor
+  let visitor = baseVisitor? Object.create(baseVisitor) : new Base();
+  return Object.assign(visitor, funcs)
 }
 
 function skipThrough(node, st, c) { c(node, st) }
@@ -184,28 +183,35 @@ function ignore(_node, _st, _c) {}
 
 // Node walkers.
 
-export const base = {}
+/**
+ * can be used to create custom baseVisitor
+ * ```js
+ * const visitor = new Base();
+ * visitor.BlockStatement = (...args) => {}
+ * ```
+ */
+export class Base {}
 
-base.Program = base.BlockStatement = base.StaticBlock = (node, st, c) => {
+Base.prototype.Program = Base.prototype.BlockStatement = Base.prototype.StaticBlock = function (node, st, c) {
   for (let stmt of node.body)
     c(stmt, st, "Statement")
 }
-base.Statement = skipThrough
-base.EmptyStatement = ignore
-base.ExpressionStatement = base.ParenthesizedExpression = base.ChainExpression =
-  (node, st, c) => c(node.expression, st, "Expression")
-base.IfStatement = (node, st, c) => {
+Base.prototype.Statement = skipThrough
+Base.prototype.EmptyStatement = ignore
+Base.prototype.ExpressionStatement = Base.prototype.ParenthesizedExpression = Base.prototype.ChainExpression =
+  function (node, st, c) { c(node.expression, st, "Expression") };
+Base.prototype.IfStatement = function (node, st, c) {
   c(node.test, st, "Expression")
   c(node.consequent, st, "Statement")
   if (node.alternate) c(node.alternate, st, "Statement")
 }
-base.LabeledStatement = (node, st, c) => c(node.body, st, "Statement")
-base.BreakStatement = base.ContinueStatement = ignore
-base.WithStatement = (node, st, c) => {
+Base.prototype.LabeledStatement = function (node, st, c) { c(node.body, st, "Statement") }
+Base.prototype.BreakStatement = Base.prototype.ContinueStatement = ignore
+Base.prototype.WithStatement = function (node, st, c) {
   c(node.object, st, "Expression")
   c(node.body, st, "Statement")
 }
-base.SwitchStatement = (node, st, c) => {
+Base.prototype.SwitchStatement = function (node, st, c) {
   c(node.discriminant, st, "Expression")
   for (let cs of node.cases) {
     if (cs.test) c(cs.test, st, "Expression")
@@ -213,64 +219,64 @@ base.SwitchStatement = (node, st, c) => {
       c(cons, st, "Statement")
   }
 }
-base.SwitchCase = (node, st, c) => {
+Base.prototype.SwitchCase = function (node, st, c) {
   if (node.test) c(node.test, st, "Expression")
   for (let cons of node.consequent)
     c(cons, st, "Statement")
 }
-base.ReturnStatement = base.YieldExpression = base.AwaitExpression = (node, st, c) => {
+Base.prototype.ReturnStatement = Base.prototype.YieldExpression = Base.prototype.AwaitExpression = function (node, st, c) {
   if (node.argument) c(node.argument, st, "Expression")
 }
-base.ThrowStatement = base.SpreadElement =
-  (node, st, c) => c(node.argument, st, "Expression")
-base.TryStatement = (node, st, c) => {
+Base.prototype.ThrowStatement = Base.prototype.SpreadElement =
+function (node, st, c) { c(node.argument, st, "Expression") }
+Base.prototype.TryStatement = function (node, st, c) {
   c(node.block, st, "Statement")
   if (node.handler) c(node.handler, st)
   if (node.finalizer) c(node.finalizer, st, "Statement")
 }
-base.CatchClause = (node, st, c) => {
+Base.prototype.CatchClause = function (node, st, c) {
   if (node.param) c(node.param, st, "Pattern")
   c(node.body, st, "Statement")
 }
-base.WhileStatement = base.DoWhileStatement = (node, st, c) => {
+Base.prototype.WhileStatement = Base.prototype.DoWhileStatement = function (node, st, c) {
   c(node.test, st, "Expression")
   c(node.body, st, "Statement")
 }
-base.ForStatement = (node, st, c) => {
+Base.prototype.ForStatement = function (node, st, c) {
   if (node.init) c(node.init, st, "ForInit")
   if (node.test) c(node.test, st, "Expression")
   if (node.update) c(node.update, st, "Expression")
   c(node.body, st, "Statement")
 }
-base.ForInStatement = base.ForOfStatement = (node, st, c) => {
+Base.prototype.ForInStatement = Base.prototype.ForOfStatement = function (node, st, c) {
   c(node.left, st, "ForInit")
   c(node.right, st, "Expression")
   c(node.body, st, "Statement")
 }
-base.ForInit = (node, st, c) => {
+Base.prototype.ForInit = function (node, st, c) {
   if (node.type === "VariableDeclaration") c(node, st)
   else c(node, st, "Expression")
 }
-base.DebuggerStatement = ignore
+Base.prototype.DebuggerStatement = ignore
 
-base.FunctionDeclaration = (node, st, c) => c(node, st, "Function")
-base.VariableDeclaration = (node, st, c) => {
+Base.prototype.FunctionDeclaration = function (node, st, c) { c(node, st, "Function") }
+Base.prototype.VariableDeclaration = function (node, st, c) {
   for (let decl of node.declarations)
     c(decl, st)
 }
-base.VariableDeclarator = (node, st, c) => {
+Base.prototype.VariableDeclarator = function (node, st, c) {
   c(node.id, st, "Pattern")
   if (node.init) c(node.init, st, "Expression")
 }
 
-base.Function = (node, st, c) => {
+Base.prototype.Function = function (node, st, c) {
   if (node.id) c(node.id, st, "Pattern")
   for (let param of node.params)
     c(param, st, "Pattern")
   c(node.body, st, node.expression ? "Expression" : "Statement")
 }
 
-base.Pattern = (node, st, c) => {
+Base.prototype.Pattern = function (node, st, c) {
   if (node.type === "Identifier")
     c(node, st, "VariablePattern")
   else if (node.type === "MemberExpression")
@@ -278,15 +284,15 @@ base.Pattern = (node, st, c) => {
   else
     c(node, st)
 }
-base.VariablePattern = ignore
-base.MemberPattern = skipThrough
-base.RestElement = (node, st, c) => c(node.argument, st, "Pattern")
-base.ArrayPattern = (node, st, c) => {
+Base.prototype.VariablePattern = ignore
+Base.prototype.MemberPattern = skipThrough
+Base.prototype.RestElement = function (node, st, c) { c(node.argument, st, "Pattern") }
+Base.prototype.ArrayPattern = function (node, st, c) {
   for (let elt of node.elements) {
     if (elt) c(elt, st, "Pattern")
   }
 }
-base.ObjectPattern = (node, st, c) => {
+Base.prototype.ObjectPattern = function (node, st, c) {
   for (let prop of node.properties) {
     if (prop.type === "Property") {
       if (prop.computed) c(prop.key, st, "Expression")
@@ -297,91 +303,93 @@ base.ObjectPattern = (node, st, c) => {
   }
 }
 
-base.Expression = skipThrough
-base.ThisExpression = base.Super = base.MetaProperty = ignore
-base.ArrayExpression = (node, st, c) => {
+Base.prototype.Expression = skipThrough
+Base.prototype.ThisExpression = Base.prototype.Super = Base.prototype.MetaProperty = ignore
+Base.prototype.ArrayExpression = function (node, st, c) {
   for (let elt of node.elements) {
     if (elt) c(elt, st, "Expression")
   }
 }
-base.ObjectExpression = (node, st, c) => {
+Base.prototype.ObjectExpression = function (node, st, c) {
   for (let prop of node.properties)
     c(prop, st)
 }
-base.FunctionExpression = base.ArrowFunctionExpression = base.FunctionDeclaration
-base.SequenceExpression = (node, st, c) => {
+Base.prototype.FunctionExpression = Base.prototype.ArrowFunctionExpression = Base.prototype.FunctionDeclaration
+Base.prototype.SequenceExpression = function (node, st, c) {
   for (let expr of node.expressions)
     c(expr, st, "Expression")
 }
-base.TemplateLiteral = (node, st, c) => {
+Base.prototype.TemplateLiteral = function (node, st, c) {
   for (let quasi of node.quasis)
     c(quasi, st)
 
   for (let expr of node.expressions)
     c(expr, st, "Expression")
 }
-base.TemplateElement = ignore
-base.UnaryExpression = base.UpdateExpression = (node, st, c) => {
+Base.prototype.TemplateElement = ignore
+Base.prototype.UnaryExpression = Base.prototype.UpdateExpression = function (node, st, c) {
   c(node.argument, st, "Expression")
 }
-base.BinaryExpression = base.LogicalExpression = (node, st, c) => {
+Base.prototype.BinaryExpression = Base.prototype.LogicalExpression = function (node, st, c) {
   c(node.left, st, "Expression")
   c(node.right, st, "Expression")
 }
-base.AssignmentExpression = base.AssignmentPattern = (node, st, c) => {
+Base.prototype.AssignmentExpression = Base.prototype.AssignmentPattern = function (node, st, c) {
   c(node.left, st, "Pattern")
   c(node.right, st, "Expression")
 }
-base.ConditionalExpression = (node, st, c) => {
+Base.prototype.ConditionalExpression = function (node, st, c) {
   c(node.test, st, "Expression")
   c(node.consequent, st, "Expression")
   c(node.alternate, st, "Expression")
 }
-base.NewExpression = base.CallExpression = (node, st, c) => {
+Base.prototype.NewExpression = Base.prototype.CallExpression = function (node, st, c) {
   c(node.callee, st, "Expression")
   if (node.arguments)
     for (let arg of node.arguments)
       c(arg, st, "Expression")
 }
-base.MemberExpression = (node, st, c) => {
+Base.prototype.MemberExpression = function (node, st, c) {
   c(node.object, st, "Expression")
   if (node.computed) c(node.property, st, "Expression")
 }
-base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
+Base.prototype.ExportNamedDeclaration = Base.prototype.ExportDefaultDeclaration = function (node, st, c) {
   if (node.declaration)
     c(node.declaration, st, node.type === "ExportNamedDeclaration" || node.declaration.id ? "Statement" : "Expression")
   if (node.source) c(node.source, st, "Expression")
 }
-base.ExportAllDeclaration = (node, st, c) => {
+Base.prototype.ExportAllDeclaration = function (node, st, c) {
   if (node.exported)
     c(node.exported, st)
   c(node.source, st, "Expression")
 }
-base.ImportDeclaration = (node, st, c) => {
+Base.prototype.ImportDeclaration = function (node, st, c) {
   for (let spec of node.specifiers)
     c(spec, st)
   c(node.source, st, "Expression")
 }
-base.ImportExpression = (node, st, c) => {
+Base.prototype.ImportExpression = function (node, st, c) {
   c(node.source, st, "Expression")
 }
-base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.PrivateIdentifier = base.Literal = ignore
+Base.prototype.ImportSpecifier = Base.prototype.ImportDefaultSpecifier = Base.prototype.ImportNamespaceSpecifier = Base.prototype.Identifier = Base.prototype.PrivateIdentifier = Base.prototype.Literal = ignore
 
-base.TaggedTemplateExpression = (node, st, c) => {
+Base.prototype.TaggedTemplateExpression = function (node, st, c) {
   c(node.tag, st, "Expression")
   c(node.quasi, st, "Expression")
 }
-base.ClassDeclaration = base.ClassExpression = (node, st, c) => c(node, st, "Class")
-base.Class = (node, st, c) => {
+Base.prototype.ClassDeclaration = Base.prototype.ClassExpression = function (node, st, c) { c(node, st, "Class") }
+Base.prototype.Class = function (node, st, c) {
   if (node.id) c(node.id, st, "Pattern")
   if (node.superClass) c(node.superClass, st, "Expression")
   c(node.body, st)
 }
-base.ClassBody = (node, st, c) => {
+Base.prototype.ClassBody = function (node, st, c) {
   for (let elt of node.body)
     c(elt, st)
 }
-base.MethodDefinition = base.PropertyDefinition = base.Property = (node, st, c) => {
+Base.prototype.MethodDefinition = Base.prototype.PropertyDefinition = Base.prototype.Property = function (node, st, c) {
   if (node.computed) c(node.key, st, "Expression")
   if (node.value) c(node.value, st, "Expression")
 }
+
+export const base = new Base();
