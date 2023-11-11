@@ -19,9 +19,9 @@
 export function simple(node, visitors, baseVisitor, state, override) {
   if (!baseVisitor) baseVisitor = base
   ;(function c(node, st, override) {
-    let type = override || node.type, found = visitors[type]
+    let type = override || node.type
     baseVisitor[type](node, st, c)
-    if (found) found(node, st)
+    if (visitors[type]) visitors[type](node, st)
   })(node, state, override)
 }
 
@@ -32,11 +32,11 @@ export function ancestor(node, visitors, baseVisitor, state, override) {
   let ancestors = []
   if (!baseVisitor) baseVisitor = base
   ;(function c(node, st, override) {
-    let type = override || node.type, found = visitors[type]
+    let type = override || node.type
     let isNew = node !== ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
     baseVisitor[type](node, st, c)
-    if (found) found(node, st || ancestors, ancestors)
+    if (visitors[type]) visitors[type](node, st || ancestors, ancestors)
     if (isNew) ancestors.pop()
   })(node, state, override)
 }
