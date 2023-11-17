@@ -38,7 +38,7 @@
     "eslint": "^8.49.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-n": "^16.3.1",
     "eslint-plugin-promise": "^6.1.1",
     "rollup": "^3.29.2",
     "test262": "git+https://github.com/tc39/test262.git#59bad89898333fdadf4af25519e7bdb43ec295ac",
