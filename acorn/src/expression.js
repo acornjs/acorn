@@ -524,7 +524,7 @@ pp.parseExprImport = function(forNew) {
   if (this.type === tt.parenL && !forNew) {
     return this.parseDynamicImport(node)
   } else if (this.type === tt.dot) {
-    let meta = this.startNodeAt(node.start, node.loc)
+    let meta = this.startNodeAt(node.start, node.loc && node.loc.start)
     meta.name = "import"
     node.meta = this.finishNode(meta, "Identifier")
     return this.parseImportMeta(node)
@@ -676,7 +676,7 @@ pp.parseNew = function() {
   let node = this.startNode()
   this.next()
   if (this.options.ecmaVersion >= 6 && this.type === tt.dot) {
-    let meta = this.startNodeAt(node.start, node.startLoc)
+    let meta = this.startNodeAt(node.start, node.loc && node.loc.start)
     meta.name = "new"
     node.meta = this.finishNode(meta, "Identifier")
     this.next()
