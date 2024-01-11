@@ -165,8 +165,13 @@ export function findNodeAround<TState>(
 ): Found<TState> | undefined
 
 /**
- * similar to {@link findNodeAround}, but will match all nodes after the given position (testing outer nodes before inner nodes).
+ * Find the outermost matching node after a given position.
  */
 export const findNodeAfter: typeof findNodeAround
+
+/**
+ * Find the outermost matching node before a given position.
+ */
+export const findNodeBefore: typeof findNodeAround
 
 export const base: RecursiveVisitors<any>
