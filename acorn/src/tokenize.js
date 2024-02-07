@@ -671,20 +671,18 @@ pp.readInvalidTemplateToken = function() {
       break
 
     case "$":
-      if (this.input[this.pos + 1] !== "{") {
-        break
-      }
-
-    // falls through
+      if (this.input[this.pos + 1] !== "{") break
+      // fall through
     case "`":
       return this.finishToken(tt.invalidTemplate, this.input.slice(this.start, this.pos))
 
-    case "\r": case "\n": case "\u2028": case "\u2029":
+    case "\r":
+      if (this.input[this.pos] + 1 === "\n") ++this.pos
+      // fall through
+    case "\n": case "\u2028": case "\u2029":
       ++this.curLine
       this.lineStart = this.pos + 1
       break
-
-    // no default
     }
   }
   this.raise(this.start, "Unterminated template")
