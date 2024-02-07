@@ -679,6 +679,11 @@ pp.readInvalidTemplateToken = function() {
     case "`":
       return this.finishToken(tt.invalidTemplate, this.input.slice(this.start, this.pos))
 
+    case "\r": case "\n": case "\u2028": case "\u2029":
+      ++this.curLine
+      this.lineStart = this.pos + 1
+      break
+
     // no default
     }
   }

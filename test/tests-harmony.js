@@ -1093,6 +1093,100 @@ test("`outer${{x: {y: 10}}}bar${`nested${function(){return 1;}}endnest`}end`",{
   ecmaVersion: 6
 });
 
+test("foo`\n\\x\n$\n`;", {
+  type: "Program",
+  loc: {
+    start: {
+      line: 1,
+      column: 0
+    },
+    end: {
+      line: 4,
+      column: 2
+    }
+  },
+  body: [
+    {
+      type: "ExpressionStatement",
+      loc: {
+        start: {
+          line: 1,
+          column: 0
+        },
+        end: {
+          line: 4,
+          column: 2
+        }
+      },
+      expression: {
+        type: "TaggedTemplateExpression",
+        loc: {
+          start: {
+            line: 1,
+            column: 0
+          },
+          end: {
+            line: 4,
+            column: 1
+          }
+        },
+        tag: {
+          type: "Identifier",
+          loc: {
+            start: {
+              line: 1,
+              column: 0
+            },
+            end: {
+              line: 1,
+              column: 3
+            }
+          },
+          name: "foo"
+        },
+        quasi: {
+          type: "TemplateLiteral",
+          loc: {
+            start: {
+              line: 1,
+              column: 3
+            },
+            end: {
+              line: 4,
+              column: 1
+            }
+          },
+          expressions: [],
+          quasis: [
+            {
+              type: "TemplateElement",
+              loc: {
+                start: {
+                  line: 1,
+                  column: 4
+                },
+                end: {
+                  line: 4,
+                  column: 0
+                }
+              },
+              value: {
+                raw: "\n\\x\n$\n",
+                cooked: null
+              },
+              tail: true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  sourceType: "script"
+}, {
+  ecmaVersion: 10,
+  locations: true
+});
+
 
 // ES6: Switch Case Declaration
 
