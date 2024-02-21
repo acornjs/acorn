@@ -745,6 +745,7 @@ pp.readEscapedChar = function(inTemplate) {
     if (isNewLine(ch)) {
       // Unicode new line characters after \ get removed from output in both
       // template literals and strings
+      if (this.options.locations) { this.lineStart = this.pos; ++this.curLine }
       return ""
     }
     return String.fromCharCode(ch)
