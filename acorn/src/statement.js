@@ -42,7 +42,7 @@ pp.isLet = function(context) {
   // Statement) is allowed here. If context is not empty then only a Statement
   // is allowed. However, `let [` is an explicit negative lookahead for
   // ExpressionStatement, so special-case it first.
-  if (nextCh === 91 || nextCh === 92) return true // '[', '/'
+  if (nextCh === 91 || nextCh === 92) return true // '[', '\'
   if (context) return false
 
   if (nextCh === 123 || nextCh > 0xd7ff && nextCh < 0xdc00) return true // '{', astral
