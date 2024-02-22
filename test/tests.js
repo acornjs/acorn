@@ -6928,8 +6928,8 @@ test("\"Hello\\\u2028world\"", {
             column: 0
           },
           end: {
-            line: 1,
-            column: 14
+            line: 2,
+            column: 6
           }
         }
       },
@@ -6939,8 +6939,8 @@ test("\"Hello\\\u2028world\"", {
           column: 0
         },
         end: {
-          line: 1,
-          column: 14
+          line: 2,
+          column: 6
         }
       }
     }
@@ -6951,8 +6951,8 @@ test("\"Hello\\\u2028world\"", {
       column: 0
     },
     end: {
-      line: 1,
-      column: 14
+      line: 2,
+      column: 6
     }
   }
 });
@@ -6972,8 +6972,8 @@ test("\"Hello\\\u2029world\"", {
             column: 0
           },
           end: {
-            line: 1,
-            column: 14
+            line: 2,
+            column: 6
           }
         }
       },
@@ -6983,8 +6983,8 @@ test("\"Hello\\\u2029world\"", {
           column: 0
         },
         end: {
-          line: 1,
-          column: 14
+          line: 2,
+          column: 6
         }
       }
     }
@@ -6995,8 +6995,8 @@ test("\"Hello\\\u2029world\"", {
       column: 0
     },
     end: {
-      line: 1,
-      column: 14
+      line: 2,
+      column: 6
     }
   }
 });

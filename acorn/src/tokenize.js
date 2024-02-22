@@ -677,7 +677,7 @@ pp.readInvalidTemplateToken = function() {
       return this.finishToken(tt.invalidTemplate, this.input.slice(this.start, this.pos))
 
     case "\r":
-      if (this.input[this.pos] + 1 === "\n") ++this.pos
+      if (this.input[this.pos + 1] === "\n") ++this.pos
       // fall through
     case "\n": case "\u2028": case "\u2029":
       ++this.curLine
@@ -745,6 +745,7 @@ pp.readEscapedChar = function(inTemplate) {
     if (isNewLine(ch)) {
       // Unicode new line characters after \ get removed from output in both
       // template literals and strings
+      if (this.options.locations) { this.lineStart = this.pos; ++this.curLine }
       return ""
     }
     return String.fromCharCode(ch)

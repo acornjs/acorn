@@ -816,23 +816,23 @@ test("`\\n\\r\\b\\v\\t\\f\\\n\\\r\n\\\u2028\\\u2029`", {
         tail: true,
         loc: {
           start: {line: 1, column: 1},
-          end: {line: 3, column: 4}
+          end: {line: 5, column: 0}
         }
       }],
       expressions: [],
       loc: {
         start: {line: 1, column: 0},
-        end: {line: 3, column: 5}
+        end: {line: 5, column: 1}
       }
     },
     loc: {
       start: {line: 1, column: 0},
-      end: {line: 3, column: 5}
+      end: {line: 5, column: 1}
     }
   }],
   loc: {
     start: {line: 1, column: 0},
-    end: {line: 3, column: 5}
+    end: {line: 5, column: 1}
   }
 }, {
   ecmaVersion: 6,

@@ -706,7 +706,7 @@ pp.parseTemplateElement = function({isTagged}) {
       this.raiseRecoverable(this.start, "Bad escape sequence in untagged template literal")
     }
     elem.value = {
-      raw: this.value,
+      raw: this.value.replace(/\r\n?/g, "\n"),
       cooked: null
     }
   } else {
