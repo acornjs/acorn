@@ -242,8 +242,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec, forInit)
     node.argument = this.parseMaybeUnary(null, true, update, forInit)
     this.checkExpressionErrors(refDestructuringErrors, true)
     if (update) this.checkLValSimple(node.argument)
-    else if (this.strict && node.operator === "delete" &&
-             node.argument.type === "Identifier")
+    else if (this.strict && node.operator === "delete" && isLocalVariableAccess(node.argument))
       this.raiseRecoverable(node.start, "Deleting local variable in strict mode")
     else if (node.operator === "delete" && isPrivateFieldAccess(node.argument))
       this.raiseRecoverable(node.start, "Private fields can not be deleted")
@@ -278,10 +277,18 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec, forInit)
   }
 }
 
+function isLocalVariableAccess(node) {
+  return (
+    node.type === "Identifier" ||
+    node.type === "ParenthesizedExpression" && isLocalVariableAccess(node.expression)
+  )
+}
+
 function isPrivateFieldAccess(node) {
   return (
     node.type === "MemberExpression" && node.property.type === "PrivateIdentifier" ||
-    node.type === "ChainExpression" && isPrivateFieldAccess(node.expression)
+    node.type === "ChainExpression" && isPrivateFieldAccess(node.expression) ||
+    node.type === "ParenthesizedExpression" && isPrivateFieldAccess(node.expression)
   )
 }
 

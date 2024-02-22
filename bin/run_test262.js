@@ -10,7 +10,7 @@ function loadList(filename) {
 }
 
 run(
-  (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: "latest"}),
+  (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: "latest", preserveParens: true}),
   {
     testsDirectory: path.dirname(require.resolve("test262/package.json")),
     skip: test => test.attrs.features &&
