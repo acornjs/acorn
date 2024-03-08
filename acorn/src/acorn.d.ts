@@ -733,7 +733,7 @@ export class Parser {
   options: Options
   input: string
   
-  private constructor(options: Options, input: string, startPos?: number)
+  protected constructor(options: Options, input: string, startPos?: number)
   parse(): Program
   
   static parse(input: string, options: Options): Program
