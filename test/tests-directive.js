@@ -2,6 +2,7 @@
 if (typeof exports !== "undefined") {
   var driver = require("./driver.js");
   var test = driver.test;
+  var testFail = driver.testFail;
 }
 
 //------------------------------------------------------------------------
@@ -1384,3 +1385,8 @@ test("(a = () => { \"use strict\"; foo }) => { \"use strict\" }", {
     }
   ]
 }, { ecmaVersion: 6 })
+
+testFail(
+  "function invalid() { \"\\7\\\n\"; \"use strict\"; }",
+  "Octal literal in strict mode (1:22)",
+  { ecmaVersion: 6 })
