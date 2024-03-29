@@ -237,6 +237,7 @@ pp.parseForStatement = function(node) {
   let startsWithLet = this.isContextual("let"), isForOf = false
   let containsEsc = this.containsEsc
   let refDestructuringErrors = new DestructuringErrors
+  let initPos = this.start
   let init = awaitAt > -1
     ? this.parseExprSubscripts(refDestructuringErrors, "await")
     : this.parseExpression(true, refDestructuringErrors)
@@ -245,7 +246,7 @@ pp.parseForStatement = function(node) {
       if (this.type === tt._in) this.unexpected(awaitAt)
       node.await = true
     } else if (isForOf && this.options.ecmaVersion >= 8) {
-      if (!containsEsc && init.type === "Identifier" && init.name === "async") this.unexpected()
+      if (init.start === initPos && !containsEsc && init.type === "Identifier" && init.name === "async") this.unexpected()
       else if (this.options.ecmaVersion >= 9) node.await = false
     }
     if (startsWithLet && isForOf) this.raise(init.start, "The left-hand side of a for-of loop may not start with 'let'.")
