@@ -1998,3 +1998,6 @@ test("async () => { for await (async of []); }", {}, {ecmaVersion: 9})
 test("for (async of => {}; i < 10; ++i) {}", {}, {ecmaVersion: 9})
 testFail("for (async of [1]) {}", "Unexpected token (1:14)", {ecmaVersion: 9})
 
+testFail("async () => { for (async\nof []); }", "Unexpected token (2:0)", {ecmaVersion: 9})
+testFail("async () => { for (async of\n[]); }", "Unexpected token (2:0)", {ecmaVersion: 9})
+test("for ((async) of [7]);", {}, {ecmaVersion: 9})

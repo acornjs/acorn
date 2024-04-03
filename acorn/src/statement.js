@@ -235,13 +235,19 @@ pp.parseForStatement = function(node) {
     return this.parseFor(node, init)
   }
   let startsWithLet = this.isContextual("let"), isForOf = false
+  let containsEsc = this.containsEsc
   let refDestructuringErrors = new DestructuringErrors
-  let init = this.parseExpression(awaitAt > -1 ? "await" : true, refDestructuringErrors)
+  let initPos = this.start
+  let init = awaitAt > -1
+    ? this.parseExprSubscripts(refDestructuringErrors, "await")
+    : this.parseExpression(true, refDestructuringErrors)
   if (this.type === tt._in || (isForOf = this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
-    if (this.options.ecmaVersion >= 9) {
-      if (this.type === tt._in) {
-        if (awaitAt > -1) this.unexpected(awaitAt)
-      } else node.await = awaitAt > -1
+    if (awaitAt > -1) { // implies `ecmaVersion >= 9` (see declaration of awaitAt)
+      if (this.type === tt._in) this.unexpected(awaitAt)
+      node.await = true
+    } else if (isForOf && this.options.ecmaVersion >= 8) {
+      if (init.start === initPos && !containsEsc && init.type === "Identifier" && init.name === "async") this.unexpected()
+      else if (this.options.ecmaVersion >= 9) node.await = false
     }
     if (startsWithLet && isForOf) this.raise(init.start, "The left-hand side of a for-of loop may not start with 'let'.")
     this.toAssignable(init, false, refDestructuringErrors)
