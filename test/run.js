@@ -15,6 +15,7 @@
   require("./tests-regexp-2020.js");
   require("./tests-regexp-2022.js");
   require("./tests-regexp-2024.js");
+  require("./tests-regexp-2025.js");
   require("./tests-json-superset.js");
   require("./tests-optional-catch-binding.js");
   require("./tests-bigint.js");

@@ -23,6 +23,8 @@ export class RegExpValidationState {
     this.numCapturingParens = 0
     this.maxBackReference = 0
     this.groupNames = []
+    this.groupNamesInDisjunction = []
+    this.groupNamesInAlternative = []
     this.backReferenceNames = []
   }
 
@@ -169,6 +171,8 @@ pp.regexp_pattern = function(state) {
   state.numCapturingParens = 0
   state.maxBackReference = 0
   state.groupNames.length = 0
+  state.groupNamesInDisjunction.length = 0
+  state.groupNamesInAlternative.length = 0
   state.backReferenceNames.length = 0
 
   this.regexp_disjunction(state)
@@ -194,9 +198,25 @@ pp.regexp_pattern = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
 pp.regexp_disjunction = function(state) {
+  let upperGroupNamesInDisjunction
+  if (this.options.ecmaVersion >= 16) {
+    upperGroupNamesInDisjunction = state.groupNamesInDisjunction
+    state.groupNamesInDisjunction = []
+  }
+
   this.regexp_alternative(state)
   while (state.eat(0x7C /* | */)) {
     this.regexp_alternative(state)
+  }
+
+  if (this.options.ecmaVersion >= 16) {
+    // Adds the group name that appears in current Disjunction
+    // as the group name of the current Alternative and upper Disjunction.
+    for (const groupName of state.groupNamesInDisjunction) {
+      upperGroupNamesInDisjunction.push(groupName)
+      state.groupNamesInAlternative.push(groupName)
+    }
+    state.groupNamesInDisjunction = upperGroupNamesInDisjunction
   }
 
   // Make the same message as V8.
@@ -210,8 +230,18 @@ pp.regexp_disjunction = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Alternative
 pp.regexp_alternative = function(state) {
+  let upperGroupNamesInAlternative
+  if (this.options.ecmaVersion >= 16) {
+    upperGroupNamesInAlternative = state.groupNamesInAlternative
+    state.groupNamesInAlternative = [...state.groupNamesInAlternative]
+  }
+
   while (state.pos < state.source.length && this.regexp_eatTerm(state))
     ;
+
+  if (this.options.ecmaVersion >= 16) {
+    state.groupNamesInAlternative = upperGroupNamesInAlternative
+  }
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Term
@@ -448,10 +478,15 @@ pp.regexp_eatExtendedPatternCharacter = function(state) {
 pp.regexp_groupSpecifier = function(state) {
   if (state.eat(0x3F /* ? */)) {
     if (this.regexp_eatGroupName(state)) {
-      if (state.groupNames.indexOf(state.lastStringValue) !== -1) {
+      const groupNames = this.options.ecmaVersion >= 16 ? state.groupNamesInAlternative : state.groupNames
+      if (groupNames.indexOf(state.lastStringValue) !== -1) {
         state.raise("Duplicate capture group name")
       }
       state.groupNames.push(state.lastStringValue)
+      if (this.options.ecmaVersion >= 16) {
+        state.groupNamesInAlternative.push(state.lastStringValue)
+        state.groupNamesInDisjunction.push(state.lastStringValue)
+      }
       return
     }
     state.raise("Invalid group")
