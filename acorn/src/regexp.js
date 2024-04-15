@@ -244,7 +244,7 @@ pp.regexp_alternative = function(state) {
         state.groupNamesToAddToUpperScope.push(groupName)
       }
     }
-    // Reverts the groupNames so that the next adjacent Alt does not report duplicates.
+    // Reverts the groupNames so that the next adjacent Alternative does not report duplicates.
     state.groupNames = upperGroupNames
   }
 }
