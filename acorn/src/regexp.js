@@ -212,7 +212,7 @@ pp.regexp_disjunction = function(state) {
     for (const groupName of state.groupNamesToAddToUpperScope) {
       // Adds the groupName added in Disjunction to groupNames.
       state.groupNames.push(groupName)
-      // Adds the groupName added with Disjunction to the upper scope.
+      // Adds the groupName added in Disjunction to the upper scope.
       groupNamesToAddToUpperUpperScope.push(groupName)
     }
     state.groupNamesToAddToUpperScope = groupNamesToAddToUpperUpperScope
@@ -238,7 +238,7 @@ pp.regexp_alternative = function(state) {
     ;
 
   if (this.options.ecmaVersion >= 16) {
-    // Adds the groupName added with Alternative to the upper scope.
+    // Adds the groupName added in Alternative to the upper scope.
     for (const groupName of state.groupNames) {
       if (upperGroupNames.indexOf(groupName) === -1) {
         state.groupNamesToAddToUpperScope.push(groupName)
