@@ -23,8 +23,7 @@ export class RegExpValidationState {
     this.numCapturingParens = 0
     this.maxBackReference = 0
     this.groupNames = []
-    this.groupNamesInDisjunction = []
-    this.groupNamesInAlternative = []
+    this.groupNamesToAddToUpperScope = []
     this.backReferenceNames = []
   }
 
@@ -171,8 +170,7 @@ pp.regexp_pattern = function(state) {
   state.numCapturingParens = 0
   state.maxBackReference = 0
   state.groupNames.length = 0
-  state.groupNamesInDisjunction.length = 0
-  state.groupNamesInAlternative.length = 0
+  state.groupNamesToAddToUpperScope.length = 0
   state.backReferenceNames.length = 0
 
   this.regexp_disjunction(state)
@@ -198,10 +196,11 @@ pp.regexp_pattern = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
 pp.regexp_disjunction = function(state) {
-  let upperGroupNamesInDisjunction
+  let groupNamesToAddToUpperUpperScope
   if (this.options.ecmaVersion >= 16) {
-    upperGroupNamesInDisjunction = state.groupNamesInDisjunction
-    state.groupNamesInDisjunction = []
+    groupNamesToAddToUpperUpperScope = state.groupNamesToAddToUpperScope
+    // Clear groupNamesToAddToUpperScope to store the groupName added in this Disjunction.
+    state.groupNamesToAddToUpperScope = []
   }
 
   this.regexp_alternative(state)
@@ -210,13 +209,13 @@ pp.regexp_disjunction = function(state) {
   }
 
   if (this.options.ecmaVersion >= 16) {
-    // Adds the group name that appears in current Disjunction
-    // as the group name of the current Alternative and upper Disjunction.
-    for (const groupName of state.groupNamesInDisjunction) {
-      upperGroupNamesInDisjunction.push(groupName)
-      state.groupNamesInAlternative.push(groupName)
+    for (const groupName of state.groupNamesToAddToUpperScope) {
+      // Adds the groupName added in Disjunction to groupNames.
+      state.groupNames.push(groupName)
+      // Adds the groupName added with Disjunction to the upper scope.
+      groupNamesToAddToUpperUpperScope.push(groupName)
     }
-    state.groupNamesInDisjunction = upperGroupNamesInDisjunction
+    state.groupNamesToAddToUpperScope = groupNamesToAddToUpperUpperScope
   }
 
   // Make the same message as V8.
@@ -230,17 +229,23 @@ pp.regexp_disjunction = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Alternative
 pp.regexp_alternative = function(state) {
-  let upperGroupNamesInAlternative
+  let upperGroupNames
   if (this.options.ecmaVersion >= 16) {
-    upperGroupNamesInAlternative = state.groupNamesInAlternative
-    state.groupNamesInAlternative = [...state.groupNamesInAlternative]
+    upperGroupNames = [...state.groupNames]
   }
 
   while (state.pos < state.source.length && this.regexp_eatTerm(state))
     ;
 
   if (this.options.ecmaVersion >= 16) {
-    state.groupNamesInAlternative = upperGroupNamesInAlternative
+    // Adds the groupName added with Alternative to the upper scope.
+    for (const groupName of state.groupNames) {
+      if (upperGroupNames.indexOf(groupName) === -1) {
+        state.groupNamesToAddToUpperScope.push(groupName)
+      }
+    }
+    // Reverts the groupNames so that the next adjacent Alt does not report duplicates.
+    state.groupNames = upperGroupNames
   }
 }
 
@@ -478,15 +483,10 @@ pp.regexp_eatExtendedPatternCharacter = function(state) {
 pp.regexp_groupSpecifier = function(state) {
   if (state.eat(0x3F /* ? */)) {
     if (this.regexp_eatGroupName(state)) {
-      const groupNames = this.options.ecmaVersion >= 16 ? state.groupNamesInAlternative : state.groupNames
-      if (groupNames.indexOf(state.lastStringValue) !== -1) {
+      if (state.groupNames.indexOf(state.lastStringValue) !== -1) {
         state.raise("Duplicate capture group name")
       }
       state.groupNames.push(state.lastStringValue)
-      if (this.options.ecmaVersion >= 16) {
-        state.groupNamesInAlternative.push(state.lastStringValue)
-        state.groupNamesInDisjunction.push(state.lastStringValue)
-      }
       return
     }
     state.raise("Invalid group")
