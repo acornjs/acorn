@@ -21,6 +21,8 @@ module.exports = {
   ],
   plugins: ["eslint-plugin-import"],
   rules: {
+    "no-unreachable-loop": "off",
+    "no-empty": "off",
     curly: "off",
     eqeqeq: ["error", "always", {null: "ignore"}],
     indent: [

@@ -5,6 +5,32 @@ import {hasOwn, codePointToString} from "./util.js"
 
 const pp = Parser.prototype
 
+// Track disjunction structure to determine whether a duplicate
+// capture group name is allowed because it is in a separate branch.
+class BranchID {
+  constructor(parent, base) {
+    // Parent disjunction branch
+    this.parent = parent
+    // Identifies this set of sibling branches
+    this.base = base || this
+  }
+
+  separatedFrom(alt) {
+    // A branch is separate from another branch if they or any of
+    // their parents are siblings in a given disjunction
+    for (let self = this; self; self = self.parent) {
+      for (let other = alt; other; other = other.parent) {
+        if (self.base === other.base && self !== other) return true
+      }
+    }
+    return false
+  }
+
+  sibling() {
+    return new BranchID(this.parent, this.base)
+  }
+}
+
 export class RegExpValidationState {
   constructor(parser) {
     this.parser = parser
@@ -22,8 +48,9 @@ export class RegExpValidationState {
     this.lastAssertionIsQuantifiable = false
     this.numCapturingParens = 0
     this.maxBackReference = 0
-    this.groupNames = []
+    this.groupNames = Object.create(null)
     this.backReferenceNames = []
+    this.alternative = null
   }
 
   reset(start, pattern, flags) {
@@ -140,6 +167,11 @@ pp.validateRegExpFlags = function(state) {
   }
 }
 
+function hasProp(obj) {
+  for (let _ in obj) return true
+  return false
+}
+
 /**
  * Validate the pattern part of a given RegExpLiteral.
  *
@@ -154,7 +186,7 @@ pp.validateRegExpPattern = function(state) {
   // |Pattern[~U, +N]| and use this result instead. Throw a *SyntaxError*
   // exception if _P_ did not conform to the grammar, if any elements of _P_
   // were not matched by the parse, or if any Early Error conditions exist.
-  if (!state.switchN && this.options.ecmaVersion >= 9 && state.groupNames.length > 0) {
+  if (!state.switchN && this.options.ecmaVersion >= 9 && hasProp(state.groupNames)) {
     state.switchN = true
     this.regexp_pattern(state)
   }
@@ -168,8 +200,9 @@ pp.regexp_pattern = function(state) {
   state.lastAssertionIsQuantifiable = false
   state.numCapturingParens = 0
   state.maxBackReference = 0
-  state.groupNames.length = 0
+  state.groupNames = Object.create(null)
   state.backReferenceNames.length = 0
+  state.branchID = null
 
   this.regexp_disjunction(state)
 
@@ -186,7 +219,7 @@ pp.regexp_pattern = function(state) {
     state.raise("Invalid escape")
   }
   for (const name of state.backReferenceNames) {
-    if (state.groupNames.indexOf(name) === -1) {
+    if (!state.groupNames[name]) {
       state.raise("Invalid named capture referenced")
     }
   }
@@ -194,10 +227,14 @@ pp.regexp_pattern = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
 pp.regexp_disjunction = function(state) {
+  let trackDisjunction = this.options.ecmaVersion >= 16
+  if (trackDisjunction) state.branchID = new BranchID(state.branchID, null, 0)
   this.regexp_alternative(state)
   while (state.eat(0x7C /* | */)) {
+    if (trackDisjunction) state.branchID = state.branchID.sibling()
     this.regexp_alternative(state)
   }
+  if (trackDisjunction) state.branchID = state.branchID.parent
 
   // Make the same message as V8.
   if (this.regexp_eatQuantifier(state, true)) {
@@ -210,8 +247,7 @@ pp.regexp_disjunction = function(state) {
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Alternative
 pp.regexp_alternative = function(state) {
-  while (state.pos < state.source.length && this.regexp_eatTerm(state))
-    ;
+  while (state.pos < state.source.length && this.regexp_eatTerm(state)) {}
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-Term
@@ -447,14 +483,24 @@ pp.regexp_eatExtendedPatternCharacter = function(state) {
 //   `?` GroupName
 pp.regexp_groupSpecifier = function(state) {
   if (state.eat(0x3F /* ? */)) {
-    if (this.regexp_eatGroupName(state)) {
-      if (state.groupNames.indexOf(state.lastStringValue) !== -1) {
+    if (!this.regexp_eatGroupName(state)) state.raise("Invalid group")
+    let trackDisjunction = this.options.ecmaVersion >= 16
+    let known = state.groupNames[state.lastStringValue]
+    if (known) {
+      if (trackDisjunction) {
+        for (let altID of known) {
+          if (!altID.separatedFrom(state.branchID))
+            state.raise("Duplicate capture group name")
+        }
+      } else {
         state.raise("Duplicate capture group name")
       }
-      state.groupNames.push(state.lastStringValue)
-      return
     }
-    state.raise("Invalid group")
+    if (trackDisjunction) {
+      (known || (state.groupNames[state.lastStringValue] = [])).push(state.branchID)
+    } else {
+      state.groupNames[state.lastStringValue] = true
+    }
   }
 }
 
