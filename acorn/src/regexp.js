@@ -50,7 +50,6 @@ export class RegExpValidationState {
     this.maxBackReference = 0
     this.groupNames = Object.create(null)
     this.backReferenceNames = []
-    this.alternative = null
   }
 
   reset(start, pattern, flags) {
@@ -228,7 +227,7 @@ pp.regexp_pattern = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
 pp.regexp_disjunction = function(state) {
   let trackDisjunction = this.options.ecmaVersion >= 16
-  if (trackDisjunction) state.branchID = new BranchID(state.branchID, null, 0)
+  if (trackDisjunction) state.branchID = new BranchID(state.branchID, null)
   this.regexp_alternative(state)
   while (state.eat(0x7C /* | */)) {
     if (trackDisjunction) state.branchID = state.branchID.sibling()
