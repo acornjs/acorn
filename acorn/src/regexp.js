@@ -50,6 +50,7 @@ export class RegExpValidationState {
     this.maxBackReference = 0
     this.groupNames = Object.create(null)
     this.backReferenceNames = []
+    this.branchID = null
   }
 
   reset(start, pattern, flags) {
