@@ -20,6 +20,9 @@
   "engines": {
     "node": ">=0.4.0"
   },
+  "dependencies": {
+    "acorn": "^8.11.0"
+  },
   "maintainers": [
     {
       "name": "Marijn Haverbeke",
