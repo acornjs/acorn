@@ -1,3 +1,9 @@
+## 8.3.3 (2024-01-11)
+
+### Bug fixes
+
+Make acorn a dependency because acorn-walk uses the types from that package.
+
 ## 8.3.2 (2024-01-11)
 
 ### Bug fixes
