@@ -350,12 +350,19 @@ base.MemberExpression = (node, st, c) => {
 base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
   if (node.declaration)
     c(node.declaration, st, node.type === "ExportNamedDeclaration" || node.declaration.id ? "Statement" : "Expression")
+  if (node.specifiers)
+    for (let spec of node.specifiers)
+      c(spec, st)
   if (node.source) c(node.source, st, "Expression")
 }
 base.ExportAllDeclaration = (node, st, c) => {
   if (node.exported)
     c(node.exported, st)
   c(node.source, st, "Expression")
+}
+base.ExportSpecifier = (node, st, c) => {
+  c(node.local, st)
+  c(node.exported, st)
 }
 base.ImportDeclaration = (node, st, c) => {
   for (let spec of node.specifiers)
