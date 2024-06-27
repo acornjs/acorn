@@ -5,6 +5,7 @@
   "main": "dist/acorn.js",
   "type": "commonjs",
   "types": "dist/acorn.d.ts",
+  "module": "dist/acorn.mjs",
   "exports": {
     ".": [
       {
