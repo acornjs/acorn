@@ -6,7 +6,7 @@ const pp = Parser.prototype
 
 // ## Parser utilities
 
-const literal = /^(?:'((?:\\.|[^'\\])*?)'|"((?:\\.|[^"\\])*?)")/s
+const literal = /^(?:'((?:\\[^]|[^'\\])*?)'|"((?:\\[^]|[^"\\])*?)")/
 pp.strictDirective = function(start) {
   if (this.options.ecmaVersion < 5) return false
   for (;;) {
