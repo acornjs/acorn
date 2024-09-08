@@ -207,11 +207,7 @@ base.WithStatement = (node, st, c) => {
 }
 base.SwitchStatement = (node, st, c) => {
   c(node.discriminant, st, "Expression")
-  for (let cs of node.cases) {
-    if (cs.test) c(cs.test, st, "Expression")
-    for (let cons of cs.consequent)
-      c(cons, st, "Statement")
-  }
+  for (let cs of node.cases) c(cs, st)
 }
 base.SwitchCase = (node, st, c) => {
   if (node.test) c(node.test, st, "Expression")
