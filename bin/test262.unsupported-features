@@ -1,5 +1,5 @@
 decorators
 explicit-resource-management
 regexp-modifiers
-import-assertions
 import-attributes
+source-phase-imports
