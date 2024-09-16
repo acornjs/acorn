@@ -35,12 +35,11 @@
   "devDependencies": {
     "@rollup/plugin-buble": "^1.0.2",
     "@unicode/unicode-16.0.0": "^1.6.0",
-    "eslint": "^8.49.0",
+    "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-n": "^16.3.1",
-    "eslint-plugin-promise": "^6.1.1",
-    "rollup": "^3.29.2",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-n": "^16.6.2",
+    "rollup": "^3.29.4",
     "test262": "git+https://github.com/tc39/test262.git#867ca540d6cc991a82b41a3b7f9ccb9e93efe803",
     "test262-parser-runner": "^0.5.0"
   }
