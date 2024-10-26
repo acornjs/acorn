@@ -378,12 +378,41 @@ pp.regexp_eatReverseSolidusAtomEscape = function(state) {
 pp.regexp_eatUncapturingGroup = function(state) {
   const start = state.pos
   if (state.eat(0x28 /* ( */)) {
-    if (state.eat(0x3F /* ? */) && state.eat(0x3A /* : */)) {
-      this.regexp_disjunction(state)
-      if (state.eat(0x29 /* ) */)) {
-        return true
+    if (state.eat(0x3F /* ? */)) {
+      if (this.options.ecmaVersion >= 16) {
+        const addModifiers = this.regexp_eatModifiers(state)
+        const hasHyphen = state.eat(0x2D /* - */)
+        if (addModifiers || hasHyphen) {
+          for (let i = 0; i < addModifiers.length; i++) {
+            const modifier = addModifiers.charAt(i)
+            if (addModifiers.indexOf(modifier, i + 1) > -1) {
+              state.raise("Duplicate regular expression modifiers")
+            }
+          }
+          if (hasHyphen) {
+            const removeModifiers = this.regexp_eatModifiers(state)
+            if (!addModifiers && !removeModifiers && state.current() === 0x3A /* : */) {
+              state.raise("Invalid regular expression modifiers")
+            }
+            for (let i = 0; i < removeModifiers.length; i++) {
+              const modifier = removeModifiers.charAt(i)
+              if (
+                removeModifiers.indexOf(modifier, i + 1) > -1 ||
+                addModifiers.indexOf(modifier) > -1
+              ) {
+                state.raise("Duplicate regular expression modifiers")
+              }
+            }
+          }
+        }
       }
-      state.raise("Unterminated group")
+      if (state.eat(0x3A /* : */)) {
+        this.regexp_disjunction(state)
+        if (state.eat(0x29 /* ) */)) {
+          return true
+        }
+        state.raise("Unterminated group")
+      }
     }
     state.pos = start
   }
@@ -404,6 +433,23 @@ pp.regexp_eatCapturingGroup = function(state) {
     state.raise("Unterminated group")
   }
   return false
+}
+// RegularExpressionModifiers ::
+//   [empty]
+//   RegularExpressionModifiers RegularExpressionModifier
+pp.regexp_eatModifiers = function(state) {
+  let modifiers = ""
+  let ch = 0
+  while ((ch = state.current()) !== -1 && isRegularExpressionModifier(ch)) {
+    modifiers += codePointToString(ch)
+    state.advance()
+  }
+  return modifiers
+}
+// RegularExpressionModifier :: one of
+//   `i` `m` `s`
+function isRegularExpressionModifier(ch) {
+  return ch === 0x69 /* i */ || ch === 0x6d /* m */ || ch === 0x73 /* s */
 }
 
 // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ExtendedAtom
