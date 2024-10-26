@@ -352,7 +352,9 @@ lp.parseExprImport = function() {
 }
 
 lp.parseDynamicImport = function(node) {
-  node.source = this.parseExprList(tt.parenR)[0] || this.dummyString()
+  const list = this.parseExprList(tt.parenR)
+  node.source = list[0] || this.dummyString()
+  node.options = list[1] || null
   return this.finishNode(node, "ImportExpression")
 }
 

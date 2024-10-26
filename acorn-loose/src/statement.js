@@ -461,6 +461,8 @@ lp.parseExport = function() {
       }
     }
     node.source = this.eatContextual("from") ? this.parseExprAtom() : this.dummyString()
+    if (this.options.ecmaVersion >= 16)
+      node.attributes = this.parseWithClause()
     this.semicolon()
     return this.finishNode(node, "ExportAllDeclaration")
   }
@@ -488,6 +490,8 @@ lp.parseExport = function() {
     node.declaration = null
     node.specifiers = this.parseExportSpecifierList()
     node.source = this.eatContextual("from") ? this.parseExprAtom() : null
+    if (this.options.ecmaVersion >= 16)
+      node.attributes = this.parseWithClause()
     this.semicolon()
   }
   return this.finishNode(node, "ExportNamedDeclaration")
@@ -511,6 +515,8 @@ lp.parseImport = function() {
     node.source = this.eatContextual("from") && this.tok.type === tt.string ? this.parseExprAtom() : this.dummyString()
     if (elt) node.specifiers.unshift(elt)
   }
+  if (this.options.ecmaVersion >= 16)
+    node.attributes = this.parseWithClause()
   this.semicolon()
   return this.finishNode(node, "ImportDeclaration")
 }
@@ -546,6 +552,42 @@ lp.parseImportSpecifiers = function() {
     this.popCx()
   }
   return elts
+}
+
+lp.parseWithClause = function() {
+  let nodes = []
+  if (!this.eat(tt._with)) {
+    return nodes
+  }
+
+  let indent = this.curIndent, line = this.curLineStart, continuedLine = this.nextLineStart
+  this.pushCx()
+  this.eat(tt.braceL)
+  if (this.curLineStart > continuedLine) continuedLine = this.curLineStart
+  while (!this.closes(tt.braceR, indent + (this.curLineStart <= continuedLine ? 1 : 0), line)) {
+    const attr = this.parseImportAttribute()
+    if (!attr) break
+    nodes.push(attr)
+    this.eat(tt.comma)
+  }
+  this.eat(tt.braceR)
+  this.popCx()
+  return nodes
+}
+
+lp.parseImportAttribute = function() {
+  const node = this.startNode()
+  node.key = this.tok.type === tt.string ? this.parseExprAtom() : this.parseIdent()
+  this.eat(tt.colon)
+  if (this.tok.type === tt.string) {
+    node.value = this.parseExprAtom()
+  } else {
+    if (isDummy(node.key)) {
+      return null
+    }
+    node.value = this.dummyString()
+  }
+  return this.finishNode(node, "ImportAttribute")
 }
 
 lp.parseExportSpecifierList = function() {

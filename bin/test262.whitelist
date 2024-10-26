@@ -26,3 +26,7 @@ built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Todhri.js (defau
 built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Todhri.js (strict mode)
 built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Tulu_Tigalari.js (default)
 built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Tulu_Tigalari.js (strict mode)
+language/import/import-attributes/json-invalid.js (default)
+language/import/import-attributes/json-invalid.js (strict mode)
+language/import/import-attributes/json-named-bindings.js (default)
+language/import/import-attributes/json-named-bindings.js (strict mode)
