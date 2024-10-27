@@ -13,7 +13,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["acorn/src/bin/*.js", "bin/generate-identifier-regex.js"],
+      files: ["acorn/src/bin/*.js", "bin/generate-identifier-regex.js", "bin/generate-unicode-script-values.js"],
       rules: {
         "no-console": "off"
       }
