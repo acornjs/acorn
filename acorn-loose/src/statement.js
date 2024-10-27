@@ -565,29 +565,24 @@ lp.parseWithClause = function() {
   this.eat(tt.braceL)
   if (this.curLineStart > continuedLine) continuedLine = this.curLineStart
   while (!this.closes(tt.braceR, indent + (this.curLineStart <= continuedLine ? 1 : 0), line)) {
-    const attr = this.parseImportAttribute()
-    if (!attr) break
-    nodes.push(attr)
+    const attr = this.startNode()
+    attr.key = this.tok.type === tt.string ? this.parseExprAtom() : this.parseIdent()
+    if (this.eat(tt.colon)) {
+      if (this.tok.type === tt.string)
+        attr.value = this.parseExprAtom()
+      else attr.value = this.dummyString()
+    } else {
+      if (isDummy(attr.key)) break
+      if (this.tok.type === tt.string)
+        attr.value = this.parseExprAtom()
+      else break
+    }
+    nodes.push(this.finishNode(attr, "ImportAttribute"))
     this.eat(tt.comma)
   }
   this.eat(tt.braceR)
   this.popCx()
   return nodes
-}
-
-lp.parseImportAttribute = function() {
-  const node = this.startNode()
-  node.key = this.tok.type === tt.string ? this.parseExprAtom() : this.parseIdent()
-  this.eat(tt.colon)
-  if (this.tok.type === tt.string) {
-    node.value = this.parseExprAtom()
-  } else {
-    if (isDummy(node.key)) {
-      return null
-    }
-    node.value = this.dummyString()
-  }
-  return this.finishNode(node, "ImportAttribute")
 }
 
 lp.parseExportSpecifierList = function() {
