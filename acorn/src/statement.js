@@ -859,6 +859,8 @@ pp.parseExportAllDeclaration = function(node, exports) {
   this.expectContextual("from")
   if (this.type !== tt.string) this.unexpected()
   node.source = this.parseExprAtom()
+  if (this.options.ecmaVersion >= 16)
+    node.attributes = this.parseWithClause()
   this.semicolon()
   return this.finishNode(node, "ExportAllDeclaration")
 }
@@ -889,6 +891,8 @@ pp.parseExport = function(node, exports) {
     if (this.eatContextual("from")) {
       if (this.type !== tt.string) this.unexpected()
       node.source = this.parseExprAtom()
+      if (this.options.ecmaVersion >= 16)
+        node.attributes = this.parseWithClause()
     } else {
       for (let spec of node.specifiers) {
         // check for keywords used as local names
@@ -1017,6 +1021,8 @@ pp.parseImport = function(node) {
     this.expectContextual("from")
     node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected()
   }
+  if (this.options.ecmaVersion >= 16)
+    node.attributes = this.parseWithClause()
   this.semicolon()
   return this.finishNode(node, "ImportDeclaration")
 }
@@ -1075,6 +1081,41 @@ pp.parseImportSpecifiers = function() {
     nodes.push(this.parseImportSpecifier())
   }
   return nodes
+}
+
+pp.parseWithClause = function() {
+  let nodes = []
+  if (!this.eat(tt._with)) {
+    return nodes
+  }
+  this.expect(tt.braceL)
+  const attributeKeys = {}
+  let first = true
+  while (!this.eat(tt.braceR)) {
+    if (!first) {
+      this.expect(tt.comma)
+      if (this.afterTrailingComma(tt.braceR)) break
+    } else first = false
+
+    const attr = this.parseImportAttribute()
+    const keyName = attr.key.type === "Identifier" ? attr.key.name : attr.key.value
+    if (hasOwn(attributeKeys, keyName))
+      this.raiseRecoverable(attr.key.start, "Duplicate attribute key '" + keyName + "'")
+    attributeKeys[keyName] = true
+    nodes.push(attr)
+  }
+  return nodes
+}
+
+pp.parseImportAttribute = function() {
+  const node = this.startNode()
+  node.key = this.type === tt.string ? this.parseExprAtom() : this.parseIdent(this.options.allowReserved !== "never")
+  this.expect(tt.colon)
+  if (this.type !== tt.string) {
+    this.unexpected()
+  }
+  node.value = this.parseExprAtom()
+  return this.finishNode(node, "ImportAttribute")
 }
 
 pp.parseModuleExportName = function() {

@@ -347,19 +347,30 @@ base.ExportNamedDeclaration = base.ExportDefaultDeclaration = (node, st, c) => {
   if (node.declaration)
     c(node.declaration, st, node.type === "ExportNamedDeclaration" || node.declaration.id ? "Statement" : "Expression")
   if (node.source) c(node.source, st, "Expression")
+  if (node.attributes)
+    for (let attr of node.attributes)
+      c(attr, st)
 }
 base.ExportAllDeclaration = (node, st, c) => {
   if (node.exported)
     c(node.exported, st)
   c(node.source, st, "Expression")
+  for (let attr of node.attributes)
+    c(attr, st)
+}
+base.ImportAttribute = (node, st, c) => {
+  c(node.value, st, "Expression")
 }
 base.ImportDeclaration = (node, st, c) => {
   for (let spec of node.specifiers)
     c(spec, st)
   c(node.source, st, "Expression")
+  for (let attr of node.attributes)
+    c(attr, st)
 }
 base.ImportExpression = (node, st, c) => {
   c(node.source, st, "Expression")
+  if (node.options) c(node.options, st, "Expression")
 }
 base.ImportSpecifier = base.ImportDefaultSpecifier = base.ImportNamespaceSpecifier = base.Identifier = base.PrivateIdentifier = base.Literal = ignore
 

@@ -546,13 +546,32 @@ pp.parseDynamicImport = function(node) {
   // Parse node.source.
   node.source = this.parseMaybeAssign()
 
-  // Verify ending.
-  if (!this.eat(tt.parenR)) {
-    const errorPos = this.start
-    if (this.eat(tt.comma) && this.eat(tt.parenR)) {
-      this.raiseRecoverable(errorPos, "Trailing comma is not allowed in import()")
+  if (this.options.ecmaVersion >= 16) {
+    if (!this.eat(tt.parenR)) {
+      this.expect(tt.comma)
+      if (!this.afterTrailingComma(tt.parenR)) {
+        node.options = this.parseMaybeAssign()
+        if (!this.eat(tt.parenR)) {
+          this.expect(tt.comma)
+          if (!this.afterTrailingComma(tt.parenR)) {
+            this.unexpected()
+          }
+        }
+      } else {
+        node.options = null
+      }
     } else {
-      this.unexpected(errorPos)
+      node.options = null
+    }
+  } else {
+    // Verify ending.
+    if (!this.eat(tt.parenR)) {
+      const errorPos = this.start
+      if (this.eat(tt.comma) && this.eat(tt.parenR)) {
+        this.raiseRecoverable(errorPos, "Trailing comma is not allowed in import()")
+      } else {
+        this.unexpected(errorPos)
+      }
     }
   }
 
