@@ -104,9 +104,10 @@ export class Parser {
   get inAsync() { return (this.currentVarScope().flags & SCOPE_ASYNC) > 0 && !this.currentVarScope().inClassFieldInit }
 
   get canAwait() {
+    if (this.currentThisScope().inClassFieldInit) return false
     for (let i = this.scopeStack.length - 1; i >= 0; i--) {
       let scope = this.scopeStack[i]
-      if (scope.inClassFieldInit || scope.flags & SCOPE_CLASS_STATIC_BLOCK) return false
+      if (scope.flags & SCOPE_CLASS_STATIC_BLOCK) return false
       if (scope.flags & SCOPE_FUNCTION) return (scope.flags & SCOPE_ASYNC) > 0
     }
     return (this.inModule && this.options.ecmaVersion >= 13) || this.options.allowAwaitOutsideFunction
