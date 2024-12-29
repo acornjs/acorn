@@ -742,7 +742,7 @@ pp.parseClassField = function(field) {
 
   if (this.eat(tt.eq)) {
     // To raise SyntaxError if 'arguments' exists in the initializer.
-    const scope = this.currentScope()
+    const scope = this.currentThisScope()
     const inClassFieldInit = scope.inClassFieldInit
     scope.inClassFieldInit = true
     field.value = this.parseMaybeAssign()
