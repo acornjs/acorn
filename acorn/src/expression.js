@@ -1043,7 +1043,7 @@ pp.checkUnreserved = function({start, end, name}) {
     this.raiseRecoverable(start, "Cannot use 'yield' as identifier inside a generator")
   if (this.inAsync && name === "await")
     this.raiseRecoverable(start, "Cannot use 'await' as identifier inside an async function")
-  if (this.currentThisScope().inClassFieldInit && name === "arguments")
+  if (this.currentScope().inClassFieldInit && name === "arguments")
     this.raiseRecoverable(start, "Cannot use 'arguments' in class field initializer")
   if (this.inClassStaticBlock && (name === "arguments" || name === "await"))
     this.raise(start, `Cannot use ${name} in class static initialization block`)
