@@ -4,7 +4,7 @@ import {lineBreak, skipWhiteSpace} from "./whitespace.js"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier.js"
 import {hasOwn, loneSurrogate} from "./util.js"
 import {DestructuringErrors} from "./parseutil.js"
-import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION, SCOPE_CLASS_STATIC_BLOCK, SCOPE_SUPER} from "./scopeflags.js"
+import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION, SCOPE_CLASS_STATIC_BLOCK, SCOPE_SUPER, SCOPE_CLASS_FIELD_INIT} from "./scopeflags.js"
 
 const pp = Parser.prototype
 
@@ -742,11 +742,9 @@ pp.parseClassField = function(field) {
 
   if (this.eat(tt.eq)) {
     // To raise SyntaxError if 'arguments' exists in the initializer.
-    const scope = this.currentScope()
-    const inClassFieldInit = scope.inClassFieldInit
-    scope.inClassFieldInit = true
+    this.enterScope(SCOPE_CLASS_FIELD_INIT | SCOPE_SUPER)
     field.value = this.parseMaybeAssign()
-    scope.inClassFieldInit = inClassFieldInit
+    this.exitScope()
   } else {
     field.value = null
   }

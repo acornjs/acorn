@@ -21,7 +21,7 @@ import {types as tokenCtxTypes} from "./tokencontext.js"
 import {Parser} from "./state.js"
 import {DestructuringErrors} from "./parseutil.js"
 import {lineBreak} from "./whitespace.js"
-import {functionFlags, SCOPE_ARROW, SCOPE_SUPER, SCOPE_DIRECT_SUPER, BIND_OUTSIDE, BIND_VAR} from "./scopeflags.js"
+import {functionFlags, SCOPE_ARROW, SCOPE_SUPER, SCOPE_DIRECT_SUPER, BIND_OUTSIDE, BIND_VAR, SCOPE_VAR} from "./scopeflags.js"
 
 const pp = Parser.prototype
 
@@ -1043,7 +1043,7 @@ pp.checkUnreserved = function({start, end, name}) {
     this.raiseRecoverable(start, "Cannot use 'yield' as identifier inside a generator")
   if (this.inAsync && name === "await")
     this.raiseRecoverable(start, "Cannot use 'await' as identifier inside an async function")
-  if (this.currentScope().inClassFieldInit && name === "arguments")
+  if (!(this.currentThisScope().flags & SCOPE_VAR) && name === "arguments")
     this.raiseRecoverable(start, "Cannot use 'arguments' in class field initializer")
   if (this.inClassStaticBlock && (name === "arguments" || name === "await"))
     this.raise(start, `Cannot use ${name} in class static initialization block`)

@@ -9,6 +9,7 @@ export const
     SCOPE_SUPER = 64,
     SCOPE_DIRECT_SUPER = 128,
     SCOPE_CLASS_STATIC_BLOCK = 256,
+    SCOPE_CLASS_FIELD_INIT = 512,
     SCOPE_VAR = SCOPE_TOP | SCOPE_FUNCTION | SCOPE_CLASS_STATIC_BLOCK
 
 export function functionFlags(async, generator) {

@@ -1,5 +1,8 @@
 import {Parser} from "./state.js"
-import {SCOPE_VAR, SCOPE_FUNCTION, SCOPE_TOP, SCOPE_ARROW, SCOPE_SIMPLE_CATCH, BIND_LEXICAL, BIND_SIMPLE_CATCH, BIND_FUNCTION} from "./scopeflags.js"
+import {
+  SCOPE_VAR, SCOPE_FUNCTION, SCOPE_TOP, SCOPE_ARROW, SCOPE_SIMPLE_CATCH, BIND_LEXICAL,
+  BIND_SIMPLE_CATCH, BIND_FUNCTION, SCOPE_CLASS_FIELD_INIT, SCOPE_CLASS_STATIC_BLOCK
+} from "./scopeflags.js"
 
 const pp = Parser.prototype
 
@@ -12,8 +15,6 @@ class Scope {
     this.lexical = []
     // A list of lexically-declared FunctionDeclaration names in the current lexical scope
     this.functions = []
-    // A switch to disallow the identifier reference 'arguments'
-    this.inClassFieldInit = false
   }
 }
 
@@ -84,7 +85,7 @@ pp.currentScope = function() {
 pp.currentVarScope = function() {
   for (let i = this.scopeStack.length - 1;; i--) {
     let scope = this.scopeStack[i]
-    if (scope.flags & SCOPE_VAR) return scope
+    if (scope.flags & (SCOPE_VAR | SCOPE_CLASS_FIELD_INIT | SCOPE_CLASS_STATIC_BLOCK)) return scope
   }
 }
 
@@ -92,6 +93,7 @@ pp.currentVarScope = function() {
 pp.currentThisScope = function() {
   for (let i = this.scopeStack.length - 1;; i--) {
     let scope = this.scopeStack[i]
-    if (scope.flags & SCOPE_VAR && !(scope.flags & SCOPE_ARROW)) return scope
+    if (scope.flags & (SCOPE_VAR | SCOPE_CLASS_FIELD_INIT | SCOPE_CLASS_STATIC_BLOCK) &&
+        !(scope.flags & SCOPE_ARROW)) return scope
   }
 }
