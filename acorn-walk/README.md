@@ -107,7 +107,7 @@ walk.full(acorn.parse("1 + 1"), node => {
 
 **findNodeAt**`(node, start, end, test, base, state)` tries to locate
 a node in a tree at the given start and/or end offsets, which
-satisfies the predicate `test`. `start` and `end` can be either `null`
+satisfies the predicate `test`. `start` and `end` can be either `undefined`
 (as wildcard) or a number. `test` may be a string (indicating a node
 type) or a function that takes `(nodeType, node)` arguments and
 returns a boolean indicating whether this node is interesting. `base`
