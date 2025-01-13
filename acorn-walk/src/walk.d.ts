@@ -66,10 +66,6 @@ export function simple<TState>(
 
 /**
  * does a 'simple' walk over a tree, building up an array of ancestor nodes (including the current node) and passing the array to the callbacks as a third parameter.
- * @param node
- * @param visitors
- * @param base
- * @param state
  */
 export function ancestor<TState>(
     node: acorn.Node,
@@ -94,10 +90,6 @@ export function recursive<TState>(
 
 /**
  * does a 'full' walk over a tree, calling the {@link callback} with the arguments (node, state, type) for each node
- * @param node
- * @param callback
- * @param base
- * @param state
  */
 export function full<TState>(
   node: acorn.Node,
@@ -108,10 +100,6 @@ export function full<TState>(
 
 /**
  * does a 'full' walk over a tree, building up an array of ancestor nodes (including the current node) and passing the array to the callbacks as a third parameter.
- * @param node
- * @param callback
- * @param base
- * @param state
  */
 export function fullAncestor<TState>(
   node: acorn.Node,
@@ -122,8 +110,6 @@ export function fullAncestor<TState>(
 
 /**
  * builds a new walker object by using the walker functions in {@link functions} and filling in the missing ones by taking defaults from {@link base}.
- * @param functions
- * @param base
  */
 export function make<TState>(
   functions: RecursiveVisitors<TState>,
@@ -132,12 +118,6 @@ export function make<TState>(
 
 /**
  * tries to locate a node in a tree at the given start and/or end offsets, which satisfies the predicate test. {@link start} and {@link end} can be either `null` (as wildcard) or a `number`. {@link test} may be a string (indicating a node type) or a function that takes (nodeType, node) arguments and returns a boolean indicating whether this node is interesting. {@link base} and {@link state} are optional, and can be used to specify a custom walker. Nodes are tested from inner to outer, so if two nodes match the boundaries, the inner one will be preferred.
- * @param node
- * @param start
- * @param end
- * @param type
- * @param base
- * @param state
  */
 export function findNodeAt<TState>(
   node: acorn.Node,
@@ -150,11 +130,6 @@ export function findNodeAt<TState>(
 
 /**
  * like {@link findNodeAt}, but will match any node that exists 'around' (spanning) the given position.
- * @param node
- * @param start
- * @param type
- * @param base
- * @param state
  */
 export function findNodeAround<TState>(
   node: acorn.Node,
