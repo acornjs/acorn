@@ -141,8 +141,8 @@ export function make<TState>(
  */
 export function findNodeAt<TState>(
   node: acorn.Node,
-  start: number | undefined,
-  end?: number | undefined,
+  start: number | undefined | null,
+  end?: number | undefined | null,
   type?: FindPredicate | string,
   base?: RecursiveVisitors<TState>,
   state?: TState
@@ -158,7 +158,7 @@ export function findNodeAt<TState>(
  */
 export function findNodeAround<TState>(
   node: acorn.Node,
-  start: number | undefined,
+  start: number | undefined | null,
   type?: FindPredicate | string,
   base?: RecursiveVisitors<TState>,
   state?: TState
