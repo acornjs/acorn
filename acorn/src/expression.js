@@ -831,9 +831,10 @@ pp.parseProperty = function(isPattern, refDestructuringErrors) {
 }
 
 pp.parseGetterSetter = function(prop) {
-  prop.kind = prop.key.name
+  const kind = prop.key.name
   this.parsePropertyName(prop)
   prop.value = this.parseMethod(false)
+  prop.kind = kind
   let paramCount = prop.kind === "get" ? 0 : 1
   if (prop.value.params.length !== paramCount) {
     let start = prop.value.start
@@ -856,9 +857,9 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
     prop.kind = "init"
   } else if (this.options.ecmaVersion >= 6 && this.type === tt.parenL) {
     if (isPattern) this.unexpected()
-    prop.kind = "init"
     prop.method = true
     prop.value = this.parseMethod(isGenerator, isAsync)
+    prop.kind = "init"
   } else if (!isPattern && !containsEsc &&
              this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" &&
              (prop.key.name === "get" || prop.key.name === "set") &&
@@ -870,7 +871,6 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
     this.checkUnreserved(prop.key)
     if (prop.key.name === "await" && !this.awaitIdentPos)
       this.awaitIdentPos = startPos
-    prop.kind = "init"
     if (isPattern) {
       prop.value = this.parseMaybeDefault(startPos, startLoc, this.copyNode(prop.key))
     } else if (this.type === tt.eq && refDestructuringErrors) {
@@ -880,6 +880,7 @@ pp.parsePropertyValue = function(prop, isPattern, isGenerator, isAsync, startPos
     } else {
       prop.value = this.copyNode(prop.key)
     }
+    prop.kind = "init"
     prop.shorthand = true
   } else this.unexpected()
 }
