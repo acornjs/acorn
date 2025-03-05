@@ -19,6 +19,7 @@ module.exports = {
       }
     }
   ],
+  ignorePatterns: ["*.ts"],
   plugins: ["eslint-plugin-import"],
   rules: {
     "no-unreachable-loop": "off",
