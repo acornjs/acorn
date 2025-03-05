@@ -883,6 +883,8 @@ pp.parseExport = function(node, exports) {
       this.checkExport(exports, node.declaration.id, node.declaration.id.start)
     node.specifiers = []
     node.source = null
+    if (this.options.ecmaVersion >= 16)
+      node.attributes = []
   } else { // export { x, y as z } [from '...']
     node.declaration = null
     node.specifiers = this.parseExportSpecifiers(exports)
@@ -904,6 +906,8 @@ pp.parseExport = function(node, exports) {
       }
 
       node.source = null
+      if (this.options.ecmaVersion >= 16)
+        node.attributes = []
     }
     this.semicolon()
   }
