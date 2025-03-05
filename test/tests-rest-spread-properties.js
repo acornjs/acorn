@@ -139,13 +139,13 @@ test("({a,...obj1,b:1,...obj2,c:2})", {
               "end": 3,
               "name": "a"
             },
-            "kind": "init",
             "value": {
               "type": "Identifier",
               "start": 2,
               "end": 3,
               "name": "a"
-            }
+            },
+            "kind": "init"
           },
           {
             "type": "SpreadElement",
@@ -288,13 +288,13 @@ test("({...a,b,c})", {
               "end": 8,
               "name": "b"
             },
-            "kind": "init",
             "value": {
               "type": "Identifier",
               "start": 7,
               "end": 8,
               "name": "b"
-            }
+            },
+            "kind": "init"
           },
           {
             "type": "Property",
@@ -309,13 +309,13 @@ test("({...a,b,c})", {
               "end": 10,
               "name": "c"
             },
-            "kind": "init",
             "value": {
               "type": "Identifier",
               "start": 9,
               "end": 10,
               "name": "c"
-            }
+            },
+            "kind": "init"
           }
         ]
       }
@@ -374,13 +374,13 @@ test("({...(a,b),c})", {
               "end": 12,
               "name": "c"
             },
-            "kind": "init",
             "value": {
               "type": "Identifier",
               "start": 11,
               "end": 12,
               "name": "c"
-            }
+            },
+            "kind": "init"
           }
         ]
       }
@@ -471,13 +471,13 @@ test("({a,...obj} = foo)", {
                 "end": 3,
                 "name": "a"
               },
-              "kind": "init",
               "value": {
                 "type": "Identifier",
                 "start": 2,
                 "end": 3,
                 "name": "a"
-              }
+              },
+              "kind": "init"
             },
             {
               "type": "RestElement",
@@ -710,13 +710,13 @@ test("({a,...obj}) => {}", {
                   "end": 3,
                   "name": "a"
                 },
-                "kind": "init",
                 "value": {
                   "type": "Identifier",
                   "start": 2,
                   "end": 3,
                   "name": "a"
-                }
+                },
+                "kind": "init"
               },
               {
                 "type": "RestElement",
@@ -1289,13 +1289,13 @@ test("let {x, ...y} = v", {
                   "end": 6,
                   "name": "x"
                 },
-                "kind": "init",
                 "value": {
                   "type": "Identifier",
                   "start": 5,
                   "end": 6,
                   "name": "x"
-                }
+                },
+                "kind": "init"
               },
               {
                 "type": "RestElement",
@@ -1358,13 +1358,13 @@ test("(function({x, ...y}) {})", {
                   "end": 12,
                   "name": "x"
                 },
-                "kind": "init",
                 "value": {
                   "type": "Identifier",
                   "start": 11,
                   "end": 12,
                   "name": "x"
-                }
+                },
+                "kind": "init"
               },
               {
                 "type": "RestElement",
@@ -1437,7 +1437,6 @@ test("const fn = ({text = \"default\", ...props}) => text + props.children", {
                       "end": 17,
                       "name": "text"
                     },
-                    "kind": "init",
                     "value": {
                       "type": "AssignmentPattern",
                       "start": 13,
@@ -1455,7 +1454,8 @@ test("const fn = ({text = \"default\", ...props}) => text + props.children", {
                         "value": "default",
                         "raw": "\"default\""
                       }
-                    }
+                    },
+                    "kind": "init"
                   },
                   {
                     "type": "RestElement",

@@ -14740,7 +14740,9 @@ test("let {x} = y", {
             "start": 4,
             "properties": [
               {
+                "type": "Property",
                 "start": 5,
+                "end": 6,
                 "method": false,
                 "shorthand": true,
                 "computed": false,
@@ -14750,15 +14752,13 @@ test("let {x} = y", {
                   "type": "Identifier",
                   "end": 6
                 },
-                "kind": "init",
                 "value": {
                   "start": 5,
                   "name": "x",
                   "type": "Identifier",
                   "end": 6
                 },
-                "type": "Property",
-                "end": 6
+                "kind": "init"
               }
             ],
             "type": "ObjectPattern",
@@ -15181,13 +15181,13 @@ test("function foo() { return {arguments} }", {
                                         "end": 34,
                                         "name": "arguments"
                                     },
-                                    "kind": "init",
                                     "value": {
                                         "type": "Identifier",
                                         "start": 25,
                                         "end": 34,
                                         "name": "arguments"
-                                    }
+                                    },
+                                    "kind": "init"
                                 }
                             ]
                         }
@@ -15243,13 +15243,13 @@ test("function foo() { return {eval} }", {
                                         "end": 29,
                                         "name": "eval"
                                     },
-                                    "kind": "init",
                                     "value": {
                                         "type": "Identifier",
                                         "start": 25,
                                         "end": 29,
                                         "name": "eval"
-                                    }
+                                    },
+                                    "kind": "init"
                                 }
                             ]
                         }
@@ -15317,13 +15317,13 @@ test("function foo() { 'use strict'; return {arguments} }", {
                                         "end": 48,
                                         "name": "arguments"
                                     },
-                                    "kind": "init",
                                     "value": {
                                         "type": "Identifier",
                                         "start": 39,
                                         "end": 48,
                                         "name": "arguments"
-                                    }
+                                    },
+                                    "kind": "init"
                                 }
                             ]
                         }
@@ -15391,13 +15391,13 @@ test("function foo() { 'use strict'; return {eval} }", {
                                         "end": 43,
                                         "name": "eval"
                                     },
-                                    "kind": "init",
                                     "value": {
                                         "type": "Identifier",
                                         "start": 39,
                                         "end": 43,
                                         "name": "eval"
-                                    }
+                                    },
+                                    "kind": "init"
                                 }
                             ]
                         }
@@ -15454,13 +15454,13 @@ test("function foo() { return {yield} }", {
                                         "end": 30,
                                         "name": "yield"
                                     },
-                                    "kind": "init",
                                     "value": {
                                         "type": "Identifier",
                                         "start": 25,
                                         "end": 30,
                                         "name": "yield"
-                                    }
+                                    },
+                                    "kind": "init"
                                 }
                             ]
                         }
@@ -15623,7 +15623,6 @@ test("({*yield() {}})", {
                             "end": 8,
                             "name": "yield"
                         },
-                        "kind": "init",
                         "value": {
                             "type": "FunctionExpression",
                             "start": 8,
@@ -15638,7 +15637,8 @@ test("({*yield() {}})", {
                                 "end": 13,
                                 "body": []
                             }
-                        }
+                        },
+                        "kind": "init"
                     }
                 ]
             }
@@ -15842,7 +15842,6 @@ test("function* foo(a = {*bar() { yield b }}) {}", {
                   "end": 23,
                   "name": "bar"
                 },
-                "kind": "init",
                 "value": {
                   "type": "FunctionExpression",
                   "start": 23,
@@ -15875,7 +15874,8 @@ test("function* foo(a = {*bar() { yield b }}) {}", {
                       }
                     ]
                   }
-                }
+                },
+                "kind": "init"
               }
             ]
           }
@@ -16104,7 +16104,6 @@ test("function* wrap() {\n({a = yield b} = obj)\n}", {
                       "end": 22,
                       "name": "a"
                     },
-                    "kind": "init",
                     "value": {
                       "type": "AssignmentPattern",
                       "start": 21,
@@ -16127,7 +16126,8 @@ test("function* wrap() {\n({a = yield b} = obj)\n}", {
                           "name": "b"
                         }
                       }
-                    }
+                    },
+                    "kind": "init"
                   }
                 ]
               },
@@ -16640,7 +16640,6 @@ test("const myFn = ({ set = '' }) => {};", {
                       "type": "Identifier",
                       "name": "set"
                     },
-                    "kind": "init",
                     "value": {
                       "type": "AssignmentPattern",
                       "left": {
@@ -16651,7 +16650,8 @@ test("const myFn = ({ set = '' }) => {};", {
                         "type": "Literal",
                         "value": ""
                       }
-                    }
+                    },
+                    "kind": "init"
                   }
                 ]
               }
