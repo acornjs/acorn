@@ -182,7 +182,6 @@ test("({foo(a,) {}})", {
               "end": 5,
               "name": "foo"
             },
-            "kind": "init",
             "value": {
               "type": "FunctionExpression",
               "start": 5,
@@ -205,7 +204,8 @@ test("({foo(a,) {}})", {
                 "end": 12,
                 "body": []
               }
-            }
+            },
+            "kind": "init"
           }
         ]
       }

@@ -415,7 +415,6 @@ test("obj = { async f() { for await (x of xs); } }", {
                 "end": 15,
                 "name": "f"
               },
-              "kind": "init",
               "value": {
                 "type": "FunctionExpression",
                 "start": 15,
@@ -455,7 +454,8 @@ test("obj = { async f() { for await (x of xs); } }", {
                     }
                   ]
                 }
-              }
+              },
+              "kind": "init"
             }
           ]
         }
@@ -846,7 +846,6 @@ test("obj = { async* f() { await a; yield b; } }", {
                 "end": 16,
                 "name": "f"
               },
-              "kind": "init",
               "value": {
                 "type": "FunctionExpression",
                 "start": 16,
@@ -896,7 +895,8 @@ test("obj = { async* f() { await a; yield b; } }", {
                     }
                   ]
                 }
-              }
+              },
+              "kind": "init"
             }
           ]
         }
@@ -1249,7 +1249,6 @@ test("var gen = { async *method() {} }", {
                   "end": 25,
                   "name": "method"
                 },
-                "kind": "init",
                 "value": {
                   "type": "FunctionExpression",
                   "start": 25,
@@ -1265,7 +1264,8 @@ test("var gen = { async *method() {} }", {
                     "start": 28,
                     "type": "BlockStatement"
                   }
-                }
+                },
+                "kind": "init"
               }
             ]
           }
@@ -1360,7 +1360,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                   "end": 25,
 //                   "name": "method"
 //                 },
-//                 "kind": "init",
 //                 "value": {
 //                   "type": "FunctionExpression",
 //                   "start": 25,
@@ -1429,7 +1428,8 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                       }
 //                     ]
 //                   }
-//                 }
+//                 },
+//                 "kind": "init"
 //               }
 //             ]
 //           }
@@ -1565,7 +1565,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                   "end": 25,
 //                   "name": "method"
 //                 },
-//                 "kind": "init",
 //                 "value": {
 //                   "type": "FunctionExpression",
 //                   "start": 25,
@@ -1634,7 +1633,8 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                       }
 //                     ]
 //                   }
-//                 }
+//                 },
+//                 "kind": "init"
 //               }
 //             ]
 //           }
@@ -1770,7 +1770,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                   "end": 25,
 //                   "name": "method"
 //                 },
-//                 "kind": "init",
 //                 "value": {
 //                   "type": "FunctionExpression",
 //                   "start": 25,
@@ -1861,7 +1860,8 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                       }
 //                     ]
 //                   }
-//                 }
+//                 },
+//                 "kind": "init"
 //               }
 //             ]
 //           }

@@ -551,7 +551,6 @@ test("({ wrap() { \"use strict\"; foo } })", {
               "end": 7,
               "name": "wrap"
             },
-            "kind": "init",
             "value": {
               "type": "FunctionExpression",
               "start": 7,
@@ -592,7 +591,8 @@ test("({ wrap() { \"use strict\"; foo } })", {
                   }
                 ]
               }
-            }
+            },
+            "kind": "init"
           }
         ]
       },
