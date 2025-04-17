@@ -1,3 +1,9 @@
+## 8.5.0 (2025-04-17)
+
+### New features
+
+Support ES2025 import attributes.
+
 ## 8.4.0 (2023-10-26)
 
 ### Bug fixes
