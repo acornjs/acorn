@@ -1,14 +1,38 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
 name: ci
-on: [push, pull_request]
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
 permissions:
   contents: read
+
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Check code style
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: node --run lint
+
   build-and-test:
     runs-on: ubuntu-latest
     name: Build and test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-      - run: npm install
-      - run: npm test
-      - run: npm run test:test262
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: node --run test
+      - run: node --run test:test262
