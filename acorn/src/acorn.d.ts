@@ -572,7 +572,24 @@ export type ModuleDeclaration =
 | ExportDefaultDeclaration
 | ExportAllDeclaration
 
-export type AnyNode = Statement | Expression | Declaration | ModuleDeclaration | Literal | Program | SwitchCase | CatchClause | Property | Super | SpreadElement | TemplateElement | AssignmentProperty | ObjectPattern | ArrayPattern | RestElement | AssignmentPattern | ClassBody | MethodDefinition | MetaProperty | ImportAttribute | ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier | ExportSpecifier | AnonymousFunctionDeclaration | AnonymousClassDeclaration | PropertyDefinition | PrivateIdentifier | StaticBlock | VariableDeclarator
+/**
+  * This interface is only used for defining {@link AnyNode}. 
+  * It exists so that it can be extended by plugins:
+  *
+  * @example 
+  * ```typescript
+  * declare module 'acorn' {
+  *   interface AllNodesRecord {
+  *     PluginName: FirstNode | SecondNode | ThirdNode | ... | LastNode;
+  *   }
+  * }
+  * ```
+  */
+interface AllNodesRecord {
+  Default: Statement | Expression | Declaration | ModuleDeclaration | Literal | Program | SwitchCase | CatchClause | Property | Super | SpreadElement | TemplateElement | AssignmentProperty | ObjectPattern | ArrayPattern | RestElement | AssignmentPattern | ClassBody | MethodDefinition | MetaProperty | ImportAttribute | ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier | ExportSpecifier | AnonymousFunctionDeclaration | AnonymousClassDeclaration | PropertyDefinition | PrivateIdentifier | StaticBlock | VariableDeclarator;
+}
+
+export type AnyNode = AllNodesRecord[keyof AllNodesRecord];
 
 export function parse(input: string, options: Options): Program
 
