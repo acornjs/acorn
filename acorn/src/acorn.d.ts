@@ -573,14 +573,14 @@ export type ModuleDeclaration =
 | ExportAllDeclaration
 
 /**
-  * This interface is only used for defining {@link AnyNode}. 
+  * This interface is only used for defining {@link AnyNode}.
   * It exists so that it can be extended by plugins:
   *
-  * @example 
+  * @example
   * ```typescript
   * declare module 'acorn' {
   *   interface NodeTypes {
-  *     pluginName: FirstNode | SecondNode | ThirdNode | ... | LastNode;
+  *     pluginName: FirstNode | SecondNode | ThirdNode | ... | LastNode
   *   }
   * }
   * ```
