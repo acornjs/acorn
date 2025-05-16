@@ -579,8 +579,8 @@ export type ModuleDeclaration =
   * @example 
   * ```typescript
   * declare module 'acorn' {
-  *   interface AllNodesRecord {
-  *     PluginName: FirstNode | SecondNode | ThirdNode | ... | LastNode;
+  *   interface NodeTypes {
+  *     pluginName: FirstNode | SecondNode | ThirdNode | ... | LastNode;
   *   }
   * }
   * ```
