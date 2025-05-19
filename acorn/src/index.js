@@ -11,8 +11,6 @@
 // Please use the [github bug tracker][ghbt] to report issues.
 //
 // [ghbt]: https://github.com/acornjs/acorn/issues
-//
-// [walk]: util/walk.js
 
 import {Parser} from "./state.js"
 import "./parseutil.js"
