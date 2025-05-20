@@ -58,7 +58,7 @@ lp.readToken = function() {
         } else {
           replace = false
         }
-      } else if (/invalid (unicode|regexp|number)|expecting unicode|octal literal|is reserved|directly after number|expected number in radix/i.test(msg)) {
+      } else if (/invalid (unicode|regexp|number)|expecting unicode|octal literal|is reserved|directly after number|expected number in radix|numeric separator/i.test(msg)) {
         while (pos < this.input.length && !isSpace(this.input.charCodeAt(pos))) ++pos
       } else if (/character escape|expected hexadecimal/i.test(msg)) {
         while (pos < this.input.length) {
