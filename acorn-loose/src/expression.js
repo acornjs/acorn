@@ -540,7 +540,6 @@ lp.initFunction = function(node) {
   node.params = []
   if (this.options.ecmaVersion >= 6) {
     node.generator = false
-    node.expression = false
   }
   if (this.options.ecmaVersion >= 8)
     node.async = false
