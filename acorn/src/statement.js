@@ -72,6 +72,34 @@ pp.isAsyncFunction = function() {
      !(isIdentifierChar(after = this.input.charCodeAt(next + 8)) || after > 0xd7ff && after < 0xdc00))
 }
 
+// check 'await using' declaration
+pp.isAwaitUsingDeclaration = function() {
+  if (this.options.ecmaVersion < 17 || !this.canAwait || !this.isContextual("await"))
+    return false
+
+  skipWhiteSpace.lastIndex = this.pos
+  let skip = skipWhiteSpace.exec(this.input)
+  let next = this.pos + skip[0].length
+  return this.input.slice(next, next + 5) === "using"
+}
+
+// check whether a "using" declaration is allowed in the current context
+pp.isUsing = function() {
+  if (this.options.ecmaVersion < 17 || !this.isContextual("using"))
+    return false
+  skipWhiteSpace.lastIndex = this.pos
+  let skip = skipWhiteSpace.exec(this.input)
+  let nextPos = this.pos + skip[0].length
+  let ch = this.input.charCodeAt(nextPos)
+  if (ch === 91 || ch === 92 || ch === 123) { // '[', '\\', '{'
+    return true
+  }
+  if (ch > 0xd7ff && ch < 0xdc00) { // astral
+    return true
+  }
+  return isIdentifierStart(ch, true)
+}
+
 // Parse a single statement.
 //
 // If expecting a statement and finding a slash operator, parse a
@@ -146,6 +174,23 @@ pp.parseStatement = function(context, topLevel, exports) {
       if (context) this.unexpected()
       this.next()
       return this.parseFunctionStatement(node, true, !context)
+    }
+
+    // Check for await using declarations
+    if (this.isAwaitUsingDeclaration()) {
+      this.next() // consume 'await'
+      this.next() // consume 'using'
+      this.parseVar(node, false, "await using")
+      this.semicolon()
+      return this.finishNode(node, "VariableDeclaration")
+    }
+
+    // Check for using declarations
+    if (this.isUsing()) {
+      this.next() // consume 'using'
+      this.parseVar(node, false, "using")
+      this.semicolon()
+      return this.finishNode(node, "VariableDeclaration")
     }
 
     let maybeName = this.value, expr = this.parseExpression()
@@ -235,6 +280,32 @@ pp.parseForStatement = function(node) {
     return this.parseFor(node, init)
   }
   let startsWithLet = this.isContextual("let"), isForOf = false
+  let isUsing = this.isUsing()
+  let isAwaitUsing = this.isAwaitUsingDeclaration()
+  if (isUsing || isAwaitUsing) {
+    let init = this.startNode()
+    let kind
+    if (isAwaitUsing) {
+      this.next() // consume 'await'
+      this.next() // consume 'using'
+      kind = "await using"
+    } else {
+      this.next() // consume 'using'
+      kind = "using"
+    }
+    this.parseVar(init, true, kind)
+    this.finishNode(init, "VariableDeclaration")
+    if ((this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1) {
+      if (this.options.ecmaVersion >= 9) {
+        if (this.type === tt._in) {
+          if (awaitAt > -1) this.unexpected(awaitAt)
+        } else node.await = awaitAt > -1
+      }
+      return this.parseForIn(node, init)
+    }
+    if (awaitAt > -1) this.unexpected(awaitAt)
+    return this.parseFor(node, init)
+  }
   let containsEsc = this.containsEsc
   let refDestructuringErrors = new DestructuringErrors
   let initPos = this.start
@@ -511,6 +582,8 @@ pp.parseVar = function(node, isFor, kind, allowMissingInitializer) {
       decl.init = this.parseMaybeAssign(isFor)
     } else if (!allowMissingInitializer && kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
       this.unexpected()
+    } else if (!allowMissingInitializer && (kind === "using" || kind === "await using") && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
+      this.raise(this.lastTokEnd, `Missing initializer in ${kind} declaration`)
     } else if (!allowMissingInitializer && decl.id.type !== "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
       this.raise(this.lastTokEnd, "Complex binding patterns require an initialization value")
     } else {
@@ -883,7 +956,7 @@ pp.parseExport = function(node, exports) {
       this.checkExport(exports, node.declaration.id, node.declaration.id.start)
     node.specifiers = []
     node.source = null
-    if (this.options.ecmaVersion >= 16)
+    if (this.options.ecmaVersion >= 17)
       node.attributes = []
   } else { // export { x, y as z } [from '...']
     node.declaration = null
@@ -975,7 +1048,9 @@ pp.shouldParseExportStatement = function() {
     this.type.keyword === "class" ||
     this.type.keyword === "function" ||
     this.isLet() ||
-    this.isAsyncFunction()
+    this.isAsyncFunction() ||
+    this.isUsing() ||
+    this.isAwaitUsingDeclaration()
 }
 
 // Parses a comma-separated list of module exports.

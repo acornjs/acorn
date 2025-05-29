@@ -148,6 +148,55 @@ export class LooseParser {
     return true
   }
 
+  isLet() {
+    if (this.options.ecmaVersion < 6 || !this.isContextual("let")) return false
+
+    // Check if the current token contains unicode escapes
+    // If so, it should not be treated as a let declaration
+    let currentTokenText = this.input.slice(this.tok.start, this.tok.end)
+    if (currentTokenText.includes("\\u")) return false
+
+    // In loose parser, be more conservative - only treat as let declaration
+    // if followed by clear declaration patterns
+    let nextTok = this.lookAhead(1)
+    if (!nextTok) return false
+    // Check for common let declaration patterns: let x, let {, let [
+    return nextTok.type === tt.name || nextTok.type === tt.braceL || nextTok.type === tt.bracketL
+  }
+
+  isAsyncFunction() {
+    if (this.options.ecmaVersion < 8 || !this.isContextual("async"))
+      return false
+
+    // Check if there is a line break between 'async' and 'function'
+    // If so, it should not be treated as async function
+    let asyncEnd = this.tok.end
+    let nextTok = this.lookAhead(1)
+    if (!nextTok) return false
+
+    // Check for line break between async and function
+    let betweenText = this.input.slice(asyncEnd, nextTok.start)
+    if (/\n|\r/.test(betweenText)) return false
+
+    return nextTok.type === tt._function
+  }
+
+  isUsing() {
+    if (this.options.ecmaVersion < 17 || !this.isContextual("using"))
+      return false
+    return true // loose parser is more permissive
+  }
+
+  isAwaitUsingDeclaration() {
+    if (this.options.ecmaVersion < 17 || !this.isContextual("await"))
+      return false
+    // In modules, top-level await is allowed
+    if (this.inAsync || this.options.sourceType === "module") {
+      return true
+    }
+    return false
+  }
+
   extend(name, f) {
     this[name] = f(this[name])
   }

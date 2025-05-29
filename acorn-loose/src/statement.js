@@ -15,9 +15,9 @@ lp.parseTopLevel = function() {
 }
 
 lp.parseStatement = function() {
-  let starttype = this.tok.type, node = this.startNode(), kind
+  let starttype = this.tok.type, node = this.startNode(), kind = null
 
-  if (this.toks.isLet()) {
+  if (this.isLet()) {
     starttype = tt._var
     kind = "let"
   }
@@ -53,9 +53,43 @@ lp.parseStatement = function() {
     this.pushCx()
     this.expect(tt.parenL)
     if (this.tok.type === tt.semi) return this.parseFor(node, null)
-    let isLet = this.toks.isLet()
-    if (isLet || this.tok.type === tt._var || this.tok.type === tt._const) {
-      let init = this.parseVar(this.startNode(), true, isLet ? "let" : this.tok.value)
+    let isLet = this.isLet()
+    let isUsing = this.isUsing()
+    let isAwaitUsing = !isUsing && this.isAwaitUsingDeclaration()
+
+    if (isLet || this.tok.type === tt._var || this.tok.type === tt._const || isUsing || isAwaitUsing) {
+      let init = this.startNode()
+      let kind
+      if (isLet) {
+        kind = "let"
+        this.next()
+      } else if (isUsing) {
+        kind = "using"
+        this.next()
+      } else if (isAwaitUsing) {
+        kind = "await using"
+        this.next() // consume 'await'
+        this.next() // consume 'using'
+      } else {
+        kind = this.tok.value
+        this.next()
+      }
+
+      init.kind = kind
+      init.declarations = []
+      do {
+        let decl = this.startNode()
+        decl.id = this.options.ecmaVersion >= 6 ? this.toAssignable(this.parseExprAtom(), true) : this.parseIdent()
+        decl.init = this.eat(tt.eq) ? this.parseMaybeAssign(true) : null
+        init.declarations.push(this.finishNode(decl, "VariableDeclarator"))
+      } while (this.eat(tt.comma))
+      if (!init.declarations.length) {
+        let decl = this.startNode()
+        decl.id = this.dummyIdent()
+        init.declarations.push(this.finishNode(decl, "VariableDeclarator"))
+      }
+      this.finishNode(init, "VariableDeclaration")
+
       if (init.declarations.length === 1 && (this.tok.type === tt._in || this.isContextual("of"))) {
         if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
           node.await = isAwait
@@ -191,11 +225,53 @@ lp.parseStatement = function() {
     return this.parseExport()
 
   default:
-    if (this.toks.isAsyncFunction()) {
+    if (this.isAsyncFunction()) {
       this.next()
       this.next()
       return this.parseFunction(node, true, true)
     }
+
+    // Check for using declarations
+    if (this.isUsing()) {
+      this.next() // consume 'using'
+      node.kind = "using"
+      node.declarations = []
+      do {
+        let decl = this.startNode()
+        decl.id = this.options.ecmaVersion >= 6 ? this.toAssignable(this.parseExprAtom(), true) : this.parseIdent()
+        decl.init = this.eat(tt.eq) ? this.parseMaybeAssign(false) : null
+        node.declarations.push(this.finishNode(decl, "VariableDeclarator"))
+      } while (this.eat(tt.comma))
+      if (!node.declarations.length) {
+        let decl = this.startNode()
+        decl.id = this.dummyIdent()
+        node.declarations.push(this.finishNode(decl, "VariableDeclarator"))
+      }
+      this.semicolon()
+      return this.finishNode(node, "VariableDeclaration")
+    }
+
+    // Check for await using declarations
+    if (this.isAwaitUsingDeclaration()) {
+      this.next() // consume 'await'
+      this.next() // consume 'using'
+      node.kind = "await using"
+      node.declarations = []
+      do {
+        let decl = this.startNode()
+        decl.id = this.options.ecmaVersion >= 6 ? this.toAssignable(this.parseExprAtom(), true) : this.parseIdent()
+        decl.init = this.eat(tt.eq) ? this.parseMaybeAssign(false) : null
+        node.declarations.push(this.finishNode(decl, "VariableDeclarator"))
+      } while (this.eat(tt.comma))
+      if (!node.declarations.length) {
+        let decl = this.startNode()
+        decl.id = this.dummyIdent()
+        node.declarations.push(this.finishNode(decl, "VariableDeclarator"))
+      }
+      this.semicolon()
+      return this.finishNode(node, "VariableDeclaration")
+    }
+
     let expr = this.parseExpression()
     if (isDummy(expr)) {
       this.next()
@@ -469,7 +545,7 @@ lp.parseExport = function() {
   if (this.eat(tt._default)) {
     // export default (function foo() {}) // This is FunctionExpression.
     let isAsync
-    if (this.tok.type === tt._function || (isAsync = this.toks.isAsyncFunction())) {
+    if (this.tok.type === tt._function || (isAsync = this.isAsyncFunction())) {
       let fNode = this.startNode()
       this.next()
       if (isAsync) this.next()
@@ -482,10 +558,12 @@ lp.parseExport = function() {
     }
     return this.finishNode(node, "ExportDefaultDeclaration")
   }
-  if (this.tok.type.keyword || this.toks.isLet() || this.toks.isAsyncFunction()) {
+  if (this.tok.type.keyword || this.isLet() || this.isAsyncFunction() || this.isUsing() || this.isAwaitUsingDeclaration()) {
     node.declaration = this.parseStatement()
     node.specifiers = []
     node.source = null
+    if (this.options.ecmaVersion >= 17)
+      node.attributes = []
   } else {
     node.declaration = null
     node.specifiers = this.parseExportSpecifierList()
