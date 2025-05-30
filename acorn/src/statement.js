@@ -72,6 +72,39 @@ pp.isAsyncFunction = function() {
      !(isIdentifierChar(after = this.input.charCodeAt(next + 8)) || after > 0xd7ff && after < 0xdc00))
 }
 
+pp.isUsingKeyword = function(isAwaitUsing) {
+  if (this.options.ecmaVersion < 17 || !this.isContextual(isAwaitUsing ? "await" : "using"))
+    return false
+
+  skipWhiteSpace.lastIndex = this.pos
+  let skip = skipWhiteSpace.exec(this.input)
+  let next = this.pos + skip[0].length
+
+  if (lineBreak.test(this.input.slice(this.pos, next))) return false
+
+  if (isAwaitUsing) {
+    let usingEndPos = next + 5 /** using */
+    if (this.input.slice(next, usingEndPos) !== "using") return false
+    skipWhiteSpace.lastIndex = 0
+    let skipAfterUsing = skipWhiteSpace.exec(this.input.slice(usingEndPos))
+    if (skipAfterUsing) {
+      let nextAfterUsing = usingEndPos + skipAfterUsing[0].length
+      if (lineBreak.test(this.input.slice(usingEndPos, nextAfterUsing))) return false
+    }
+  }
+
+  let ch = this.input.charCodeAt(next)
+  return isIdentifierStart(ch, true) || ch === 92 // '\'
+}
+
+pp.isAwaitUsingDeclaration = function() {
+  return this.isUsingKeyword(true)
+}
+
+pp.isUsing = function() {
+  return this.isUsingKeyword(false)
+}
+
 // Parse a single statement.
 //
 // If expecting a statement and finding a slash operator, parse a
@@ -146,6 +179,20 @@ pp.parseStatement = function(context, topLevel, exports) {
       if (context) this.unexpected()
       this.next()
       return this.parseFunctionStatement(node, true, !context)
+    }
+
+    let usingKind = this.isAwaitUsingDeclaration() ? "await using" : this.isUsing() ? "using" : null
+    if (usingKind) {
+      if (usingKind === "await using") {
+        if (topLevel && !this.inModule) {
+          this.raise(this.pos + 1, "Unexpected token")
+        }
+        this.next()
+      }
+      this.next()
+      this.parseVar(node, false, usingKind)
+      this.semicolon()
+      return this.finishNode(node, "VariableDeclaration")
     }
 
     let maybeName = this.value, expr = this.parseExpression()
@@ -223,18 +270,19 @@ pp.parseForStatement = function(node) {
     this.next()
     this.parseVar(init, true, kind)
     this.finishNode(init, "VariableDeclaration")
-    if ((this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1) {
-      if (this.options.ecmaVersion >= 9) {
-        if (this.type === tt._in) {
-          if (awaitAt > -1) this.unexpected(awaitAt)
-        } else node.await = awaitAt > -1
-      }
-      return this.parseForIn(node, init)
-    }
-    if (awaitAt > -1) this.unexpected(awaitAt)
-    return this.parseFor(node, init)
+    return this.parseForAfterInit(node, init, awaitAt)
   }
   let startsWithLet = this.isContextual("let"), isForOf = false
+
+  let usingKind = this.isUsing() ? "using" : this.isAwaitUsingDeclaration() ? "await using" : null
+  if (usingKind) {
+    let init = this.startNode()
+    this.next()
+    if (usingKind === "await using") this.next()
+    this.parseVar(init, true, usingKind)
+    this.finishNode(init, "VariableDeclaration")
+    return this.parseForAfterInit(node, init, awaitAt)
+  }
   let containsEsc = this.containsEsc
   let refDestructuringErrors = new DestructuringErrors
   let initPos = this.start
@@ -255,6 +303,20 @@ pp.parseForStatement = function(node) {
     return this.parseForIn(node, init)
   } else {
     this.checkExpressionErrors(refDestructuringErrors, true)
+  }
+  if (awaitAt > -1) this.unexpected(awaitAt)
+  return this.parseFor(node, init)
+}
+
+// Helper method to parse for loop after variable initialization
+pp.parseForAfterInit = function(node, init, awaitAt) {
+  if ((this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1) {
+    if (this.options.ecmaVersion >= 9) {
+      if (this.type === tt._in) {
+        if (awaitAt > -1) this.unexpected(awaitAt)
+      } else node.await = awaitAt > -1
+    }
+    return this.parseForIn(node, init)
   }
   if (awaitAt > -1) this.unexpected(awaitAt)
   return this.parseFor(node, init)
@@ -511,6 +573,8 @@ pp.parseVar = function(node, isFor, kind, allowMissingInitializer) {
       decl.init = this.parseMaybeAssign(isFor)
     } else if (!allowMissingInitializer && kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
       this.unexpected()
+    } else if (!allowMissingInitializer && (kind === "using" || kind === "await using") && this.options.ecmaVersion >= 17 && this.type !== tt._in && !this.isContextual("of")) {
+      this.raise(this.lastTokEnd, `Missing initializer in ${kind} declaration`)
     } else if (!allowMissingInitializer && decl.id.type !== "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
       this.raise(this.lastTokEnd, "Complex binding patterns require an initialization value")
     } else {
@@ -523,7 +587,10 @@ pp.parseVar = function(node, isFor, kind, allowMissingInitializer) {
 }
 
 pp.parseVarId = function(decl, kind) {
-  decl.id = this.parseBindingAtom()
+  decl.id = kind === "using" || kind === "await using"
+    ? this.parseIdent()
+    : this.parseBindingAtom()
+
   this.checkLValPattern(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false)
 }
 
