@@ -54,8 +54,19 @@ lp.parseStatement = function() {
     this.expect(tt.parenL)
     if (this.tok.type === tt.semi) return this.parseFor(node, null)
     let isLet = this.toks.isLet()
-    if (isLet || this.tok.type === tt._var || this.tok.type === tt._const) {
-      let init = this.parseVar(this.startNode(), true, isLet ? "let" : this.tok.value)
+    let isAwaitUsing = this.toks.isAwaitUsing(true)
+    let isUsing = !isAwaitUsing && this.toks.isUsing(true)
+
+    if (isLet || this.tok.type === tt._var || this.tok.type === tt._const || isUsing || isAwaitUsing) {
+      let kind = isLet ? "let" : isUsing ? "using" : isAwaitUsing ? "await using" : this.tok.value
+      let init = this.startNode()
+      if (isUsing || isAwaitUsing) {
+        if (isAwaitUsing) this.next()
+        this.parseVar(init, true, kind)
+      } else {
+        init = this.parseVar(init, true, kind)
+      }
+
       if (init.declarations.length === 1 && (this.tok.type === tt._in || this.isContextual("of"))) {
         if (this.options.ecmaVersion >= 9 && this.tok.type !== tt._in) {
           node.await = isAwait
@@ -196,6 +207,16 @@ lp.parseStatement = function() {
       this.next()
       return this.parseFunction(node, true, true)
     }
+
+    if (this.toks.isUsing(false)) {
+      return this.parseVar(node, false, "using")
+    }
+
+    if (this.toks.isAwaitUsing(false)) {
+      this.next()
+      return this.parseVar(node, false, "await using")
+    }
+
     let expr = this.parseExpression()
     if (isDummy(expr)) {
       this.next()
