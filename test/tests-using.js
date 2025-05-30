@@ -1201,3 +1201,1285 @@ testFail("(using x = resource)", "Unexpected token (1:7)", {"ecmaVersion": 17});
 
 // Using with invalid identifier characters
 testFail("{ using \\u0030x = resource; }", "Invalid Unicode escape (1:8)", {"ecmaVersion": 17});
+
+// =============================================================================
+// EDGE CASES - Unusual but valid scenarios and boundary conditions
+// =============================================================================
+
+// --- ECMAScript version compatibility ---
+
+// ES16: using should be treated as regular identifier (assignment)
+test("using = 5;", {
+  type: "Program",
+  start: 0,
+  end: 10,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 10,
+    expression: {
+      type: "AssignmentExpression",
+      start: 0,
+      end: 9,
+      operator: "=",
+      left: {
+        type: "Identifier",
+        start: 0,
+        end: 5,
+        name: "using"
+      },
+      right: {
+        type: "Literal",
+        start: 8,
+        end: 9,
+        value: 5
+      }
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 16});
+
+// ES16: using should be treated as regular identifier (method call)
+test("using.dispose();", {
+  type: "Program",
+  start: 0,
+  end: 16,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 16,
+    expression: {
+      type: "CallExpression",
+      start: 0,
+      end: 15,
+      callee: {
+        type: "MemberExpression",
+        start: 0,
+        end: 13,
+        object: {
+          type: "Identifier",
+          start: 0,
+          end: 5,
+          name: "using"
+        },
+        property: {
+          type: "Identifier",
+          start: 6,
+          end: 13,
+          name: "dispose"
+        },
+        computed: false
+      },
+      arguments: []
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 16});
+
+// ES16: using should be treated as regular identifier (logical expression)
+test("using && doSomething();", {
+  type: "Program",
+  start: 0,
+  end: 23,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 23,
+    expression: {
+      type: "LogicalExpression",
+      start: 0,
+      end: 22,
+      operator: "&&",
+      left: {
+        type: "Identifier",
+        start: 0,
+        end: 5,
+        name: "using"
+      },
+      right: {
+        type: "CallExpression",
+        start: 9,
+        end: 22,
+        callee: {
+          type: "Identifier",
+          start: 9,
+          end: 20,
+          name: "doSomething"
+        },
+        arguments: []
+      }
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 16});
+
+// ES16: await using should be treated as regular identifiers
+test("await.using;", {
+  type: "Program",
+  start: 0,
+  end: 12,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 12,
+    expression: {
+      type: "MemberExpression",
+      start: 0,
+      end: 11,
+      object: {
+        type: "Identifier",
+        start: 0,
+        end: 5,
+        name: "await"
+      },
+      property: {
+        type: "Identifier",
+        start: 6,
+        end: 11,
+        name: "using"
+      },
+      computed: false
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 16});
+
+// --- LineTerminator restrictions ---
+
+// using with LineTerminator should be parsed as identifier + assignment, not using declaration
+test(`using
+x = resource;`, {
+  type: "Program",
+  start: 0,
+  end: 19,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 5,
+    expression: {
+      type: "Identifier",
+      start: 0,
+      end: 5,
+      name: "using"
+    }
+  }, {
+    type: "ExpressionStatement",
+    start: 6,
+    end: 19,
+    expression: {
+      type: "AssignmentExpression",
+      start: 6,
+      end: 18,
+      operator: "=",
+      left: {
+        type: "Identifier",
+        start: 6,
+        end: 7,
+        name: "x"
+      },
+      right: {
+        type: "Identifier",
+        start: 10,
+        end: 18,
+        name: "resource"
+      }
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// LineTerminator between 'await' and 'using' (violates spec)
+testFail(`async function test() { await
+using x = resource; }`, "Unexpected token (2:6)", {"ecmaVersion": 17, "sourceType": "script"});
+
+// await using with LineTerminator after using should be parsed as await identifier + assignment
+test(`async function test() { await using
+x = resource; }`, {
+  type: "Program",
+  start: 0,
+  end: 51,
+  body: [{
+    type: "FunctionDeclaration",
+    start: 0,
+    end: 51,
+    id: {
+      type: "Identifier",
+      start: 15,
+      end: 19,
+      name: "test"
+    },
+    params: [],
+    body: {
+      type: "BlockStatement",
+      start: 22,
+      end: 51,
+      body: [{
+        type: "ExpressionStatement",
+        start: 24,
+        end: 35,
+        expression: {
+          type: "AwaitExpression",
+          start: 24,
+          end: 35,
+          argument: {
+            type: "Identifier",
+            start: 30,
+            end: 35,
+            name: "using"
+          }
+        }
+      }, {
+        type: "ExpressionStatement",
+        start: 36,
+        end: 49,
+        expression: {
+          type: "AssignmentExpression",
+          start: 36,
+          end: 48,
+          operator: "=",
+          left: {
+            type: "Identifier",
+            start: 36,
+            end: 37,
+            name: "x"
+          },
+          right: {
+            type: "Identifier",
+            start: 40,
+            end: 48,
+            name: "resource"
+          }
+        }
+      }]
+    },
+    generator: false,
+    async: true
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Top-level await using with LineTerminator after using should parse as await identifier + assignment
+test(`await using
+x = resource;`, {
+  type: "Program",
+  start: 0,
+  end: 25,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 11,
+    expression: {
+      type: "AwaitExpression",
+      start: 0,
+      end: 11,
+      argument: {
+        type: "Identifier",
+        start: 6,
+        end: 11,
+        name: "using"
+      }
+    }
+  }, {
+    type: "ExpressionStatement",
+    start: 12,
+    end: 25,
+    expression: {
+      type: "AssignmentExpression",
+      start: 12,
+      end: 24,
+      operator: "=",
+      left: {
+        type: "Identifier",
+        start: 12,
+        end: 13,
+        name: "x"
+      },
+      right: {
+        type: "Identifier",
+        start: 16,
+        end: 24,
+        name: "resource"
+      }
+    }
+  }],
+  sourceType: "module"
+}, {"ecmaVersion": 17, "sourceType": "module"});
+
+// Valid case: Comments between await and using (no actual LineTerminator)
+test("async function test() { await /* comment */ using x = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 65,
+  body: [{
+    type: "FunctionDeclaration",
+    start: 0,
+    end: 65,
+    id: {
+      type: "Identifier",
+      start: 15,
+      end: 19,
+      name: "test"
+    },
+    params: [],
+    body: {
+      type: "BlockStatement",
+      start: 22,
+      end: 65,
+      body: [{
+        type: "VariableDeclaration",
+        start: 24,
+        end: 63,
+        declarations: [{
+          type: "VariableDeclarator",
+          start: 50,
+          end: 62,
+          id: {
+            type: "Identifier",
+            start: 50,
+            end: 51,
+            name: "x"
+          },
+          init: {
+            type: "Identifier",
+            start: 54,
+            end: 62,
+            name: "resource"
+          }
+        }],
+        kind: "await using"
+      }]
+    },
+    generator: false,
+    async: true
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Multiple line terminators should be parsed as separate statements
+test(`using
+
+
+x = resource;`, {
+  type: "Program",
+  start: 0,
+  end: 21,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 5,
+    expression: {
+      type: "Identifier",
+      start: 0,
+      end: 5,
+      name: "using"
+    }
+  }, {
+    type: "ExpressionStatement",
+    start: 8,
+    end: 21,
+    expression: {
+      type: "AssignmentExpression",
+      start: 8,
+      end: 20,
+      operator: "=",
+      left: {
+        type: "Identifier",
+        start: 8,
+        end: 9,
+        name: "x"
+      },
+      right: {
+        type: "Identifier",
+        start: 12,
+        end: 20,
+        name: "resource"
+      }
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// --- Unicode and special characters ---
+
+// Using with Unicode escape sequence identifier
+test("{ using \\u0078 = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 28,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 28,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 26,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 25,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 14,
+          name: "x"
+        },
+        init: {
+          type: "Identifier",
+          start: 17,
+          end: 25,
+          name: "resource"
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using with Latin-1 supplement characters
+test("{ using café = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 26,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 26,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 24,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 23,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 12,
+          name: "café"
+        },
+        init: {
+          type: "Identifier",
+          start: 15,
+          end: 23,
+          name: "resource"
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Await using with Unicode identifier
+test("async function test() { await using \\u03B1 = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 56,
+  body: [{
+    type: "FunctionDeclaration",
+    start: 0,
+    end: 56,
+    id: {
+      type: "Identifier",
+      start: 15,
+      end: 19,
+      name: "test"
+    },
+    params: [],
+    body: {
+      type: "BlockStatement",
+      start: 22,
+      end: 56,
+      body: [{
+        type: "VariableDeclaration",
+        start: 24,
+        end: 54,
+        declarations: [{
+          type: "VariableDeclarator",
+          start: 36,
+          end: 53,
+          id: {
+            type: "Identifier",
+            start: 36,
+            end: 42,
+            name: "α"
+          },
+          init: {
+            type: "Identifier",
+            start: 45,
+            end: 53,
+            name: "resource"
+          }
+        }],
+        kind: "await using"
+      }]
+    },
+    generator: false,
+    async: true
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Unicode in using identifier
+test("{ using \\u{61} = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 28,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 28,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 26,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 25,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 14,
+          name: "a"
+        },
+        init: {
+          type: "Identifier",
+          start: 17,
+          end: 25,
+          name: "resource"
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// --- Complex expressions and ASI ---
+
+// Using with complex member expression
+test("{ using x = obj.resource.handle; }", {
+  type: "Program",
+  start: 0,
+  end: 34,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 34,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 32,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 31,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "MemberExpression",
+          start: 12,
+          end: 31,
+          object: {
+            type: "MemberExpression",
+            start: 12,
+            end: 24,
+            object: {
+              type: "Identifier",
+              start: 12,
+              end: 15,
+              name: "obj"
+            },
+            property: {
+              type: "Identifier",
+              start: 16,
+              end: 24,
+              name: "resource"
+            },
+            computed: false
+          },
+          property: {
+            type: "Identifier",
+            start: 25,
+            end: 31,
+            name: "handle"
+          },
+          computed: false
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using with computed property access
+test("{ using x = obj[key]; }", {
+  type: "Program",
+  start: 0,
+  end: 23,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 23,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 21,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 20,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "MemberExpression",
+          start: 12,
+          end: 20,
+          object: {
+            type: "Identifier",
+            start: 12,
+            end: 15,
+            name: "obj"
+          },
+          property: {
+            type: "Identifier",
+            start: 16,
+            end: 19,
+            name: "key"
+          },
+          computed: true
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using with call expression
+test("{ using x = createResource(); }", {
+  type: "Program",
+  start: 0,
+  end: 31,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 31,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 29,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 28,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "CallExpression",
+          start: 12,
+          end: 28,
+          callee: {
+            type: "Identifier",
+            start: 12,
+            end: 26,
+            name: "createResource"
+          },
+          arguments: []
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using with conditional (ternary) expression
+test("{ using x = condition ? resource1 : resource2; }", {
+  type: "Program",
+  start: 0,
+  end: 48,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 48,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 46,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 45,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "ConditionalExpression",
+          start: 12,
+          end: 45,
+          test: {
+            type: "Identifier",
+            start: 12,
+            end: 21,
+            name: "condition"
+          },
+          consequent: {
+            type: "Identifier",
+            start: 24,
+            end: 33,
+            name: "resource1"
+          },
+          alternate: {
+            type: "Identifier",
+            start: 36,
+            end: 45,
+            name: "resource2"
+          }
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using with logical OR expression
+test("{ using x = resource || fallback; }", {
+  type: "Program",
+  start: 0,
+  end: 35,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 35,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 33,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 32,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "LogicalExpression",
+          start: 12,
+          end: 32,
+          operator: "||",
+          left: {
+            type: "Identifier",
+            start: 12,
+            end: 20,
+            name: "resource"
+          },
+          right: {
+            type: "Identifier",
+            start: 24,
+            end: 32,
+            name: "fallback"
+          }
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Test null and undefined as valid initializers
+test("{ using x = null; }", {
+  type: "Program",
+  start: 0,
+  end: 19,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 19,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 17,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 16,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "Literal",
+          start: 12,
+          end: 16,
+          value: null
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+test("{ using x = undefined; }", {
+  type: "Program",
+  start: 0,
+  end: 24,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 24,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 22,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 21,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "Identifier",
+          start: 12,
+          end: 21,
+          name: "undefined"
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using with BigInt literal
+test("{ using x = 123n; }", {
+  type: "Program",
+  start: 0,
+  end: 19,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 19,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 17,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 16,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "Literal",
+          start: 12,
+          end: 16,
+          value: 123n,
+          bigint: "123"
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// ASI (Automatic Semicolon Insertion) test - using without semicolon 
+test("{ using x = resource\n}", {
+  type: "Program",
+  start: 0,
+  end: 22,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 22,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 20,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 20,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 9,
+          name: "x"
+        },
+        init: {
+          type: "Identifier",
+          start: 12,
+          end: 20,
+          name: "resource"
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// --- Additional contexts ---
+
+// Using in catch clause
+test("try {} catch (e) { using x = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 40,
+  body: [{
+    type: "TryStatement",
+    start: 0,
+    end: 40,
+    block: {
+      type: "BlockStatement",
+      start: 4,
+      end: 6,
+      body: []
+    },
+    handler: {
+      type: "CatchClause",
+      start: 7,
+      end: 40,
+      param: {
+        type: "Identifier",
+        start: 14,
+        end: 15,
+        name: "e"
+      },
+      body: {
+        type: "BlockStatement",
+        start: 17,
+        end: 40,
+        body: [{
+          type: "VariableDeclaration",
+          start: 19,
+          end: 38,
+          declarations: [{
+            type: "VariableDeclarator",
+            start: 25,
+            end: 37,
+            id: {
+              type: "Identifier",
+              start: 25,
+              end: 26,
+              name: "x"
+            },
+            init: {
+              type: "Identifier",
+              start: 29,
+              end: 37,
+              name: "resource"
+            }
+          }],
+          kind: "using"
+        }]
+      }
+    },
+    finalizer: null
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using in finally clause
+test("try {} finally { using x = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 38,
+  body: [{
+    type: "TryStatement",
+    start: 0,
+    end: 38,
+    block: {
+      type: "BlockStatement",
+      start: 4,
+      end: 6,
+      body: []
+    },
+    handler: null,
+    finalizer: {
+      type: "BlockStatement",
+      start: 15,
+      end: 38,
+      body: [{
+        type: "VariableDeclaration",
+        start: 17,
+        end: 36,
+        declarations: [{
+          type: "VariableDeclarator",
+          start: 23,
+          end: 35,
+          id: {
+            type: "Identifier",
+            start: 23,
+            end: 24,
+            name: "x"
+          },
+          init: {
+            type: "Identifier",
+            start: 27,
+            end: 35,
+            name: "resource"
+          }
+        }],
+        kind: "using"
+      }]
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using in if statement block
+test("if (condition) { using x = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 38,
+  body: [{
+    type: "IfStatement",
+    start: 0,
+    end: 38,
+    test: {
+      type: "Identifier",
+      start: 4,
+      end: 13,
+      name: "condition"
+    },
+    consequent: {
+      type: "BlockStatement",
+      start: 15,
+      end: 38,
+      body: [{
+        type: "VariableDeclaration",
+        start: 17,
+        end: 36,
+        declarations: [{
+          type: "VariableDeclarator",
+          start: 23,
+          end: 35,
+          id: {
+            type: "Identifier",
+            start: 23,
+            end: 24,
+            name: "x"
+          },
+          init: {
+            type: "Identifier",
+            start: 27,
+            end: 35,
+            name: "resource"
+          }
+        }],
+        kind: "using"
+      }]
+    },
+    alternate: null
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using in while statement block
+test("while (condition) { using x = resource; break; }", {
+  type: "Program",
+  start: 0,
+  end: 48,
+  body: [{
+    type: "WhileStatement",
+    start: 0,
+    end: 48,
+    test: {
+      type: "Identifier",
+      start: 7,
+      end: 16,
+      name: "condition"
+    },
+    body: {
+      type: "BlockStatement",
+      start: 18,
+      end: 48,
+      body: [{
+        type: "VariableDeclaration",
+        start: 20,
+        end: 39,
+        declarations: [{
+          type: "VariableDeclarator",
+          start: 26,
+          end: 38,
+          id: {
+            type: "Identifier",
+            start: 26,
+            end: 27,
+            name: "x"
+          },
+          init: {
+            type: "Identifier",
+            start: 30,
+            end: 38,
+            name: "resource"
+          }
+        }],
+        kind: "using"
+      }, {
+        type: "BreakStatement",
+        start: 40,
+        end: 46,
+        label: null
+      }]
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using in labeled statement block
+test("label: { using x = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 30,
+  body: [{
+    type: "LabeledStatement",
+    start: 0,
+    end: 30,
+    label: {
+      type: "Identifier",
+      start: 0,
+      end: 5,
+      name: "label"
+    },
+    body: {
+      type: "BlockStatement",
+      start: 7,
+      end: 30,
+      body: [{
+        type: "VariableDeclaration",
+        start: 9,
+        end: 28,
+        declarations: [{
+          type: "VariableDeclarator",
+          start: 15,
+          end: 27,
+          id: {
+            type: "Identifier",
+            start: 15,
+            end: 16,
+            name: "x"
+          },
+          init: {
+            type: "Identifier",
+            start: 19,
+            end: 27,
+            name: "resource"
+          }
+        }],
+        kind: "using"
+      }]
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using with 'arguments' identifier
+test("{ using arguments = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 31,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 31,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 29,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 28,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 17,
+          name: "arguments"
+        },
+        init: {
+          type: "Identifier",
+          start: 20,
+          end: 28,
+          name: "resource"
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// Using with 'eval' identifier (should work, eval is not restricted in using declarations)
+test("{ using eval = resource; }", {
+  type: "Program",
+  start: 0,
+  end: 26,
+  body: [{
+    type: "BlockStatement",
+    start: 0,
+    end: 26,
+    body: [{
+      type: "VariableDeclaration",
+      start: 2,
+      end: 24,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 8,
+        end: 23,
+        id: {
+          type: "Identifier",
+          start: 8,
+          end: 12,
+          name: "eval"
+        },
+        init: {
+          type: "Identifier",
+          start: 15,
+          end: 23,
+          name: "resource"
+        }
+      }],
+      kind: "using"
+    }]
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17}); 
