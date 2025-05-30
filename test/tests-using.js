@@ -1126,3 +1126,78 @@ test("class C { static { using x = resource; } }", {
   }],
   sourceType: "script"
 }, {"ecmaVersion": 17});
+
+// =============================================================================
+// ERROR CASES - Expected failures and invalid syntax
+// =============================================================================
+
+// Basic missing initializer
+testFail("{ using x; }", "Missing initializer in using declaration (1:9)", {"ecmaVersion": 17});
+testFail("{ using x = 5, y; }", "Missing initializer in using declaration (1:16)", {"ecmaVersion": 17});
+
+// Await using missing initializer
+testFail("async function test() { await using x; }", "Missing initializer in await using declaration (1:37)", {"ecmaVersion": 17});
+
+// Using with object destructuring is not supported
+testFail("{ using {x} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});
+
+// Complex object destructuring with renaming is not supported
+testFail("{ using {x: y, z} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});
+
+// Export using declarations - should fail as they are not allowed
+testFail("export using x = resource;", "Unexpected token (1:7)", {"ecmaVersion": 17, "sourceType": "module"});
+testFail("export await using x = resource;", "Unexpected token (1:7)", {"ecmaVersion": 17, "sourceType": "module"});
+
+// Using with wrong ecmaVersion - should fail with Unexpected token
+testFail("{ using x = resource; }", "Unexpected token (1:8)", {"ecmaVersion": 16});
+
+// Top-level await using in script mode should fail  
+testFail("await using x = resource;", "Unexpected token (1:6)", {"ecmaVersion": 17, "sourceType": "script"});
+
+// Using in for-in with initializer (should fail)
+testFail("for (using x = resource in obj) {}", "for-in loop variable declaration may not have an initializer (1:5)", {"ecmaVersion": 17});
+
+// Using in for-of with initializer (should fail)
+testFail("for (using x = resource of arr) {}", "for-of loop variable declaration may not have an initializer (1:5)", {"ecmaVersion": 17});
+
+// "let" is not allowed as variable name in using declaration
+testFail("{ using let = resource; }", "let is disallowed as a lexically bound name (1:8)", {"ecmaVersion": 17});
+
+// Duplicate variable names in using declaration
+testFail("{ using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:23)", {"ecmaVersion": 17});
+
+// Reserved words and strict mode restrictions
+testFail("{ using super = resource; }", "Unexpected keyword 'super' (1:8)", {"ecmaVersion": 17});
+testFail("{ using this = resource; }", "Unexpected keyword 'this' (1:8)", {"ecmaVersion": 17});
+testFail("'use strict'; { using arguments = resource; }", "Binding arguments in strict mode (1:22)", {"ecmaVersion": 17});
+testFail("'use strict'; { using eval = resource; }", "Binding eval in strict mode (1:22)", {"ecmaVersion": 17});
+
+// Context-sensitive keyword restrictions
+testFail("function* gen() { using yield = resource; }", "Cannot use 'yield' as identifier inside a generator (1:24)", {"ecmaVersion": 17});
+testFail("async function test() { using await = resource; }", "Cannot use 'await' as identifier inside an async function (1:30)", {"ecmaVersion": 17});
+
+// Rest elements are not allowed in await using declarations
+testFail("async function test() { await using [first, ...rest] = arr; }", "Unexpected token (1:36)", {"ecmaVersion": 17});
+
+// Strict mode restrictions with await using
+testFail("'use strict'; async function test() { await using arguments = resource; }", "Binding arguments in strict mode (1:50)", {"ecmaVersion": 17});
+testFail("'use strict'; async function test() { await using eval = resource; }", "Binding eval in strict mode (1:50)", {"ecmaVersion": 17});
+
+// Duplicate variable names in await using declaration
+testFail("async function test() { await using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:51)", {"ecmaVersion": 17});
+
+// Valid destructuring with default values in using - should be an error
+testFail("{ using {x = 5} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});
+
+// Using with object destructuring and computed property names - should be an error
+testFail("{ using {[key]: value} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});
+
+// 'let' is not allowed as variable name in await using declaration
+testFail("async function test() { await using let = resource; }", "let is disallowed as a lexically bound name (1:36)", {"ecmaVersion": 17});
+testFail("async function test() { await using x = resource1, let = resource2; }", "let is disallowed as a lexically bound name (1:51)", {"ecmaVersion": 17});
+
+// Using declaration inside expression (should not be allowed)
+testFail("(using x = resource)", "Unexpected token (1:7)", {"ecmaVersion": 17});
+
+// Using with invalid identifier characters
+testFail("{ using \\u0030x = resource; }", "Invalid Unicode escape (1:8)", {"ecmaVersion": 17});
