@@ -72,7 +72,7 @@ pp.isAsyncFunction = function() {
      !(isIdentifierChar(after = this.input.charCodeAt(next + 8)) || after > 0xd7ff && after < 0xdc00))
 }
 
-pp.isUsingKeyword = function(isAwaitUsing) {
+pp.isUsingKeyword = function(isAwaitUsing, isFor) {
   if (this.options.ecmaVersion < 17 || !this.isContextual(isAwaitUsing ? "await" : "using"))
     return false
 
@@ -83,13 +83,23 @@ pp.isUsingKeyword = function(isAwaitUsing) {
   if (lineBreak.test(this.input.slice(this.pos, next))) return false
 
   if (isAwaitUsing) {
-    let usingEndPos = next + 5 /** using */
-    if (this.input.slice(next, usingEndPos) !== "using") return false
-    skipWhiteSpace.lastIndex = 0
-    let skipAfterUsing = skipWhiteSpace.exec(this.input.slice(usingEndPos))
-    if (skipAfterUsing) {
-      let nextAfterUsing = usingEndPos + skipAfterUsing[0].length
-      if (lineBreak.test(this.input.slice(usingEndPos, nextAfterUsing))) return false
+    let awaitEndPos = next + 5 /* await */, after
+    if (this.input.slice(next, awaitEndPos) !== "using" ||
+      awaitEndPos === this.input.length ||
+      isIdentifierChar(after = this.input.charCodeAt(awaitEndPos)) ||
+      (after > 0xd7ff && after < 0xdc00)
+    ) return false
+
+    skipWhiteSpace.lastIndex = awaitEndPos
+    let skipAfterUsing = skipWhiteSpace.exec(this.input)
+    if (skipAfterUsing && lineBreak.test(this.input.slice(awaitEndPos, awaitEndPos + skipAfterUsing[0].length))) return false
+  }
+
+  if (isFor) {
+    let ofEndPos = next + 2 /* of */, after
+    if (this.input.slice(next, ofEndPos) === "of") {
+      if (ofEndPos === this.input.length ||
+        (!isIdentifierChar(after = this.input.charCodeAt(ofEndPos)) && !(after > 0xd7ff && after < 0xdc00))) return false
     }
   }
 
@@ -97,12 +107,12 @@ pp.isUsingKeyword = function(isAwaitUsing) {
   return isIdentifierStart(ch, true) || ch === 92 // '\'
 }
 
-pp.isAwaitUsing = function() {
-  return this.isUsingKeyword(true)
+pp.isAwaitUsing = function(isFor) {
+  return this.isUsingKeyword(true, isFor)
 }
 
-pp.isUsing = function() {
-  return this.isUsingKeyword(false)
+pp.isUsing = function(isFor) {
+  return this.isUsingKeyword(false, isFor)
 }
 
 // Parse a single statement.
@@ -181,7 +191,7 @@ pp.parseStatement = function(context, topLevel, exports) {
       return this.parseFunctionStatement(node, true, !context)
     }
 
-    let usingKind = this.isAwaitUsing() ? "await using" : this.isUsing() ? "using" : null
+    let usingKind = this.isAwaitUsing(false) ? "await using" : this.isUsing(false) ? "using" : null
     if (usingKind) {
       if (usingKind === "await using") {
         if (topLevel && !this.inModule) {
@@ -274,7 +284,7 @@ pp.parseForStatement = function(node) {
   }
   let startsWithLet = this.isContextual("let"), isForOf = false
 
-  let usingKind = this.isUsing() ? "using" : this.isAwaitUsing() ? "await using" : null
+  let usingKind = this.isUsing(true) ? "using" : this.isAwaitUsing(true) ? "await using" : null
   if (usingKind) {
     let init = this.startNode()
     this.next()

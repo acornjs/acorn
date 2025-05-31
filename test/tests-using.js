@@ -2727,3 +2727,46 @@ test("for (using ofa of x) {}", {
   }],
   sourceType: "script"
 }, {"ecmaVersion": 17});
+
+// await using should be treated as regular identifiers when not followed by variable declaration
+test("async function test() { await usingX; }", {
+  type: "Program",
+  start: 0,
+  end: 39,
+  body: [{
+    type: "FunctionDeclaration",
+    start: 0,
+    end: 39,
+    id: {
+      type: "Identifier",
+      start: 15,
+      end: 19,
+      name: "test"
+    },
+    generator: false,
+    async: true,
+    params: [],
+    body: {
+      type: "BlockStatement",
+      start: 22,
+      end: 39,
+      body: [{
+        type: "ExpressionStatement",
+        start: 24,
+        end: 37,
+        expression: {
+          type: "AwaitExpression",
+          start: 24,
+          end: 36,
+          argument: {
+            type: "Identifier",
+            start: 30,
+            end: 36,
+            name: "usingX"
+          }
+        }
+      }]
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
