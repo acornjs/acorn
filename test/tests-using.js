@@ -186,8 +186,8 @@ test("using x = resource;", {
     }],
     kind: "using"
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {"ecmaVersion": 17, "sourceType": "module"});
 
 // --- Await using declarations ---
 
@@ -1131,6 +1131,22 @@ test("class C { static { using x = resource; } }", {
 // ERROR CASES - Expected failures and invalid syntax
 // =============================================================================
 
+// BoundNames contains "let"
+testFail("{ using let = resource; }", "let is disallowed as a lexically bound name (1:8)", {"ecmaVersion": 17});
+// BoundNames contains duplicate entries
+testFail("let await using x = resource;", "Unexpected token (1:10)", {"ecmaVersion": 17});
+// let using is not allowed
+testFail("let using x = resource;", "Unexpected token (1:10)", {"ecmaVersion": 17});
+// top level using is not allowed
+testFail("using x = resource;", "Using declaration cannot appear in the top level when source type is `script` (1:0)", {"ecmaVersion": 17, "sourceType": "script"});
+
+// BoundNames contains "let"  
+testFail("async function test() { await using let = resource; }", "let is disallowed as a lexically bound name (1:36)", {"ecmaVersion": 17});
+// BoundNames contains duplicate entries
+testFail("async function test() { await using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:51)", {"ecmaVersion": 17});
+// top level await using is not allowed
+testFail("await using x = resource;", "Using declaration cannot appear in the top level when source type is `script` (1:0)", {"ecmaVersion": 17, "sourceType": "script"});
+
 // Basic missing initializer
 testFail("{ using x; }", "Missing initializer in using declaration (1:9)", {"ecmaVersion": 17});
 testFail("{ using x = 5, y; }", "Missing initializer in using declaration (1:16)", {"ecmaVersion": 17});
@@ -1150,9 +1166,6 @@ testFail("export await using x = resource;", "Unexpected token (1:7)", {"ecmaVer
 
 // Using with wrong ecmaVersion - should fail with Unexpected token
 testFail("{ using x = resource; }", "Unexpected token (1:8)", {"ecmaVersion": 16});
-
-// Top-level await using in script mode should fail  
-testFail("await using x = resource;", "Unexpected token (1:6)", {"ecmaVersion": 17, "sourceType": "script"});
 
 // Using in for-in with initializer (should fail)
 testFail("for (using x = resource in obj) {}", "for-in loop variable declaration may not have an initializer (1:5)", {"ecmaVersion": 17});
@@ -1182,9 +1195,6 @@ testFail("async function test() { await using [first, ...rest] = arr; }", "Unexp
 // Strict mode restrictions with await using
 testFail("'use strict'; async function test() { await using arguments = resource; }", "Binding arguments in strict mode (1:50)", {"ecmaVersion": 17});
 testFail("'use strict'; async function test() { await using eval = resource; }", "Binding eval in strict mode (1:50)", {"ecmaVersion": 17});
-
-// Duplicate variable names in await using declaration
-testFail("async function test() { await using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:51)", {"ecmaVersion": 17});
 
 // Valid destructuring with default values in using - should be an error
 testFail("{ using {x = 5} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});

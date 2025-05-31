@@ -193,13 +193,11 @@ pp.parseStatement = function(context, topLevel, exports) {
 
     let usingKind = this.isAwaitUsing(false) ? "await using" : this.isUsing(false) ? "using" : null
     if (usingKind) {
-      if (usingKind === "await using") {
-        if (topLevel && !this.inModule) {
-          this.raise(this.pos + 1, "Unexpected token")
-        }
-        this.next()
+      if (topLevel && this.options.sourceType === "script") {
+        this.raise(this.start, "Using declaration cannot appear in the top level when source type is `script`")
       }
       this.next()
+      if (usingKind === "await using") this.next()
       this.parseVar(node, false, usingKind)
       this.semicolon()
       return this.finishNode(node, "VariableDeclaration")
