@@ -42,8 +42,8 @@ test("{ using x = resource; }", {
       "kind": "using"
     }]
   }],
-  "sourceType": "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Multiple variable declarations
 test("{ using a = resource1, b = resource2; }", {
@@ -94,8 +94,8 @@ test("{ using a = resource1, b = resource2; }", {
       "kind": "using"
     }]
   }],
-  "sourceType": "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with array syntax - this should be parsed as member expression assignment using[a, b] = arr
 test("{ using [a, b] = arr; }", {
@@ -155,8 +155,8 @@ test("{ using [a, b] = arr; }", {
       }
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Top-level using declaration
 test("using x = resource;", {
@@ -187,7 +187,7 @@ test("using x = resource;", {
     kind: "using"
   }],
   sourceType: "module"
-}, {"ecmaVersion": 17, "sourceType": "module"});
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // --- Await using declarations ---
 
@@ -238,8 +238,8 @@ test("async function test() { await using x = resource; }", {
     generator: false,
     async: true
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Await using with multiple declarations
 test("async function test() { await using a = resource1, b = resource2; }", {
@@ -304,44 +304,8 @@ test("async function test() { await using a = resource1, b = resource2; }", {
     generator: false,
     async: true
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
-
-// Await using outside async context - but in block statement should work
-test("{ await using x = resource; }", {
-  type: "Program",
-  start: 0,
-  end: 29,
-  body: [{
-    type: "BlockStatement",
-    start: 0,
-    end: 29,
-    body: [{
-      type: "VariableDeclaration",
-      start: 2,
-      end: 27,
-      declarations: [{
-        type: "VariableDeclarator",
-        start: 14,
-        end: 26,
-        id: {
-          type: "Identifier",
-          start: 14,
-          end: 15,
-          name: "x"
-        },
-        init: {
-          type: "Identifier",
-          start: 18,
-          end: 26,
-          name: "resource"
-        }
-      }],
-      kind: "await using"
-    }]
-  }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Top-level await using - should work in module context
 test("await using x = resource;", {
@@ -372,7 +336,7 @@ test("await using x = resource;", {
     kind: "await using"
   }],
   sourceType: "module"
-}, {"ecmaVersion": 17, "sourceType": "module"});
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // --- Using in different contexts ---
 
@@ -423,8 +387,8 @@ test("function test() { using x = resource; }", {
     generator: false,
     async: false
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using in generator function
 test("function* generator() { using x = resource; yield x; }", {
@@ -489,8 +453,8 @@ test("function* generator() { using x = resource; yield x; }", {
     generator: true,
     async: false
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using in async generator function 
 test("async function* asyncGenerator() { await using x = resource; yield x; }", {
@@ -555,8 +519,8 @@ test("async function* asyncGenerator() { await using x = resource; yield x; }", 
     generator: true,
     async: true
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using in try/catch/finally blocks
 test("try { using x = resource; } catch (e) { }", {
@@ -614,8 +578,8 @@ test("try { using x = resource; } catch (e) { }", {
     },
     finalizer: null
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with Symbol.dispose
 test("{ using resource = { [Symbol.dispose]() {} }; }", {
@@ -690,8 +654,8 @@ test("{ using resource = { [Symbol.dispose]() {} }; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // DisposableStack usage
 test("{ using stack = new DisposableStack(); }", {
@@ -732,8 +696,8 @@ test("{ using stack = new DisposableStack(); }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // AsyncDisposableStack usage
 test("async function test() { await using stack = new AsyncDisposableStack(); }", {
@@ -788,8 +752,8 @@ test("async function test() { await using stack = new AsyncDisposableStack(); }"
     generator: false,
     async: true
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // --- Using in loops ---
 
@@ -863,8 +827,8 @@ test("for (using x = resource; i < 10; i++) {}", {
       body: []
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // For-of loop with using
 test("for (using x of resources) {}", {
@@ -906,8 +870,8 @@ test("for (using x of resources) {}", {
       body: []
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // For-in loop with using
 test("for (using x in obj) {}", {
@@ -949,8 +913,8 @@ test("for (using x in obj) {}", {
       body: []
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Await using in for-of loop
 test("async function test() { for (await using x of resources) {} }", {
@@ -1011,8 +975,8 @@ test("async function test() { for (await using x of resources) {} }", {
     generator: false,
     async: true
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // --- Using in special contexts ---
 
@@ -1071,8 +1035,8 @@ test("switch (x) { case 1: { using y = resource; } }", {
       }]
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using in class static block
 test("class C { static { using x = resource; } }", {
@@ -1124,93 +1088,96 @@ test("class C { static { using x = resource; } }", {
       }]
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // =============================================================================
 // ERROR CASES - Expected failures and invalid syntax
 // =============================================================================
 
 // BoundNames contains "let"
-testFail("{ using let = resource; }", "let is disallowed as a lexically bound name (1:8)", {"ecmaVersion": 17});
+testFail("{ using let = resource; }", "The keyword 'let' is reserved (1:8)", {ecmaVersion: 17, sourceType: "module"});
 // BoundNames contains duplicate entries
-testFail("let await using x = resource;", "Unexpected token (1:10)", {"ecmaVersion": 17});
+testFail("let await using x = resource;", "Cannot use keyword 'await' outside an async function (1:4)", {ecmaVersion: 17, sourceType: "module"});
 // let using is not allowed
-testFail("let using x = resource;", "Unexpected token (1:10)", {"ecmaVersion": 17});
+testFail("let using x = resource;", "Unexpected token (1:10)", {ecmaVersion: 17, sourceType: "module"});
 // top level using is not allowed
-testFail("using x = resource;", "Using declaration cannot appear in the top level when source type is `script` (1:0)", {"ecmaVersion": 17, "sourceType": "script"});
+testFail("using x = resource;", "Using declaration cannot appear in the top level when source type is `script` (1:0)", {ecmaVersion: 17, sourceType: "script"});
 
 // BoundNames contains "let"  
-testFail("async function test() { await using let = resource; }", "let is disallowed as a lexically bound name (1:36)", {"ecmaVersion": 17});
+testFail("async function test() { await using let = resource; }", "The keyword 'let' is reserved (1:36)", {ecmaVersion: 17, sourceType: "module"});
 // BoundNames contains duplicate entries
-testFail("async function test() { await using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:51)", {"ecmaVersion": 17});
+testFail("async function test() { await using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:51)", {ecmaVersion: 17, sourceType: "module"});
 // top level await using is not allowed
-testFail("await using x = resource;", "Using declaration cannot appear in the top level when source type is `script` (1:0)", {"ecmaVersion": 17, "sourceType": "script"});
+testFail("await using x = resource;", "Using declaration cannot appear in the top level when source type is `script` (1:0)", {ecmaVersion: 17, sourceType: "script"});
 
 // Basic missing initializer
-testFail("{ using x; }", "Missing initializer in using declaration (1:9)", {"ecmaVersion": 17});
-testFail("{ using x = 5, y; }", "Missing initializer in using declaration (1:16)", {"ecmaVersion": 17});
+testFail("{ using x; }", "Missing initializer in using declaration (1:9)", {ecmaVersion: 17, sourceType: "module"});
+testFail("{ using x = 5, y; }", "Missing initializer in using declaration (1:16)", {ecmaVersion: 17, sourceType: "module"});
 
 // Await using missing initializer
-testFail("async function test() { await using x; }", "Missing initializer in await using declaration (1:37)", {"ecmaVersion": 17});
+testFail("async function test() { await using x; }", "Missing initializer in await using declaration (1:37)", {ecmaVersion: 17, sourceType: "module"});
 
 // Using with object destructuring is not supported
-testFail("{ using {x} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});
+testFail("{ using {x} = obj; }", "Unexpected token (1:8)", {ecmaVersion: 17, sourceType: "module"});
 
 // Complex object destructuring with renaming is not supported
-testFail("{ using {x: y, z} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});
+testFail("{ using {x: y, z} = obj; }", "Unexpected token (1:8)", {ecmaVersion: 17, sourceType: "module"});
 
 // Export using declarations - should fail as they are not allowed
-testFail("export using x = resource;", "Unexpected token (1:7)", {"ecmaVersion": 17, "sourceType": "module"});
-testFail("export await using x = resource;", "Unexpected token (1:7)", {"ecmaVersion": 17, "sourceType": "module"});
+testFail("export using x = resource;", "Unexpected token (1:7)", {ecmaVersion: 17, sourceType: "module"});
+testFail("export await using x = resource;", "Unexpected token (1:7)", {ecmaVersion: 17, sourceType: "module"});
 
 // Using with wrong ecmaVersion - should fail with Unexpected token
-testFail("{ using x = resource; }", "Unexpected token (1:8)", {"ecmaVersion": 16});
+testFail("{ using x = resource; }", "Unexpected token (1:8)", {ecmaVersion: 16}, {sourceType: "module"});
 
 // Using in for-in with initializer (should fail)
-testFail("for (using x = resource in obj) {}", "for-in loop variable declaration may not have an initializer (1:5)", {"ecmaVersion": 17});
+testFail("for (using x = resource in obj) {}", "for-in loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 17, sourceType: "module"});
 
 // Using in for-of with initializer (should fail)
-testFail("for (using x = resource of arr) {}", "for-of loop variable declaration may not have an initializer (1:5)", {"ecmaVersion": 17});
+testFail("for (using x = resource of arr) {}", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 17, sourceType: "module"});
 
 // "let" is not allowed as variable name in using declaration
-testFail("{ using let = resource; }", "let is disallowed as a lexically bound name (1:8)", {"ecmaVersion": 17});
+testFail("{ using let = resource; }", "The keyword 'let' is reserved (1:8)", {ecmaVersion: 17, sourceType: "module"});
 
 // Duplicate variable names in using declaration
-testFail("{ using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:23)", {"ecmaVersion": 17});
+testFail("{ using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:23)", {ecmaVersion: 17, sourceType: "module"});
 
 // Reserved words and strict mode restrictions
-testFail("{ using super = resource; }", "Unexpected keyword 'super' (1:8)", {"ecmaVersion": 17});
-testFail("{ using this = resource; }", "Unexpected keyword 'this' (1:8)", {"ecmaVersion": 17});
-testFail("'use strict'; { using arguments = resource; }", "Binding arguments in strict mode (1:22)", {"ecmaVersion": 17});
-testFail("'use strict'; { using eval = resource; }", "Binding eval in strict mode (1:22)", {"ecmaVersion": 17});
+testFail("{ using super = resource; }", "Unexpected keyword 'super' (1:8)", {ecmaVersion: 17, sourceType: "module"});
+testFail("{ using this = resource; }", "Unexpected keyword 'this' (1:8)", {ecmaVersion: 17, sourceType: "module"});
+testFail("'use strict'; { using arguments = resource; }", "Binding arguments in strict mode (1:22)", {ecmaVersion: 17, sourceType: "module"});
+testFail("'use strict'; { using eval = resource; }", "Binding eval in strict mode (1:22)", {ecmaVersion: 17, sourceType: "module"});
 
 // Context-sensitive keyword restrictions
-testFail("function* gen() { using yield = resource; }", "Cannot use 'yield' as identifier inside a generator (1:24)", {"ecmaVersion": 17});
-testFail("async function test() { using await = resource; }", "Cannot use 'await' as identifier inside an async function (1:30)", {"ecmaVersion": 17});
+testFail("function* gen() { using yield = resource; }", "Cannot use 'yield' as identifier inside a generator (1:24)", {ecmaVersion: 17, sourceType: "module"});
+testFail("async function test() { using await = resource; }", "Cannot use 'await' as identifier inside an async function (1:30)", {ecmaVersion: 17, sourceType: "module"});
 
 // Rest elements are not allowed in await using declarations
-testFail("async function test() { await using [first, ...rest] = arr; }", "Unexpected token (1:36)", {"ecmaVersion": 17});
+testFail("async function test() { await using [first, ...rest] = arr; }", "Unexpected token (1:36)", {ecmaVersion: 17, sourceType: "module"});
 
 // Strict mode restrictions with await using
-testFail("'use strict'; async function test() { await using arguments = resource; }", "Binding arguments in strict mode (1:50)", {"ecmaVersion": 17});
-testFail("'use strict'; async function test() { await using eval = resource; }", "Binding eval in strict mode (1:50)", {"ecmaVersion": 17});
+testFail("'use strict'; async function test() { await using arguments = resource; }", "Binding arguments in strict mode (1:50)", {ecmaVersion: 17, sourceType: "module"});
+testFail("'use strict'; async function test() { await using eval = resource; }", "Binding eval in strict mode (1:50)", {ecmaVersion: 17, sourceType: "module"});
 
 // Valid destructuring with default values in using - should be an error
-testFail("{ using {x = 5} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});
+testFail("{ using {x = 5} = obj; }", "Unexpected token (1:8)", {ecmaVersion: 17, sourceType: "module"});
 
 // Using with object destructuring and computed property names - should be an error
-testFail("{ using {[key]: value} = obj; }", "Unexpected token (1:8)", {"ecmaVersion": 17});
+testFail("{ using {[key]: value} = obj; }", "Unexpected token (1:8)", {ecmaVersion: 17, sourceType: "module"});
 
 // 'let' is not allowed as variable name in await using declaration
-testFail("async function test() { await using let = resource; }", "let is disallowed as a lexically bound name (1:36)", {"ecmaVersion": 17});
-testFail("async function test() { await using x = resource1, let = resource2; }", "let is disallowed as a lexically bound name (1:51)", {"ecmaVersion": 17});
+testFail("async function test() { await using let = resource; }", "The keyword 'let' is reserved (1:36)", {ecmaVersion: 17, sourceType: "module"});
+testFail("async function test() { await using x = resource1, let = resource2; }", "The keyword 'let' is reserved (1:51)", {ecmaVersion: 17, sourceType: "module"});
 
 // Using declaration inside expression (should not be allowed)
-testFail("(using x = resource)", "Unexpected token (1:7)", {"ecmaVersion": 17});
+testFail("(using x = resource)", "Unexpected token (1:7)", {ecmaVersion: 17, sourceType: "module"});
 
 // Using with invalid identifier characters
-testFail("{ using \\u0030x = resource; }", "Invalid Unicode escape (1:8)", {"ecmaVersion": 17});
+testFail("{ using \\u0030x = resource; }", "Invalid Unicode escape (1:8)", {ecmaVersion: 17, sourceType: "module"});
+
+// await using in script mode
+testFail("{await using a = x}", "Await using cannot appear outside of async function (1:1)", {ecmaVersion: 17, sourceType: "script"});
 
 // =============================================================================
 // EDGE CASES - Unusual but valid scenarios and boundary conditions
@@ -1247,7 +1214,7 @@ test("using = 5;", {
     }
   }],
   sourceType: "script"
-}, {"ecmaVersion": 16});
+}, {ecmaVersion: 16, sourceType: "script"});
 
 // ES17: using should be treated as regular identifier (assignment)
 test("using = 5;", {
@@ -1277,8 +1244,8 @@ test("using = 5;", {
       }
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // ES16: using should be treated as regular identifier (method call)
 test("using.dispose();", {
@@ -1315,7 +1282,7 @@ test("using.dispose();", {
     }
   }],
   sourceType: "script"
-}, {"ecmaVersion": 16});
+}, {ecmaVersion: 16, sourceType: "script"});
 
 // ES17: using should be treated as regular identifier (method call)
 test("using.dispose();", {
@@ -1351,8 +1318,8 @@ test("using.dispose();", {
       arguments: []
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // ES16: using should be treated as regular identifier (logical expression)
 test("using && doSomething();", {
@@ -1389,7 +1356,7 @@ test("using && doSomething();", {
     }
   }],
   sourceType: "script"
-}, {"ecmaVersion": 16});
+}, {ecmaVersion: 16, sourceType: "script"});
 
 // ES17: using should be treated as regular identifier (logical expression)
 test("using && doSomething();", {
@@ -1425,8 +1392,8 @@ test("using && doSomething();", {
       }
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // ES16: await using should be treated as regular identifiers
 test("await.using;", {
@@ -1457,9 +1424,9 @@ test("await.using;", {
     }
   }],
   sourceType: "script"
-}, {"ecmaVersion": 16});
+}, {ecmaVersion: 16, sourceType: "script"});
 
-// ES17: await using should be treated as regular identifiers
+// ES17: await using should be treated as regular identifiers in script mode
 test("await.using;", {
   type: "Program",
   start: 0,
@@ -1488,7 +1455,10 @@ test("await.using;", {
     }
   }],
   sourceType: "script"
-}, {"ecmaVersion": 17});
+}, {ecmaVersion: 17, sourceType: "script"});
+
+// ES17: unexpected token in module mode
+testFail("await.using;", "Unexpected token (1:5)", {ecmaVersion: 17, sourceType: "module"});
 
 // ES16: using should be treated as regular identifier (for-of)
 test("for (using of x) {}", {
@@ -1520,7 +1490,7 @@ test("for (using of x) {}", {
     }
   }],
   sourceType: "script"
-}, {"ecmaVersion": 16});
+}, {ecmaVersion: 16, sourceType: "script"});
 
 // ES17: using should be treated as regular identifier (for-of)
 test("for (using of x) {}", {
@@ -1551,8 +1521,8 @@ test("for (using of x) {}", {
       body: []
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // --- LineTerminator restrictions ---
 
@@ -1595,12 +1565,12 @@ x = resource;`, {
       }
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // LineTerminator between 'await' and 'using' (violates spec)
 testFail(`async function test() { await
-using x = resource; }`, "Unexpected token (2:6)", {"ecmaVersion": 17, "sourceType": "script"});
+using x = resource; }`, "Unexpected token (2:6)", {ecmaVersion: 17, sourceType: "script"});
 
 // await using with LineTerminator after using should be parsed as await identifier + assignment
 test(`async function test() { await using
@@ -1665,8 +1635,8 @@ x = resource; }`, {
     generator: false,
     async: true
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Top-level await using with LineTerminator after using should parse as await identifier + assignment
 test(`await using
@@ -1713,7 +1683,7 @@ x = resource;`, {
     }
   }],
   sourceType: "module"
-}, {"ecmaVersion": 17, "sourceType": "module"});
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Valid case: Comments between await and using (no actual LineTerminator)
 test("async function test() { await /* comment */ using x = resource; }", {
@@ -1762,8 +1732,8 @@ test("async function test() { await /* comment */ using x = resource; }", {
     generator: false,
     async: true
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Multiple line terminators should be parsed as separate statements
 test(`using
@@ -1806,8 +1776,8 @@ x = resource;`, {
       }
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // --- Unicode and special characters ---
 
@@ -1844,8 +1814,8 @@ test("{ using \\u0078 = resource; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with Latin-1 supplement characters
 test("{ using café = resource; }", {
@@ -1880,8 +1850,8 @@ test("{ using café = resource; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Await using with Unicode identifier
 test("async function test() { await using \\u03B1 = resource; }", {
@@ -1930,8 +1900,8 @@ test("async function test() { await using \\u03B1 = resource; }", {
     generator: false,
     async: true
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Unicode in using identifier
 test("{ using \\u{61} = resource; }", {
@@ -1966,8 +1936,8 @@ test("{ using \\u{61} = resource; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // --- Complex expressions and ASI ---
 
@@ -2028,8 +1998,8 @@ test("{ using x = obj.resource.handle; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with computed property access
 test("{ using x = obj[key]; }", {
@@ -2076,8 +2046,8 @@ test("{ using x = obj[key]; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with call expression
 test("{ using x = createResource(); }", {
@@ -2118,8 +2088,8 @@ test("{ using x = createResource(); }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with conditional (ternary) expression
 test("{ using x = condition ? resource1 : resource2; }", {
@@ -2171,8 +2141,8 @@ test("{ using x = condition ? resource1 : resource2; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with logical OR expression
 test("{ using x = resource || fallback; }", {
@@ -2219,8 +2189,8 @@ test("{ using x = resource || fallback; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Test null and undefined as valid initializers
 test("{ using x = null; }", {
@@ -2255,8 +2225,8 @@ test("{ using x = null; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 test("{ using x = undefined; }", {
   type: "Program",
@@ -2290,8 +2260,8 @@ test("{ using x = undefined; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with BigInt literal
 test("{ using x = 123n; }", {
@@ -2327,8 +2297,8 @@ test("{ using x = 123n; }", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // ASI (Automatic Semicolon Insertion) test - using without semicolon 
 test("{ using x = resource\n}", {
@@ -2363,8 +2333,8 @@ test("{ using x = resource\n}", {
       kind: "using"
     }]
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // --- Additional contexts ---
 
@@ -2424,8 +2394,8 @@ test("try {} catch (e) { using x = resource; }", {
     },
     finalizer: null
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using in finally clause
 test("try {} finally { using x = resource; }", {
@@ -2472,8 +2442,8 @@ test("try {} finally { using x = resource; }", {
       }]
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using in if statement block
 test("if (condition) { using x = resource; }", {
@@ -2520,8 +2490,8 @@ test("if (condition) { using x = resource; }", {
     },
     alternate: null
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using in while statement block
 test("while (condition) { using x = resource; break; }", {
@@ -2572,8 +2542,8 @@ test("while (condition) { using x = resource; break; }", {
       }]
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using in labeled statement block
 test("label: { using x = resource; }", {
@@ -2619,8 +2589,8 @@ test("label: { using x = resource; }", {
       }]
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // Using with 'arguments' identifier
 test("{ using arguments = resource; }", {
@@ -2656,7 +2626,7 @@ test("{ using arguments = resource; }", {
     }]
   }],
   sourceType: "script"
-}, {"ecmaVersion": 17});
+}, {ecmaVersion: 17, sourceType: "script"});
 
 // Using with 'eval' identifier (should work, eval is not restricted in using declarations)
 test("{ using eval = resource; }", {
@@ -2692,7 +2662,7 @@ test("{ using eval = resource; }", {
     }]
   }],
   sourceType: "script"
-}, {"ecmaVersion": 17});
+}, {ecmaVersion: 17, sourceType: "script"});
 
 
 // ES17: using should be treated as using keyword
@@ -2735,8 +2705,8 @@ test("for (using ofa of x) {}", {
       body: []
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
 
 // await using should be treated as regular identifiers when not followed by variable declaration
 test("async function test() { await usingX; }", {
@@ -2778,5 +2748,5 @@ test("async function test() { await usingX; }", {
       }]
     }
   }],
-  sourceType: "script"
-}, {"ecmaVersion": 17});
+  sourceType: "module"
+}, {ecmaVersion: 17, sourceType: "module"});
