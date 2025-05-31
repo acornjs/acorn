@@ -1239,6 +1239,37 @@ test("using = 5;", {
   sourceType: "script"
 }, {"ecmaVersion": 16});
 
+// ES17: using should be treated as regular identifier (assignment)
+test("using = 5;", {
+  type: "Program",
+  start: 0,
+  end: 10,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 10,
+    expression: {
+      type: "AssignmentExpression",
+      start: 0,
+      end: 9,
+      operator: "=",
+      left: {
+        type: "Identifier",
+        start: 0,
+        end: 5,
+        name: "using"
+      },
+      right: {
+        type: "Literal",
+        start: 8,
+        end: 9,
+        value: 5
+      }
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
 // ES16: using should be treated as regular identifier (method call)
 test("using.dispose();", {
   type: "Program",
@@ -1275,6 +1306,43 @@ test("using.dispose();", {
   }],
   sourceType: "script"
 }, {"ecmaVersion": 16});
+
+// ES17: using should be treated as regular identifier (method call)
+test("using.dispose();", {
+  type: "Program",
+  start: 0,
+  end: 16,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 16,
+    expression: {
+      type: "CallExpression",
+      start: 0,
+      end: 15,
+      callee: {
+        type: "MemberExpression",
+        start: 0,
+        end: 13,
+        object: {
+          type: "Identifier",
+          start: 0,
+          end: 5,
+          name: "using"
+        },
+        property: {
+          type: "Identifier",
+          start: 6,
+          end: 13,
+          name: "dispose"
+        },
+        computed: false
+      },
+      arguments: []
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
 
 // ES16: using should be treated as regular identifier (logical expression)
 test("using && doSomething();", {
@@ -1313,6 +1381,43 @@ test("using && doSomething();", {
   sourceType: "script"
 }, {"ecmaVersion": 16});
 
+// ES17: using should be treated as regular identifier (logical expression)
+test("using && doSomething();", {
+  type: "Program",
+  start: 0,
+  end: 23,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 23,
+    expression: {
+      type: "LogicalExpression",
+      start: 0,
+      end: 22,
+      operator: "&&",
+      left: {
+        type: "Identifier",
+        start: 0,
+        end: 5,
+        name: "using"
+      },
+      right: {
+        type: "CallExpression",
+        start: 9,
+        end: 22,
+        callee: {
+          type: "Identifier",
+          start: 9,
+          end: 20,
+          name: "doSomething"
+        },
+        arguments: []
+      }
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
 // ES16: await using should be treated as regular identifiers
 test("await.using;", {
   type: "Program",
@@ -1343,6 +1448,101 @@ test("await.using;", {
   }],
   sourceType: "script"
 }, {"ecmaVersion": 16});
+
+// ES17: await using should be treated as regular identifiers
+test("await.using;", {
+  type: "Program",
+  start: 0,
+  end: 12,
+  body: [{
+    type: "ExpressionStatement",
+    start: 0,
+    end: 12,
+    expression: {
+      type: "MemberExpression",
+      start: 0,
+      end: 11,
+      object: {
+        type: "Identifier",
+        start: 0,
+        end: 5,
+        name: "await"
+      },
+      property: {
+        type: "Identifier",
+        start: 6,
+        end: 11,
+        name: "using"
+      },
+      computed: false
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
+
+// ES16: using should be treated as regular identifier (for-of)
+test("for (using of x) {}", {
+  type: "Program",
+  start: 0,
+  end: 19,
+  body: [{
+    type: "ForOfStatement",
+    start: 0,
+    end: 19,
+    await: false,
+    left: {
+      type: "Identifier",
+      start: 5,
+      end: 10,
+      name: "using"
+    },
+    right: {
+      type: "Identifier",
+      start: 14,
+      end: 15,
+      name: "x"
+    },
+    body: {
+      type: "BlockStatement",
+      start: 17,
+      end: 19,
+      body: []
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 16});
+
+// ES17: using should be treated as regular identifier (for-of)
+test("for (using of x) {}", {
+  type: "Program",
+  start: 0,
+  end: 19,
+  body: [{
+    type: "ForOfStatement",
+    start: 0,
+    end: 19,
+    await: false,
+    left: {
+      type: "Identifier",
+      start: 5,
+      end: 10,
+      name: "using"
+    },
+    right: {
+      type: "Identifier",
+      start: 14,
+      end: 15,
+      name: "x"
+    },
+    body: {
+      type: "BlockStatement",
+      start: 17,
+      end: 19,
+      body: []
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
 
 // --- LineTerminator restrictions ---
 
@@ -2482,4 +2682,48 @@ test("{ using eval = resource; }", {
     }]
   }],
   sourceType: "script"
-}, {"ecmaVersion": 17}); 
+}, {"ecmaVersion": 17});
+
+
+// ES17: using should be treated as using keyword
+test("for (using ofa of x) {}", {
+  type: "Program",
+  start: 0,
+  end: 23,
+  body: [{
+    type: "ForOfStatement",
+    start: 0,
+    end: 23,
+    left: {
+      type: "VariableDeclaration",
+      start: 5,
+      end: 14,
+      declarations: [{
+        type: "VariableDeclarator",
+        start: 11,
+        end: 14,
+        id: {
+          type: "Identifier",
+          start: 11,
+          end: 14,
+          name: "ofa"
+        },
+        init: null
+      }],
+      kind: "using"
+    },
+    right: {
+      type: "Identifier",
+      start: 18,
+      end: 19,
+      name: "x"
+    },
+    body: {
+      type: "BlockStatement",
+      start: 21,
+      end: 23,
+      body: []
+    }
+  }],
+  sourceType: "script"
+}, {"ecmaVersion": 17});
