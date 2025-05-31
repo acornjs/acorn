@@ -97,7 +97,7 @@ pp.isUsingKeyword = function(isAwaitUsing) {
   return isIdentifierStart(ch, true) || ch === 92 // '\'
 }
 
-pp.isAwaitUsingDeclaration = function() {
+pp.isAwaitUsing = function() {
   return this.isUsingKeyword(true)
 }
 
@@ -181,7 +181,7 @@ pp.parseStatement = function(context, topLevel, exports) {
       return this.parseFunctionStatement(node, true, !context)
     }
 
-    let usingKind = this.isAwaitUsingDeclaration() ? "await using" : this.isUsing() ? "using" : null
+    let usingKind = this.isAwaitUsing() ? "await using" : this.isUsing() ? "using" : null
     if (usingKind) {
       if (usingKind === "await using") {
         if (topLevel && !this.inModule) {
@@ -274,7 +274,7 @@ pp.parseForStatement = function(node) {
   }
   let startsWithLet = this.isContextual("let"), isForOf = false
 
-  let usingKind = this.isUsing() ? "using" : this.isAwaitUsingDeclaration() ? "await using" : null
+  let usingKind = this.isUsing() ? "using" : this.isAwaitUsing() ? "await using" : null
   if (usingKind) {
     let init = this.startNode()
     this.next()

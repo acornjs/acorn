@@ -54,7 +54,7 @@ lp.parseStatement = function() {
     this.expect(tt.parenL)
     if (this.tok.type === tt.semi) return this.parseFor(node, null)
     let isLet = this.toks.isLet()
-    let isAwaitUsing = this.toks.isAwaitUsingDeclaration()
+    let isAwaitUsing = this.toks.isAwaitUsing()
     let isUsing = !isAwaitUsing && this.toks.isUsing()
 
     if (isLet || this.tok.type === tt._var || this.tok.type === tt._const || isUsing || isAwaitUsing) {
@@ -212,7 +212,7 @@ lp.parseStatement = function() {
       return this.parseVar(node, false, "using")
     }
 
-    if (this.toks.isAwaitUsingDeclaration()) {
+    if (this.toks.isAwaitUsing()) {
       this.next()
       return this.parseVar(node, false, "await using")
     }
