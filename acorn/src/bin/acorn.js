@@ -56,7 +56,7 @@ function run(codeList) {
     console.error(fileMode ? e.message.replace(/\(\d+:\d+\)$/, m => m.slice(0, 1) + inputFilePaths[fileIdx] + " " + m.slice(1)) : e.message)
     process.exit(1)
   }
-  if (!silent) console.log(JSON.stringify(result, null, compact ? null : 2))
+  if (!silent) console.log(JSON.stringify(result, (_, value) => typeof value == "bigint" ? null : value, compact ? null : 2))
 }
 
 if (fileMode = inputFilePaths.length && (forceFileName || !inputFilePaths.includes("-") || inputFilePaths.length !== 1)) {
