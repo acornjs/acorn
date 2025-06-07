@@ -598,7 +598,8 @@ pp.parseLiteral = function(value) {
   let node = this.startNode()
   node.value = value
   node.raw = this.input.slice(this.start, this.end)
-  if (node.raw.charCodeAt(node.raw.length - 1) === 110) node.bigint = node.raw.slice(0, -1).replace(/_/g, "")
+  if (node.raw.charCodeAt(node.raw.length - 1) === 110)
+    node.bigint = node.value != null ? node.value.toString() : node.raw.slice(0, -1).replace(/_/g, "")
   this.next()
   return this.finishNode(node, "Literal")
 }

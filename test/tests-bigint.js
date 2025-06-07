@@ -3,28 +3,28 @@ if (typeof exports !== "undefined") {
   var testFail = require("./driver.js").testFail;
 }
 
-const newBigIntLiteral = (start, stringValue) => ({
+const newBigIntLiteral = (start, stringValue, bigint = stringValue) => ({
   start: start,
   type: "Literal",
   end: start + stringValue.length + 1,
   value: typeof BigInt !== "undefined" ? BigInt(stringValue) : null,
   raw: `${stringValue}n`,
-  bigint: stringValue
+  bigint
 })
 
 const digits = [
   {d: "0", ast: start => newBigIntLiteral(start, "0")},
   {d: "2", ast: start => newBigIntLiteral(start, "2")},
-  {d: "0x2", ast: start => newBigIntLiteral(start, "0x2")},
-  {d: "0o2", ast: start => newBigIntLiteral(start, "0o2")},
-  {d: "0b10", ast: start => newBigIntLiteral(start, "0b10")},
+  {d: "0x2", ast: start => newBigIntLiteral(start, "0x2", "2")},
+  {d: "0o2", ast: start => newBigIntLiteral(start, "0o2", "2")},
+  {d: "0b10", ast: start => newBigIntLiteral(start, "0b10", "2")},
   {d: "-0xbf2ed51ff75d380fd3be813ec6185780", ast: start => ({
     start: start,
     type: "UnaryExpression",
     end: start + 36,
     operator: "-",
     prefix: true,
-    argument: newBigIntLiteral(start + 1, "0xbf2ed51ff75d380fd3be813ec6185780")
+    argument: newBigIntLiteral(start + 1, "0xbf2ed51ff75d380fd3be813ec6185780", "254125715536285641815112686497309415296")
   })},
   {d: "02", error: start => `Identifier directly after number (1:${start + 2})`},
   {d: "2e2", error: start => `Identifier directly after number (1:${start + 3})`},
