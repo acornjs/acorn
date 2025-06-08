@@ -1,3 +1,9 @@
+## 8.5.1 (2025-06-08)
+
+### Bug fixes
+
+Handle tokenizer exceptions raised by invalid numeric separators.
+
 ## 8.5.0 (2025-04-17)
 
 ### New features
