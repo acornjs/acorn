@@ -1154,7 +1154,7 @@ testFail("function* gen() { using yield = resource; }", "Cannot use 'yield' as i
 testFail("async function test() { using await = resource; }", "Cannot use 'await' as identifier inside an async function (1:30)", {ecmaVersion: 17, sourceType: "module"});
 
 // Rest elements are not allowed in await using declarations
-testFail("async function test() { await using [first, ...rest] = arr; }", "Unexpected token (1:36)", {ecmaVersion: 17, sourceType: "module"});
+testFail("async function test() { await using [first, ...rest] = arr; }", "Unexpected token (1:44)", {ecmaVersion: 17, sourceType: "module"});
 
 // Strict mode restrictions with await using
 testFail("'use strict'; async function test() { await using arguments = resource; }", "Binding arguments in strict mode (1:50)", {ecmaVersion: 17, sourceType: "module"});
@@ -1493,7 +1493,7 @@ test("for (using of x) {}", {
 }, {ecmaVersion: 16, sourceType: "script"});
 
 // ES17: using should be treated as regular identifier (for-of)
-test("for (using of x) {}", {
+test("for (using of y) {}", {
   type: "Program",
   start: 0,
   end: 19,
@@ -1512,7 +1512,7 @@ test("for (using of x) {}", {
       type: "Identifier",
       start: 14,
       end: 15,
-      name: "x"
+      name: "y"
     },
     body: {
       type: "BlockStatement",
@@ -2750,3 +2750,235 @@ test("async function test() { await usingX; }", {
   }],
   sourceType: "module"
 }, {ecmaVersion: 17, sourceType: "module"});
+
+test(`async function f() {
+  await using in foo;
+}`, {
+  "type": "Program",
+  "start": 0,
+  "end": 44,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 44,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 16,
+        "name": "f"
+      },
+      "expression": false,
+      "generator": false,
+      "async": true,
+      "params": [],
+      "body": {
+        "type": "BlockStatement",
+        "start": 19,
+        "end": 44,
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "start": 23,
+            "end": 42,
+            "expression": {
+              "type": "BinaryExpression",
+              "start": 23,
+              "end": 41,
+              "left": {
+                "type": "AwaitExpression",
+                "start": 23,
+                "end": 34,
+                "argument": {
+                  "type": "Identifier",
+                  "start": 29,
+                  "end": 34,
+                  "name": "using"
+                }
+              },
+              "operator": "in",
+              "right": {
+                "type": "Identifier",
+                "start": 38,
+                "end": 41,
+                "name": "foo"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 17})
+
+test(`async function f() {
+  await using instanceof foo;
+}`, {
+  "type": "Program",
+  "start": 0,
+  "end": 52,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 52,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 16,
+        "name": "f"
+      },
+      "expression": false,
+      "generator": false,
+      "async": true,
+      "params": [],
+      "body": {
+        "type": "BlockStatement",
+        "start": 19,
+        "end": 52,
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "start": 23,
+            "end": 50,
+            "expression": {
+              "type": "BinaryExpression",
+              "start": 23,
+              "end": 49,
+              "left": {
+                "type": "AwaitExpression",
+                "start": 23,
+                "end": 34,
+                "argument": {
+                  "type": "Identifier",
+                  "start": 29,
+                  "end": 34,
+                  "name": "using"
+                }
+              },
+              "operator": "instanceof",
+              "right": {
+                "type": "Identifier",
+                "start": 46,
+                "end": 49,
+                "name": "foo"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 17})
+
+test(`{ let 𠮷 = foo(); }`, {
+  "type": "Program",
+  "start": 0,
+  "end": 19,
+  "body": [
+    {
+      "type": "BlockStatement",
+      "start": 0,
+      "end": 19,
+      "body": [
+        {
+          "type": "VariableDeclaration",
+          "start": 2,
+          "end": 17,
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "start": 6,
+              "end": 16,
+              "id": {
+                "type": "Identifier",
+                "start": 6,
+                "end": 8,
+                "name": "𠮷"
+              },
+              "init": {
+                "type": "CallExpression",
+                "start": 11,
+                "end": 16,
+                "callee": {
+                  "type": "Identifier",
+                  "start": 11,
+                  "end": 14,
+                  "name": "foo"
+                },
+                "arguments": [],
+                "optional": false
+              }
+            }
+          ],
+          "kind": "let"
+        }
+      ]
+    }
+  ],
+  "sourceType": "module"
+}, {ecmaVersion: 17, sourceType: "module"})
+
+test(`async function f() {
+  await using[x];
+}`, {
+  "type": "Program",
+  "start": 0,
+  "end": 40,
+  "body": [
+    {
+      "type": "FunctionDeclaration",
+      "start": 0,
+      "end": 40,
+      "id": {
+        "type": "Identifier",
+        "start": 15,
+        "end": 16,
+        "name": "f"
+      },
+      "expression": false,
+      "generator": false,
+      "async": true,
+      "params": [],
+      "body": {
+        "type": "BlockStatement",
+        "start": 19,
+        "end": 40,
+        "body": [
+          {
+            "type": "ExpressionStatement",
+            "start": 23,
+            "end": 38,
+            "expression": {
+              "type": "AwaitExpression",
+              "start": 23,
+              "end": 37,
+              "argument": {
+                "type": "MemberExpression",
+                "start": 29,
+                "end": 37,
+                "object": {
+                  "type": "Identifier",
+                  "start": 29,
+                  "end": 34,
+                  "name": "using"
+                },
+                "property": {
+                  "type": "Identifier",
+                  "start": 35,
+                  "end": 36,
+                  "name": "x"
+                },
+                "computed": true,
+                "optional": false
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}, {ecmaVersion: 17})

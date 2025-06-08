@@ -88,11 +88,15 @@ pp.readToken = function(code) {
   return this.getTokenFromCode(code)
 }
 
-pp.fullCharCodeAtPos = function() {
-  let code = this.input.charCodeAt(this.pos)
+pp.fullCharCodeAt = function(pos) {
+  let code = this.input.charCodeAt(pos)
   if (code <= 0xd7ff || code >= 0xdc00) return code
-  let next = this.input.charCodeAt(this.pos + 1)
+  let next = this.input.charCodeAt(pos + 1)
   return next <= 0xdbff || next >= 0xe000 ? code : (code << 10) + next - 0x35fdc00
+}
+
+pp.fullCharCodeAtPos = function() {
+  return this.fullCharCodeAt(this.pos)
 }
 
 pp.skipBlockComment = function() {
