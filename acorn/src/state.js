@@ -115,13 +115,6 @@ export class Parser {
     return (this.inModule && this.options.ecmaVersion >= 13) || this.options.allowAwaitOutsideFunction
   }
 
-  get canUsing() {
-    let {flags} = this.currentScope()
-    if (flags & SCOPE_SWITCH) return false
-    if (!this.inModule && flags & SCOPE_TOP) return false
-    return true
-  }
-
   get allowSuper() {
     const {flags} = this.currentThisScope()
     return (flags & SCOPE_SUPER) > 0 || this.options.allowSuperOutsideMethod
@@ -138,6 +131,13 @@ export class Parser {
           ((flags & SCOPE_FUNCTION) && !(flags & SCOPE_ARROW))) return true
     }
     return false
+  }
+
+  get allowUsing() {
+    const {flags} = this.currentScope()
+    if (flags & SCOPE_SWITCH) return false
+    if (!this.inModule && flags & SCOPE_TOP) return false
+    return true
   }
 
   get inClassStaticBlock() {

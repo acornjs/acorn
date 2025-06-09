@@ -194,7 +194,7 @@ pp.parseStatement = function(context, topLevel, exports) {
 
     let usingKind = this.isAwaitUsing(false) ? "await using" : this.isUsing(false) ? "using" : null
     if (usingKind) {
-      if (!this.canUsing) {
+      if (!this.allowUsing) {
         this.raise(this.start, "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement")
       }
       if (usingKind === "await using") {
