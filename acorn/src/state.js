@@ -5,7 +5,7 @@ import {getOptions} from "./options.js"
 import {wordsRegexp} from "./util.js"
 import {
   SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER,
-  SCOPE_ARROW, SCOPE_CLASS_STATIC_BLOCK, SCOPE_CLASS_FIELD_INIT
+  SCOPE_ARROW, SCOPE_CLASS_STATIC_BLOCK, SCOPE_CLASS_FIELD_INIT, SCOPE_SWITCH
 } from "./scopeflags.js"
 
 export class Parser {
@@ -113,6 +113,13 @@ export class Parser {
       if (flags & SCOPE_FUNCTION) return (flags & SCOPE_ASYNC) > 0
     }
     return (this.inModule && this.options.ecmaVersion >= 13) || this.options.allowAwaitOutsideFunction
+  }
+
+  get canUsing() {
+    let {flags} = this.currentScope()
+    if (flags & SCOPE_SWITCH) return false
+    if (!this.inModule && flags & SCOPE_TOP) return false
+    return true
   }
 
   get allowSuper() {
