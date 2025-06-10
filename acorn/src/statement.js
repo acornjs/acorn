@@ -4,7 +4,7 @@ import {lineBreak, skipWhiteSpace} from "./whitespace.js"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier.js"
 import {hasOwn, loneSurrogate} from "./util.js"
 import {DestructuringErrors} from "./parseutil.js"
-import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION, SCOPE_CLASS_STATIC_BLOCK, SCOPE_SUPER, SCOPE_CLASS_FIELD_INIT} from "./scopeflags.js"
+import {functionFlags, SCOPE_SIMPLE_CATCH, BIND_SIMPLE_CATCH, BIND_LEXICAL, BIND_VAR, BIND_FUNCTION, SCOPE_CLASS_STATIC_BLOCK, SCOPE_SUPER, SCOPE_CLASS_FIELD_INIT, SCOPE_SWITCH} from "./scopeflags.js"
 
 const pp = Parser.prototype
 
@@ -194,8 +194,8 @@ pp.parseStatement = function(context, topLevel, exports) {
 
     let usingKind = this.isAwaitUsing(false) ? "await using" : this.isUsing(false) ? "using" : null
     if (usingKind) {
-      if (topLevel && this.options.sourceType === "script") {
-        this.raise(this.start, "Using declaration cannot appear in the top level when source type is `script`")
+      if (!this.allowUsing) {
+        this.raise(this.start, "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement")
       }
       if (usingKind === "await using") {
         if (!this.canAwait) {
@@ -292,7 +292,12 @@ pp.parseForStatement = function(node) {
   if (usingKind) {
     let init = this.startNode()
     this.next()
-    if (usingKind === "await using") this.next()
+    if (usingKind === "await using") {
+      if (!this.canAwait) {
+        this.raise(this.start, "Await using cannot appear outside of async function")
+      }
+      this.next()
+    }
     this.parseVar(init, true, usingKind)
     this.finishNode(init, "VariableDeclaration")
     return this.parseForAfterInit(node, init, awaitAt)
@@ -370,7 +375,7 @@ pp.parseSwitchStatement = function(node) {
   node.cases = []
   this.expect(tt.braceL)
   this.labels.push(switchLabel)
-  this.enterScope(0)
+  this.enterScope(SCOPE_SWITCH)
 
   // Statements under must be grouped (by label) in SwitchCase
   // nodes. `cur` is used to keep the node that we are currently
