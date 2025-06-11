@@ -38,7 +38,7 @@ export interface Literal extends Node {
 export interface Program extends Node {
   type: "Program"
   body: Array<Statement | ModuleDeclaration>
-  sourceType: "script" | "module" | "commonjs"
+  sourceType: "script" | "module"
 }
 
 export interface Function extends Node {

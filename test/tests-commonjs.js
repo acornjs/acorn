@@ -21,7 +21,7 @@ test("using x = resource;", {
     }],
     kind: "using"
   }],
-  sourceType: "commonjs"
+  sourceType: "script"
 }, {ecmaVersion: 17, sourceType: "commonjs"});
 
 // Top-level new.target with commonjs
@@ -35,7 +35,7 @@ test("new.target", {
       property: {type: "Identifier", name: "target"}
     }
   }],
-  sourceType: "commonjs"
+  sourceType: "script"
 }, {ecmaVersion: 6, sourceType: "commonjs"});
 
 // new.target at top-level scope with commonjs
@@ -61,7 +61,7 @@ test("let y = () => new.target", {
     }],
     kind: "let"
   }],
-  sourceType: "commonjs"
+  sourceType: "script"
 }, {ecmaVersion: 6, sourceType: "commonjs"});
 
 // Top-level return statement with commonjs
@@ -82,7 +82,7 @@ test("return {} / 2", {
       operator: "/"
     }
   }],
-  sourceType: "commonjs"
+  sourceType: "script"
 }, {sourceType: "commonjs"});
 
 // Illegal return statement with commonjs
