@@ -61,11 +61,11 @@ required):
   implemented through plugins.
 
 - **sourceType**: Indicate the mode the code should be parsed in. Can be
-  either `"script"` or `"module"`. This influences global strict mode
+  either `"script"`, `"module"` or `"commonjs"`. This influences global strict mode
   and parsing of `import` and `export` declarations.
 
   **NOTE**: If set to `"module"`, then static `import` / `export` syntax
-  will be valid, even if `ecmaVersion` is less than 6.
+  will be valid, even if `ecmaVersion` is less than 6. If set to `"commonjs"`, it is the same as `"script"` except that the top-level scope behaves like a function.
 
 - **onInsertedSemicolon**: If given a callback, that callback will be
   called whenever a missing semicolon is inserted by the parser. The

@@ -31,6 +31,7 @@
   require("./tests-module-string-names.js");
   require("./tests-import-attributes.js");
   require("./tests-using.js");
+  require("./tests-commonjs.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")
 
