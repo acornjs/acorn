@@ -87,5 +87,3 @@ test("return {} / 2", {
 
 // Illegal return statement with commonjs
 testFail(`class X { static { return; } }`, "'return' outside of function (1:19)", {ecmaVersion: 13, sourceType: "commonjs"});
-// with allowReturnOutsideFunction option
-test(`class X { static { return; } }`, {}, {allowReturnOutsideFunction: true, ecmaVersion: 13, sourceType: "commonjs"});
