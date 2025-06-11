@@ -115,6 +115,12 @@ export class Parser {
     return (this.inModule && this.options.ecmaVersion >= 13) || this.options.allowAwaitOutsideFunction
   }
 
+  get allowReturn() {
+    if (this.inFunction) return true
+    if (this.options.allowReturnOutsideFunction && this.currentVarScope().flags & SCOPE_TOP) return true
+    return false
+  }
+
   get allowSuper() {
     const {flags} = this.currentThisScope()
     return (flags & SCOPE_SUPER) > 0 || this.options.allowSuperOutsideMethod
