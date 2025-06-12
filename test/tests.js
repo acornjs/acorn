@@ -27458,7 +27458,7 @@ testFail("\"\\u",
          "Bad character escape sequence (1:3)");
 
 testFail("return",
-         "'return' outside of function (1:0)");
+         "'return' outside of function (1:0)", { commonjs: false });
 
 testFail("break",
          "Unsyntactic break (1:0)");

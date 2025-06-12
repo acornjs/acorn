@@ -5,7 +5,8 @@ import {getOptions} from "./options.js"
 import {wordsRegexp} from "./util.js"
 import {
   SCOPE_TOP, SCOPE_FUNCTION, SCOPE_ASYNC, SCOPE_GENERATOR, SCOPE_SUPER, SCOPE_DIRECT_SUPER,
-  SCOPE_ARROW, SCOPE_CLASS_STATIC_BLOCK, SCOPE_CLASS_FIELD_INIT, SCOPE_SWITCH
+  SCOPE_ARROW, SCOPE_CLASS_STATIC_BLOCK, SCOPE_CLASS_FIELD_INIT, SCOPE_SWITCH,
+  functionFlags
 } from "./scopeflags.js"
 
 export class Parser {
@@ -85,7 +86,8 @@ export class Parser {
     this.scopeStack = []
     this.enterScope(
       this.options.sourceType === "commonjs"
-        ? SCOPE_FUNCTION // In commonjs, the top-level scope behaves like a function scope
+        // In commonjs, the top-level scope behaves like a function scope
+        ? functionFlags(this.options.allowAwaitOutsideFunction, false)
         : SCOPE_TOP
     )
 

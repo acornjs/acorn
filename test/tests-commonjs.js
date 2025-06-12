@@ -87,3 +87,6 @@ test("return {} / 2", {
 
 // Illegal return statement with commonjs
 testFail(`class X { static { return; } }`, "'return' outside of function (1:19)", {ecmaVersion: 13, sourceType: "commonjs"});
+
+// Top-level await using declaration with commonjs
+testFail("await using x = resource;", "Await using cannot appear outside of async function (1:0)", {ecmaVersion: 17, sourceType: "commonjs"});

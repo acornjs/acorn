@@ -30,7 +30,7 @@ test("await 1", {
       }
     }
   ]
-}, {allowAwaitOutsideFunction: true, ecmaVersion: 8})
+}, {allowAwaitOutsideFunction: true, ecmaVersion: 8, commonjs: false})
 testFail("function foo() {return await 1}", "Unexpected token (1:29)", {ecmaVersion: 8})
 testFail("function foo() {return await 1}", "Unexpected token (1:29)", {
   allowAwaitOutsideFunction: true,
