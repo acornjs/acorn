@@ -356,7 +356,7 @@ pp.parseIfStatement = function(node) {
 }
 
 pp.parseReturnStatement = function(node) {
-  if (!this.inFunction && !this.options.allowReturnOutsideFunction)
+  if (!this.allowReturn)
     this.raise(this.start, "'return' outside of function")
   this.next()
 
