@@ -90,3 +90,8 @@ testFail(`class X { static { return; } }`, "'return' outside of function (1:19)"
 
 // Top-level await using declaration with commonjs
 testFail("await using x = resource;", "Await using cannot appear outside of async function (1:0)", {ecmaVersion: 17, sourceType: "commonjs"});
+
+// Disallowing allowAwaitOutsideFunction with commonjs
+testFail("await 1", "Cannot use allowAwaitOutsideFunction with sourceType: commonjs", {allowAwaitOutsideFunction: true, sourceType: "commonjs"});
+testFail("x", "Cannot use allowAwaitOutsideFunction with sourceType: commonjs", {allowAwaitOutsideFunction: true, sourceType: "commonjs"});
+test("x", {}, {allowAwaitOutsideFunction: false, sourceType: "commonjs"});

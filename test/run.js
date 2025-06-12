@@ -93,7 +93,7 @@
         parse: (code, option) => acorn.parse(code, Object.assign({}, option, { sourceType: 'commonjs' })),
         filter: function (test) {
           var opts = test.options || {};
-          return opts.commonjs !== false && (!opts.sourceType || opts.sourceType === 'script');
+          return opts.commonjs !== false && !opts.allowAwaitOutsideFunction && (!opts.sourceType || opts.sourceType === 'script');
         }
       }
     },
@@ -104,7 +104,7 @@
         filter: function (test) {
           var opts = test.options || {};
           if (opts.loose === false) return false;
-          return opts.commonjs !== false && (!opts.sourceType || opts.sourceType === 'script');
+          return opts.commonjs !== false && !opts.allowAwaitOutsideFunction && (!opts.sourceType || opts.sourceType === 'script');
         }
       }
     }

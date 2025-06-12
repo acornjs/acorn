@@ -137,6 +137,9 @@ export function getOptions(opts) {
   if (isArray(options.onComment))
     options.onComment = pushComment(options, options.onComment)
 
+  if (options.sourceType === "commonjs" && options.allowAwaitOutsideFunction)
+    throw new Error("Cannot use allowAwaitOutsideFunction with sourceType: commonjs")
+
   return options
 }
 
