@@ -31,6 +31,7 @@
   require("./tests-module-string-names.js");
   require("./tests-import-attributes.js");
   require("./tests-using.js");
+  require("./tests-commonjs.js");
   var acorn = require("../acorn")
   var acorn_loose = require("../acorn-loose")
 
@@ -82,6 +83,28 @@
         filter: function (test) {
           var opts = test.options || {};
           return opts.loose !== false;
+        }
+      }
+    },
+
+    // Test whether the test for `sourceType: 'script'` produces the same result for `'commonjs'`.
+    'Normal with sourceType: commonjs': {
+      config: {
+        parse: (code, option) => acorn.parse(code, Object.assign({}, option, { sourceType: 'commonjs' })),
+        filter: function (test) {
+          var opts = test.options || {};
+          return opts.commonjs !== false && !opts.allowAwaitOutsideFunction && (!opts.sourceType || opts.sourceType === 'script');
+        }
+      }
+    },
+    'Loose with sourceType: commonjs': {
+      config: {
+        parse: (code, option) => acorn_loose.parse(code, Object.assign({}, option, { sourceType: 'commonjs' })),
+        loose: true,
+        filter: function (test) {
+          var opts = test.options || {};
+          if (opts.loose === false) return false;
+          return opts.commonjs !== false && !opts.allowAwaitOutsideFunction && (!opts.sourceType || opts.sourceType === 'script');
         }
       }
     }

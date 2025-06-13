@@ -27,13 +27,13 @@ exports.runTests = function(config, callback) {
     try {
       var ast = parse(test.code, testOpts);
     } catch(e) {
-      if (!(e instanceof SyntaxError)) { console.log(e.stack); throw e; }
       if (test.error) {
         if (test.error.charAt(0) === "~" ? e.message.indexOf(test.error.slice(1)) > -1 : e.message === test.error)
           callback("ok", test.code);
         else
           callback("fail", test.code, "Expected error message: " + test.error + "\nGot error message: " + e.message);
       } else {
+        if (!(e instanceof SyntaxError)) { console.log(e.stack); throw e; }
         callback("error", test.code, e.message || e.toString());
       }
       continue

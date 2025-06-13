@@ -27,7 +27,7 @@ pp.parseTopLevel = function(node) {
       this.raiseRecoverable(this.undefinedExports[name].start, `Export '${name}' is not defined`)
   this.adaptDirectivePrologue(node.body)
   this.next()
-  node.sourceType = this.options.sourceType
+  node.sourceType = this.options.sourceType === "commonjs" ? "script" : this.options.sourceType
   return this.finishNode(node, "Program")
 }
 

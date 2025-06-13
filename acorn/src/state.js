@@ -83,7 +83,12 @@ export class Parser {
 
     // Scope tracking for duplicate variable names (see scope.js)
     this.scopeStack = []
-    this.enterScope(SCOPE_TOP)
+    this.enterScope(
+      this.options.sourceType === "commonjs"
+        // In commonjs, the top-level scope behaves like a function scope
+        ? SCOPE_FUNCTION
+        : SCOPE_TOP
+    )
 
     // For RegExp validation
     this.regexpState = null

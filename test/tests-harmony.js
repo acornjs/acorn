@@ -14873,9 +14873,9 @@ test("function foo() { new.target; }", {
 }, {ecmaVersion: 6});
 
 testFail("new.prop", "The only valid meta property for new is 'new.target' (1:4)", {ecmaVersion: 6});
-testFail("new.target", "'new.target' can only be used in functions and class static block (1:0)", {ecmaVersion: 6});
+testFail("new.target", "'new.target' can only be used in functions and class static block (1:0)", {ecmaVersion: 6, commonjs: false});
 test("function x() { return () => new.target }", {}, {ecmaVersion: 6});
-testFail("let y = () => new.target", "'new.target' can only be used in functions and class static block (1:14)", {ecmaVersion: 6});
+testFail("let y = () => new.target", "'new.target' can only be used in functions and class static block (1:14)", {ecmaVersion: 6, commonjs: false});
 
 test("export default function foo() {} false", {
   body: [

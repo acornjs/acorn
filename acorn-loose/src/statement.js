@@ -10,7 +10,7 @@ lp.parseTopLevel = function() {
   while (this.tok.type !== tt.eof) node.body.push(this.parseStatement())
   this.toks.adaptDirectivePrologue(node.body)
   this.last = this.tok
-  node.sourceType = this.options.sourceType
+  node.sourceType = this.options.sourceType === "commonjs" ? "script" : this.options.sourceType
   return this.finishNode(node, "Program")
 }
 

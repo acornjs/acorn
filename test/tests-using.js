@@ -1102,14 +1102,14 @@ testFail("let await using x = resource;", "Cannot use keyword 'await' outside an
 // let using is not allowed
 testFail("let using x = resource;", "Unexpected token (1:10)", {ecmaVersion: 17, sourceType: "module"});
 // top level using is not allowed
-testFail("using x = resource;", "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement (1:0)", {ecmaVersion: 17, sourceType: "script"});
+testFail("using x = resource;", "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement (1:0)", {ecmaVersion: 17, sourceType: "script", commonjs: false});
 
 // BoundNames contains "let"  
 testFail("async function test() { await using let = resource; }", "The keyword 'let' is reserved (1:36)", {ecmaVersion: 17, sourceType: "module"});
 // BoundNames contains duplicate entries
 testFail("async function test() { await using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:51)", {ecmaVersion: 17, sourceType: "module"});
 // top level await using is not allowed
-testFail("await using x = resource;", "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement (1:0)", {ecmaVersion: 17, sourceType: "script"});
+testFail("await using x = resource;", "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement (1:0)", {ecmaVersion: 17, sourceType: "script", commonjs: false});
 
 // Basic missing initializer
 testFail("{ using x; }", "Missing initializer in using declaration (1:9)", {ecmaVersion: 17, sourceType: "module"});

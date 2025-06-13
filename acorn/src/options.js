@@ -13,7 +13,7 @@ export const defaultOptions = {
   // for new syntax features.
   ecmaVersion: null,
   // `sourceType` indicates the mode the code should be parsed in.
-  // Can be either `"script"` or `"module"`. This influences global
+  // Can be either `"script"`, `"module"` or `"commonjs"`. This influences global
   // strict mode and parsing of `import` and `export` declarations.
   sourceType: "script",
   // `onInsertedSemicolon` can be a callback that will be called when
@@ -136,6 +136,9 @@ export function getOptions(opts) {
   }
   if (isArray(options.onComment))
     options.onComment = pushComment(options, options.onComment)
+
+  if (options.sourceType === "commonjs" && options.allowAwaitOutsideFunction)
+    throw new Error("Cannot use allowAwaitOutsideFunction with sourceType: commonjs")
 
   return options
 }
