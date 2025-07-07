@@ -87,8 +87,8 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
     let usingEndPos = next + 5 /* using */, after
     if (this.input.slice(next, usingEndPos) !== "using" ||
       usingEndPos === this.input.length ||
-      isIdentifierChar(after = this.input.charCodeAt(usingEndPos)) ||
-      (after > 0xd7ff && after < 0xdc00)
+      isIdentifierChar(after = this.fullCharCodeAt(usingEndPos)) ||
+      after === 92 /* '\' */
     ) return false
 
     skipWhiteSpace.lastIndex = usingEndPos
