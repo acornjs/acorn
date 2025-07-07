@@ -84,17 +84,17 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
   if (lineBreak.test(this.input.slice(this.pos, next))) return false
 
   if (isAwaitUsing) {
-    let awaitEndPos = next + 5 /* await */, after
-    if (this.input.slice(next, awaitEndPos) !== "using" ||
-      awaitEndPos === this.input.length ||
-      isIdentifierChar(after = this.input.charCodeAt(awaitEndPos)) ||
+    let usingEndPos = next + 5 /* using */, after
+    if (this.input.slice(next, usingEndPos) !== "using" ||
+      usingEndPos === this.input.length ||
+      isIdentifierChar(after = this.input.charCodeAt(usingEndPos)) ||
       (after > 0xd7ff && after < 0xdc00)
     ) return false
 
-    skipWhiteSpace.lastIndex = awaitEndPos
+    skipWhiteSpace.lastIndex = usingEndPos
     let skipAfterUsing = skipWhiteSpace.exec(this.input)
-    next = awaitEndPos + skipAfterUsing[0].length
-    if (skipAfterUsing && lineBreak.test(this.input.slice(awaitEndPos, next))) return false
+    next = usingEndPos + skipAfterUsing[0].length
+    if (skipAfterUsing && lineBreak.test(this.input.slice(usingEndPos, next))) return false
   }
 
   let ch = this.fullCharCodeAt(next)
