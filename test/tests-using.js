@@ -1184,6 +1184,9 @@ testFail("for (await using a of x) {}", "Await using cannot appear outside of as
 testFail("switch (x) { case 1: using y = resource; }", "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement (1:21)", {ecmaVersion: 17, sourceType: "module"});
 testFail("switch (x) { case 1: break; default: using y = resource; }", "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement (1:37)", {ecmaVersion: 17, sourceType: "module"});
 
+// await using double lookahead should detect using keyword correctly
+testFail("async () => { await using\\u0061 b = c }", "Unexpected token (1:32)", {ecmaVersion: 17, sourceType: "module"});
+
 // =============================================================================
 // EDGE CASES - Unusual but valid scenarios and boundary conditions
 // =============================================================================
