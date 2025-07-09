@@ -70,7 +70,7 @@ pp.isAsyncFunction = function() {
   return !lineBreak.test(this.input.slice(this.pos, next)) &&
     this.input.slice(next, next + 8) === "function" &&
     (next + 8 === this.input.length ||
-     !(isIdentifierChar(after = this.input.charCodeAt(next + 8)) || after > 0xd7ff && after < 0xdc00))
+     !(isIdentifierChar(after = this.input.charCodeAt(next + 8)) || after === 92 || after > 0xd7ff && after < 0xdc00))
 }
 
 pp.isUsingKeyword = function(isAwaitUsing, isFor) {
