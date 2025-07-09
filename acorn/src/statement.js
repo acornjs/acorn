@@ -46,10 +46,10 @@ pp.isLet = function(context) {
   if (context) return false
 
   if (nextCh === 123) return true // '{'
-  if (isIdentifierStart(nextCh, true)) {
+  if (isIdentifierStart(nextCh)) {
     let start = next
     do { next += nextCh <= 0xffff ? 1 : 2 }
-    while (isIdentifierChar(nextCh = this.fullCharCodeAt(next), true))
+    while (isIdentifierChar(nextCh = this.fullCharCodeAt(next)))
     if (nextCh === 92) return true
     let ident = this.input.slice(start, next)
     if (!keywordRelationalOperator.test(ident)) return true
@@ -70,7 +70,7 @@ pp.isAsyncFunction = function() {
   return !lineBreak.test(this.input.slice(this.pos, next)) &&
     this.input.slice(next, next + 8) === "function" &&
     (next + 8 === this.input.length ||
-     !(isIdentifierChar(after = this.fullCharCodeAt(next + 8), true) || after === 92 /* '\' */))
+     !(isIdentifierChar(after = this.fullCharCodeAt(next + 8)) || after === 92 /* '\' */))
 }
 
 pp.isUsingKeyword = function(isAwaitUsing, isFor) {
@@ -87,7 +87,7 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
     let usingEndPos = next + 5 /* using */, after
     if (this.input.slice(next, usingEndPos) !== "using" ||
       usingEndPos === this.input.length ||
-      isIdentifierChar(after = this.fullCharCodeAt(usingEndPos), true) ||
+      isIdentifierChar(after = this.fullCharCodeAt(usingEndPos)) ||
       after === 92 /* '\' */
     ) return false
 
@@ -98,10 +98,10 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
   }
 
   let ch = this.fullCharCodeAt(next)
-  if (!isIdentifierStart(ch, true) && ch !== 92 /* '\' */) return false
+  if (!isIdentifierStart(ch) && ch !== 92 /* '\' */) return false
   let idStart = next
   do { next += ch <= 0xffff ? 1 : 2 }
-  while (isIdentifierChar(ch = this.fullCharCodeAt(next), true))
+  while (isIdentifierChar(ch = this.fullCharCodeAt(next)))
   if (ch === 92) return true
   let id = this.input.slice(idStart, next)
   if (keywordRelationalOperator.test(id) || isFor && id === "of") return false
