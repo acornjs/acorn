@@ -26,6 +26,24 @@ git clone https://github.com/acornjs/acorn.git
 cd acorn
 npm install
 ```
+## Importing acorn
+
+ESM as well as CommonJS is supported for all 3: `acorn`, `acorn-walk` and `acorn-loose`.
+
+ESM example for `acorn`:
+
+```js
+import * as acorn from "acorn";
+```
+
+CommonJS example for `acorn`:
+
+```js
+let acorn = require("acorn");
+```
+
+ESM is preferred, as it allows better editor auto-completions by offering TypeScript support.
+For this reason, following examples will use ESM imports.
 
 ## Interface
 
@@ -36,7 +54,7 @@ syntax tree object as specified by the [ESTree
 spec](https://github.com/estree/estree).
 
 ```javascript
-let acorn = require("acorn");
+import * as acorn from "acorn";
 console.log(acorn.parse("1 + 1", {ecmaVersion: 2020}));
 ```
 
