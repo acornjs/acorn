@@ -49,7 +49,7 @@ placeholders in places where it can't make sense of the input. Depends
 on the `acorn` package, because it uses the same tokenizer.
 
 ```javascript
-var acornLoose = require("acorn-loose");
+import * as acornLoose from "acorn-loose";
 console.log(acornLoose.parse("1 / * 4 )[2]", {ecmaVersion: 2020}));
 ```
 
