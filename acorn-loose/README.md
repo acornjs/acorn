@@ -49,8 +49,8 @@ placeholders in places where it can't make sense of the input. Depends
 on the `acorn` package, because it uses the same tokenizer.
 
 ```javascript
-import * as acornLoose from "acorn-loose";
-console.log(acornLoose.parse("1 / * 4 )[2]", {ecmaVersion: 2020}));
+import * as acornLoose from "acorn-loose"
+console.log(acornLoose.parse("1 / * 4 )[2]", {ecmaVersion: 2020}))
 ```
 
 Like the regular parser, the loose parser supports plugins. You can
