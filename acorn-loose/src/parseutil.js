@@ -1,3 +1,5 @@
-export const dummyValue = "✖"
+export const dummyValue = "✖";
 
-export function isDummy(node) { return node.name === dummyValue }
+export function isDummy(node) {
+  return node.name === dummyValue;
+}

@@ -1,9 +1,11 @@
-import {readFile, writeFile} from "node:fs/promises"
-import buble from "@rollup/plugin-buble"
+import { readFile, writeFile } from "node:fs/promises";
+import buble from "@rollup/plugin-buble";
 
 const copy = (from, to) => ({
-  async writeBundle() { await writeFile(to, await readFile(from)) }
-})
+  async writeBundle() {
+    await writeFile(to, await readFile(from));
+  },
+});
 
 export default [
   {
@@ -12,18 +14,18 @@ export default [
       {
         file: "acorn/dist/acorn.js",
         format: "umd",
-        name: "acorn"
+        name: "acorn",
       },
       {
         file: "acorn/dist/acorn.mjs",
-        format: "es"
-      }
+        format: "es",
+      },
     ],
     plugins: [
-      buble({transforms: {dangerousForOf: true}}),
+      buble({ transforms: { dangerousForOf: true } }),
       copy("acorn/src/acorn.d.ts", "acorn/dist/acorn.d.ts"),
-      copy("acorn/src/acorn.d.ts", "acorn/dist/acorn.d.mts")
-    ]
+      copy("acorn/src/acorn.d.ts", "acorn/dist/acorn.d.mts"),
+    ],
   },
   {
     external: ["acorn", "fs", "path"],
@@ -31,10 +33,8 @@ export default [
     output: {
       file: "acorn/dist/bin.js",
       format: "cjs",
-      paths: {acorn: "./acorn.js"}
+      paths: { acorn: "./acorn.js" },
     },
-    plugins: [
-      buble({transforms: {dangerousForOf: true}})
-    ]
-  }
-]
+    plugins: [buble({ transforms: { dangerousForOf: true } })],
+  },
+];

@@ -1,35 +1,35 @@
-'use strict';
+"use strict";
 
-const BenchTable = require('benchtable');
-const { parsers, parserNames, inputs, inputNames } = require('./common');
+const BenchTable = require("benchtable");
+const { parsers, parserNames, inputs, inputNames } = require("./common");
 
-const yargs = require('yargs')
-  .help()
-  .alias('?', 'help');
+const yargs = require("yargs").help().alias("?", "help");
 
-const optionNames = new Map(parserNames.map(name => [
-  name,
+const optionNames = new Map(
+  parserNames.map((name) => [
+    name,
 
-  name
-  .toLowerCase()
-  .replace(/[^a-z]+/g, '-')
-  .replace(/(^-|-$)/g, '')
-]));
+    name
+      .toLowerCase()
+      .replace(/[^a-z]+/g, "-")
+      .replace(/(^-|-$)/g, ""),
+  ])
+);
 
-parserNames.forEach(name => {
+parserNames.forEach((name) => {
   yargs.option(optionNames.get(name), {
-    group: 'Benchmark parsers:',
+    group: "Benchmark parsers:",
     describe: name,
-    type: 'boolean',
-    default: name.startsWith('Acorn') || undefined
+    type: "boolean",
+    default: name.startsWith("Acorn") || undefined,
   });
 });
 
 const { argv } = yargs;
 
-let suite = new BenchTable('parsers', { isTransposed: true });
+let suite = new BenchTable("parsers", { isTransposed: true });
 
-parserNames.forEach(name => {
+parserNames.forEach((name) => {
   if (!argv[optionNames.get(name)]) {
     return;
   }
@@ -41,22 +41,24 @@ parserNames.forEach(name => {
   suite.addFunction(name, parse);
 });
 
-console.log('Running benchmarks...');
+console.log("Running benchmarks...");
 
-inputs.then(inputs => {
-  inputNames.forEach((inputName, i) => {
-    suite.addInput(inputName, [inputs[i]]);
-  });
+inputs
+  .then((inputs) => {
+    inputNames.forEach((inputName, i) => {
+      suite.addInput(inputName, [inputs[i]]);
+    });
 
-  suite
-  .on('cycle', function (event) {
-    console.log(event.target.toString());
+    suite
+      .on("cycle", function (event) {
+        console.log(event.target.toString());
+      })
+      .on("error", function (event) {
+        throw event.target.error;
+      })
+      .on("complete", function () {
+        console.log(suite.table.toString());
+      })
+      .run();
   })
-  .on('error', function (event) {
-    throw event.target.error;
-  })
-  .on('complete', function () {
-    console.log(suite.table.toString());
-  })
-  .run()
-}).catch(console.error);
+  .catch(console.error);

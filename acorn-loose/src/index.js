@@ -29,17 +29,17 @@
 // invasive changes and simplifications without creating a complicated
 // tangle.
 
-import {defaultOptions} from "acorn"
-import {LooseParser} from "./state.js"
-import "./tokenize.js"
-import "./statement.js"
-import "./expression.js"
+import { defaultOptions } from "acorn";
+import { LooseParser } from "./state.js";
+import "./tokenize.js";
+import "./statement.js";
+import "./expression.js";
 
-export {LooseParser} from "./state.js"
-export {isDummy} from "./parseutil.js"
+export { LooseParser } from "./state.js";
+export { isDummy } from "./parseutil.js";
 
-defaultOptions.tabSize = 4
+defaultOptions.tabSize = 4;
 
 export function parse(input, options) {
-  return LooseParser.parse(input, options)
+  return LooseParser.parse(input, options);
 }

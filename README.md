@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/acornjs/acorn/workflows/ci/badge.svg)](https://github.com/acornjs/acorn/actions)
 [![NPM version](https://img.shields.io/npm/v/acorn.svg)](https://www.npmjs.com/package/acorn)
-[![CDNJS](https://img.shields.io/cdnjs/v/acorn.svg)](https://cdnjs.com/libraries/acorn)  
+[![CDNJS](https://img.shields.io/cdnjs/v/acorn.svg)](https://cdnjs.com/libraries/acorn)
 
 A tiny, fast JavaScript parser, written completely in JavaScript.
 
@@ -21,12 +21,12 @@ requests on [github](https://github.com/acornjs/acorn).
 
 This repository holds three packages:
 
- - [acorn](https://github.com/acornjs/acorn/tree/master/acorn/): The
-   main parser
- - [acorn-loose](https://github.com/acornjs/acorn/tree/master/acorn-loose/): The
-   error-tolerant parser
- - [acorn-walk](https://github.com/acornjs/acorn/tree/master/acorn-walk/): The
-   syntax tree walker
+- [acorn](https://github.com/acornjs/acorn/tree/master/acorn/): The
+  main parser
+- [acorn-loose](https://github.com/acornjs/acorn/tree/master/acorn-loose/): The
+  error-tolerant parser
+- [acorn-walk](https://github.com/acornjs/acorn/tree/master/acorn-walk/): The
+  syntax tree walker
 
 To build the content of the repository, run `npm install`.
 
@@ -61,13 +61,10 @@ extended class only once, and then repeatedly call `parse` on it, to
 avoid needlessly confusing the JavaScript engine's optimizer.
 
 ```javascript
-const {Parser} = require("acorn")
+const { Parser } = require("acorn");
 
-const MyParser = Parser.extend(
-  require("acorn-jsx")(),
-  require("acorn-bigint")
-)
-console.log(MyParser.parse("// Some bigint + JSX code"))
+const MyParser = Parser.extend(require("acorn-jsx")(), require("acorn-bigint"));
+console.log(MyParser.parse("// Some bigint + JSX code"));
 ```
 
 Plugins override methods in their new parser class to implement
@@ -83,9 +80,9 @@ This is what a trivial plugin, which adds a bit of code to the
 module.exports = function noisyReadToken(Parser) {
   return class extends Parser {
     readToken(code) {
-      console.log("Reading a token!")
-      super.readToken(code)
+      console.log("Reading a token!");
+      super.readToken(code);
     }
-  }
-}
+  };
+};
 ```

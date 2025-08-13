@@ -47,14 +47,14 @@ produce a meaningful state. (An example of a use of state is to track
 scope at each point in the tree.)
 
 ```js
-import * as acorn from "acorn"
-import * as walk from "acorn-walk"
+import * as acorn from "acorn";
+import * as walk from "acorn-walk";
 
 walk.simple(acorn.parse("let x = 10"), {
   Literal(node) {
-    console.log(`Found a literal: ${node.value}`)
-  }
-})
+    console.log(`Found a literal: ${node.value}`);
+  },
+});
 ```
 
 **ancestor**`(node, visitors, base, state)` does a 'simple' walk over
@@ -62,14 +62,17 @@ a tree, building up an array of ancestor nodes (including the current node)
 and passing the array to the callbacks as a third parameter.
 
 ```js
-import * as acorn from "acorn"
-import * as walk from "acorn-walk"
+import * as acorn from "acorn";
+import * as walk from "acorn-walk";
 
 walk.ancestor(acorn.parse("foo('hi')"), {
   Literal(_node, _state, ancestors) {
-    console.log("This literal's ancestors are:", ancestors.map(n => n.type))
-  }
-})
+    console.log(
+      "This literal's ancestors are:",
+      ancestors.map((n) => n.type)
+    );
+  },
+});
 ```
 
 **recursive**`(node, state, functions, base)` does a 'recursive'
@@ -97,12 +100,12 @@ current node) and passing the array to the callbacks as a third
 parameter.
 
 ```js
-import * as acorn from "acorn"
-import * as walk from "acorn-walk"
+import * as acorn from "acorn";
+import * as walk from "acorn-walk";
 
-walk.full(acorn.parse("1 + 1"), node => {
-  console.log(`There's a ${node.type} node at ${node.ch}`)
-})
+walk.full(acorn.parse("1 + 1"), (node) => {
+  console.log(`There's a ${node.type} node at ${node.ch}`);
+});
 ```
 
 **findNodeAt**`(node, start, end, test, base, state)` tries to locate
@@ -120,5 +123,5 @@ boundaries, the inner one will be preferred.
 the given position.
 
 **findNodeAfter**`(node, pos, test, base, state)` is similar to
-`findNodeAround`, but will match all nodes *after* the given position
+`findNodeAround`, but will match all nodes _after_ the given position
 (testing outer nodes before inner nodes).

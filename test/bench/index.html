@@ -1,6 +1,6 @@
 <!doctype html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>Acorn benchmark</title>
   <style>
     table {
@@ -10,11 +10,12 @@
       table-layout: fixed;
     }
 
-    thead>tr>th:first-child {
+    thead > tr > th:first-child {
       border: none;
     }
 
-    th, td {
+    th,
+    td {
       border: 1px solid black;
       height: 20pt;
     }
@@ -36,14 +37,18 @@
 
 <h1>JavaScript parsers speed comparison</h1>
 
-<p>The table below will contain generic summary (ops/sec or type of error) for
-each parser/input combination. If something doesn't look right, you can find
-more details in the devtools console afterwards.</p>
+<p>
+  The table below will contain generic summary (ops/sec or type of error) for
+  each parser/input combination. If something doesn't look right, you can find
+  more details in the devtools console afterwards.
+</p>
 
-<p>Note that having the developer tools open in browser <em>heavily</em>
-influences the numbers you get. In Chrome, the effect even lingers (in the tab)
-after you close the developer tools. Load in a fresh tab to get (halfway) stable
-numbers.</p>
+<p>
+  Note that having the developer tools open in browser
+  <em>heavily</em> influences the numbers you get. In Chrome, the effect even
+  lingers (in the tab) after you close the developer tools. Load in a fresh tab
+  to get (halfway) stable numbers.
+</p>
 
 <button id="run" disabled>Run benchmarks</button>
 
@@ -57,120 +62,122 @@ numbers.</p>
 </table>
 
 <script>
-(() => {
-  'use strict';
+  (() => {
+    "use strict";
 
-  let runElem = document.getElementById('run');
-  let parsersElem = document.getElementById('parsers');
-  let inputsElem = document.getElementById('inputs');
-  let initElem = document.getElementById('init');
+    let runElem = document.getElementById("run");
+    let parsersElem = document.getElementById("parsers");
+    let inputsElem = document.getElementById("inputs");
+    let initElem = document.getElementById("init");
 
-  let worker = new Worker('worker.js');
+    let worker = new Worker("worker.js");
 
-  worker.onmessage = ({ data: { parserNames, inputNames } }) => {
-    let checkBoxes = parserNames.map(parserName => {
-      let cbElem = document.createElement('input');
-      cbElem.type = 'checkbox';
-      cbElem.checked = parserName.startsWith('Acorn');
+    worker.onmessage = ({ data: { parserNames, inputNames } }) => {
+      let checkBoxes = parserNames.map((parserName) => {
+        let cbElem = document.createElement("input");
+        cbElem.type = "checkbox";
+        cbElem.checked = parserName.startsWith("Acorn");
 
-      let labelElem = document.createElement('label');
-      labelElem.appendChild(cbElem);
-      labelElem.appendChild(document.createTextNode(parserName));
+        let labelElem = document.createElement("label");
+        labelElem.appendChild(cbElem);
+        labelElem.appendChild(document.createTextNode(parserName));
 
-      let thElem = document.createElement('th');
-      thElem.appendChild(labelElem);
+        let thElem = document.createElement("th");
+        thElem.appendChild(labelElem);
 
-      parsersElem.appendChild(thElem);
+        parsersElem.appendChild(thElem);
 
-      return cbElem;
-    });
-
-    let rows = inputNames.map(name => {
-      let thElem = document.createElement('th');
-      thElem.textContent = name;
-
-      let trElem = document.createElement('tr');
-      trElem.appendChild(thElem);
-
-      let cells = parserNames.map(() => trElem.insertCell());
-
-      inputsElem.appendChild(trElem);
-
-      return cells;
-    });
-
-    runElem.addEventListener('click', () => {
-      let indices = [];
-
-      checkBoxes.forEach((cbElem, i) => {
-        if (cbElem.checked) {
-          indices.push(i);
-        }
+        return cbElem;
       });
 
-      if (!indices.length) {
-        alert('Choose at least one parser');
-        return;
-      }
+      let rows = inputNames.map((name) => {
+        let thElem = document.createElement("th");
+        thElem.textContent = name;
 
-      checkBoxes.forEach(cbElem => {
-        cbElem.disabled = true;
+        let trElem = document.createElement("tr");
+        trElem.appendChild(thElem);
+
+        let cells = parserNames.map(() => trElem.insertCell());
+
+        inputsElem.appendChild(trElem);
+
+        return cells;
       });
 
-      runElem.disabled = true;
+      runElem.addEventListener("click", () => {
+        let indices = [];
 
-      worker.onmessage = ({ data }) => {
-        if (data.type === 'versions') {
-          for (let i = 0; i < data.versions.length; i++) {
-            let version = data.versions[i];
-            if (version) {
-              parsersElem.cells[indices[i] + 1].appendChild(document.createTextNode(` ${version}`));
-            }
+        checkBoxes.forEach((cbElem, i) => {
+          if (cbElem.checked) {
+            indices.push(i);
           }
+        });
+
+        if (!indices.length) {
+          alert("Choose at least one parser");
           return;
         }
 
-        let row = rows[data.row];
+        checkBoxes.forEach((cbElem) => {
+          cbElem.disabled = true;
+        });
 
-        if (data.type === 'complete') {
-          ['slowest', 'fastest'].forEach(type => {
-            data[type].forEach(i => {
-              row[i].className = type;
+        runElem.disabled = true;
+
+        worker.onmessage = ({ data }) => {
+          if (data.type === "versions") {
+            for (let i = 0; i < data.versions.length; i++) {
+              let version = data.versions[i];
+              if (version) {
+                parsersElem.cells[indices[i] + 1].appendChild(
+                  document.createTextNode(` ${version}`)
+                );
+              }
+            }
+            return;
+          }
+
+          let row = rows[data.row];
+
+          if (data.type === "complete") {
+            ["slowest", "fastest"].forEach((type) => {
+              data[type].forEach((i) => {
+                row[i].className = type;
+              });
             });
-          });
-          return;
-        }
-
-        let cell = row[data.cell];
-
-        switch (data.type) {
-          case 'start': {
-            cell.textContent = '⌛';
-            initElem.style.visibility = 'hidden';
-            break;
+            return;
           }
-          case 'cycle': {
-            cell.textContent = data.text;
-            if (data.nextCell !== undefined) {
-              row[data.nextCell].textContent = '⌛';
+
+          let cell = row[data.cell];
+
+          switch (data.type) {
+            case "start": {
+              cell.textContent = "⌛";
+              initElem.style.visibility = "hidden";
+              break;
             }
-            break;
+            case "cycle": {
+              cell.textContent = data.text;
+              if (data.nextCell !== undefined) {
+                row[data.nextCell].textContent = "⌛";
+              }
+              break;
+            }
+            case "error": {
+              cell.className = "error";
+              cell.textContent = data.text;
+              break;
+            }
           }
-          case 'error': {
-            cell.className = 'error';
-            cell.textContent = data.text;
-            break;
-          }
-        }
-      };
+        };
 
-      initElem.style.visibility = 'visible';
+        initElem.style.visibility = "visible";
 
-      worker.postMessage(indices);
-    });
+        worker.postMessage(indices);
+      });
 
-    initElem.style.visibility = 'hidden';
-    runElem.disabled = false;
-  };
-})();
+      initElem.style.visibility = "hidden";
+      runElem.disabled = false;
+    };
+  })();
 </script>

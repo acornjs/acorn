@@ -26,6 +26,7 @@ git clone https://github.com/acornjs/acorn.git
 cd acorn
 npm install
 ```
+
 ## Importing acorn
 
 ESM as well as CommonJS is supported for all 3: `acorn`, `acorn-walk` and `acorn-loose`.
@@ -33,13 +34,13 @@ ESM as well as CommonJS is supported for all 3: `acorn`, `acorn-walk` and `acorn
 ESM example for `acorn`:
 
 ```js
-import * as acorn from "acorn"
+import * as acorn from "acorn";
 ```
 
 CommonJS example for `acorn`:
 
 ```js
-let acorn = require("acorn")
+let acorn = require("acorn");
 ```
 
 ESM is preferred, as it allows better editor auto-completions by offering TypeScript support.
@@ -54,8 +55,8 @@ syntax tree object as specified by the [ESTree
 spec](https://github.com/estree/estree).
 
 ```javascript
-import * as acorn from "acorn"
-console.log(acorn.parse("1 + 1", {ecmaVersion: 2020}))
+import * as acorn from "acorn";
+console.log(acorn.parse("1 + 1", { ecmaVersion: 2020 }));
 ```
 
 When encountering a syntax error, the parser will raise a
@@ -146,7 +147,6 @@ required):
 - **onComment**: If a function is passed for this option, whenever a
   comment is encountered the function will be called with the
   following parameters:
-
   - `block`: `true` if the comment is a block comment, false if it
     is a line comment.
   - `text`: The content of the comment.
@@ -236,7 +236,7 @@ for (let token of acorn.tokenizer(str)) {
 }
 
 // transform code to array of tokens:
-var tokens = [...acorn.tokenizer(str)]
+var tokens = [...acorn.tokenizer(str)];
 ```
 
 **tokTypes** holds an object mapping names to the token type objects
@@ -257,10 +257,10 @@ on the extended version of the class. To extend a parser with plugins,
 you can use its static `extend` method.
 
 ```javascript
-var acorn = require("acorn")
-var jsx = require("acorn-jsx")
-var JSXParser = acorn.Parser.extend(jsx())
-JSXParser.parse("foo(<bar/>)", {ecmaVersion: 2020})
+var acorn = require("acorn");
+var jsx = require("acorn-jsx");
+var JSXParser = acorn.Parser.extend(jsx());
+JSXParser.parse("foo(<bar/>)", { ecmaVersion: 2020 });
 ```
 
 The `extend` method takes any number of plugin values, and returns a
@@ -298,4 +298,4 @@ The utility spits out the syntax tree as JSON data.
 
 ## Existing plugins
 
- - [`acorn-jsx`](https://github.com/RReverser/acorn-jsx): Parse [Facebook JSX syntax extensions](https://github.com/facebook/jsx)
+- [`acorn-jsx`](https://github.com/RReverser/acorn-jsx): Parse [Facebook JSX syntax extensions](https://github.com/facebook/jsx)

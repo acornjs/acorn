@@ -8,29 +8,29 @@ if (typeof exports !== "undefined") {
 test(
   "import('dynamicImport.js')",
   {
-    type: 'Program',
+    type: "Program",
     start: 0,
     end: 26,
     body: [
       {
-        type: 'ExpressionStatement',
+        type: "ExpressionStatement",
         start: 0,
         end: 26,
         expression: {
-          type: 'ImportExpression',
+          type: "ImportExpression",
           start: 0,
           end: 26,
           source: {
-            type: 'Literal',
+            type: "Literal",
             start: 7,
             end: 25,
-            value: 'dynamicImport.js',
-            raw: "'dynamicImport.js'"
-          }
-        }
-      }
+            value: "dynamicImport.js",
+            raw: "'dynamicImport.js'",
+          },
+        },
+      },
     ],
-    sourceType: 'script'
+    sourceType: "script",
   },
   { ecmaVersion: 11 }
 );
@@ -39,41 +39,41 @@ test(
 test(
   "import(a = 'dynamicImport.js')",
   {
-    "type": "Program",
-    "start": 0,
-    "end": 30,
-    "body": [
+    type: "Program",
+    start: 0,
+    end: 30,
+    body: [
       {
-        "type": "ExpressionStatement",
-        "start": 0,
-        "end": 30,
-        "expression": {
-          "type": "ImportExpression",
-          "start": 0,
-          "end": 30,
-          "source": {
-            "type": "AssignmentExpression",
-            "start": 7,
-            "end": 29,
-            "operator": "=",
-            "left": {
-              "type": "Identifier",
-              "start": 7,
-              "end": 8,
-              "name": "a"
+        type: "ExpressionStatement",
+        start: 0,
+        end: 30,
+        expression: {
+          type: "ImportExpression",
+          start: 0,
+          end: 30,
+          source: {
+            type: "AssignmentExpression",
+            start: 7,
+            end: 29,
+            operator: "=",
+            left: {
+              type: "Identifier",
+              start: 7,
+              end: 8,
+              name: "a",
             },
-            "right": {
-              "type": "Literal",
-              "start": 11,
-              "end": 29,
-              "value": "dynamicImport.js",
-              "raw": "'dynamicImport.js'"
-            }
-          }
-        }
-      }
+            right: {
+              type: "Literal",
+              start: 11,
+              end: 29,
+              value: "dynamicImport.js",
+              raw: "'dynamicImport.js'",
+            },
+          },
+        },
+      },
     ],
-    "sourceType": "script"
+    sourceType: "script",
   },
   { ecmaVersion: 11 }
 );
@@ -81,46 +81,52 @@ test(
 test(
   "function* a() { yield import('http'); }",
   {
-    type: 'Program',
+    type: "Program",
     start: 0,
     end: 39,
     body: [
       {
-        type: 'FunctionDeclaration',
+        type: "FunctionDeclaration",
         start: 0,
         end: 39,
-        id: { type: 'Identifier', start: 10, end: 11, name: 'a' },
+        id: { type: "Identifier", start: 10, end: 11, name: "a" },
         expression: false,
         generator: true,
         async: false,
         params: [],
         body: {
-          type: 'BlockStatement',
+          type: "BlockStatement",
           start: 14,
           end: 39,
           body: [
             {
-              type: 'ExpressionStatement',
+              type: "ExpressionStatement",
               start: 16,
               end: 37,
               expression: {
-                type: 'YieldExpression',
+                type: "YieldExpression",
                 start: 16,
                 end: 36,
                 delegate: false,
                 argument: {
-                  type: 'ImportExpression',
+                  type: "ImportExpression",
                   start: 22,
                   end: 36,
-                  source: { type: 'Literal', start: 29, end: 35, value: 'http', raw: "'http'" }
-                }
-              }
-            }
-          ]
-        }
-      }
+                  source: {
+                    type: "Literal",
+                    start: 29,
+                    end: 35,
+                    value: "http",
+                    raw: "'http'",
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
     ],
-    sourceType: 'script'
+    sourceType: "script",
   },
   { ecmaVersion: 11 }
 );
@@ -129,34 +135,34 @@ test(
 test(
   "new (import(s))",
   {
-    "type": "Program",
-    "start": 0,
-    "end": 15,
-    "body": [
+    type: "Program",
+    start: 0,
+    end: 15,
+    body: [
       {
-        "type": "ExpressionStatement",
-        "start": 0,
-        "end": 15,
-        "expression": {
-          "type": "NewExpression",
-          "start": 0,
-          "end": 15,
-          "callee": {
-            "type": "ImportExpression",
-            "start": 5,
-            "end": 14,
-            "source": {
-              "type": "Identifier",
-              "start": 12,
-              "end": 13,
-              "name": "s"
-            }
+        type: "ExpressionStatement",
+        start: 0,
+        end: 15,
+        expression: {
+          type: "NewExpression",
+          start: 0,
+          end: 15,
+          callee: {
+            type: "ImportExpression",
+            start: 5,
+            end: 14,
+            source: {
+              type: "Identifier",
+              start: 12,
+              end: 13,
+              name: "s",
+            },
           },
-          "arguments": []
-        }
-      }
+          arguments: [],
+        },
+      },
     ],
-    "sourceType": "script"
+    sourceType: "script",
   },
   { ecmaVersion: 11 }
 );
@@ -165,92 +171,104 @@ test(
 test(
   "import((s,t))",
   {
-    "type": "Program",
-    "start": 0,
-    "end": 13,
-    "body": [
+    type: "Program",
+    start: 0,
+    end: 13,
+    body: [
       {
-        "type": "ExpressionStatement",
-        "start": 0,
-        "end": 13,
-        "expression": {
-          "type": "ImportExpression",
-          "start": 0,
-          "end": 13,
-          "source": {
-            "type": "SequenceExpression",
-            "start": 8,
-            "end": 11,
-            "expressions": [
+        type: "ExpressionStatement",
+        start: 0,
+        end: 13,
+        expression: {
+          type: "ImportExpression",
+          start: 0,
+          end: 13,
+          source: {
+            type: "SequenceExpression",
+            start: 8,
+            end: 11,
+            expressions: [
               {
-                "type": "Identifier",
-                "start": 8,
-                "end": 9,
-                "name": "s"
+                type: "Identifier",
+                start: 8,
+                end: 9,
+                name: "s",
               },
               {
-                "type": "Identifier",
-                "start": 10,
-                "end": 11,
-                "name": "t"
-              }
-            ]
-          }
-        }
-      }
+                type: "Identifier",
+                start: 10,
+                end: 11,
+                name: "t",
+              },
+            ],
+          },
+        },
+      },
     ],
-    "sourceType": "script"
+    sourceType: "script",
   },
   { ecmaVersion: 11 }
 );
 
-testFail('function failsParse() { return import.then(); }', 'The only valid meta property for import is \'import.meta\' (1:38)', {
-  ecmaVersion: 11,
-  loose: false
-});
+testFail(
+  "function failsParse() { return import.then(); }",
+  "The only valid meta property for import is 'import.meta' (1:38)",
+  {
+    ecmaVersion: 11,
+    loose: false,
+  }
+);
 
-testFail("var dynImport = import; dynImport('http');", 'Unexpected token (1:22)', {
-  ecmaVersion: 11,
-  loose: false
-});
+testFail(
+  "var dynImport = import; dynImport('http');",
+  "Unexpected token (1:22)",
+  {
+    ecmaVersion: 11,
+    loose: false,
+  }
+);
 
-testFail("import('test.js')", 'Unexpected token (1:6)', {
+testFail("import('test.js')", "Unexpected token (1:6)", {
   ecmaVersion: 10,
   loose: false,
-  sourceType: 'module'
+  sourceType: "module",
 });
 
-testFail("import()", 'Unexpected token (1:7)', {
+testFail("import()", "Unexpected token (1:7)", {
   ecmaVersion: 11,
-  loose: false
+  loose: false,
 });
 
-testFail("import(a, b)", 'Unexpected token (1:8)', {
+testFail("import(a, b)", "Unexpected token (1:8)", {
   ecmaVersion: 11,
-  loose: false
+  loose: false,
 });
 
-testFail("import(...[a])", 'Unexpected token (1:7)', {
+testFail("import(...[a])", "Unexpected token (1:7)", {
   ecmaVersion: 11,
-  loose: false
+  loose: false,
 });
 
-testFail("import(source,)", 'Trailing comma is not allowed in import() (1:13)', {
+testFail(
+  "import(source,)",
+  "Trailing comma is not allowed in import() (1:13)",
+  {
+    ecmaVersion: 11,
+    loose: false,
+  }
+);
+
+testFail("new import(source)", "Unexpected token (1:10)", {
   ecmaVersion: 11,
-  loose: false
+  loose: false,
 });
 
-testFail("new import(source)", 'Unexpected token (1:10)', {
+testFail("new import(source).foo", "Unexpected token (1:10)", {
   ecmaVersion: 11,
-  loose: false
+  loose: false,
 });
 
-testFail("new import(source).foo", 'Unexpected token (1:10)', {
+testFail("(import)(s)", "Unexpected token (1:7)", {
   ecmaVersion: 11,
-  loose: false
-});
-
-testFail("(import)(s)", 'Unexpected token (1:7)', {
-  ecmaVersion: 11,
-  loose: false
+  loose: false,
 });

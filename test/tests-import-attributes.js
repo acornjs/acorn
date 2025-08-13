@@ -1,8 +1,8 @@
 /* eslint quote-props: ["error", "as-needed"] */
 /* eslint quotes: ["error", "double", { "avoidEscape": true }] */
 if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
+  var test = require("./driver.js").test;
+  var testFail = require("./driver.js").testFail;
 }
 
 test(
@@ -25,16 +25,16 @@ test(
               type: "Identifier",
               start: 7,
               end: 11,
-              name: "json"
-            }
-          }
+              name: "json",
+            },
+          },
         ],
         source: {
           type: "Literal",
           start: 17,
           end: 29,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
         attributes: [
           {
@@ -45,23 +45,23 @@ test(
               type: "Identifier",
               start: 37,
               end: 41,
-              name: "type"
+              name: "type",
             },
             value: {
               type: "Literal",
               start: 43,
               end: 49,
               value: "json",
-              raw: "\"json\""
-            }
-          }
-        ]
-      }
+              raw: '"json"',
+            },
+          },
+        ],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import "./foo.json" with { type: "json" };',
@@ -80,7 +80,7 @@ test(
           start: 7,
           end: 19,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
         attributes: [
           {
@@ -91,23 +91,23 @@ test(
               type: "Identifier",
               start: 27,
               end: 31,
-              name: "type"
+              name: "type",
             },
             value: {
               type: "Literal",
               start: 33,
               end: 39,
               value: "json",
-              raw: "\"json\""
-            }
-          }
-        ]
-      }
+              raw: '"json"',
+            },
+          },
+        ],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import json from "./foo.json";', // Without attributes
@@ -129,24 +129,24 @@ test(
               type: "Identifier",
               start: 7,
               end: 11,
-              name: "json"
-            }
-          }
+              name: "json",
+            },
+          },
         ],
         source: {
           type: "Literal",
           start: 17,
           end: 29,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
-        attributes: []
-      }
+        attributes: [],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import "./foo.json";', // Without attributes
@@ -165,15 +165,15 @@ test(
           start: 7,
           end: 19,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
-        attributes: []
-      }
+        attributes: [],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'export {v} from "./foo.json" with { type: "json" };',
@@ -196,22 +196,22 @@ test(
               type: "Identifier",
               start: 8,
               end: 9,
-              name: "v"
+              name: "v",
             },
             exported: {
               type: "Identifier",
               start: 8,
               end: 9,
-              name: "v"
-            }
-          }
+              name: "v",
+            },
+          },
         ],
         source: {
           type: "Literal",
           start: 16,
           end: 28,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
         attributes: [
           {
@@ -222,23 +222,23 @@ test(
               type: "Identifier",
               start: 36,
               end: 40,
-              name: "type"
+              name: "type",
             },
             value: {
               type: "Literal",
               start: 42,
               end: 48,
               value: "json",
-              raw: "\"json\""
-            }
-          }
-        ]
-      }
+              raw: '"json"',
+            },
+          },
+        ],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'export {v} from "./foo.json";', // Without attributes
@@ -261,30 +261,30 @@ test(
               type: "Identifier",
               start: 8,
               end: 9,
-              name: "v"
+              name: "v",
             },
             exported: {
               type: "Identifier",
               start: 8,
               end: 9,
-              name: "v"
-            }
-          }
+              name: "v",
+            },
+          },
         ],
         source: {
           type: "Literal",
           start: 16,
           end: 28,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
-        attributes: []
-      }
+        attributes: [],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'export * as json from "./foo.json" with { type: "json" };',
@@ -301,14 +301,14 @@ test(
           type: "Identifier",
           start: 12,
           end: 16,
-          name: "json"
+          name: "json",
         },
         source: {
           type: "Literal",
           start: 22,
           end: 34,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
         attributes: [
           {
@@ -319,23 +319,23 @@ test(
               type: "Identifier",
               start: 42,
               end: 46,
-              name: "type"
+              name: "type",
             },
             value: {
               type: "Literal",
               start: 48,
               end: 54,
               value: "json",
-              raw: "\"json\""
-            }
-          }
-        ]
-      }
+              raw: '"json"',
+            },
+          },
+        ],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'export * as json from "./foo.json";', // Without attributes
@@ -352,22 +352,22 @@ test(
           type: "Identifier",
           start: 12,
           end: 16,
-          name: "json"
+          name: "json",
         },
         source: {
           type: "Literal",
           start: 22,
           end: 34,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
-        attributes: []
-      }
+        attributes: [],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import("foo.json", { with: { type: "json" } });',
@@ -389,7 +389,7 @@ test(
             start: 7,
             end: 17,
             value: "foo.json",
-            raw: "\"foo.json\""
+            raw: '"foo.json"',
           },
           options: {
             type: "ObjectExpression",
@@ -407,7 +407,7 @@ test(
                   type: "Identifier",
                   start: 21,
                   end: 25,
-                  name: "with"
+                  name: "with",
                 },
                 value: {
                   type: "ObjectExpression",
@@ -425,30 +425,30 @@ test(
                         type: "Identifier",
                         start: 29,
                         end: 33,
-                        name: "type"
+                        name: "type",
                       },
                       value: {
                         type: "Literal",
                         start: 35,
                         end: 41,
                         value: "json",
-                        raw: "\"json\""
+                        raw: '"json"',
                       },
-                      kind: "init"
-                    }
-                  ]
+                      kind: "init",
+                    },
+                  ],
                 },
-                kind: "init"
-              }
-            ]
-          }
-        }
-      }
+                kind: "init",
+              },
+            ],
+          },
+        },
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import("foo.json", );', // Allow trailing comma
@@ -470,16 +470,16 @@ test(
             start: 7,
             end: 17,
             value: "foo.json",
-            raw: "\"foo.json\""
+            raw: '"foo.json"',
           },
-          options: null
-        }
-      }
+          options: null,
+        },
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import("foo.json", { with: { type: "json" } }, );',
@@ -501,7 +501,7 @@ test(
             start: 7,
             end: 17,
             value: "foo.json",
-            raw: "\"foo.json\""
+            raw: '"foo.json"',
           },
           options: {
             type: "ObjectExpression",
@@ -519,7 +519,7 @@ test(
                   type: "Identifier",
                   start: 21,
                   end: 25,
-                  name: "with"
+                  name: "with",
                 },
                 kind: "init",
                 value: {
@@ -538,7 +538,7 @@ test(
                         type: "Identifier",
                         start: 29,
                         end: 33,
-                        name: "type"
+                        name: "type",
                       },
                       kind: "init",
                       value: {
@@ -546,21 +546,21 @@ test(
                         start: 35,
                         end: 41,
                         value: "json",
-                        raw: "\"json\""
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      }
+                        raw: '"json"',
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import(\"foo.json\", foo );',
@@ -582,21 +582,21 @@ test(
             start: 7,
             end: 17,
             value: "foo.json",
-            raw: "\"foo.json\""
+            raw: '"foo.json"',
           },
           options: {
             type: "Identifier",
             start: 19,
             end: 22,
-            name: "foo"
-          }
-        }
-      }
+            name: "foo",
+          },
+        },
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import "./foo.json" with { foo: "bar" };', // Allow unknown attributes
@@ -615,7 +615,7 @@ test(
           start: 7,
           end: 19,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
         attributes: [
           {
@@ -626,23 +626,23 @@ test(
               type: "Identifier",
               start: 27,
               end: 30,
-              name: "foo"
+              name: "foo",
             },
             value: {
               type: "Literal",
               start: 32,
               end: 37,
               value: "bar",
-              raw: "\"bar\""
-            }
-          }
-        ]
-      }
+              raw: '"bar"',
+            },
+          },
+        ],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import "./foo.json" with { "type": "json" };', // Allow string key
@@ -661,7 +661,7 @@ test(
           start: 7,
           end: 19,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
         attributes: [
           {
@@ -673,23 +673,23 @@ test(
               start: 27,
               end: 33,
               value: "type",
-              raw: "\"type\""
+              raw: '"type"',
             },
             value: {
               type: "Literal",
               start: 35,
               end: 41,
               value: "json",
-              raw: "\"json\""
-            }
-          }
-        ]
-      }
+              raw: '"json"',
+            },
+          },
+        ],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import "./foo.json" with { a: "a", b: "b" };', // Allow multiple attributes
@@ -708,7 +708,7 @@ test(
           start: 7,
           end: 19,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
         attributes: [
           {
@@ -719,15 +719,15 @@ test(
               type: "Identifier",
               start: 27,
               end: 28,
-              name: "a"
+              name: "a",
             },
             value: {
               type: "Literal",
               start: 30,
               end: 33,
               value: "a",
-              raw: "\"a\""
-            }
+              raw: '"a"',
+            },
           },
           {
             type: "ImportAttribute",
@@ -737,23 +737,23 @@ test(
               type: "Identifier",
               start: 35,
               end: 36,
-              name: "b"
+              name: "b",
             },
             value: {
               type: "Literal",
               start: 38,
               end: 41,
               value: "b",
-              raw: "\"b\""
-            }
-          }
-        ]
-      }
+              raw: '"b"',
+            },
+          },
+        ],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 test(
   'import "./foo.json" with { "type": "json",  };', // Allow trailing comma
@@ -772,7 +772,7 @@ test(
           start: 7,
           end: 19,
           value: "./foo.json",
-          raw: "\"./foo.json\""
+          raw: '"./foo.json"',
         },
         attributes: [
           {
@@ -784,62 +784,59 @@ test(
               start: 27,
               end: 33,
               value: "type",
-              raw: "\"type\""
+              raw: '"type"',
             },
             value: {
               type: "Literal",
               start: 35,
               end: 41,
               value: "json",
-              raw: "\"json\""
-            }
-          }
-        ]
-      }
+              raw: '"json"',
+            },
+          },
+        ],
+      },
     ],
-    sourceType: "module"
+    sourceType: "module",
   },
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 testFail(
   'import "./foo.json" with { 42: "s" };', // Disallow number key
   "Unexpected token (1:27)",
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 testFail(
   'import "./foo.json" with { type: 42 };', // Disallow number value
   "Unexpected token (1:33)",
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 testFail(
   'import "./foo.json" with { type: "json", type: "html" };', // Disallow duplicate key
   "Duplicate attribute key 'type' (1:41)",
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
 testFail(
   'import "./foo.json" with { type: "json", , };',
   "Unexpected token (1:41)",
-  {sourceType: "module", ecmaVersion: 16}
-)
+  { sourceType: "module", ecmaVersion: 16 }
+);
 
-testFail(
-  "export { json } with { type: \"json\" };",
-  "Unexpected token (1:16)",
-  {sourceType: "module", ecmaVersion: 16}
-)
+testFail('export { json } with { type: "json" };', "Unexpected token (1:16)", {
+  sourceType: "module",
+  ecmaVersion: 16,
+});
 
-testFail(
-  "import(\"foo.json\", , );",
-  "Unexpected token (1:19)",
-  {sourceType: "module", ecmaVersion: 16}
-)
+testFail('import("foo.json", , );', "Unexpected token (1:19)", {
+  sourceType: "module",
+  ecmaVersion: 16,
+});
 
-testFail(
-  "import(\"foo.json\", foo , , );",
-  "Unexpected token (1:25)",
-  {sourceType: "module", ecmaVersion: 16}
-)
+testFail('import("foo.json", foo , , );', "Unexpected token (1:25)", {
+  sourceType: "module",
+  ecmaVersion: 16,
+});

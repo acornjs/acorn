@@ -1,150 +1,422 @@
 if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
+  var test = require("./driver.js").test;
+  var testFail = require("./driver.js").testFail;
 }
 
 //------------------------------------------------------------------------------
 // Named capture groups
 //------------------------------------------------------------------------------
 
-test("/(a)/", {}, { ecmaVersion: 2018 })
-test("/(?:a)/", {}, { ecmaVersion: 2018 })
-testFail("/(?a/", "Invalid regular expression: /(?a/: Invalid group (1:1)", { ecmaVersion: 2018 })
-testFail("/(?a)/", "Invalid regular expression: /(?a)/: Invalid group (1:1)", { ecmaVersion: 2018 })
-testFail("/(?</", "Invalid regular expression: /(?</: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<)/", "Invalid regular expression: /(?<)/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a)/", "Invalid regular expression: /(?<a)/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-test("/(?<a>)/", {}, { ecmaVersion: 2018 })
-test("/\\k/", {}, { ecmaVersion: 2017 })
-test("/\\k/", {}, { ecmaVersion: 2018 })
-testFail("/\\k/u", "Invalid regular expression: /\\k/: Invalid escape (1:1)", { ecmaVersion: 2017 })
-testFail("/\\k/u", "Invalid regular expression: /\\k/: Invalid named reference (1:1)", { ecmaVersion: 2018 })
-test("/\\k<a>/", {}, { ecmaVersion: 2017 })
-test("/\\k<a>/", {}, { ecmaVersion: 2018 })
-testFail("/\\k<a>/u", "Invalid regular expression: /\\k<a>/: Invalid escape (1:1)", { ecmaVersion: 2017 })
-testFail("/\\k<a>/u", "Invalid regular expression: /\\k<a>/: Invalid named capture referenced (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\k</", "Invalid regular expression: /(?<a>a)\\k</: Invalid group (1:1)", { ecmaVersion: 2017 })
-testFail("/(?<a>a)\\k</", "Invalid regular expression: /(?<a>a)\\k</: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\k</u", "Invalid regular expression: /(?<a>a)\\k</: Invalid group (1:1)", { ecmaVersion: 2017 })
-testFail("/(?<a>a)\\k</u", "Invalid regular expression: /(?<a>a)\\k</: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\k<a/", "Invalid regular expression: /(?<a>a)\\k<a/: Invalid group (1:1)", { ecmaVersion: 2017 })
-testFail("/(?<a>a)\\k<a/", "Invalid regular expression: /(?<a>a)\\k<a/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\k<a/u", "Invalid regular expression: /(?<a>a)\\k<a/: Invalid group (1:1)", { ecmaVersion: 2017 })
-testFail("/(?<a>a)\\k<a/u", "Invalid regular expression: /(?<a>a)\\k<a/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\k<a>/", "Invalid regular expression: /(?<a>a)\\k<a>/: Invalid group (1:1)", { ecmaVersion: 2017 })
-test("/(?<a>a)\\k<a>/", {}, { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\k<a>/u", "Invalid regular expression: /(?<a>a)\\k<a>/: Invalid group (1:1)", { ecmaVersion: 2017 })
-test("/(?<a>a)\\k<a>/u", {}, { ecmaVersion: 2018 })
+test("/(a)/", {}, { ecmaVersion: 2018 });
+test("/(?:a)/", {}, { ecmaVersion: 2018 });
+testFail("/(?a/", "Invalid regular expression: /(?a/: Invalid group (1:1)", {
+  ecmaVersion: 2018,
+});
+testFail("/(?a)/", "Invalid regular expression: /(?a)/: Invalid group (1:1)", {
+  ecmaVersion: 2018,
+});
+testFail(
+  "/(?</",
+  "Invalid regular expression: /(?</: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<)/",
+  "Invalid regular expression: /(?<)/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a)/",
+  "Invalid regular expression: /(?<a)/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/(?<a>)/", {}, { ecmaVersion: 2018 });
+test("/\\k/", {}, { ecmaVersion: 2017 });
+test("/\\k/", {}, { ecmaVersion: 2018 });
+testFail("/\\k/u", "Invalid regular expression: /\\k/: Invalid escape (1:1)", {
+  ecmaVersion: 2017,
+});
+testFail(
+  "/\\k/u",
+  "Invalid regular expression: /\\k/: Invalid named reference (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/\\k<a>/", {}, { ecmaVersion: 2017 });
+test("/\\k<a>/", {}, { ecmaVersion: 2018 });
+testFail(
+  "/\\k<a>/u",
+  "Invalid regular expression: /\\k<a>/: Invalid escape (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/\\k<a>/u",
+  "Invalid regular expression: /\\k<a>/: Invalid named capture referenced (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)\\k</",
+  "Invalid regular expression: /(?<a>a)\\k</: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/(?<a>a)\\k</",
+  "Invalid regular expression: /(?<a>a)\\k</: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)\\k</u",
+  "Invalid regular expression: /(?<a>a)\\k</: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/(?<a>a)\\k</u",
+  "Invalid regular expression: /(?<a>a)\\k</: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)\\k<a/",
+  "Invalid regular expression: /(?<a>a)\\k<a/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/(?<a>a)\\k<a/",
+  "Invalid regular expression: /(?<a>a)\\k<a/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)\\k<a/u",
+  "Invalid regular expression: /(?<a>a)\\k<a/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/(?<a>a)\\k<a/u",
+  "Invalid regular expression: /(?<a>a)\\k<a/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)\\k<a>/",
+  "Invalid regular expression: /(?<a>a)\\k<a>/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+test("/(?<a>a)\\k<a>/", {}, { ecmaVersion: 2018 });
+testFail(
+  "/(?<a>a)\\k<a>/u",
+  "Invalid regular expression: /(?<a>a)\\k<a>/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+test("/(?<a>a)\\k<a>/u", {}, { ecmaVersion: 2018 });
 
-test("/(?<a>a)\\1/", {}, { ecmaVersion: 2018 })
-test("/(?<a>a)\\1/u", {}, { ecmaVersion: 2018 })
-test("/(?<a>a)\\2/", {}, { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\2/u", "Invalid regular expression: /(?<a>a)\\2/: Invalid escape (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\k<b>/", "Invalid regular expression: /(?<a>a)\\k<b>/: Invalid named capture referenced (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)\\k<b>/u", "Invalid regular expression: /(?<a>a)\\k<b>/: Invalid named capture referenced (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)(?<a>a)/", "Invalid regular expression: /(?<a>a)(?<a>a)/: Duplicate capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)(?<a>a)/u", "Invalid regular expression: /(?<a>a)(?<a>a)/: Duplicate capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)(?<\\u{61}>a)/u", "Invalid regular expression: /(?<a>a)(?<\\u{61}>a)/: Duplicate capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a>a)(?<\\u0061>a)/u", "Invalid regular expression: /(?<a>a)(?<\\u0061>a)/: Duplicate capture group name (1:1)", { ecmaVersion: 2018 })
-test("/(?<a>a)(?<b>a)/", {}, { ecmaVersion: 2018 })
-test("/(?<a>a)(?<b>a)/u", {}, { ecmaVersion: 2018 })
+test("/(?<a>a)\\1/", {}, { ecmaVersion: 2018 });
+test("/(?<a>a)\\1/u", {}, { ecmaVersion: 2018 });
+test("/(?<a>a)\\2/", {}, { ecmaVersion: 2018 });
+testFail(
+  "/(?<a>a)\\2/u",
+  "Invalid regular expression: /(?<a>a)\\2/: Invalid escape (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)\\k<b>/",
+  "Invalid regular expression: /(?<a>a)\\k<b>/: Invalid named capture referenced (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)\\k<b>/u",
+  "Invalid regular expression: /(?<a>a)\\k<b>/: Invalid named capture referenced (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)(?<a>a)/",
+  "Invalid regular expression: /(?<a>a)(?<a>a)/: Duplicate capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)(?<a>a)/u",
+  "Invalid regular expression: /(?<a>a)(?<a>a)/: Duplicate capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)(?<\\u{61}>a)/u",
+  "Invalid regular expression: /(?<a>a)(?<\\u{61}>a)/: Duplicate capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a>a)(?<\\u0061>a)/u",
+  "Invalid regular expression: /(?<a>a)(?<\\u0061>a)/: Duplicate capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/(?<a>a)(?<b>a)/", {}, { ecmaVersion: 2018 });
+test("/(?<a>a)(?<b>a)/u", {}, { ecmaVersion: 2018 });
 
-test("/\\k<a>(?<a>a)/", {}, { ecmaVersion: 2018 })
-test("/\\k<a>(?<a>a)/u", {}, { ecmaVersion: 2018 })
-test("/\\1(?<a>a)/", {}, { ecmaVersion: 2018 })
-test("/\\1(?<a>a)/u", {}, { ecmaVersion: 2018 })
+test("/\\k<a>(?<a>a)/", {}, { ecmaVersion: 2018 });
+test("/\\k<a>(?<a>a)/u", {}, { ecmaVersion: 2018 });
+test("/\\1(?<a>a)/", {}, { ecmaVersion: 2018 });
+test("/\\1(?<a>a)/u", {}, { ecmaVersion: 2018 });
 
-test("/(?<$abc>a)\\k<$abc>/u", {}, { ecmaVersion: 2018 })
-test("/(?<あ>a)\\k<あ>/u", {}, { ecmaVersion: 2018 })
-test("/(?<𠮷>a)\\k<\\u{20bb7}>/u", {}, { ecmaVersion: 2018 })
-test("/(?<\\uD842\\uDFB7>a)\\k<\\u{20bb7}>/u", {}, { ecmaVersion: 2018 })
-test("/(?<\\u{20bb7}>a)\\k<\\uD842\\uDFB7>/u", {}, { ecmaVersion: 2018 })
-testFail("/(?<☀>a)\\k<☀>/u", "Invalid regular expression: /(?<☀>a)\\k<☀>/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<\\u0020>a)\\k<\\u0020>/u", "Invalid regular expression: /(?<\\u0020>a)\\k<\\u0020>/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-test("/(?<abc>a)\\k<\\u0061\\u0062\\u0063>/u", {}, { ecmaVersion: 2018 })
-test("/(?<\\u0061\\u0062\\u0063>a)\\k<abc>/u", {}, { ecmaVersion: 2018 })
-test("/(?<\\u0061\\u0062\\u0063>a)\\k<\\u{61}\\u{62}\\u{63}>/u", {}, { ecmaVersion: 2018 })
-testFail("/(?<\\u0061\\u0062\\u0063>a)\\k<abd>/u", "Invalid regular expression: /(?<\\u0061\\u0062\\u0063>a)\\k<abd>/: Invalid named capture referenced (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<11>a)\\k<11>/u", "Invalid regular expression: /(?<11>a)\\k<11>/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-test("/(?<a1>a)\\k<a1>/u", {}, { ecmaVersion: 2018 })
+test("/(?<$abc>a)\\k<$abc>/u", {}, { ecmaVersion: 2018 });
+test("/(?<あ>a)\\k<あ>/u", {}, { ecmaVersion: 2018 });
+test("/(?<𠮷>a)\\k<\\u{20bb7}>/u", {}, { ecmaVersion: 2018 });
+test("/(?<\\uD842\\uDFB7>a)\\k<\\u{20bb7}>/u", {}, { ecmaVersion: 2018 });
+test("/(?<\\u{20bb7}>a)\\k<\\uD842\\uDFB7>/u", {}, { ecmaVersion: 2018 });
+testFail(
+  "/(?<☀>a)\\k<☀>/u",
+  "Invalid regular expression: /(?<☀>a)\\k<☀>/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<\\u0020>a)\\k<\\u0020>/u",
+  "Invalid regular expression: /(?<\\u0020>a)\\k<\\u0020>/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/(?<abc>a)\\k<\\u0061\\u0062\\u0063>/u", {}, { ecmaVersion: 2018 });
+test("/(?<\\u0061\\u0062\\u0063>a)\\k<abc>/u", {}, { ecmaVersion: 2018 });
+test(
+  "/(?<\\u0061\\u0062\\u0063>a)\\k<\\u{61}\\u{62}\\u{63}>/u",
+  {},
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<\\u0061\\u0062\\u0063>a)\\k<abd>/u",
+  "Invalid regular expression: /(?<\\u0061\\u0062\\u0063>a)\\k<abd>/: Invalid named capture referenced (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<11>a)\\k<11>/u",
+  "Invalid regular expression: /(?<11>a)\\k<11>/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/(?<a1>a)\\k<a1>/u", {}, { ecmaVersion: 2018 });
 
 //------------------------------------------------------------------------------
 // Unicode property escapes
 //------------------------------------------------------------------------------
 
-test("/\\p/", {}, { ecmaVersion: 2017 })
-testFail("/\\p/u", "Invalid regular expression: /\\p/: Invalid escape (1:1)", { ecmaVersion: 2017 })
-test("/\\p/", {}, { ecmaVersion: 2018 })
-testFail("/\\p/u", "Invalid regular expression: /\\p/: Invalid property name (1:1)", { ecmaVersion: 2018 })
-test("/\\p{/", {}, { ecmaVersion: 2017 })
-testFail("/\\p{/u", "Invalid regular expression: /\\p{/: Invalid escape (1:1)", { ecmaVersion: 2017 })
-test("/\\p{/", {}, { ecmaVersion: 2018 })
-testFail("/\\p{/u", "Invalid regular expression: /\\p{/: Invalid property name (1:1)", { ecmaVersion: 2018 })
-test("/\\p{ASCII/", {}, { ecmaVersion: 2017 })
-testFail("/\\p{ASCII/u", "Invalid regular expression: /\\p{ASCII/: Invalid escape (1:1)", { ecmaVersion: 2017 })
-test("/\\p{ASCII/", {}, { ecmaVersion: 2018 })
-testFail("/\\p{ASCII/u", "Invalid regular expression: /\\p{ASCII/: Invalid property name (1:1)", { ecmaVersion: 2018 })
-test("/\\p{ASCII}/", {}, { ecmaVersion: 2017 })
-testFail("/\\p{ASCII}/u", "Invalid regular expression: /\\p{ASCII}/: Invalid escape (1:1)", { ecmaVersion: 2017 })
-test("/\\p{ASCII}/", {}, { ecmaVersion: 2018 })
-test("/\\p{ASCII}/u", {}, { ecmaVersion: 2018 })
+test("/\\p/", {}, { ecmaVersion: 2017 });
+testFail("/\\p/u", "Invalid regular expression: /\\p/: Invalid escape (1:1)", {
+  ecmaVersion: 2017,
+});
+test("/\\p/", {}, { ecmaVersion: 2018 });
+testFail(
+  "/\\p/u",
+  "Invalid regular expression: /\\p/: Invalid property name (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/\\p{/", {}, { ecmaVersion: 2017 });
+testFail(
+  "/\\p{/u",
+  "Invalid regular expression: /\\p{/: Invalid escape (1:1)",
+  { ecmaVersion: 2017 }
+);
+test("/\\p{/", {}, { ecmaVersion: 2018 });
+testFail(
+  "/\\p{/u",
+  "Invalid regular expression: /\\p{/: Invalid property name (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/\\p{ASCII/", {}, { ecmaVersion: 2017 });
+testFail(
+  "/\\p{ASCII/u",
+  "Invalid regular expression: /\\p{ASCII/: Invalid escape (1:1)",
+  { ecmaVersion: 2017 }
+);
+test("/\\p{ASCII/", {}, { ecmaVersion: 2018 });
+testFail(
+  "/\\p{ASCII/u",
+  "Invalid regular expression: /\\p{ASCII/: Invalid property name (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/\\p{ASCII}/", {}, { ecmaVersion: 2017 });
+testFail(
+  "/\\p{ASCII}/u",
+  "Invalid regular expression: /\\p{ASCII}/: Invalid escape (1:1)",
+  { ecmaVersion: 2017 }
+);
+test("/\\p{ASCII}/", {}, { ecmaVersion: 2018 });
+test("/\\p{ASCII}/u", {}, { ecmaVersion: 2018 });
 
-test("/\\p{Emoji}/u", {}, { ecmaVersion: 2018 })
-testFail("/\\p{General_Category}/u", "Invalid regular expression: /\\p{General_Category}/: Invalid property name (1:1)", { ecmaVersion: 2018 })
-testFail("/\\p{General_Category=}/u", "Invalid regular expression: /\\p{General_Category=}/: Invalid property name (1:1)", { ecmaVersion: 2018 })
-testFail("/\\p{General_Category/u", "Invalid regular expression: /\\p{General_Category/: Invalid property name (1:1)", { ecmaVersion: 2018 })
-testFail("/\\p{General_Category=/u", "Invalid regular expression: /\\p{General_Category=/: Invalid property name (1:1)", { ecmaVersion: 2018 })
-testFail("/\\p{General_Category=Letter/u", "Invalid regular expression: /\\p{General_Category=Letter/: Invalid property name (1:1)", { ecmaVersion: 2018 })
-test("/\\p{General_Category=Letter}/u", {}, { ecmaVersion: 2018 })
-testFail("/\\p{General_Category=Hiragana}/u", "Invalid regular expression: /\\p{General_Category=Hiragana}/: Invalid property value (1:1)", { ecmaVersion: 2018 })
-test("/\\p{Script=Hiragana}/u", {}, { ecmaVersion: 2018 })
-testFail("/[\\p{Script=Hiragana}-\\p{Script=Katakana}]/u", "Invalid regular expression: /[\\p{Script=Hiragana}-\\p{Script=Katakana}]/: Invalid character class (1:1)", { ecmaVersion: 2018 })
-test("/[\\p{Script=Hiragana}\\-\\p{Script=Katakana}]/u", {}, { ecmaVersion: 2018 })
+test("/\\p{Emoji}/u", {}, { ecmaVersion: 2018 });
+testFail(
+  "/\\p{General_Category}/u",
+  "Invalid regular expression: /\\p{General_Category}/: Invalid property name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/\\p{General_Category=}/u",
+  "Invalid regular expression: /\\p{General_Category=}/: Invalid property name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/\\p{General_Category/u",
+  "Invalid regular expression: /\\p{General_Category/: Invalid property name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/\\p{General_Category=/u",
+  "Invalid regular expression: /\\p{General_Category=/: Invalid property name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/\\p{General_Category=Letter/u",
+  "Invalid regular expression: /\\p{General_Category=Letter/: Invalid property name (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/\\p{General_Category=Letter}/u", {}, { ecmaVersion: 2018 });
+testFail(
+  "/\\p{General_Category=Hiragana}/u",
+  "Invalid regular expression: /\\p{General_Category=Hiragana}/: Invalid property value (1:1)",
+  { ecmaVersion: 2018 }
+);
+test("/\\p{Script=Hiragana}/u", {}, { ecmaVersion: 2018 });
+testFail(
+  "/[\\p{Script=Hiragana}-\\p{Script=Katakana}]/u",
+  "Invalid regular expression: /[\\p{Script=Hiragana}-\\p{Script=Katakana}]/: Invalid character class (1:1)",
+  { ecmaVersion: 2018 }
+);
+test(
+  "/[\\p{Script=Hiragana}\\-\\p{Script=Katakana}]/u",
+  {},
+  { ecmaVersion: 2018 }
+);
 
 //------------------------------------------------------------------------------
 // Lookbehind assertions
 //------------------------------------------------------------------------------
 
-testFail("/(?<a)/", "Invalid regular expression: /(?<a)/: Invalid group (1:1)", { ecmaVersion: 2017 })
-testFail("/(?<a)/u", "Invalid regular expression: /(?<a)/: Invalid group (1:1)", { ecmaVersion: 2017 })
-testFail("/(?<a)/", "Invalid regular expression: /(?<a)/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<a)/u", "Invalid regular expression: /(?<a)/: Invalid capture group name (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<=a)/", "Invalid regular expression: /(?<=a)/: Invalid group (1:1)", { ecmaVersion: 2017 })
-testFail("/(?<=a)/u", "Invalid regular expression: /(?<=a)/: Invalid group (1:1)", { ecmaVersion: 2017 })
-test("/(?<=a)/", {}, { ecmaVersion: 2018 })
-test("/(?<=a)/u", {}, { ecmaVersion: 2018 })
-testFail("/(?<!a)/", "Invalid regular expression: /(?<!a)/: Invalid group (1:1)", { ecmaVersion: 2017 })
-testFail("/(?<!a)/u", "Invalid regular expression: /(?<!a)/: Invalid group (1:1)", { ecmaVersion: 2017 })
-test("/(?<!a)/", {}, { ecmaVersion: 2018 })
-test("/(?<!a)/u", {}, { ecmaVersion: 2018 })
+testFail(
+  "/(?<a)/",
+  "Invalid regular expression: /(?<a)/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/(?<a)/u",
+  "Invalid regular expression: /(?<a)/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/(?<a)/",
+  "Invalid regular expression: /(?<a)/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<a)/u",
+  "Invalid regular expression: /(?<a)/: Invalid capture group name (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<=a)/",
+  "Invalid regular expression: /(?<=a)/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/(?<=a)/u",
+  "Invalid regular expression: /(?<=a)/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+test("/(?<=a)/", {}, { ecmaVersion: 2018 });
+test("/(?<=a)/u", {}, { ecmaVersion: 2018 });
+testFail(
+  "/(?<!a)/",
+  "Invalid regular expression: /(?<!a)/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+testFail(
+  "/(?<!a)/u",
+  "Invalid regular expression: /(?<!a)/: Invalid group (1:1)",
+  { ecmaVersion: 2017 }
+);
+test("/(?<!a)/", {}, { ecmaVersion: 2018 });
+test("/(?<!a)/u", {}, { ecmaVersion: 2018 });
 
-testFail("/(?<=a)?/", "Invalid regular expression: /(?<=a)?/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<=a)?/u", "Invalid regular expression: /(?<=a)?/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<=a)+/", "Invalid regular expression: /(?<=a)+/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<=a)+/u", "Invalid regular expression: /(?<=a)+/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<=a)*/", "Invalid regular expression: /(?<=a)*/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<=a)*/u", "Invalid regular expression: /(?<=a)*/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<=a){1}/", "Invalid regular expression: /(?<=a){1}/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<=a){1}/u", "Invalid regular expression: /(?<=a){1}/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
+testFail(
+  "/(?<=a)?/",
+  "Invalid regular expression: /(?<=a)?/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<=a)?/u",
+  "Invalid regular expression: /(?<=a)?/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<=a)+/",
+  "Invalid regular expression: /(?<=a)+/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<=a)+/u",
+  "Invalid regular expression: /(?<=a)+/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<=a)*/",
+  "Invalid regular expression: /(?<=a)*/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<=a)*/u",
+  "Invalid regular expression: /(?<=a)*/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<=a){1}/",
+  "Invalid regular expression: /(?<=a){1}/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<=a){1}/u",
+  "Invalid regular expression: /(?<=a){1}/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
 
-testFail("/(?<!a)?/", "Invalid regular expression: /(?<!a)?/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<!a)?/u", "Invalid regular expression: /(?<!a)?/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<!a)+/", "Invalid regular expression: /(?<!a)+/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<!a)+/u", "Invalid regular expression: /(?<!a)+/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<!a)*/", "Invalid regular expression: /(?<!a)*/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<!a)*/u", "Invalid regular expression: /(?<!a)*/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<!a){1}/", "Invalid regular expression: /(?<!a){1}/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
-testFail("/(?<!a){1}/u", "Invalid regular expression: /(?<!a){1}/: Nothing to repeat (1:1)", { ecmaVersion: 2018 })
+testFail(
+  "/(?<!a)?/",
+  "Invalid regular expression: /(?<!a)?/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<!a)?/u",
+  "Invalid regular expression: /(?<!a)?/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<!a)+/",
+  "Invalid regular expression: /(?<!a)+/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<!a)+/u",
+  "Invalid regular expression: /(?<!a)+/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<!a)*/",
+  "Invalid regular expression: /(?<!a)*/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<!a)*/u",
+  "Invalid regular expression: /(?<!a)*/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<!a){1}/",
+  "Invalid regular expression: /(?<!a){1}/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
+testFail(
+  "/(?<!a){1}/u",
+  "Invalid regular expression: /(?<!a){1}/: Nothing to repeat (1:1)",
+  { ecmaVersion: 2018 }
+);
 
-test("/(?<=(?<a>\\w){3})f/u", {}, { ecmaVersion: 2018 })
-test("/((?<=\\w{3}))f/u", {}, { ecmaVersion: 2018 })
-test("/(?<a>(?<=\\w{3}))f/u", {}, { ecmaVersion: 2018 })
-test("/(?<!(?<a>\\d){3})f/u", {}, { ecmaVersion: 2018 })
-test("/(?<!(?<a>\\D){3})f|f/u", {}, { ecmaVersion: 2018 })
-test("/(?<a>(?<!\\D{3}))f|f/u", {}, { ecmaVersion: 2018 })
-test("/(?<=(?<a>\\w){3})f/", {}, { ecmaVersion: 2018 })
-test("/((?<=\\w{3}))f/", {}, { ecmaVersion: 2018 })
-test("/(?<a>(?<=\\w{3}))f/", {}, { ecmaVersion: 2018 })
-test("/(?<!(?<a>\\d){3})f/", {}, { ecmaVersion: 2018 })
-test("/(?<a>(?<!\\D{3}))f|f/", {}, { ecmaVersion: 2018 })
-test("/(?<=(?<fst>.)|(?<snd>.))/u", {}, { ecmaVersion: 2018 })
+test("/(?<=(?<a>\\w){3})f/u", {}, { ecmaVersion: 2018 });
+test("/((?<=\\w{3}))f/u", {}, { ecmaVersion: 2018 });
+test("/(?<a>(?<=\\w{3}))f/u", {}, { ecmaVersion: 2018 });
+test("/(?<!(?<a>\\d){3})f/u", {}, { ecmaVersion: 2018 });
+test("/(?<!(?<a>\\D){3})f|f/u", {}, { ecmaVersion: 2018 });
+test("/(?<a>(?<!\\D{3}))f|f/u", {}, { ecmaVersion: 2018 });
+test("/(?<=(?<a>\\w){3})f/", {}, { ecmaVersion: 2018 });
+test("/((?<=\\w{3}))f/", {}, { ecmaVersion: 2018 });
+test("/(?<a>(?<=\\w{3}))f/", {}, { ecmaVersion: 2018 });
+test("/(?<!(?<a>\\d){3})f/", {}, { ecmaVersion: 2018 });
+test("/(?<a>(?<!\\D{3}))f|f/", {}, { ecmaVersion: 2018 });
+test("/(?<=(?<fst>.)|(?<snd>.))/u", {}, { ecmaVersion: 2018 });

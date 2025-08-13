@@ -1,5 +1,5 @@
-(function() {
-  var driver = require("./driver.js")
+(function () {
+  let driver = require("./driver.js");
   require("./tests.js");
   require("./tests-harmony.js");
   require("./tests-es7.js");
@@ -32,17 +32,17 @@
   require("./tests-import-attributes.js");
   require("./tests-using.js");
   require("./tests-commonjs.js");
-  var acorn = require("../acorn")
-  var acorn_loose = require("../acorn-loose")
+  let acorn = require("../acorn");
+  let acorn_loose = require("../acorn-loose");
 
-  var htmlLog = typeof document === "object" && document.getElementById('log');
-  var htmlGroup = htmlLog;
+  let htmlLog = typeof document === "object" && document.getElementById("log");
+  let htmlGroup = htmlLog;
 
   function group(name) {
     if (htmlGroup) {
-      var parentGroup = htmlGroup;
+      let parentGroup = htmlGroup;
       htmlGroup = document.createElement("ul");
-      var item = document.createElement("li");
+      let item = document.createElement("li");
       item.textContent = name;
       item.appendChild(htmlGroup);
       parentGroup.appendChild(item);
@@ -63,55 +63,75 @@
 
   function log(title, message) {
     if (htmlGroup) {
-      var elem = document.createElement("li");
+      let elem = document.createElement("li");
       elem.innerHTML = "<b>" + title + "</b> " + message;
       htmlGroup.appendChild(elem);
     }
     if (typeof console === "object") console.log(title, message);
   }
 
-  var stats, modes = {
-    Normal: {
-      config: {
-        parse: acorn.parse
-      }
-    },
-    Loose: {
-      config: {
-        parse: acorn_loose.parse,
-        loose: true,
-        filter: function (test) {
-          var opts = test.options || {};
-          return opts.loose !== false;
-        }
-      }
-    },
+  var stats,
+    modes = {
+      Normal: {
+        config: {
+          parse: acorn.parse,
+        },
+      },
+      Loose: {
+        config: {
+          parse: acorn_loose.parse,
+          loose: true,
+          filter: function (test) {
+            let opts = test.options || {};
+            return opts.loose !== false;
+          },
+        },
+      },
 
-    // Test whether the test for `sourceType: 'script'` produces the same result for `'commonjs'`.
-    'Normal with sourceType: commonjs': {
-      config: {
-        parse: (code, option) => acorn.parse(code, Object.assign({}, option, { sourceType: 'commonjs' })),
-        filter: function (test) {
-          var opts = test.options || {};
-          return opts.commonjs !== false && !opts.allowAwaitOutsideFunction && (!opts.sourceType || opts.sourceType === 'script');
-        }
-      }
-    },
-    'Loose with sourceType: commonjs': {
-      config: {
-        parse: (code, option) => acorn_loose.parse(code, Object.assign({}, option, { sourceType: 'commonjs' })),
-        loose: true,
-        filter: function (test) {
-          var opts = test.options || {};
-          if (opts.loose === false) return false;
-          return opts.commonjs !== false && !opts.allowAwaitOutsideFunction && (!opts.sourceType || opts.sourceType === 'script');
-        }
-      }
-    }
-  };
+      // Test whether the test for `sourceType: 'script'` produces the same result for `'commonjs'`.
+      "Normal with sourceType: commonjs": {
+        config: {
+          parse: (code, option) =>
+            acorn.parse(
+              code,
+              Object.assign({}, option, { sourceType: "commonjs" })
+            ),
+          filter: function (test) {
+            let opts = test.options || {};
+            return (
+              opts.commonjs !== false &&
+              !opts.allowAwaitOutsideFunction &&
+              (!opts.sourceType || opts.sourceType === "script")
+            );
+          },
+        },
+      },
+      "Loose with sourceType: commonjs": {
+        config: {
+          parse: (code, option) =>
+            acorn_loose.parse(
+              code,
+              Object.assign({}, option, { sourceType: "commonjs" })
+            ),
+          loose: true,
+          filter: function (test) {
+            let opts = test.options || {};
+            if (opts.loose === false) return false;
+            return (
+              opts.commonjs !== false &&
+              !opts.allowAwaitOutsideFunction &&
+              (!opts.sourceType || opts.sourceType === "script")
+            );
+          },
+        },
+      },
+    };
 
   function report(state, code, message) {
-    if (state !== "ok") {++stats.failed; log(code, message);}
+    if (state !== "ok") {
+      ++stats.failed;
+      log(code, message);
+    }
     ++stats.testsRun;
   }
 
@@ -119,29 +139,35 @@
 
   for (var name in modes) {
     group(name);
-    var mode = modes[name];
-    stats = mode.stats = {testsRun: 0, failed: 0};
-    var t0 = +new Date;
+    let mode = modes[name];
+    stats = mode.stats = { testsRun: 0, failed: 0 };
+    let t0 = +new Date();
     driver.runTests(mode.config, report);
-    mode.stats.duration = +new Date - t0;
+    mode.stats.duration = +new Date() - t0;
     groupEnd();
   }
 
   groupEnd();
 
   function outputStats(name, stats) {
-    log(name + ":", stats.testsRun + " tests run in " + stats.duration + "ms; " +
-      (stats.failed ? stats.failed + " failures." : "all passed."));
+    log(
+      name + ":",
+      stats.testsRun +
+        " tests run in " +
+        stats.duration +
+        "ms; " +
+        (stats.failed ? stats.failed + " failures." : "all passed.")
+    );
   }
 
-  var total = {testsRun: 0, failed: 0, duration: 0};
+  let total = { testsRun: 0, failed: 0, duration: 0 };
 
   group("Stats");
 
   for (var name in modes) {
     var stats = modes[name].stats;
     outputStats(name + " parser", stats);
-    for (var key in stats) total[key] += stats[key];
+    for (let key in stats) total[key] += stats[key];
   }
 
   outputStats("Total", total);
@@ -149,7 +175,7 @@
   groupEnd();
 
   if (total.failed && typeof process === "object") {
-    process.stdout.write("", function() {
+    process.stdout.write("", function () {
       process.exit(1);
     });
   }

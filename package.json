@@ -30,20 +30,25 @@
     "generate:unicode-script-values": "node bin/generate-unicode-script-values.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepare": "npm run test",
     "pretest": "npm run build:main && npm run build:loose",
     "test": "node test/run.js",
     "test:test262": "node bin/run_test262.js"
   },
   "devDependencies": {
+    "@eslint/js": "^9.33.0",
     "@rollup/plugin-buble": "^1.0.2",
     "@unicode/unicode-16.0.0": "^1.6.0",
-    "eslint": "^8.57.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.30.0",
-    "eslint-plugin-n": "^16.6.2",
+    "eslint": "^9.33.0",
+    "eslint-plugin-import-x": "^4.16.1",
+    "prettier": "^3.6.2",
     "rollup": "^3.29.4",
     "test262": "git+https://github.com/tc39/test262.git#9b127c190cd418b2451c556784aae3d0ac7e9bcf",
     "test262-parser-runner": "^0.5.0"
+  },
+  "dependencies": {
+    "globals": "^16.3.0"
   }
 }

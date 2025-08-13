@@ -12,24 +12,33 @@
 //
 // [ghbt]: https://github.com/acornjs/acorn/issues
 
-import {Parser} from "./state.js"
-import "./parseutil.js"
-import "./statement.js"
-import "./lval.js"
-import "./expression.js"
-import "./location.js"
-import "./scope.js"
+import { Parser } from "./state.js";
+import "./parseutil.js";
+import "./statement.js";
+import "./lval.js";
+import "./expression.js";
+import "./location.js";
+import "./scope.js";
 
-import {defaultOptions} from "./options.js"
-import {Position, SourceLocation, getLineInfo} from "./locutil.js"
-import {Node} from "./node.js"
-import {TokenType, types as tokTypes, keywords as keywordTypes} from "./tokentype.js"
-import {TokContext, types as tokContexts} from "./tokencontext.js"
-import {isIdentifierChar, isIdentifierStart} from "./identifier.js"
-import {Token} from "./tokenize.js"
-import {isNewLine, lineBreak, lineBreakG, nonASCIIwhitespace} from "./whitespace.js"
+import { defaultOptions } from "./options.js";
+import { Position, SourceLocation, getLineInfo } from "./locutil.js";
+import { Node } from "./node.js";
+import {
+  TokenType,
+  types as tokTypes,
+  keywords as keywordTypes,
+} from "./tokentype.js";
+import { TokContext, types as tokContexts } from "./tokencontext.js";
+import { isIdentifierChar, isIdentifierStart } from "./identifier.js";
+import { Token } from "./tokenize.js";
+import {
+  isNewLine,
+  lineBreak,
+  lineBreakG,
+  nonASCIIwhitespace,
+} from "./whitespace.js";
 
-export const version = "8.15.0"
+export const version = "8.15.0";
 export {
   Parser,
   defaultOptions,
@@ -48,8 +57,8 @@ export {
   isNewLine,
   lineBreak,
   lineBreakG,
-  nonASCIIwhitespace
-}
+  nonASCIIwhitespace,
+};
 
 Parser.acorn = {
   Parser,
@@ -70,8 +79,8 @@ Parser.acorn = {
   isNewLine,
   lineBreak,
   lineBreakG,
-  nonASCIIwhitespace
-}
+  nonASCIIwhitespace,
+};
 
 // The main exported interface (under `self.acorn` when in the
 // browser) is a `parse` function that takes a code string and returns
@@ -80,7 +89,7 @@ Parser.acorn = {
 // [estree]: https://github.com/estree/estree
 
 export function parse(input, options) {
-  return Parser.parse(input, options)
+  return Parser.parse(input, options);
 }
 
 // This function tries to parse a single expression at a given
@@ -88,12 +97,12 @@ export function parse(input, options) {
 // that embed JavaScript expressions.
 
 export function parseExpressionAt(input, pos, options) {
-  return Parser.parseExpressionAt(input, pos, options)
+  return Parser.parseExpressionAt(input, pos, options);
 }
 
 // Acorn is organized as a tokenizer and a recursive-descent parser.
 // The `tokenizer` export provides an interface to the tokenizer.
 
 export function tokenizer(input, options) {
-  return Parser.tokenizer(input, options)
+  return Parser.tokenizer(input, options);
 }

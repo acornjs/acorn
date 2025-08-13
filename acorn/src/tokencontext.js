@@ -2,17 +2,17 @@
 // given point in the program is loosely based on sweet.js' approach.
 // See https://github.com/mozilla/sweet.js/wiki/design
 
-import {Parser} from "./state.js"
-import {types as tt} from "./tokentype.js"
-import {lineBreak} from "./whitespace.js"
+import { Parser } from "./state.js";
+import { types as tt } from "./tokentype.js";
+import { lineBreak } from "./whitespace.js";
 
 export class TokContext {
   constructor(token, isExpr, preserveSpace, override, generator) {
-    this.token = token
-    this.isExpr = !!isExpr
-    this.preserveSpace = !!preserveSpace
-    this.override = override
-    this.generator = !!generator
+    this.token = token;
+    this.isExpr = !!isExpr;
+    this.preserveSpace = !!preserveSpace;
+    this.override = override;
+    this.generator = !!generator;
   }
 }
 
@@ -22,146 +22,161 @@ export const types = {
   b_tmpl: new TokContext("${", false),
   p_stat: new TokContext("(", false),
   p_expr: new TokContext("(", true),
-  q_tmpl: new TokContext("`", true, true, p => p.tryReadTemplateToken()),
+  q_tmpl: new TokContext("`", true, true, (p) => p.tryReadTemplateToken()),
   f_stat: new TokContext("function", false),
   f_expr: new TokContext("function", true),
   f_expr_gen: new TokContext("function", true, false, null, true),
-  f_gen: new TokContext("function", false, false, null, true)
-}
+  f_gen: new TokContext("function", false, false, null, true),
+};
 
-const pp = Parser.prototype
+const pp = Parser.prototype;
 
-pp.initialContext = function() {
-  return [types.b_stat]
-}
+pp.initialContext = function () {
+  return [types.b_stat];
+};
 
-pp.curContext = function() {
-  return this.context[this.context.length - 1]
-}
+pp.curContext = function () {
+  return this.context[this.context.length - 1];
+};
 
-pp.braceIsBlock = function(prevType) {
-  let parent = this.curContext()
-  if (parent === types.f_expr || parent === types.f_stat)
-    return true
-  if (prevType === tt.colon && (parent === types.b_stat || parent === types.b_expr))
-    return !parent.isExpr
+pp.braceIsBlock = function (prevType) {
+  let parent = this.curContext();
+  if (parent === types.f_expr || parent === types.f_stat) return true;
+  if (
+    prevType === tt.colon &&
+    (parent === types.b_stat || parent === types.b_expr)
+  )
+    return !parent.isExpr;
 
   // The check for `tt.name && exprAllowed` detects whether we are
   // after a `yield` or `of` construct. See the `updateContext` for
   // `tt.name`.
-  if (prevType === tt._return || prevType === tt.name && this.exprAllowed)
-    return lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
-  if (prevType === tt._else || prevType === tt.semi || prevType === tt.eof || prevType === tt.parenR || prevType === tt.arrow)
-    return true
-  if (prevType === tt.braceL)
-    return parent === types.b_stat
+  if (prevType === tt._return || (prevType === tt.name && this.exprAllowed))
+    return lineBreak.test(this.input.slice(this.lastTokEnd, this.start));
+  if (
+    prevType === tt._else ||
+    prevType === tt.semi ||
+    prevType === tt.eof ||
+    prevType === tt.parenR ||
+    prevType === tt.arrow
+  )
+    return true;
+  if (prevType === tt.braceL) return parent === types.b_stat;
   if (prevType === tt._var || prevType === tt._const || prevType === tt.name)
-    return false
-  return !this.exprAllowed
-}
+    return false;
+  return !this.exprAllowed;
+};
 
-pp.inGeneratorContext = function() {
+pp.inGeneratorContext = function () {
   for (let i = this.context.length - 1; i >= 1; i--) {
-    let context = this.context[i]
-    if (context.token === "function")
-      return context.generator
+    let context = this.context[i];
+    if (context.token === "function") return context.generator;
   }
-  return false
-}
+  return false;
+};
 
-pp.updateContext = function(prevType) {
-  let update, type = this.type
-  if (type.keyword && prevType === tt.dot)
-    this.exprAllowed = false
-  else if (update = type.updateContext)
-    update.call(this, prevType)
-  else
-    this.exprAllowed = type.beforeExpr
-}
+pp.updateContext = function (prevType) {
+  let update,
+    type = this.type;
+  if (type.keyword && prevType === tt.dot) this.exprAllowed = false;
+  else if ((update = type.updateContext)) update.call(this, prevType);
+  else this.exprAllowed = type.beforeExpr;
+};
 
 // Used to handle edge cases when token context could not be inferred correctly during tokenization phase
 
-pp.overrideContext = function(tokenCtx) {
+pp.overrideContext = function (tokenCtx) {
   if (this.curContext() !== tokenCtx) {
-    this.context[this.context.length - 1] = tokenCtx
+    this.context[this.context.length - 1] = tokenCtx;
   }
-}
+};
 
 // Token-specific context update code
 
-tt.parenR.updateContext = tt.braceR.updateContext = function() {
+tt.parenR.updateContext = tt.braceR.updateContext = function () {
   if (this.context.length === 1) {
-    this.exprAllowed = true
-    return
+    this.exprAllowed = true;
+    return;
   }
-  let out = this.context.pop()
+  let out = this.context.pop();
   if (out === types.b_stat && this.curContext().token === "function") {
-    out = this.context.pop()
+    out = this.context.pop();
   }
-  this.exprAllowed = !out.isExpr
-}
+  this.exprAllowed = !out.isExpr;
+};
 
-tt.braceL.updateContext = function(prevType) {
-  this.context.push(this.braceIsBlock(prevType) ? types.b_stat : types.b_expr)
-  this.exprAllowed = true
-}
+tt.braceL.updateContext = function (prevType) {
+  this.context.push(this.braceIsBlock(prevType) ? types.b_stat : types.b_expr);
+  this.exprAllowed = true;
+};
 
-tt.dollarBraceL.updateContext = function() {
-  this.context.push(types.b_tmpl)
-  this.exprAllowed = true
-}
+tt.dollarBraceL.updateContext = function () {
+  this.context.push(types.b_tmpl);
+  this.exprAllowed = true;
+};
 
-tt.parenL.updateContext = function(prevType) {
-  let statementParens = prevType === tt._if || prevType === tt._for || prevType === tt._with || prevType === tt._while
-  this.context.push(statementParens ? types.p_stat : types.p_expr)
-  this.exprAllowed = true
-}
+tt.parenL.updateContext = function (prevType) {
+  let statementParens =
+    prevType === tt._if ||
+    prevType === tt._for ||
+    prevType === tt._with ||
+    prevType === tt._while;
+  this.context.push(statementParens ? types.p_stat : types.p_expr);
+  this.exprAllowed = true;
+};
 
-tt.incDec.updateContext = function() {
+tt.incDec.updateContext = function () {
   // tokExprAllowed stays unchanged
-}
+};
 
-tt._function.updateContext = tt._class.updateContext = function(prevType) {
-  if (prevType.beforeExpr && prevType !== tt._else &&
-      !(prevType === tt.semi && this.curContext() !== types.p_stat) &&
-      !(prevType === tt._return && lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) &&
-      !((prevType === tt.colon || prevType === tt.braceL) && this.curContext() === types.b_stat))
-    this.context.push(types.f_expr)
-  else
-    this.context.push(types.f_stat)
-  this.exprAllowed = false
-}
+tt._function.updateContext = tt._class.updateContext = function (prevType) {
+  if (
+    prevType.beforeExpr &&
+    prevType !== tt._else &&
+    !(prevType === tt.semi && this.curContext() !== types.p_stat) &&
+    !(
+      prevType === tt._return &&
+      lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
+    ) &&
+    !(
+      (prevType === tt.colon || prevType === tt.braceL) &&
+      this.curContext() === types.b_stat
+    )
+  )
+    this.context.push(types.f_expr);
+  else this.context.push(types.f_stat);
+  this.exprAllowed = false;
+};
 
-tt.colon.updateContext = function() {
-  if (this.curContext().token === "function") this.context.pop()
-  this.exprAllowed = true
-}
+tt.colon.updateContext = function () {
+  if (this.curContext().token === "function") this.context.pop();
+  this.exprAllowed = true;
+};
 
-tt.backQuote.updateContext = function() {
-  if (this.curContext() === types.q_tmpl)
-    this.context.pop()
-  else
-    this.context.push(types.q_tmpl)
-  this.exprAllowed = false
-}
+tt.backQuote.updateContext = function () {
+  if (this.curContext() === types.q_tmpl) this.context.pop();
+  else this.context.push(types.q_tmpl);
+  this.exprAllowed = false;
+};
 
-tt.star.updateContext = function(prevType) {
+tt.star.updateContext = function (prevType) {
   if (prevType === tt._function) {
-    let index = this.context.length - 1
+    let index = this.context.length - 1;
     if (this.context[index] === types.f_expr)
-      this.context[index] = types.f_expr_gen
-    else
-      this.context[index] = types.f_gen
+      this.context[index] = types.f_expr_gen;
+    else this.context[index] = types.f_gen;
   }
-  this.exprAllowed = true
-}
+  this.exprAllowed = true;
+};
 
-tt.name.updateContext = function(prevType) {
-  let allowed = false
+tt.name.updateContext = function (prevType) {
+  let allowed = false;
   if (this.options.ecmaVersion >= 6 && prevType !== tt.dot) {
-    if (this.value === "of" && !this.exprAllowed ||
-        this.value === "yield" && this.inGeneratorContext())
-      allowed = true
+    if (
+      (this.value === "of" && !this.exprAllowed) ||
+      (this.value === "yield" && this.inGeneratorContext())
+    )
+      allowed = true;
   }
-  this.exprAllowed = allowed
-}
+  this.exprAllowed = allowed;
+};

@@ -1,5 +1,5 @@
-import {hasOwn, isArray} from "./util.js"
-import {SourceLocation} from "./locutil.js"
+import { hasOwn, isArray } from "./util.js";
+import { SourceLocation } from "./locutil.js";
 
 // A second argument must be given to configure the parser process.
 // These options are recognized (only `ecmaVersion` is required):
@@ -99,62 +99,69 @@ export const defaultOptions = {
   directSourceFile: null,
   // When enabled, parenthesized expressions are represented by
   // (non-standard) ParenthesizedExpression nodes
-  preserveParens: false
-}
+  preserveParens: false,
+};
 
 // Interpret and default an options object
 
-let warnedAboutEcmaVersion = false
+let warnedAboutEcmaVersion = false;
 
 export function getOptions(opts) {
-  let options = {}
+  let options = {};
 
   for (let opt in defaultOptions)
-    options[opt] = opts && hasOwn(opts, opt) ? opts[opt] : defaultOptions[opt]
+    options[opt] = opts && hasOwn(opts, opt) ? opts[opt] : defaultOptions[opt];
 
   if (options.ecmaVersion === "latest") {
-    options.ecmaVersion = 1e8
+    options.ecmaVersion = 1e8;
   } else if (options.ecmaVersion == null) {
-    if (!warnedAboutEcmaVersion && typeof console === "object" && console.warn) {
-      warnedAboutEcmaVersion = true
-      console.warn("Since Acorn 8.0.0, options.ecmaVersion is required.\nDefaulting to 2020, but this will stop working in the future.")
+    if (
+      !warnedAboutEcmaVersion &&
+      typeof console === "object" &&
+      console.warn
+    ) {
+      warnedAboutEcmaVersion = true;
+      console.warn(
+        "Since Acorn 8.0.0, options.ecmaVersion is required.\nDefaulting to 2020, but this will stop working in the future."
+      );
     }
-    options.ecmaVersion = 11
+    options.ecmaVersion = 11;
   } else if (options.ecmaVersion >= 2015) {
-    options.ecmaVersion -= 2009
+    options.ecmaVersion -= 2009;
   }
 
   if (options.allowReserved == null)
-    options.allowReserved = options.ecmaVersion < 5
+    options.allowReserved = options.ecmaVersion < 5;
 
   if (!opts || opts.allowHashBang == null)
-    options.allowHashBang = options.ecmaVersion >= 14
+    options.allowHashBang = options.ecmaVersion >= 14;
 
   if (isArray(options.onToken)) {
-    let tokens = options.onToken
-    options.onToken = (token) => tokens.push(token)
+    let tokens = options.onToken;
+    options.onToken = (token) => tokens.push(token);
   }
   if (isArray(options.onComment))
-    options.onComment = pushComment(options, options.onComment)
+    options.onComment = pushComment(options, options.onComment);
 
   if (options.sourceType === "commonjs" && options.allowAwaitOutsideFunction)
-    throw new Error("Cannot use allowAwaitOutsideFunction with sourceType: commonjs")
+    throw new Error(
+      "Cannot use allowAwaitOutsideFunction with sourceType: commonjs"
+    );
 
-  return options
+  return options;
 }
 
 function pushComment(options, array) {
-  return function(block, text, start, end, startLoc, endLoc) {
+  return function (block, text, start, end, startLoc, endLoc) {
     let comment = {
       type: block ? "Block" : "Line",
       value: text,
       start: start,
-      end: end
-    }
+      end: end,
+    };
     if (options.locations)
-      comment.loc = new SourceLocation(this, startLoc, endLoc)
-    if (options.ranges)
-      comment.range = [start, end]
-    array.push(comment)
-  }
+      comment.loc = new SourceLocation(this, startLoc, endLoc);
+    if (options.ranges) comment.range = [start, end];
+    array.push(comment);
+  };
 }
