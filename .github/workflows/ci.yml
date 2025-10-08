@@ -1,6 +1,10 @@
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# master-language-server: $schema=https://json.schemastore.org/github-workflow.json
 
-name: ci
+name: cimaster-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: cimaster-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: clarencerenneth 
 
 on:
   pull_request:
