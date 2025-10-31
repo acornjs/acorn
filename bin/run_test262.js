@@ -1,7 +1,7 @@
-const fs = require("fs")
-const path = require("path")
-const run = require("test262-parser-runner")
-const parse = require("../acorn").parse
+import fs from "fs"
+import path from "path"
+import run from "test262-parser-runner"
+import {parse} from "../acorn/src/index.js"
 
 function loadList(filename) {
   return fs.readFileSync(filename, "utf8")
@@ -12,7 +12,7 @@ function loadList(filename) {
 run(
   (content, {sourceType}) => parse(content, {sourceType, ecmaVersion: "latest", preserveParens: true}),
   {
-    testsDirectory: path.dirname(require.resolve("test262/package.json")),
+    testsDirectory: path.dirname(new URL(import.meta.resolve("test262/package.json")).pathname),
     skip: test => test.attrs.features &&
       loadList("./bin/test262.unsupported-features").some(f => test.attrs.features.includes(f)),
     whitelist: loadList("./bin/test262.whitelist")

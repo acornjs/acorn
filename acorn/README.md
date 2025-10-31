@@ -257,8 +257,8 @@ on the extended version of the class. To extend a parser with plugins,
 you can use its static `extend` method.
 
 ```javascript
-var acorn = require("acorn")
-var jsx = require("acorn-jsx")
+import * as acorn from "acorn"
+import jsx from "acorn-jsx"
 var JSXParser = acorn.Parser.extend(jsx())
 JSXParser.parse("foo(<bar/>)", {ecmaVersion: 2020})
 ```

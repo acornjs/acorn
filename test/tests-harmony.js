@@ -29,10 +29,8 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test;
-  var testFail = require("./driver.js").testFail;
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 /*
   Tests below were automatically converted from https://github.com/ariya/esprima/blob/2bb17ef9a45c88e82d72c2c61b7b7af93caef028/test/harmonytest.js.

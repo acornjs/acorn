@@ -1,11 +1,9 @@
 // Tests largely based on those of Esprima
 // (http://esprima.org/test/)
 
-if (typeof exports !== "undefined") {
-  var driver = require("./driver.js");
-  var test = driver.test, testFail = driver.testFail, testAssert = driver.testAssert;
-  var acorn = require("../acorn");
-}
+import * as driver from "./driver.js";
+var test = driver.test, testFail = driver.testFail, testAssert = driver.testAssert;
+import * as acorn from "../acorn/src/index.js";
 
 test("import ''", {
   type: "Program",

@@ -1,6 +1,5 @@
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 test("try {} catch {}", {
   type: "Program",

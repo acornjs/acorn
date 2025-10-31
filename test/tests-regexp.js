@@ -1,7 +1,5 @@
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 test("/foo/", {}, { ecmaVersion: 5 })
 test("/foo/", {}, { ecmaVersion: 2015 })
@@ -1349,6 +1347,6 @@ for (const [pattern, message, messageU] of patterns) {
     }
 }
 
-require("fs").writeFileSync("a.txt", tests.join("\n"))
+fs.writeFileSync("a.txt", tests.join("\n"))
 
 */

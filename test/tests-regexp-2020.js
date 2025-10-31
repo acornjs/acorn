@@ -1,7 +1,5 @@
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 // https://github.com/tc39/ecma262/pull/1869
 testFail("/(?<\\ud835\\udc9c>.)/", "Invalid regular expression: /(?<\\ud835\\udc9c>.)/: Invalid capture group name (1:1)", { ecmaVersion: 2019 })

@@ -1,9 +1,7 @@
 // Tests for ECMAScript 2020 dynamic import
 
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test;
-  var testFail = require("./driver.js").testFail;
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 test(
   "import('dynamicImport.js')",

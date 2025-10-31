@@ -1,16 +1,16 @@
 var tests = [];
 
-exports.test = function(code, ast, options) {
+export const test = function(code, ast, options) {
   tests.push({code: code, ast: ast, options: options});
 };
-exports.testFail = function(code, message, options) {
+export const testFail = function(code, message, options) {
   tests.push({code: code, error: message, options: options});
 };
-exports.testAssert = function(code, assert, options) {
+export const testAssert = function(code, assert, options) {
   tests.push({code: code, assert: assert, options: options});
 };
 
-exports.runTests = function(config, callback) {
+export const runTests = function(config, callback) {
   var parse = config.parse;
 
   for (var i = 0; i < tests.length; ++i) {
@@ -68,7 +68,7 @@ function addPath(str, pt) {
   return str + " (" + pt + ")";
 }
 
-var misMatch = exports.misMatch = function(exp, act) {
+export var misMatch = function(exp, act) {
   if (!exp || !act || (typeof exp !== "object") || (typeof act !== "object")) {
     if (exp !== act && typeof exp !== "function")
       return ppJSON(exp) + " !== " + ppJSON(act);

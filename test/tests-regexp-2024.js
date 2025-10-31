@@ -1,7 +1,5 @@
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 test("/a/v", {}, { ecmaVersion: 2024 })
 testFail("/a/v", "Invalid regular expression flag (1:1)", { ecmaVersion: 2023 })

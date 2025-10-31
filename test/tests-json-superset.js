@@ -1,7 +1,5 @@
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 test("'\u2029'", {}, {ecmaVersion: 2019})
 test("'\u2028'", {}, {ecmaVersion: 2019})

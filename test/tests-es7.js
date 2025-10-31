@@ -1,9 +1,7 @@
 // Tests for ECMAScript 7 syntax changes
 
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test;
-  var testFail = require("./driver.js").testFail;
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 test("x **= 42", {
   type: "Program",

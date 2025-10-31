@@ -1,8 +1,5 @@
-
-if (typeof exports !== "undefined") {
-  var driver = require("./driver.js");
-  var test = driver.test, testFail = driver.testFail;
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 //-----------------------------------------------------------------------------
 // Async Function Declarations

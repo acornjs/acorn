@@ -1,7 +1,5 @@
-if (typeof exports !== "undefined") {
-  var driver = require("./driver.js");
-  var test = driver.test, testFail = driver.testFail;
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 //------------------------------------------------------------------------------
 // Public Class Field
@@ -2055,7 +2053,7 @@ testFail("class C { static #a; #a }", "Identifier '#a' has already been declared
 // Private Class Method
 //------------------------------------------------------------------------------
 
-test("class C { #aaa(){} }", {  
+test("class C { #aaa(){} }", {
   "type": "Program",
   "start": 0,
   "end": 20,
@@ -3484,7 +3482,7 @@ test("class C { #aaa; f() { this.#aaa } }", {
   "sourceType": "script"
 }, {ecmaVersion: 13})
 
-test("class C { #aaa; f(obj) { obj.#aaa } }", {    
+test("class C { #aaa; f(obj) { obj.#aaa } }", {
   "type": "Program",
   "start": 0,
   "end": 37,
@@ -3554,15 +3552,15 @@ test("class C { #aaa; f(obj) { obj.#aaa } }", {
                 "end": 35,
                 "body": [
                   {
-                    "type": "ExpressionStatement",  
+                    "type": "ExpressionStatement",
                     "start": 25,
                     "end": 33,
                     "expression": {
-                      "type": "MemberExpression",   
+                      "type": "MemberExpression",
                       "start": 25,
                       "end": 33,
                       "object": {
-                        "type": "Identifier",       
+                        "type": "Identifier",
                         "start": 25,
                         "end": 28,
                         "name": "obj"
@@ -3658,19 +3656,19 @@ test("class C { #aaa; f(obj) { obj?.#aaa } }", {
                 "end": 36,
                 "body": [
                   {
-                    "type": "ExpressionStatement",  
+                    "type": "ExpressionStatement",
                     "start": 25,
                     "end": 34,
                     "expression": {
-                      "type": "ChainExpression",    
+                      "type": "ChainExpression",
                       "start": 25,
                       "end": 34,
                       "expression": {
-                        "type": "MemberExpression", 
+                        "type": "MemberExpression",
                         "start": 25,
                         "end": 34,
                         "object": {
-                          "type": "Identifier",     
+                          "type": "Identifier",
                           "start": 25,
                           "end": 28,
                           "name": "obj"
@@ -3697,7 +3695,7 @@ test("class C { #aaa; f(obj) { obj?.#aaa } }", {
   "sourceType": "script"
 }, {ecmaVersion: 13})
 
-test("class C { #aaa; f(f) { f()?.#aaa } }", {     
+test("class C { #aaa; f(f) { f()?.#aaa } }", {
   "type": "Program",
   "start": 0,
   "end": 36,
@@ -3767,23 +3765,23 @@ test("class C { #aaa; f(f) { f()?.#aaa } }", {
                 "end": 34,
                 "body": [
                   {
-                    "type": "ExpressionStatement",  
+                    "type": "ExpressionStatement",
                     "start": 23,
                     "end": 32,
                     "expression": {
-                      "type": "ChainExpression",    
+                      "type": "ChainExpression",
                       "start": 23,
                       "end": 32,
                       "expression": {
-                        "type": "MemberExpression", 
+                        "type": "MemberExpression",
                         "start": 23,
                         "end": 32,
                         "object": {
-                          "type": "CallExpression", 
+                          "type": "CallExpression",
                           "start": 23,
                           "end": 26,
                           "callee": {
-                            "type": "Identifier",   
+                            "type": "Identifier",
                             "start": 23,
                             "end": 24,
                             "name": "f"

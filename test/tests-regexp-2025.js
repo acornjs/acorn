@@ -1,7 +1,5 @@
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 // Duplicate named capture groups
 test("/(?<x>a)|(?<x>b)/", {}, {ecmaVersion: 2025})

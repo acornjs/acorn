@@ -1,7 +1,5 @@
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test
-  var testFail = require("./driver.js").testFail
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 // =============================================================================
 // NORMAL CASES - Basic functionality and standard usage patterns
@@ -456,7 +454,7 @@ test("function* generator() { using x = resource; yield x; }", {
   sourceType: "module"
 }, {ecmaVersion: 17, sourceType: "module"});
 
-// Using in async generator function 
+// Using in async generator function
 test("async function* asyncGenerator() { await using x = resource; yield x; }", {
   type: "Program",
   start: 0,
@@ -1104,7 +1102,7 @@ testFail("let using x = resource;", "Unexpected token (1:10)", {ecmaVersion: 17,
 // top level using is not allowed
 testFail("using x = resource;", "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement (1:0)", {ecmaVersion: 17, sourceType: "script", commonjs: false});
 
-// BoundNames contains "let"  
+// BoundNames contains "let"
 testFail("async function test() { await using let = resource; }", "The keyword 'let' is reserved (1:36)", {ecmaVersion: 17, sourceType: "module"});
 // BoundNames contains duplicate entries
 testFail("async function test() { await using x = resource1, x = resource2; }", "Identifier 'x' has already been declared (1:51)", {ecmaVersion: 17, sourceType: "module"});
@@ -2308,7 +2306,7 @@ test("{ using x = 123n; }", {
   sourceType: "module"
 }, {ecmaVersion: 17, sourceType: "module"});
 
-// ASI (Automatic Semicolon Insertion) test - using without semicolon 
+// ASI (Automatic Semicolon Insertion) test - using without semicolon
 test("{ using x = resource\n}", {
   type: "Program",
   start: 0,

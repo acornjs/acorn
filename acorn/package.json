@@ -2,9 +2,9 @@
   "name": "acorn",
   "description": "ECMAScript parser",
   "homepage": "https://github.com/acornjs/acorn",
+  "type": "module",
   "main": "dist/acorn.js",
   "types": "dist/acorn.d.ts",
-  "module": "dist/acorn.mjs",
   "exports": {
     ".": [
       {

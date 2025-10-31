@@ -1,7 +1,5 @@
-if (typeof exports !== "undefined") {
-  var test = require("./driver.js").test;
-  var testFail = require("./driver.js").testFail;
-}
+import { test } from "./driver.js";
+import { testFail } from "./driver.js";
 
 test(
   'import {"學而時習之，不亦說乎？" as quotation} from "Confucius";',

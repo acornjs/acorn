@@ -2,9 +2,9 @@
   "name": "acorn-walk",
   "description": "ECMAScript (ESTree) AST walker",
   "homepage": "https://github.com/acornjs/acorn",
+  "type": "module",
   "main": "dist/walk.js",
   "types": "dist/walk.d.ts",
-  "module": "dist/walk.mjs",
   "exports": {
     ".": [
       {

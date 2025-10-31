@@ -1,14 +1,12 @@
-"use strict"
-
-const fs = require("fs")
-const path = require("path")
-const pkg = require("../package.json")
+import fs from "fs"
+import path from "path"
+import pkg from "../package.json" with { type: "json" }
 const dependencies = Object.keys(pkg.devDependencies)
 const unicodeVersion = dependencies.find((name) => /^@unicode\/unicode-\d/.test(name))
 
-const start = require(unicodeVersion + "/Binary_Property/ID_Start/code-points.js").filter(ch => ch > 0x7f)
+const start = (await import(unicodeVersion + "/Binary_Property/ID_Start/code-points.js")).default.filter(ch => ch > 0x7f)
 let last = -1
-const cont = [0x200c, 0x200d].concat(require(unicodeVersion + "/Binary_Property/ID_Continue/code-points.js")
+const cont = [0x200c, 0x200d].concat((await import(unicodeVersion + "/Binary_Property/ID_Continue/code-points.js")).default
   .filter(ch => ch > 0x7f && search(start, ch, last + 1) === -1))
 
 function search(arr, ch, starting) {

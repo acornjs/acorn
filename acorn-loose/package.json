@@ -2,8 +2,8 @@
   "name": "acorn-loose",
   "description": "Error-tolerant ECMAScript parser",
   "homepage": "https://github.com/acornjs/acorn",
+  "type": "module",
   "main": "dist/acorn-loose.js",
-  "module": "dist/acorn-loose.mjs",
   "types": "dist/acorn-loose.d.ts",
   "exports": {
     ".": [
