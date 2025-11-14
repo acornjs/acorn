@@ -180,10 +180,10 @@ export function make(funcs, baseVisitor) {
 }
 
 function skipThrough(node, st, c) { c(node, st) }
-function ignore(_node, _st, _c) { }
+function ignore(_node, _st, _c) {}
 
 function visitNode(baseVisitor, type, node, st, c) {
-  if (baseVisitor[type] == null) throw `No walker function defined for node type ${type}`
+  if (baseVisitor[type] == null) throw new Error(`No walker function defined for node type ${type}`)
   baseVisitor[type](node, st, c)
 }
 
