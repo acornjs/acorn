@@ -1,3 +1,4 @@
 .tern-*
 /rollup.config.*
 /src
+/CHANGELOG.md
