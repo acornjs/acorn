@@ -22,7 +22,6 @@ export default [
     plugins: [
       buble({transforms: {dangerousForOf: true}}),
       copy("acorn/src/acorn.d.ts", "acorn/dist/acorn.d.ts"),
-      copy("acorn/src/acorn.d.ts", "acorn/dist/acorn.d.mts")
     ]
   },
   {

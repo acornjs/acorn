@@ -6,14 +6,12 @@
   "types": "dist/acorn.d.ts",
   "module": "dist/acorn.mjs",
   "exports": {
-    ".": [
-      {
-        "import": "./dist/acorn.mjs",
-        "require": "./dist/acorn.js",
-        "default": "./dist/acorn.js"
-      },
-      "./dist/acorn.js"
-    ],
+    ".": {
+      "types": "./dist/acorn.d.ts",
+      "import": "./dist/acorn.mjs",
+      "require": "./dist/acorn.js",
+      "default": "./dist/acorn.js"
+    },
     "./package.json": "./package.json"
   },
   "version": "8.15.0",
