@@ -360,8 +360,9 @@ base.ExportAllDeclaration = (node, st, c) => {
   if (node.exported)
     c(node.exported, st)
   c(node.source, st, "Expression")
-  for (let attr of node.attributes)
-    c(attr, st)
+  if (node.attributes)
+    for (let attr of node.attributes)
+      c(attr, st)
 }
 base.ImportAttribute = (node, st, c) => {
   c(node.value, st, "Expression")
@@ -370,8 +371,9 @@ base.ImportDeclaration = (node, st, c) => {
   for (let spec of node.specifiers)
     c(spec, st)
   c(node.source, st, "Expression")
-  for (let attr of node.attributes)
-    c(attr, st)
+  if (node.attributes)
+    for (let attr of node.attributes)
+      c(attr, st)
 }
 base.ImportExpression = (node, st, c) => {
   c(node.source, st, "Expression")
