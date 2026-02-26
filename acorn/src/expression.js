@@ -904,7 +904,7 @@ pp.parsePropertyName = function(prop) {
 
 pp.initFunction = function(node) {
   node.id = null
-  if (this.options.ecmaVersion >= 6) node.generator = node.expression = false
+  if (this.options.ecmaVersion >= 6) node.generator = false
   if (this.options.ecmaVersion >= 8) node.async = false
 }
 
@@ -960,12 +960,14 @@ pp.parseArrowExpression = function(node, params, isAsync, forInit) {
 // Parse function body and check parameters.
 
 pp.parseFunctionBody = function(node, isArrowFunction, isMethod, forInit) {
-  let isExpression = isArrowFunction && this.type !== tt.braceL
   let oldStrict = this.strict, useStrict = false
 
-  if (isExpression) {
+  if (isArrowFunction) {
+    node.expression = this.type !== tt.braceL
+  }
+
+  if (node.expression) {
     node.body = this.parseMaybeAssign(forInit)
-    node.expression = true
     this.checkParams(node, false)
   } else {
     let nonSimple = this.options.ecmaVersion >= 7 && !this.isSimpleParamList(node.params)
@@ -989,10 +991,10 @@ pp.parseFunctionBody = function(node, isArrowFunction, isMethod, forInit) {
     // Ensure the function name isn't a forbidden identifier in strict mode, e.g. 'eval'
     if (this.strict && node.id) this.checkLValSimple(node.id, BIND_OUTSIDE)
     node.body = this.parseBlock(false, undefined, useStrict && !oldStrict)
-    node.expression = false
     this.adaptDirectivePrologue(node.body.body)
     this.labels = oldLabels
   }
+
   this.exitScope()
 }
 
