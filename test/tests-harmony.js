@@ -2637,6 +2637,8 @@ test("foo((x, y) => {})", {
   locations: true
 });
 
+testFail("() => {} ? 1 : 0", "Unexpected token (1:9)", {ecmaVersion: 6})
+
 // ES6: Method Definition
 
 test("x = { method() { } }", {
