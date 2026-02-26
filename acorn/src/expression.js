@@ -167,7 +167,7 @@ pp.parseMaybeConditional = function(forInit, refDestructuringErrors) {
   let startPos = this.start, startLoc = this.startLoc
   let expr = this.parseExprOps(forInit, refDestructuringErrors)
   if (this.checkExpressionErrors(refDestructuringErrors)) return expr
-  if (!(expr.type == "ArrowFunctionExpression" && expr.start == startPos) && this.eat(tt.question)) {
+  if (!(expr.type === "ArrowFunctionExpression" && expr.start === startPos) && this.eat(tt.question)) {
     let node = this.startNodeAt(startPos, startLoc)
     node.test = expr
     node.consequent = this.parseMaybeAssign()
