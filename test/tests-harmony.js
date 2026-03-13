@@ -16430,6 +16430,7 @@ testFail("class A extends B { constructor() { super } }", "Unexpected token (1:4
 testFail("class A extends B { constructor() { super; } }", "Unexpected token (1:41)", { ecmaVersion: 6 })
 testFail("class A extends B { constructor() { (super)() } }", "Unexpected token (1:42)", { ecmaVersion: 6 })
 testFail("class A extends B { foo() { (super).foo } }", "Unexpected token (1:34)", { ecmaVersion: 6 })
+testFail("class A extends B { constructor() { new super() } }", "Invalid use of 'super' (1:40)", {ecmaVersion: 6})
 test("({super: 1})", {}, { ecmaVersion: 6 })
 test("import {super as a} from 'a'", {}, { ecmaVersion: 6, sourceType: "module" })
 test("function a() {} export {a as super}", {}, { ecmaVersion: 6, sourceType: "module" })
