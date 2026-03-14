@@ -719,7 +719,7 @@ pp.parseNew = function() {
   }
   let startPos = this.start, startLoc = this.startLoc
   node.callee = this.parseSubscripts(this.parseExprAtom(null, false, true), startPos, startLoc, true, false)
-  if (node.callee.type === "Super" && node.callee.start === startPos)
+  if (node.callee.type === "Super")
     this.raiseRecoverable(startPos, "Invalid use of 'super'")
   if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, this.options.ecmaVersion >= 8, false)
   else node.arguments = empty
