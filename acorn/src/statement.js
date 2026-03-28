@@ -79,12 +79,12 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
 
   skipWhiteSpace.lastIndex = this.pos
   let skip = skipWhiteSpace.exec(this.input)
-  let next = this.pos + skip[0].length
+  let next = this.pos + skip[0].length, after
 
   if (lineBreak.test(this.input.slice(this.pos, next))) return false
 
   if (isAwaitUsing) {
-    let usingEndPos = next + 5 /* using */, after
+    const usingEndPos = next + 5 /* using */
     if (this.input.slice(next, usingEndPos) !== "using" ||
       usingEndPos === this.input.length ||
       isIdentifierChar(after = this.fullCharCodeAt(usingEndPos)) ||
@@ -104,7 +104,18 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
   while (isIdentifierChar(ch = this.fullCharCodeAt(next)))
   if (ch === 92) return true
   let id = this.input.slice(idStart, next)
-  if (keywordRelationalOperator.test(id) || isFor && id === "of") return false
+  if (keywordRelationalOperator.test(id)) return false
+  if (isFor && !isAwaitUsing && id === "of") {
+    // Look ahead for using declaration with initializer, i.e., `for (using of = ...)`
+    skipWhiteSpace.lastIndex = next
+    const skipAfterOf = skipWhiteSpace.exec(this.input)
+    next = next + skipAfterOf[0].length
+    if (this.input.charCodeAt(next) != 61 /* '=' */ ||
+      // Check for ==, === and => operators
+      (ch = this.input.charCodeAt(next + 1)) === 61 /* '=' */ || ch === 62 /* '>' */) {
+      return false
+    }
+  }
   return true
 }
 
@@ -196,6 +207,10 @@ pp.parseStatement = function(context, topLevel, exports) {
     if (usingKind) {
       if (!this.allowUsing) {
         this.raise(this.start, "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement")
+      }
+      if (context) {
+          // Cases like `for (;;) using x = ...;`, `if (true) await using x = ...;`, etc. are not allowed.
+          this.raise(this.start, "Using declaration is not allowed in single-statement positions")
       }
       if (usingKind === "await using") {
         if (!this.canAwait) {
@@ -330,11 +345,12 @@ pp.parseForStatement = function(node) {
 // Helper method to parse for loop after variable initialization
 pp.parseForAfterInit = function(node, init, awaitAt) {
   if ((this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1) {
-    if (this.options.ecmaVersion >= 9) {
-      if (this.type === tt._in) {
-        if (awaitAt > -1) this.unexpected(awaitAt)
-      } else node.await = awaitAt > -1
-    }
+    if (this.type === tt._in) {
+      if ((init.kind === "using" || init.kind === "await using") && !init.declarations[0].init) {
+        this.raise(this.start, "Using declaration is not allowed in for-in loops")
+      }
+      if (this.options.ecmaVersion >= 9 && awaitAt > -1) this.unexpected(awaitAt)
+    } else if (this.options.ecmaVersion >= 9) node.await = awaitAt > -1
     return this.parseForIn(node, init)
   }
   if (awaitAt > -1) this.unexpected(awaitAt)
