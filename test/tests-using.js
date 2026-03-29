@@ -874,47 +874,10 @@ test("for (using x of resources) {}", {
 }, {ecmaVersion: 17, sourceType: "module"});
 
 // For-in loop with using
-test("for (using x in obj) {}", {
-  type: "Program",
-  start: 0,
-  end: 23,
-  body: [{
-    type: "ForInStatement",
-    start: 0,
-    end: 23,
-    left: {
-      type: "VariableDeclaration",
-      start: 5,
-      end: 12,
-      declarations: [{
-        type: "VariableDeclarator",
-        start: 11,
-        end: 12,
-        id: {
-          type: "Identifier",
-          start: 11,
-          end: 12,
-          name: "x"
-        },
-        init: null
-      }],
-      kind: "using"
-    },
-    right: {
-      type: "Identifier",
-      start: 16,
-      end: 19,
-      name: "obj"
-    },
-    body: {
-      type: "BlockStatement",
-      start: 21,
-      end: 23,
-      body: []
-    }
-  }],
-  sourceType: "module"
-}, {ecmaVersion: 17, sourceType: "module"});
+testFail("for (using x in obj) {}", "Using declaration is not allowed in for-in loops (1:13)", {ecmaVersion: 17, sourceType: "module"});
+
+// For-in loop with await using
+testFail("for (await using x in obj) {}", "Using declaration is not allowed in for-in loops (1:19)", {ecmaVersion: 17, sourceType: "module"});
 
 // Await using in for-of loop
 test("async function test() { for (await using x of resources) {} }", {
@@ -2990,3 +2953,160 @@ test(`async function f() {
   ],
   "sourceType": "script"
 }, {ecmaVersion: 17})
+
+// `(await) using of` edge cases in for loops
+
+test("for (using of = x;;) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 23,
+  "body": [
+    {
+      "type": "ForStatement",
+      "start": 0,
+      "end": 23,
+      "init": {
+        "type": "VariableDeclaration",
+        "start": 5,
+        "end": 17,
+        "declarations": [
+          {
+            "type": "VariableDeclarator",
+            "start": 11,
+            "end": 17,
+            "id": {
+              "type": "Identifier",
+              "start": 11,
+              "end": 13,
+              "name": "of"
+            },
+            "init": {
+              "type": "Identifier",
+              "start": 16,
+              "end": 17,
+              "name": "x"
+            }
+          }
+        ],
+        "kind": "using"
+      },
+      "test": null,
+      "update": null,
+      "body": {
+        "type": "BlockStatement",
+        "start": 21,
+        "end": 23,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "module"
+}, {ecmaVersion: 17, sourceType: "module"})
+
+test("for (await using of = x;;) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 29,
+  "body": [
+    {
+      "type": "ForStatement",
+      "start": 0,
+      "end": 29,
+      "init": {
+        "type": "VariableDeclaration",
+        "start": 5,
+        "end": 23,
+        "declarations": [
+          {
+            "type": "VariableDeclarator",
+            "start": 17,
+            "end": 23,
+            "id": {
+              "type": "Identifier",
+              "start": 17,
+              "end": 19,
+              "name": "of"
+            },
+            "init": {
+              "type": "Identifier",
+              "start": 22,
+              "end": 23,
+              "name": "x"
+            }
+          }
+        ],
+        "kind": "await using"
+      },
+      "test": null,
+      "update": null,
+      "body": {
+        "type": "BlockStatement",
+        "start": 27,
+        "end": 29,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "module"
+}, {ecmaVersion: 17, sourceType: "module"})
+
+testFail("for (using of = x of []) {}", "for-of loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 17, sourceType: "module"})
+
+testFail("for (using of = x in {}) {}", "for-in loop variable declaration may not have an initializer (1:5)", {ecmaVersion: 17, sourceType: "module"})
+
+testFail("for (using of == x;;) {}", "Unexpected token (1:14)", {ecmaVersion: 17, sourceType: "module"})
+
+testFail("for (using of => x;;) {}", "Unexpected token (1:14)", {ecmaVersion: 17, sourceType: "module"})
+
+testFail("for (using of of []) {}", "Unexpected token (1:18)", {ecmaVersion: 17, sourceType: "module"})
+
+test("for (await using of of []) {}", {
+  "type": "Program",
+  "start": 0,
+  "end": 29,
+  "body": [
+    {
+      "type": "ForOfStatement",
+      "start": 0,
+      "end": 29,
+      "await": false,
+      "left": {
+        "type": "VariableDeclaration",
+        "start": 5,
+        "end": 19,
+        "declarations": [
+          {
+            "type": "VariableDeclarator",
+            "start": 17,
+            "end": 19,
+            "id": {
+              "type": "Identifier",
+              "start": 17,
+              "end": 19,
+              "name": "of"
+            },
+            "init": null
+          }
+        ],
+        "kind": "await using"
+      },
+      "right": {
+        "type": "ArrayExpression",
+        "start": 23,
+        "end": 25,
+        "elements": []
+      },
+      "body": {
+        "type": "BlockStatement",
+        "start": 27,
+        "end": 29,
+        "body": []
+      }
+    }
+  ],
+  "sourceType": "module"
+}, {ecmaVersion: 17, sourceType: "module"})
+
+testFail("for (;;) using x = resource", "Using declaration is not allowed in single-statement positions (1:9)", {ecmaVersion: 17, sourceType: "module"})
+
+testFail("if (true) await using x = resource", "Using declaration is not allowed in single-statement positions (1:10)", {ecmaVersion: 17, sourceType: "module"})
