@@ -75,10 +75,10 @@ pp.toAssignable = function(node, isBinding, refDestructuringErrors) {
       this.raiseRecoverable(node.start, "Optional chaining cannot appear in left-hand side")
       break
 
-    case "MemberExpression":
-      if (!isBinding) break
-
     default:
+      if (!isBinding && (node.type === "MemberExpression" || !this.strict && node.type === "CallExpression")) {
+        break
+      }
       this.raise(node.start, "Assigning to rvalue")
     }
   } else if (refDestructuringErrors) this.checkPatternErrors(refDestructuringErrors, true)
@@ -249,7 +249,7 @@ pp.parseMaybeDefault = function(startPos, startLoc, left) {
 // duplicate argument names. checkClashes is ignored if the provided construct
 // is an assignment (i.e., bindingType is BIND_NONE).
 
-pp.checkLValSimple = function(expr, bindingType = BIND_NONE, checkClashes) {
+pp.checkLValSimple = function(expr, bindingType = BIND_NONE, checkClashes, isLogicalAssignment) {
   const isBind = bindingType !== BIND_NONE
 
   switch (expr.type) {
@@ -278,9 +278,12 @@ pp.checkLValSimple = function(expr, bindingType = BIND_NONE, checkClashes) {
 
   case "ParenthesizedExpression":
     if (isBind) this.raiseRecoverable(expr.start, "Binding parenthesized expression")
-    return this.checkLValSimple(expr.expression, bindingType, checkClashes)
+    return this.checkLValSimple(expr.expression, bindingType, checkClashes, isLogicalAssignment)
 
   default:
+    if (!isBind && !this.strict && !isLogicalAssignment && expr.type === "CallExpression") {
+      break
+    }
     this.raise(expr.start, (isBind ? "Binding" : "Assigning to") + " rvalue")
   }
 }

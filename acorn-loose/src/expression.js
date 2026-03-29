@@ -9,6 +9,7 @@ lp.checkLVal = function(expr) {
   switch (expr.type) {
   case "Identifier":
   case "MemberExpression":
+  case "CallExpression":
     return expr
 
   case "ParenthesizedExpression":
@@ -551,7 +552,8 @@ lp.initFunction = function(node) {
 // if possible.
 
 lp.toAssignable = function(node, binding) {
-  if (!node || node.type === "Identifier" || (node.type === "MemberExpression" && !binding)) {
+  if (!node || node.type === "Identifier" ||
+    !binding && (node.type === "MemberExpression" || node.type === "CallExpression")) {
     // Okay
   } else if (node.type === "ParenthesizedExpression") {
     this.toAssignable(node.expression, binding)
