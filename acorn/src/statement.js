@@ -110,7 +110,7 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
     skipWhiteSpace.lastIndex = next
     const skipAfterOf = skipWhiteSpace.exec(this.input)
     next = next + skipAfterOf[0].length
-    if (this.input.charCodeAt(next) != 61 /* '=' */ ||
+    if (this.input.charCodeAt(next) !== 61 /* '=' */ ||
       // Check for ==, === and => operators
       (ch = this.input.charCodeAt(next + 1)) === 61 /* '=' */ || ch === 62 /* '>' */) {
       return false
@@ -209,8 +209,8 @@ pp.parseStatement = function(context, topLevel, exports) {
         this.raise(this.start, "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement")
       }
       if (context) {
-          // Cases like `for (;;) using x = ...;`, `if (true) await using x = ...;`, etc. are not allowed.
-          this.raise(this.start, "Using declaration is not allowed in single-statement positions")
+        // Cases like `for (;;) using x = ...;`, `if (true) await using x = ...;`, etc. are not allowed.
+        this.raise(this.start, "Using declaration is not allowed in single-statement positions")
       }
       if (usingKind === "await using") {
         if (!this.canAwait) {
