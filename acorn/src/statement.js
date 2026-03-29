@@ -79,12 +79,12 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
 
   skipWhiteSpace.lastIndex = this.pos
   let skip = skipWhiteSpace.exec(this.input)
-  let next = this.pos + skip[0].length, after
+  let next = this.pos + skip[0].length
 
   if (lineBreak.test(this.input.slice(this.pos, next))) return false
 
   if (isAwaitUsing) {
-    const usingEndPos = next + 5 /* using */
+    let usingEndPos = next + 5 /* using */, after
     if (this.input.slice(next, usingEndPos) !== "using" ||
       usingEndPos === this.input.length ||
       isIdentifierChar(after = this.fullCharCodeAt(usingEndPos)) ||
