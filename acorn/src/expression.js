@@ -136,7 +136,7 @@ pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) 
   if (afterLeftParse) left = afterLeftParse.call(this, left, startPos, startLoc)
   if (this.type.isAssign) {
     let node = this.startNodeAt(startPos, startLoc)
-    node.operator = this.value
+    const op = node.operator = this.value
     if (this.type === tt.eq)
       left = this.toAssignable(left, false, refDestructuringErrors)
     if (!ownDestructuringErrors) {
@@ -147,7 +147,7 @@ pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) 
     if (this.type === tt.eq)
       this.checkLValPattern(left)
     else
-      this.checkLValSimple(left)
+      this.checkLValSimple(left, undefined, undefined, op === "??=" || op === "||=" || op === "&&=")
     node.left = left
     this.next()
     node.right = this.parseMaybeAssign(forInit)

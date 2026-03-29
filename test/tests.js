@@ -27170,8 +27170,50 @@ testFail("var x = /[a-z]/\\ux",
 testFail("3 = 4",
          "Assigning to rvalue (1:0)");
 
+test("func() = 4", {
+  "type": "Program",
+  "start": 0,
+  "end": 10,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 10,
+      "expression": {
+        "type": "AssignmentExpression",
+        "start": 0,
+        "end": 10,
+        "operator": "=",
+        "left": {
+          "type": "CallExpression",
+          "start": 0,
+          "end": 6,
+          "callee": {
+            "type": "Identifier",
+            "start": 0,
+            "end": 4,
+            "name": "func"
+          },
+          "arguments": []
+        },
+        "right": {
+          "type": "Literal",
+          "start": 9,
+          "end": 10,
+          "value": 4,
+          "raw": "4"
+        }
+      }
+    }
+  ],
+  "sourceType": "script"
+});
+
+testFail("'use strict'; func() = 4",
+         "Assigning to rvalue (1:14)");
+
 testFail("func() = 4",
-         "Assigning to rvalue (1:0)");
+         "Assigning to rvalue (1:0)", {sourceType: "module"});
 
 testFail("(1 + 1) = 10",
          "Assigning to rvalue (1:0)");
