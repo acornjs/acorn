@@ -94,15 +94,17 @@ pp.checkPropClash = function(prop, propHash, refDestructuringErrors) {
 // delayed syntax error at correct position).
 
 pp.parseExpression = function(forInit, refDestructuringErrors) {
-  let startPos = this.start, startLoc = this.startLoc
-  let expr = this.parseMaybeAssign(forInit, refDestructuringErrors)
-  if (this.type === tt.comma) {
-    let node = this.startNodeAt(startPos, startLoc)
-    node.expressions = [expr]
-    while (this.eat(tt.comma)) node.expressions.push(this.parseMaybeAssign(forInit, refDestructuringErrors))
-    return this.finishNode(node, "SequenceExpression")
-  }
-  return expr
+  return this.catchStackOverflow(() => {
+    let startPos = this.start, startLoc = this.startLoc
+    let expr = this.parseMaybeAssign(forInit, refDestructuringErrors)
+    if (this.type === tt.comma) {
+      let node = this.startNodeAt(startPos, startLoc)
+      node.expressions = [expr]
+      while (this.eat(tt.comma)) node.expressions.push(this.parseMaybeAssign(forInit, refDestructuringErrors))
+      return this.finishNode(node, "SequenceExpression")
+    }
+    return expr
+  })
 }
 
 // Parse an assignment expression. This includes applications of

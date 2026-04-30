@@ -29968,3 +29968,5 @@ test("foo.if() / 2", {
 })
 
 test("({a: /=/})", {}, {ecmaVersion: 5})
+
+testFail("[".repeat(2000) + "1" + "]".repeat(2000), "~Not enough stack space", {ecmaVersion: "latest"})

@@ -154,7 +154,14 @@ export class LooseParser {
 
   parse() {
     this.next()
-    return this.parseTopLevel()
+    try {
+      return this.parseTopLevel()
+    } catch (e) {
+      if (e instanceof Error && (/\bstack\b.*\b(exceeded|overflow)\b/i.test(e.message) || /\btoo much recursion\b/i.test(e.message)))
+        this.toks.raise(this.toks.start, "Not enough stack space to parse input")
+      else
+        throw e
+    }
   }
 
   static extend(...plugins) {

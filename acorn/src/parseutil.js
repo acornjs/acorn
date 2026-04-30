@@ -59,6 +59,17 @@ pp.eatContextual = function(name) {
   return true
 }
 
+pp.catchStackOverflow = function(f) {
+  try {
+    return f()
+  } catch (e) {
+    if (e instanceof Error && (/\bstack\b.*\b(exceeded|overflow)\b/i.test(e.message) || /\btoo much recursion\b/i.test(e.message)))
+      this.raise(this.start, "Not enough stack space to parse input")
+    else
+      throw e
+  }
+}
+
 // Asserts that following token is given contextual keyword.
 
 pp.expectContextual = function(name) {

@@ -102,7 +102,7 @@ export class Parser {
   parse() {
     let node = this.options.program || this.startNode()
     this.nextToken()
-    return this.parseTopLevel(node)
+    return this.catchStackOverflow(() => this.parseTopLevel(node))
   }
 
   get inFunction() { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 }
