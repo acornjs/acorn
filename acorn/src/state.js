@@ -64,7 +64,7 @@ export class Parser {
 
     // Figure out if it's a module code.
     this.inModule = options.sourceType === "module"
-    this.strict = this.inModule || options.strict == true || this.strictDirective(this.pos)
+    this.strict = this.inModule || options.strict === true || this.strictDirective(this.pos)
 
     // Used to signify the start of a potential arrow function
     this.potentialArrowAt = -1
