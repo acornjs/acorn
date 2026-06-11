@@ -16,6 +16,9 @@ export const defaultOptions = {
   // Can be either `"script"`, `"module"` or `"commonjs"`. This influences global
   // strict mode and parsing of `import` and `export` declarations.
   sourceType: "script",
+  // When set to true, enable strict parsing mode even if `sourceType`
+  // is `"script"`.
+  strict: false,
   // `onInsertedSemicolon` can be a callback that will be called when
   // a semicolon is automatically inserted. It will be passed the
   // position of the inserted semicolon as an offset, and if
