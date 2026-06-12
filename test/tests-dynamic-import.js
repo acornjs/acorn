@@ -90,7 +90,6 @@ test(
         start: 0,
         end: 39,
         id: { type: 'Identifier', start: 10, end: 11, name: 'a' },
-        expression: false,
         generator: true,
         async: false,
         params: [],

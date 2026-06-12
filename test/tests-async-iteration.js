@@ -23,7 +23,6 @@ test("async function f() { for await (x of xs); }", {
         "name": "f"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [],
       "body": {
@@ -76,7 +75,6 @@ test("async function f() { for await (var x of xs); }", {
         "name": "f"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [],
       "body": {
@@ -143,7 +141,6 @@ test("async function f() { for await (let x of xs); }", {
         "name": "f"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [],
       "body": {
@@ -210,7 +207,6 @@ test("async function f() { for\nawait (x of xs); }", {
         "name": "f"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [],
       "body": {
@@ -273,7 +269,6 @@ test("f = async function() { for await (x of xs); }", {
           "end": 45,
           "id": null,
           "generator": false,
-          "expression": false,
           "async": true,
           "params": [],
           "body": {
@@ -421,7 +416,6 @@ test("obj = { async f() { for await (x of xs); } }", {
                 "end": 42,
                 "id": null,
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -504,7 +498,6 @@ test("class A { async f() { for await (x of xs); } }", {
               "end": 44,
               "id": null,
               "generator": false,
-              "expression": false,
               "async": true,
               "params": [],
               "body": {
@@ -676,7 +669,6 @@ test("async function* f() { await a; yield b; }", {
         "name": "f"
       },
       "generator": true,
-      "expression": false,
       "async": true,
       "params": [],
       "body": {
@@ -759,7 +751,6 @@ test("f = async function*() { await a; yield b; }", {
           "end": 43,
           "id": null,
           "generator": true,
-          "expression": false,
           "async": true,
           "params": [],
           "body": {
@@ -852,7 +843,6 @@ test("obj = { async* f() { await a; yield b; } }", {
                 "end": 40,
                 "id": null,
                 "generator": true,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -945,7 +935,6 @@ test("class A { async* f() { await a; yield b; } }", {
               "end": 42,
               "id": null,
               "generator": true,
-              "expression": false,
               "async": true,
               "params": [],
               "body": {
@@ -1036,7 +1025,6 @@ test("class A { static async* f() { await a; yield b; } }", {
               "end": 49,
               "id": null,
               "generator": true,
-              "expression": false,
               "async": true,
               "params": [],
               "body": {
@@ -1255,7 +1243,6 @@ test("var gen = { async *method() {} }", {
                   "end": 30,
                   "id": null,
                   "generator": true,
-                  "expression": false,
                   "async": true,
                   "params": [],
                   "body": {
@@ -1291,7 +1278,6 @@ test("export default async function*() {}", {
         "end": 35,
         "id": null,
         "generator": true,
-        "expression": false,
         "async": true,
         "params": [],
         "body": {
@@ -1366,7 +1352,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                   "end": 58,
 //                   "id": null,
 //                   "generator": true,
-//                   "expression": false,
 //                   "async": true,
 //                   "params": [],
 //                   "body": {
@@ -1455,7 +1440,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //         "end": 63,
 //         "id": null,
 //         "generator": true,
-//         "expression": false,
 //         "async": true,
 //         "params": [],
 //         "body": {
@@ -1571,7 +1555,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                   "end": 64,
 //                   "id": null,
 //                   "generator": true,
-//                   "expression": false,
 //                   "async": true,
 //                   "params": [],
 //                   "body": {
@@ -1601,7 +1584,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                               "end": 62,
 //                               "id": null,
 //                               "generator": false,
-//                               "expression": false,
 //                               "async": false,
 //                               "params": [],
 //                               "body": {
@@ -1660,7 +1642,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //         "end": 69,
 //         "id": null,
 //         "generator": true,
-//         "expression": false,
 //         "async": true,
 //         "params": [],
 //         "body": {
@@ -1690,7 +1671,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                     "end": 67,
 //                     "id": null,
 //                     "generator": false,
-//                     "expression": false,
 //                     "async": false,
 //                     "params": [],
 //                     "body": {
@@ -1776,7 +1756,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                   "end": 71,
 //                   "id": null,
 //                   "generator": true,
-//                   "expression": false,
 //                   "async": true,
 //                   "params": [],
 //                   "body": {
@@ -1823,7 +1802,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                                     "end": 67,
 //                                     "id": null,
 //                                     "generator": false,
-//                                     "expression": false,
 //                                     "async": false,
 //                                     "params": [],
 //                                     "body": {
@@ -1887,7 +1865,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //         "end": 76,
 //         "id": null,
 //         "generator": true,
-//         "expression": false,
 //         "async": true,
 //         "params": [],
 //         "body": {
@@ -1934,7 +1911,6 @@ test("var C = class { async *method() {} }", {}, { "ecmaVersion": 9 })
 //                           "end": 72,
 //                           "id": null,
 //                           "generator": false,
-//                           "expression": false,
 //                           "async": false,
 //                           "params": [],
 //                           "body": {

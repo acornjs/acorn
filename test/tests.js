@@ -29865,7 +29865,6 @@ test(`typeof async function f(){}
                 },
                 name: "f"
               },
-              expression: false,
               generator: false,
               async: true,
               params: [],

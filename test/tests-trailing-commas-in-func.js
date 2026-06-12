@@ -31,7 +31,6 @@ test("function foo(a,) { }", {
         }
       ],
       "generator": false,
-      "expression": false,
       "async": false,
       "body": {
         "type": "BlockStatement",
@@ -67,7 +66,6 @@ test("(function(a,) { })", {
           }
         ],
         "generator": false,
-        "expression": false,
         "async": false,
         "body": {
           "type": "BlockStatement",
@@ -196,7 +194,6 @@ test("({foo(a,) {}})", {
                 }
               ],
               "generator": false,
-              "expression": false,
               "async": false,
               "body": {
                 "type": "BlockStatement",
@@ -262,7 +259,6 @@ test("class A {foo(a,) {}}", {
                 }
               ],
               "generator": false,
-              "expression": false,
               "async": false,
               "body": {
                 "type": "BlockStatement",
@@ -327,7 +323,6 @@ test("class A {static foo(a,) {}}", {
                 }
               ],
               "generator": false,
-              "expression": false,
               "async": false,
               "body": {
                 "type": "BlockStatement",
@@ -391,7 +386,6 @@ test("(class {foo(a,) {}})", {
                   }
                 ],
                 "generator": false,
-                "expression": false,
                 "async": false,
                 "body": {
                   "type": "BlockStatement",
@@ -456,7 +450,6 @@ test("(class {static foo(a,) {}})", {
                   }
                 ],
                 "generator": false,
-                "expression": false,
                 "async": false,
                 "body": {
                   "type": "BlockStatement",
@@ -502,7 +495,6 @@ test("export default function foo(a,) { }", {
           }
         ],
         "generator": false,
-        "expression": false,
         "async": false,
         "body": {
           "type": "BlockStatement",
@@ -544,7 +536,6 @@ test("export default (function foo(a,) { })", {
           }
         ],
         "generator": false,
-        "expression": false,
         "async": false,
         "body": {
           "type": "BlockStatement",
@@ -586,7 +577,6 @@ test("export function foo(a,) { }", {
           }
         ],
         "generator": false,
-        "expression": false,
         "async": false,
         "body": {
           "type": "BlockStatement",
