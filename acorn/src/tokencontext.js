@@ -7,12 +7,13 @@ import {types as tt} from "./tokentype.js"
 import {lineBreak} from "./whitespace.js"
 
 export class TokContext {
-  constructor(token, isExpr, preserveSpace, override, generator) {
+  constructor(token, isExpr, preserveSpace, override, generator, async) {
     this.token = token
     this.isExpr = !!isExpr
     this.preserveSpace = !!preserveSpace
     this.override = override
     this.generator = !!generator
+    this.async = !!async
   }
 }
 
@@ -26,7 +27,11 @@ export const types = {
   f_stat: new TokContext("function", false),
   f_expr: new TokContext("function", true),
   f_expr_gen: new TokContext("function", true, false, null, true),
-  f_gen: new TokContext("function", false, false, null, true)
+  f_gen: new TokContext("function", false, false, null, true),
+  f_async_stat: new TokContext("function", false, false, null, false, true),
+  f_async_expr: new TokContext("function", true, false, null, false, true),
+  f_async_expr_gen: new TokContext("function", true, false, null, true, true),
+  f_async_gen: new TokContext("function", false, false, null, true, true)
 }
 
 const pp = Parser.prototype
@@ -41,7 +46,8 @@ pp.curContext = function() {
 
 pp.braceIsBlock = function(prevType) {
   let parent = this.curContext()
-  if (parent === types.f_expr || parent === types.f_stat)
+  if (parent === types.f_expr || parent === types.f_stat ||
+      parent === types.f_async_expr || parent === types.f_async_stat)
     return true
   if (prevType === tt.colon && (parent === types.b_stat || parent === types.b_expr))
     return !parent.isExpr
@@ -65,6 +71,15 @@ pp.inGeneratorContext = function() {
     let context = this.context[i]
     if (context.token === "function")
       return context.generator
+  }
+  return false
+}
+
+pp.inAsyncContext = function() {
+  for (let i = this.context.length - 1; i >= 1; i--) {
+    let context = this.context[i]
+    if (context.token === "function")
+      return context.async
   }
   return false
 }
@@ -122,13 +137,16 @@ tt.incDec.updateContext = function() {
 }
 
 tt._function.updateContext = tt._class.updateContext = function(prevType) {
+  let isAsync = prevType === tt.name &&
+    this.input.slice(this.lastTokStart, this.lastTokEnd) === "async" &&
+    !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
   if (prevType.beforeExpr && prevType !== tt._else &&
       !(prevType === tt.semi && this.curContext() !== types.p_stat) &&
       !(prevType === tt._return && lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) &&
       !((prevType === tt.colon || prevType === tt.braceL) && this.curContext() === types.b_stat))
-    this.context.push(types.f_expr)
+    this.context.push(isAsync ? types.f_async_expr : types.f_expr)
   else
-    this.context.push(types.f_stat)
+    this.context.push(isAsync ? types.f_async_stat : types.f_stat)
   this.exprAllowed = false
 }
 
@@ -150,6 +168,10 @@ tt.star.updateContext = function(prevType) {
     let index = this.context.length - 1
     if (this.context[index] === types.f_expr)
       this.context[index] = types.f_expr_gen
+    else if (this.context[index] === types.f_async_expr)
+      this.context[index] = types.f_async_expr_gen
+    else if (this.context[index] === types.f_async_stat)
+      this.context[index] = types.f_async_gen
     else
       this.context[index] = types.f_gen
   }
@@ -160,7 +182,8 @@ tt.name.updateContext = function(prevType) {
   let allowed = false
   if (this.options.ecmaVersion >= 6 && prevType !== tt.dot) {
     if (this.value === "of" && !this.exprAllowed ||
-        this.value === "yield" && this.inGeneratorContext())
+        this.value === "yield" && this.inGeneratorContext() ||
+        this.value === "await" && this.inAsyncContext())
       allowed = true
   }
   this.exprAllowed = allowed
