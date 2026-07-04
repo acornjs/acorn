@@ -88,22 +88,30 @@ lp.readToken = function() {
 }
 
 lp.resetTo = function(pos) {
+  if (this.options.locations) {
+    if (pos >= this.toks.pos) {
+      let skipped = this.input.slice(this.toks.pos, pos), match
+      while (match = lineBreakG.exec(skipped)) {
+        ++this.toks.curLine
+        this.toks.lineStart = match.index + match[0].length
+      }
+    } else {
+      this.toks.curLine = 1
+      this.toks.lineStart = lineBreakG.lastIndex = 0
+      let match
+      while ((match = lineBreakG.exec(this.input)) && match.index < pos) {
+        ++this.toks.curLine
+        this.toks.lineStart = match.index + match[0].length
+      }
+    }
+  }
+
   this.toks.pos = pos
   this.toks.containsEsc = false
   let ch = this.input.charAt(pos - 1)
   this.toks.exprAllowed = !ch || /[[{(,;:?/*=+\-~!|&%^<>]/.test(ch) ||
     /[enwfd]/.test(ch) &&
     /\b(case|else|return|throw|new|in|(instance|type)?of|delete|void)$/.test(this.input.slice(pos - 10, pos))
-
-  if (this.options.locations) {
-    this.toks.curLine = 1
-    this.toks.lineStart = lineBreakG.lastIndex = 0
-    let match
-    while ((match = lineBreakG.exec(this.input)) && match.index < pos) {
-      ++this.toks.curLine
-      this.toks.lineStart = match.index + match[0].length
-    }
-  }
 }
 
 lp.lookAhead = function(n) {
