@@ -93,7 +93,7 @@ lp.resetTo = function(pos) {
       let skipped = this.input.slice(this.toks.pos, pos), match
       while (match = lineBreakG.exec(skipped)) {
         ++this.toks.curLine
-        this.toks.lineStart = match.index + match[0].length
+        this.toks.lineStart = pos + match.index + match[0].length
       }
     } else {
       this.toks.curLine = 1
