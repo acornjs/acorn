@@ -269,7 +269,7 @@ pp.parseMaybeUnary = function(refDestructuringErrors, sawUnary, incDec, forInit)
     }
   }
 
-  if (!incDec && this.eat(tt.starstar)) {
+  if (!incDec && !(expr.type === "ArrowFunctionExpression" && expr.start === startPos) && this.eat(tt.starstar)) {
     if (sawUnary)
       this.unexpected(this.lastTokStart)
     else
