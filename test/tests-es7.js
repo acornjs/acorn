@@ -396,3 +396,9 @@ testFail(
 testFail("'use strict'; function y(x = 1) { 'use strict' }",
          "Illegal 'use strict' directive in function with non-simple parameter list (1:14)",
          {ecmaVersion: 7})
+
+// An unparenthesized arrow function cannot be the left operand of `**`:
+// its left operand must be an UpdateExpression, and an arrow function is an
+// AssignmentExpression, so `() => {} ** x` is a SyntaxError (matches V8).
+testFail("() => {} ** 2", "Unexpected token (1:9)", {ecmaVersion: 7})
+testFail("a => {} ** b", "Unexpected token (1:8)", {ecmaVersion: 7})
