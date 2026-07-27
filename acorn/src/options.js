@@ -60,6 +60,11 @@ export const defaultOptions = {
   // line being 1-based and column 0-based) will be attached to the
   // nodes.
   locations: false,
+  // Pass an optional `{line, column}` object to use for the start of
+  // the parse. This is mostly useful when using `parseExpressionAt`
+  // with `locations: true`, to prevent the parser from having to
+  // determine the line position at the start position.
+  startLocation: null,
   // A function can be passed as `onToken` option, which will
   // cause Acorn to call that function with object in the same
   // format as tokens returned from `tokenizer().getToken()`. Note

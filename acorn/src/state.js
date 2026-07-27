@@ -32,14 +32,17 @@ export class Parser {
     // Set up token state
 
     // The current position of the tokenizer in the input.
+    this.pos = startPos || 0
     this.curLine = 1
-    if (startPos) {
-      this.pos = startPos
+    if (options.startLocation) {
+      this.lineStart = this.pos - options.startLocation.column
+      this.curLine = options.startLocation.line
+    } else if (startPos) {
       this.lineStart = this.input.lastIndexOf("\n", startPos - 1) + 1
       if (this.options.locations)
         this.curLine = this.input.slice(0, this.lineStart).split(lineBreak).length
     } else {
-      this.pos = this.lineStart = 0
+      this.lineStart = 0
     }
 
     // Properties of the current token:
