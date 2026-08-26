@@ -789,6 +789,10 @@ export const defaultOptions: Options
 
 export function getLineInfo(input: string, offset: number): Position
 
+export function isIdentifierStart(code: number, astral?: boolean): boolean
+
+export function isIdentifierChar(code: number, astral?: boolean): boolean
+
 export class TokenType {
   label: string
   keyword: string | undefined
