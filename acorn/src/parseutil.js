@@ -45,8 +45,8 @@ function keywordOpAt(parser, pos) {
     if (!isIdentifierChar(ch, true)) break
     end += ch <= 0xffff ? 1 : 2
   }
-  return end == pos + 2 && parser.input.slice(pos, end) == "in" ||
-    end == pos + 10 && parser.input.slice(pos, end) == "instanceof"
+  return end === pos + 2 && parser.input.slice(pos, end) === "in" ||
+    end === pos + 10 && parser.input.slice(pos, end) === "instanceof"
 }
 
 // Predicate that tests whether the next token is of the given
