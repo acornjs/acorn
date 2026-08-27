@@ -298,14 +298,25 @@ function isPrivateFieldAccess(node) {
 
 pp.parseExprSubscripts = function(refDestructuringErrors, forInit) {
   let startPos = this.start, startLoc = this.startLoc
+  let oldDoubleProto = -1, oldShorthandAssign = -1
+  if (refDestructuringErrors) {
+    oldDoubleProto = refDestructuringErrors.doubleProto
+    oldShorthandAssign = refDestructuringErrors.shorthandAssign
+    refDestructuringErrors.doubleProto = refDestructuringErrors.shorthandAssign = -1
+  }
   let expr = this.parseExprAtom(refDestructuringErrors, forInit)
   if (expr.type === "ArrowFunctionExpression" && this.input.slice(this.lastTokStart, this.lastTokEnd) !== ")")
     return expr
   let result = this.parseSubscripts(expr, startPos, startLoc, false, forInit)
-  if (refDestructuringErrors && result.type === "MemberExpression") {
-    if (refDestructuringErrors.parenthesizedAssign >= result.start) refDestructuringErrors.parenthesizedAssign = -1
-    if (refDestructuringErrors.parenthesizedBind >= result.start) refDestructuringErrors.parenthesizedBind = -1
-    if (refDestructuringErrors.trailingComma >= result.start) refDestructuringErrors.trailingComma = -1
+  if (refDestructuringErrors) {
+    if (result.end > expr.end) {
+      this.checkExpressionErrors(refDestructuringErrors, true)
+      if (refDestructuringErrors.parenthesizedAssign >= result.start) refDestructuringErrors.parenthesizedAssign = -1
+      if (refDestructuringErrors.parenthesizedBind >= result.start) refDestructuringErrors.parenthesizedBind = -1
+      if (refDestructuringErrors.trailingComma >= result.start) refDestructuringErrors.trailingComma = -1
+    }
+    if (oldDoubleProto > -1) refDestructuringErrors.doubleProto = oldDoubleProto
+    if (oldShorthandAssign > -1) refDestructuringErrors.shorthandAssign = oldShorthandAssign
   }
   return result
 }
