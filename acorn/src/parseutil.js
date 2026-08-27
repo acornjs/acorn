@@ -1,6 +1,7 @@
 import {types as tt} from "./tokentype.js"
 import {Parser} from "./state.js"
 import {lineBreak, skipWhiteSpace} from "./whitespace.js"
+import {isIdentifierChar} from "./identifier.js"
 
 const pp = Parser.prototype
 
@@ -21,7 +22,9 @@ pp.strictDirective = function(start) {
       let next = this.input.charAt(end)
       return next === ";" || next === "}" ||
         (lineBreak.test(spaceAfter[0]) &&
-         !(/[(`.[+\-/*%<>=,?^&]/.test(next) || next === "!" && this.input.charAt(end + 1) === "="))
+         !(/[(`.[+\-/*%<>=,?^&]/.test(next) ||
+           next === "!" && this.input.charAt(end + 1) === "=" ||
+           next === "i" && keywordOpAt(this, end)))
     }
     start += match[0].length
 
@@ -31,6 +34,19 @@ pp.strictDirective = function(start) {
     if (this.input[start] === ";")
       start++
   }
+}
+
+// Scan for `in` or `instanceof` at the given position, knowing that
+// there's an `i` there.
+function keywordOpAt(parser, pos) {
+  let end = pos + 1, stop = Math.min(parser.input.length, pos + 11)
+  while (end < stop) {
+    let ch = parser.fullCharCodeAt(end)
+    if (!isIdentifierChar(ch, true)) break
+    end += ch <= 0xffff ? 1 : 2
+  }
+  return end == pos + 2 && parser.input.slice(pos, end) == "in" ||
+    end == pos + 10 && parser.input.slice(pos, end) == "instanceof"
 }
 
 // Predicate that tests whether the next token is of the given

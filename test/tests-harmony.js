@@ -13252,6 +13252,8 @@ testFail("\"use strict\"; (a, a) => 42", "Argument name clash (1:18)", {ecmaVers
 
 testFail("\"use strict\"; (a) => 00", "Invalid number (1:21)", {ecmaVersion: 6});
 
+test('function foo() { "use strict"\nin {}; 00 }', {}, {ecmaVersion: 6});
+
 testFail("() <= 42", "Unexpected token (1:1)", {ecmaVersion: 6});
 
 testFail("(10) => 00", "Assigning to rvalue (1:1)", {ecmaVersion: 6});
