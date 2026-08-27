@@ -334,6 +334,7 @@ pp.parseForStatement = function(node) {
     if (startsWithLet && isForOf) this.raise(init.start, "The left-hand side of a for-of loop may not start with 'let'.")
     this.toAssignable(init, false, refDestructuringErrors)
     this.checkLValPattern(init)
+    this.checkAssignmentLhsErrors(init, refDestructuringErrors)
     return this.parseForIn(node, init)
   } else {
     this.checkExpressionErrors(refDestructuringErrors, true)

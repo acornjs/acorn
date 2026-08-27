@@ -323,3 +323,54 @@ pp.checkLValInnerPattern = function(expr, bindingType = BIND_NONE, checkClashes)
     this.checkLValPattern(expr, bindingType, checkClashes)
   }
 }
+
+pp.checkAssignmentLhsErrors = function(node, refDestructuringErrors) {
+  if (!refDestructuringErrors) return
+  let {shorthandAssign, doubleProto} = refDestructuringErrors
+  if (shorthandAssign < node.start && doubleProto < node.start) return
+
+  let hasError = false
+  let walk = (n) => {
+    if (!n || hasError) return
+    if (n.type === "ObjectExpression") {
+      let proto = false
+      for (let prop of n.properties) {
+        if (prop.type === "Property") {
+          if (shorthandAssign >= 0 && prop.shorthand && prop.value && prop.value.type === "AssignmentPattern") {
+            hasError = true
+            this.raise(shorthandAssign, "Shorthand property assignments are valid only in destructuring patterns")
+            return
+          }
+          if (doubleProto >= 0 && prop.kind === "init" && !prop.computed && (
+            prop.key.type === "Identifier" && prop.key.name === "__proto__" ||
+            prop.key.type === "Literal" && prop.key.value === "__proto__"
+          )) {
+            if (proto) {
+              hasError = true
+              this.raiseRecoverable(doubleProto, "Redefinition of __proto__ property")
+              return
+            }
+            proto = true
+          }
+        }
+        walk(prop)
+      }
+      return
+    }
+    for (let k in n) {
+      if (k === "loc" || k === "start" || k === "end" || k === "type") continue
+      let val = n[k]
+      if (Array.isArray(val)) {
+        for (let item of val) walk(item)
+      } else if (val && typeof val === "object" && typeof val.type === "string") {
+        walk(val)
+      }
+    }
+  }
+
+  walk(node)
+  if (!hasError) {
+    if (shorthandAssign >= node.start) refDestructuringErrors.shorthandAssign = -1
+    if (doubleProto >= node.start) refDestructuringErrors.doubleProto = -1
+  }
+}

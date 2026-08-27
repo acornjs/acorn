@@ -142,10 +142,9 @@ pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) 
     if (this.type === tt.eq)
       left = this.toAssignable(left, false, refDestructuringErrors)
     if (!ownDestructuringErrors) {
-      refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = refDestructuringErrors.doubleProto = -1
+      refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = -1
     }
-    if (refDestructuringErrors.shorthandAssign >= left.start)
-      refDestructuringErrors.shorthandAssign = -1 // reset because shorthand default was used correctly
+    this.checkAssignmentLhsErrors(left, refDestructuringErrors)
     if (this.type === tt.eq)
       this.checkLValPattern(left)
     else
@@ -153,7 +152,7 @@ pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) 
     node.left = left
     this.next()
     node.right = this.parseMaybeAssign(forInit)
-    if (oldDoubleProto > -1) refDestructuringErrors.doubleProto = oldDoubleProto
+    if (oldDoubleProto > -1 && refDestructuringErrors.doubleProto < 0) refDestructuringErrors.doubleProto = oldDoubleProto
     return this.finishNode(node, "AssignmentExpression")
   } else {
     if (ownDestructuringErrors) this.checkExpressionErrors(refDestructuringErrors, true)
