@@ -144,8 +144,8 @@ pp.parseMaybeAssign = function(forInit, refDestructuringErrors, afterLeftParse) 
     if (!ownDestructuringErrors) {
       refDestructuringErrors.parenthesizedAssign = refDestructuringErrors.trailingComma = -1
       // reset these when detected inside this expression
-      if (refDestructuringErrors.shorthandAssign >= left.start) refDestructuringErrors.shorthandAssign = -1 
-      if (refDestructuringErrors.doubleProto >= left.start) refDestructuringErrors.doubleProto = -1 
+      if (refDestructuringErrors.shorthandAssign >= left.start) refDestructuringErrors.shorthandAssign = -1
+      if (refDestructuringErrors.doubleProto >= left.start) refDestructuringErrors.doubleProto = -1
     }
     if (this.type === tt.eq)
       this.checkLValPattern(left)
