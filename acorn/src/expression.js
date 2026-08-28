@@ -332,7 +332,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls, forInit) {
     let element = this.parseSubscript(base, startPos, startLoc, noCalls, maybeAsyncArrow, optionalChained, forInit)
 
     if (element.optional) optionalChained = true
-    if (element === base || element.type === "ArrowFunctionExpression") {
+    if (element.end === base.end || element.type === "ArrowFunctionExpression") {
       if (optionalChained) {
         const chainNode = this.startNodeAt(startPos, startLoc)
         chainNode.expression = element
