@@ -45,7 +45,6 @@ test("function wrap() { foo }", {
         "name": "wrap"
       },
       "generator": false,
-      "expression": false,
       "params": [],
       "body": {
         "type": "BlockStatement",
@@ -96,7 +95,6 @@ test("!function wrap() { foo }", {
             "name": "wrap"
           },
           "generator": false,
-          "expression": false,
           "params": [],
           "body": {
             "type": "BlockStatement",
@@ -334,7 +332,6 @@ test("function wrap() { \"use strict\"\n foo }", {
         "name": "wrap"
       },
       "generator": false,
-      "expression": false,
       "params": [],
       "body": {
         "type": "BlockStatement",
@@ -398,7 +395,6 @@ test("!function wrap() { \"use strict\"\n foo }", {
             "name": "wrap"
           },
           "generator": false,
-          "expression": false,
           "params": [],
           "body": {
             "type": "BlockStatement",
@@ -557,7 +553,6 @@ test("({ wrap() { \"use strict\"; foo } })", {
               "end": 31,
               "id": null,
               "generator": false,
-              "expression": false,
               "params": [],
               "body": {
                 "type": "BlockStatement",
@@ -640,7 +635,6 @@ test("(class { wrap() { \"use strict\"; foo } })", {
                 "end": 37,
                 "id": null,
                 "generator": false,
-                "expression": false,
                 "params": [],
                 "body": {
                   "type": "BlockStatement",
@@ -772,7 +766,6 @@ test("function wrap() { \"use asm\"; \"use strict\"; foo }", {
         "name": "wrap"
       },
       "generator": false,
-      "expression": false,
       "params": [],
       "body": {
         "type": "BlockStatement",
@@ -889,7 +882,6 @@ test("function wrap() { \"use asm\"; foo; \"use strict\" }", {
         "name": "wrap"
       },
       "generator": false,
-      "expression": false,
       "params": [],
       "body": {
         "type": "BlockStatement",
@@ -988,7 +980,6 @@ test("function wrap() { { \"use strict\" } foo }", {
         "name": "wrap"
       },
       "generator": false,
-      "expression": false,
       "params": [],
       "body": {
         "type": "BlockStatement",
@@ -1086,7 +1077,6 @@ test("function wrap() { (\"use strict\"); foo }", {
         "name": "wrap"
       },
       "generator": false,
-      "expression": false,
       "params": [],
       "body": {
         "type": "BlockStatement",
@@ -1144,7 +1134,6 @@ test("function a() { \"use strict\" } \"use strict\"; foo", {
         "name": "a"
       },
       "generator": false,
-      "expression": false,
       "params": [],
       "body": {
         "type": "BlockStatement",
@@ -1211,7 +1200,6 @@ test("function a(a = function() { \"use strict\"; foo }) { \"use strict\" }", {
         "name": "a"
       },
       "generator": false,
-      "expression": false,
       "params": [
         {
           "type": "AssignmentPattern",
@@ -1229,7 +1217,6 @@ test("function a(a = function() { \"use strict\"; foo }) { \"use strict\" }", {
             "end": 47,
             "id": null,
             "generator": false,
-            "expression": false,
             "params": [],
             "body": {
               "type": "BlockStatement",

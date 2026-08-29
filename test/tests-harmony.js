@@ -215,7 +215,6 @@ test("function test() {'use strict'; 0o0; }", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 37}
@@ -370,7 +369,6 @@ test("function test() {'use strict'; 0O0; }", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 37}
@@ -1036,8 +1034,7 @@ test("`outer${{x: {y: 10}}}bar${`nested${function(){return 1;}}endnest`}end`",{
                       }
                     }
                   ]
-                },
-                expression: false
+                }
               }
             ],
             quasis: [
@@ -2681,7 +2678,6 @@ test("x = { method() { } }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 12},
               end: {line: 1, column: 18}
@@ -2768,7 +2764,6 @@ test("x = { method(test) { } }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 12},
               end: {line: 1, column: 22}
@@ -2849,7 +2844,6 @@ test("x = { 'method'() { } }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 14},
               end: {line: 1, column: 20}
@@ -2929,7 +2923,6 @@ test("x = { get() { } }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 9},
               end: {line: 1, column: 15}
@@ -3009,7 +3002,6 @@ test("x = { set() { } }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 9},
               end: {line: 1, column: 15}
@@ -3099,7 +3091,6 @@ test("x = { method() { super.a(); } }", {
               end: {line: 1, column: 29}
             },
             id: null,
-            expression: false,
             generator: false,
             params: [],
             body: {
@@ -4352,7 +4343,6 @@ test("export function parse() { }", {
         }
       },
       generator: false,
-      expression: false,
       loc: {
         start: {line: 1, column: 7},
         end: {line: 1, column: 27}
@@ -4465,7 +4455,6 @@ test("export default function () {}", {
       range: [15, 29],
       id: null,
       generator: false,
-      expression: false,
       params: [],
       body: {
         type: "BlockStatement",
@@ -4491,7 +4480,6 @@ test("export default function f() {}", {
         name: "f"
       },
       generator: false,
-      expression: false,
       params: [],
       body: {
         type: "BlockStatement",
@@ -5504,7 +5492,6 @@ test("(function* () { yield v })", {
         }
       },
       generator: true,
-      expression: false,
       loc: {
         start: {line: 1, column: 1},
         end: {line: 1, column: 25}
@@ -5575,7 +5562,6 @@ test("(function* () { yield\nv })", {
         }
       },
       generator: true,
-      expression: false,
       loc: {
         start: {line: 1, column: 1},
         end: {line: 2, column: 3}
@@ -5636,7 +5622,6 @@ test("(function* () { yield *v })", {
         }
       },
       generator: true,
-      expression: false,
       loc: {
         start: {line: 1, column: 1},
         end: {line: 1, column: 26}
@@ -5701,7 +5686,6 @@ test("function* test () { yield *v }", {
       }
     },
     generator: true,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 30}
@@ -5778,7 +5762,6 @@ test("var x = { *test () { yield *v } };", {
               }
             },
             generator: true,
-            expression: false,
             loc: {
               start: {line: 1, column: 16},
               end: {line: 1, column: 31}
@@ -5827,7 +5810,6 @@ test("function* foo() { console.log(yield); }", {
         type: "Identifier",
       },
       generator: true,
-      expression: false,
       params: [],
       body: {
         body: [
@@ -5888,7 +5870,6 @@ test("function* t() {}", {
       }
     },
     generator: true,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 16}
@@ -5952,7 +5933,6 @@ test("(function* () { yield yield 10 })", {
         }
       },
       generator: true,
-      expression: false,
       loc: {
         start: {line: 1, column: 1},
         end: {line: 1, column: 32}
@@ -6473,7 +6453,6 @@ test("class A {get() {}}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 12},
             end: {line: 1, column: 17}
@@ -6545,7 +6524,6 @@ test("class A { static get() {}}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 20},
             end: {line: 1, column: 25}
@@ -6624,7 +6602,6 @@ test("class A extends B {get foo() {}}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 26},
             end: {line: 1, column: 31}
@@ -6703,7 +6680,6 @@ test("class A extends B { static get foo() {}}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 34},
             end: {line: 1, column: 39}
@@ -6782,7 +6758,6 @@ test("class A {set a(v) {}}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 14},
             end: {line: 1, column: 20}
@@ -6861,7 +6836,6 @@ test("class A { static set a(v) {}}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 22},
             end: {line: 1, column: 28}
@@ -6940,7 +6914,6 @@ test("class A {set(v) {};}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 12},
             end: {line: 1, column: 18}
@@ -7019,7 +6992,6 @@ test("class A { static set(v) {};}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 20},
             end: {line: 1, column: 26}
@@ -7120,7 +7092,6 @@ test("class A {*gen(v) { yield v; }}", {
             }
           },
           generator: true,
-          expression: false,
           loc: {
             start: {line: 1, column: 13},
             end: {line: 1, column: 29}
@@ -7221,7 +7192,6 @@ test("class A { static *gen(v) { yield v; }}", {
             }
           },
           generator: true,
-          expression: false,
           loc: {
             start: {line: 1, column: 21},
             end: {line: 1, column: 37}
@@ -7294,7 +7264,6 @@ test("(class { *static() {} })", {
                 "end": 21,
                 "id": null,
                 "generator": true,
-                "expression": false,
                 "params": [],
                 "body": {
                   "type": "BlockStatement",
@@ -7400,7 +7369,6 @@ test("\"use strict\"; (class A extends B {constructor() { super() }})", {
                 }
               },
               generator: false,
-              expression: false,
               loc: {
                 start: {line: 1, column: 45},
                 end: {line: 1, column: 59}
@@ -7463,7 +7431,6 @@ test("class A {'constructor'() {}}", {
           type: "FunctionExpression",
           id: null,
           generator: false,
-          expression: false,
           params: [],
           body: {
             type: "BlockStatement",
@@ -7520,7 +7487,6 @@ test("class A { get ['constructor']() {} }", {
               "id": null,
               "params": [],
               "generator": false,
-              "expression": false,
               "body": {
                 "type": "BlockStatement",
                 "start": 32,
@@ -7577,7 +7543,6 @@ test("class A {static foo() {}}", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 19},
             end: {line: 1, column: 24}
@@ -7650,7 +7615,6 @@ test("class A {foo() {} static bar() {}}", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 12},
               end: {line: 1, column: 17}
@@ -7687,7 +7651,6 @@ test("class A {foo() {} static bar() {}}", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 28},
               end: {line: 1, column: 33}
@@ -7763,7 +7726,6 @@ test("class A { foo() {} bar() {}}", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 13},
               end: {line: 1, column: 18}
@@ -7800,7 +7762,6 @@ test("class A { foo() {} bar() {}}", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 22},
               end: {line: 1, column: 27}
@@ -7874,7 +7835,6 @@ test("class A { get foo() {} set foo(v) {}}", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 17},
               end: {line: 1, column: 22}
@@ -7918,7 +7878,6 @@ test("class A { get foo() {} set foo(v) {}}", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 30},
               end: {line: 1, column: 36}
@@ -7992,7 +7951,6 @@ test("class A { static get foo() {} get foo() {}}", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 24},
               end: {line: 1, column: 29}
@@ -8029,7 +7987,6 @@ test("class A { static get foo() {} get foo() {}}", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 37},
               end: {line: 1, column: 42}
@@ -8103,7 +8060,6 @@ test("class A { static get foo() {} static get bar() {} }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 24},
               end: {line: 1, column: 29}
@@ -8140,7 +8096,6 @@ test("class A { static get foo() {} static get bar() {} }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 44},
               end: {line: 1, column: 49}
@@ -8214,7 +8169,6 @@ test("class A { static get foo() {} static set foo(v) {} get foo() {} set foo(v)
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 24},
               end: {line: 1, column: 29}
@@ -8258,7 +8212,6 @@ test("class A { static get foo() {} static set foo(v) {} get foo() {} set foo(v)
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 44},
               end: {line: 1, column: 50}
@@ -8295,7 +8248,6 @@ test("class A { static get foo() {} static set foo(v) {} get foo() {} set foo(v)
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 58},
               end: {line: 1, column: 63}
@@ -8339,7 +8291,6 @@ test("class A { static get foo() {} static set foo(v) {} get foo() {} set foo(v)
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 71},
               end: {line: 1, column: 77}
@@ -8434,8 +8385,7 @@ test("class A { static [foo]() {} }", {
               end: {line: 1, column: 27}
             },
             body: []
-          },
-          expression: false
+          }
         }
       }]
     }
@@ -8510,8 +8460,7 @@ test("class A { static get [foo]() {} }", {
               end: {line: 1, column: 31}
             },
             body: []
-          },
-          expression: false
+          }
         }
       }]
     }
@@ -8569,7 +8518,6 @@ test("class A { set foo(v) {} get foo() {} }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 17},
               end: {line: 1, column: 23}
@@ -8606,7 +8554,6 @@ test("class A { set foo(v) {} get foo() {} }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 31},
               end: {line: 1, column: 36}
@@ -8701,8 +8648,7 @@ test("class A { foo() {} get foo() {} }",{
                 end: {line: 1, column: 18}
               },
               body: []
-            },
-            expression: false
+            }
           }
         },
         {
@@ -8738,8 +8684,7 @@ test("class A { foo() {} get foo() {} }",{
                 end: {line: 1, column: 31}
               },
               body: []
-            },
-            expression: false
+            }
           }
         }
       ]
@@ -8944,7 +8889,6 @@ test("({[x]: function() {}})", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 7},
             end: {line: 1, column: 20}
@@ -9093,7 +9037,6 @@ test("({get [x]() {}, set [x](v) {}})", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 9},
               end: {line: 1, column: 14}
@@ -9138,7 +9081,6 @@ test("({get [x]() {}, set [x](v) {}})", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 23},
               end: {line: 1, column: 29}
@@ -9203,7 +9145,6 @@ test("({[x]() {}})", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 5},
             end: {line: 1, column: 10}
@@ -9388,7 +9329,6 @@ test("function f({[x]: y}) {}", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 23}
@@ -9465,7 +9405,6 @@ test("var x = {*[test]() { yield *v; }}", {
               }
             },
             generator: true,
-            expression: false,
             loc: {
               start: {line: 1, column: 16},
               end: {line: 1, column: 32}
@@ -9566,8 +9505,7 @@ test("class A {[x]() {}}", {
               end: {line: 1, column: 17}
             },
             body: []
-          },
-          expression: false
+          }
         }
       }]
     }
@@ -9641,7 +9579,6 @@ test("function f([x] = [1]) {}", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 24}
@@ -9733,7 +9670,6 @@ test("function f([x] = [1]) { 'use strict' }", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 38}
@@ -9846,7 +9782,6 @@ test("function f({x} = {x: 10}) {}", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 28}
@@ -9965,7 +9900,6 @@ test("f = function({x} = {x: 10}) {}", {
           }
         },
         generator: false,
-        expression: false,
         loc: {
           start: {line: 1, column: 4},
           end: {line: 1, column: 30}
@@ -10095,7 +10029,6 @@ test("({f: function({x} = {x: 10}) {}})", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 5},
             end: {line: 1, column: 31}
@@ -10234,7 +10167,6 @@ test("({f({x} = {x: 10}) {}})", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 3},
             end: {line: 1, column: 21}
@@ -10377,7 +10309,6 @@ test("(class {f({x} = {x: 10}) {}})", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 9},
               end: {line: 1, column: 27}
@@ -10579,7 +10510,6 @@ test("x = function(y = 1) {}", {
           }
         },
         generator: false,
-        expression: false,
         loc: {
           start: {line: 1, column: 4},
           end: {line: 1, column: 22}
@@ -10650,7 +10580,6 @@ test("function f(a = 1) {}", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 20}
@@ -10729,7 +10658,6 @@ test("x = { f: function(a=1) {} }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 9},
               end: {line: 1, column: 25}
@@ -10832,7 +10760,6 @@ test("x = { f(a=1) {} }", {
               }
             },
             generator: false,
-            expression: false,
             loc: {
               start: {line: 1, column: 7},
               end: {line: 1, column: 15}
@@ -10916,7 +10843,6 @@ test("function f(a, ...b) {}", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 22}
@@ -10980,7 +10906,6 @@ test("function x([ a, b ]){}", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 22}
@@ -11080,7 +11005,6 @@ test("function x({ a, b }){}", {
       }
     },
     generator: false,
-    expression: false,
     loc: {
       start: {line: 1, column: 0},
       end: {line: 1, column: 22}
@@ -11150,7 +11074,6 @@ test("(function x([ a, b ]){})", {
         }
       },
       generator: false,
-      expression: false,
       loc: {
         start: {line: 1, column: 1},
         end: {line: 1, column: 23}
@@ -11257,7 +11180,6 @@ test("(function x({ a, b }){})", {
         }
       },
       generator: false,
-      expression: false,
       loc: {
         start: {line: 1, column: 1},
         end: {line: 1, column: 23}
@@ -11337,7 +11259,6 @@ test("({ x([ a, b ]){} })", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 4},
             end: {line: 1, column: 16}
@@ -11428,7 +11349,6 @@ test("({ x(...[ a, b ]){} })", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 4},
             end: {line: 1, column: 19}
@@ -11664,7 +11584,6 @@ test("({ x({ a: { w, x }, b: [y, z] }, ...[a, b, c]){} })", {
             }
           },
           generator: false,
-          expression: false,
           loc: {
             start: {line: 1, column: 4},
             end: {line: 1, column: 48}
@@ -13431,7 +13350,6 @@ test("(function () { yield* 10 })", {
         }
       },
       generator: false,
-      expression: false,
       loc: {
         start: {line: 1, column: 1},
         end: {line: 1, column: 26}
@@ -13716,8 +13634,7 @@ test('function normal(x, y = 10) {}', {
     body: {
       type: "BlockStatement",
       body: []
-    },
-    expression: false
+    }
   }]
 }, {ecmaVersion: 6});
 
@@ -14379,8 +14296,7 @@ test("class A { static() {} }", {
             type: "BlockStatement",
             range: [19, 21],
             body: []
-          },
-          expression: false
+          }
         }
       }]
     }
@@ -14476,8 +14392,7 @@ test("class A { *static() {} }", {
             type: "BlockStatement",
             range: [20, 22],
             body: []
-          },
-          expression: false
+          }
         }
       }]
     }
@@ -14869,8 +14784,7 @@ test("function foo() { new.target; }", {
           }
         ]
       },
-      generator: false,
-      expression: false
+      generator: false
     }
   ],
   sourceType: "script"
@@ -14890,7 +14804,6 @@ test("export default function foo() {} false", {
           type: "Identifier"
         },
         generator: false,
-        expression: false,
         params: [],
         body: {
           body: [],
@@ -15156,7 +15069,6 @@ test("function foo() { return {arguments} }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "params": [],
             "body": {
                 "type": "BlockStatement",
@@ -15218,7 +15130,6 @@ test("function foo() { return {eval} }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "params": [],
             "body": {
                 "type": "BlockStatement",
@@ -15280,7 +15191,6 @@ test("function foo() { 'use strict'; return {arguments} }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "params": [],
             "body": {
                 "type": "BlockStatement",
@@ -15354,7 +15264,6 @@ test("function foo() { 'use strict'; return {eval} }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "params": [],
             "body": {
                 "type": "BlockStatement",
@@ -15429,7 +15338,6 @@ test("function foo() { return {yield} }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "params": [],
             "body": {
                 "type": "BlockStatement",
@@ -15504,7 +15412,6 @@ test("function* foo(a = function*(b) { yield b }) { }", {
                 "name": "foo"
             },
             "generator": true,
-            "expression": false,
             "params": [
                 {
                     "type": "AssignmentPattern",
@@ -15522,7 +15429,6 @@ test("function* foo(a = function*(b) { yield b }) { }", {
                         "end": 42,
                         "id": null,
                         "generator": true,
-                        "expression": false,
                         "params": [
                             {
                                 "type": "Identifier",
@@ -15587,7 +15493,6 @@ test("function* yield() {}", {
                 "name": "yield"
             },
             "generator": true,
-            "expression": false,
             "params": [],
             "body": {
                 "type": "BlockStatement",
@@ -15633,7 +15538,6 @@ test("({*yield() {}})", {
                             "end": 13,
                             "id": null,
                             "generator": true,
-                            "expression": false,
                             "params": [],
                             "body": {
                                 "type": "BlockStatement",
@@ -15691,7 +15595,6 @@ test("class A {*yield() {}}", {
                             "end": 20,
                             "id": null,
                             "generator": true,
-                            "expression": false,
                             "params": [],
                             "body": {
                                 "type": "BlockStatement",
@@ -15738,7 +15641,6 @@ test("function* foo(a = function* foo() { yield b }) {}", {
         "name": "foo"
       },
       "generator": true,
-      "expression": false,
       "params": [
         {
           "type": "AssignmentPattern",
@@ -15761,7 +15663,6 @@ test("function* foo(a = function* foo() { yield b }) {}", {
               "name": "foo"
             },
             "generator": true,
-            "expression": false,
             "params": [],
             "body": {
               "type": "BlockStatement",
@@ -15816,7 +15717,6 @@ test("function* foo(a = {*bar() { yield b }}) {}", {
         "name": "foo"
       },
       "generator": true,
-      "expression": false,
       "params": [
         {
           "type": "AssignmentPattern",
@@ -15852,7 +15752,6 @@ test("function* foo(a = {*bar() { yield b }}) {}", {
                   "end": 37,
                   "id": null,
                   "generator": true,
-                  "expression": false,
                   "params": [],
                   "body": {
                     "type": "BlockStatement",
@@ -15911,7 +15810,6 @@ test("function* foo(a = class {*bar() { yield b }}) {}", {
         "name": "foo"
       },
       "generator": true,
-      "expression": false,
       "params": [
         {
           "type": "AssignmentPattern",
@@ -15953,7 +15851,6 @@ test("function* foo(a = class {*bar() { yield b }}) {}", {
                     "end": 43,
                     "id": null,
                     "generator": true,
-                    "expression": false,
                     "params": [],
                     "body": {
                       "type": "BlockStatement",
@@ -16014,7 +15911,6 @@ test("function* wrap() {\n(a = yield b)\n}", {
         "name": "wrap"
       },
       "generator": true,
-      "expression": false,
       "params": [],
       "body": {
         "type": "BlockStatement",
@@ -16075,7 +15971,6 @@ test("function* wrap() {\n({a = yield b} = obj)\n}", {
       },
       "params": [],
       "generator": true,
-      "expression": false,
       "body": {
         "type": "BlockStatement",
         "start": 17,
@@ -16876,7 +16771,6 @@ test("for (function (){ a in b };;);", {
           }
         },
         id: null,
-        expression: false,
         generator: false,
         async: false,
         params: [],
