@@ -42,3 +42,13 @@ driver.testAssert("async function f() { await /a*/ }", function() {
 driver.testAssert("async function* f() { await /a*/ }", function() {
   return tokenizesRegexp("async function* f() { await /a*/ }") ? null : "expected a regexp after await"
 }, opts)
+
+// The async marking is read off the `function` keyword, whose updateContext
+// handler is shared with `class`, and async functions are ES2017. Neither an
+// async class nor an older ecmaVersion may put the tokenizer in an async context.
+driver.testAssert("async function f() { await /a*/ }", function() {
+  if (tokenizesRegexp("async class C { m() { await /a*/ } }")) return "expected division inside an async class"
+  if (tokenizesRegexp("async function f() { await /a*/ }", {ecmaVersion: 7})) return "expected division below ES2017"
+  if (!tokenizesRegexp("async function f() { await /a*/ }", {ecmaVersion: 8})) return "expected a regexp after await in ES2017"
+  return null
+}, opts)

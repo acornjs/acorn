@@ -137,7 +137,8 @@ tt.incDec.updateContext = function() {
 }
 
 tt._function.updateContext = tt._class.updateContext = function(prevType) {
-  let isAsync = prevType === tt.name &&
+  let isAsync = this.type === tt._function && this.options.ecmaVersion >= 8 &&
+    prevType === tt.name &&
     this.input.slice(this.lastTokStart, this.lastTokEnd) === "async" &&
     !lineBreak.test(this.input.slice(this.lastTokEnd, this.start))
   if (prevType.beforeExpr && prevType !== tt._else &&
