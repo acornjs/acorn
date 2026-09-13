@@ -24,7 +24,6 @@ test("function foo() { }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "async": false,
             "params": [],
             "body": {
@@ -55,7 +54,6 @@ test("async function foo() { }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "async": true,
             "params": [],
             "body": {
@@ -97,7 +95,6 @@ test("async\nfunction foo() { }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "async": false,
             "params": [],
             "body": {
@@ -132,7 +129,6 @@ test("export async function foo() { }", {
                     "name": "foo"
                 },
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -165,7 +161,6 @@ test("export default async function() { }", {
                 "end": 35,
                 "id": null,
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -200,7 +195,6 @@ test("async function await() { }", {
                 "name": "await"
             },
             "generator": false,
-            "expression": false,
             "async": true,
             "params": [],
             "body": {
@@ -243,7 +237,6 @@ test("(function foo() { })", {
                     "name": "foo"
                 },
                 "generator": false,
-                "expression": false,
                 "async": false,
                 "params": [],
                 "body": {
@@ -279,7 +272,6 @@ test("(async function foo() { })", {
                     "name": "foo"
                 },
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -316,7 +308,6 @@ test("export default (async function() { })", {
                 "end": 36,
                 "id": null,
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -921,7 +912,6 @@ test("({foo() { }})", {
                             "end": 11,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": false,
                             "params": [],
                             "body": {
@@ -974,7 +964,6 @@ test("({async foo() { }})", {
                             "end": 17,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": true,
                             "params": [],
                             "body": {
@@ -1027,7 +1016,6 @@ test("({async() { }})", {
                             "end": 13,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": false,
                             "params": [],
                             "body": {
@@ -1088,7 +1076,6 @@ test("({async await() { }})", {
                             "end": 19,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": true,
                             "params": [],
                             "body": {
@@ -1160,7 +1147,6 @@ test("class A {foo() { }}", {
                             "end": 18,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": false,
                             "params": [],
                             "body": {
@@ -1219,7 +1205,6 @@ test("class A {async foo() { }}", {
                             "end": 24,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": true,
                             "params": [],
                             "body": {
@@ -1276,7 +1261,6 @@ test("class A {static async foo() { }}", {
                             "end": 31,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": true,
                             "params": [],
                             "body": {
@@ -1335,7 +1319,6 @@ test("class A {async() { }}", {
                             "end": 20,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": false,
                             "params": [],
                             "body": {
@@ -1392,7 +1375,6 @@ test("class A {static async() { }}", {
                             "end": 27,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": false,
                             "params": [],
                             "body": {
@@ -1449,7 +1431,6 @@ test("class A {*async() { }}", {
                             "end": 21,
                             "id": null,
                             "generator": true,
-                            "expression": false,
                             "async": false,
                             "params": [],
                             "body": {
@@ -1506,7 +1487,6 @@ test("class A {static* async() { }}", {
                             "end": 28,
                             "id": null,
                             "generator": true,
-                            "expression": false,
                             "async": false,
                             "params": [],
                             "body": {
@@ -1578,7 +1558,6 @@ test("class A {async await() { }}", {
                             "end": 26,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": true,
                             "params": [],
                             "body": {
@@ -1635,7 +1614,6 @@ test("class A {static async await() { }}", {
                             "end": 33,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": true,
                             "params": [],
                             "body": {
@@ -1706,7 +1684,6 @@ test("async function foo(a, b) { await a }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "async": true,
             "params": [
                 {
@@ -1769,7 +1746,6 @@ test("(async function foo(a) { await a })", {
                     "name": "foo"
                 },
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [
                     {
@@ -1881,7 +1857,6 @@ test("({async foo(a) { await a }})", {
                             "end": 26,
                             "id": null,
                             "generator": false,
-                            "expression": false,
                             "async": true,
                             "params": [
                                 {
@@ -1962,7 +1937,6 @@ test("(class {async foo(a) { await a }})", {
                                 "end": 32,
                                 "id": null,
                                 "generator": false,
-                                "expression": false,
                                 "async": true,
                                 "params": [
                                     {
@@ -2022,7 +1996,6 @@ test("async function foo(a, b) { await a + await b }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "async": true,
             "params": [
                 {
@@ -2100,7 +2073,6 @@ test("function foo() { await + 1 }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "async": false,
             "params": [],
             "body": {
@@ -2156,7 +2128,6 @@ test("async function foo() { await + 1 }", {
                 "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "async": true,
             "params": [],
             "body": {
@@ -2228,7 +2199,6 @@ test("async function foo(a = async function foo() { await b }) {}", {
         "name": "foo"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [
         {
@@ -2252,7 +2222,6 @@ test("async function foo(a = async function foo() { await b }) {}", {
               "name": "foo"
             },
             "generator": false,
-            "expression": false,
             "async": true,
             "params": [],
             "body": {
@@ -2307,7 +2276,6 @@ test("async function foo(a = async () => await b) {}", {
         "name": "foo"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [
         {
@@ -2369,7 +2337,6 @@ test("async function foo(a = {async bar() { await b }}) {}", {
         "name": "foo"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [
         {
@@ -2406,7 +2373,6 @@ test("async function foo(a = {async bar() { await b }}) {}", {
                   "end": 47,
                   "id": null,
                   "generator": false,
-                  "expression": false,
                   "async": true,
                   "params": [],
                   "body": {
@@ -2465,7 +2431,6 @@ test("async function foo(a = class {async bar() { await b }}) {}", {
         "name": "foo"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [
         {
@@ -2508,7 +2473,6 @@ test("async function foo(a = class {async bar() { await b }}) {}", {
                     "end": 53,
                     "id": null,
                     "generator": false,
-                    "expression": false,
                     "async": true,
                     "params": [],
                     "body": {
@@ -2569,7 +2533,6 @@ test("async function wrap() {\n(a = await b)\n}", {
         "name": "wrap"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [],
       "body": {
@@ -2629,7 +2592,6 @@ test("async function wrap() {\n({a = await b} = obj)\n}", {
         "name": "wrap"
       },
       "generator": false,
-      "expression": false,
       "async": true,
       "params": [],
       "body": {
@@ -2723,7 +2685,6 @@ test("function* wrap() {\nasync(a = yield b)\n}", {
       },
       "params": [],
       "generator": true,
-      "expression": false,
       "async": false,
       "body": {
         "type": "BlockStatement",
@@ -3331,7 +3292,6 @@ test(
                 "end": 17,
                 "id": null,
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -3387,7 +3347,6 @@ test(
                 "end": 17,
                 "id": null,
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -3443,7 +3402,6 @@ test(
                 "end": 15,
                 "id": null,
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
@@ -3498,7 +3456,6 @@ test(
                 "end": 17,
                 "id": null,
                 "generator": false,
-                "expression": false,
                 "async": true,
                 "params": [],
                 "body": {
