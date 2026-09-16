@@ -40,7 +40,7 @@
     "@babel/preset-env": "^7.29.2",
     "@eslint/js": "^9.39.2",
     "@rollup/plugin-buble": "^1.0.3",
-    "@unicode/unicode-17.0.0": "^1.6.16",
+    "@unicode/unicode-18.0.0": "^2.0.7",
     "eslint": "^9.39.2",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-n": "^17.23.1",
