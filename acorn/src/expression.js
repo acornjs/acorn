@@ -342,6 +342,7 @@ pp.parseSubscripts = function(base, startPos, startLoc, noCalls, forInit) {
     }
 
     base = element
+    maybeAsyncArrow = false
   }
 }
 

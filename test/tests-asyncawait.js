@@ -3551,3 +3551,5 @@ testFail("async () => class { x = await }", "Cannot use keyword 'await' outside 
          {ecmaVersion: 2024, sourceType: "module"})
 
 testFail("async function\\u1111() { }", "Unexpected token (1:20)", {ecmaVersion: 8})
+
+testFail("async(a)(b) => 1", "Unexpected token (1:12)", {ecmaVersion: 8})
