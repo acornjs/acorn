@@ -875,7 +875,8 @@ pp.parseClassStaticBlock = function(node) {
 pp.parseClassId = function(node, isStatement) {
   if (this.type === tt.name) {
     node.id = this.parseIdent()
-    this.checkLValSimple(node.id, BIND_LEXICAL, false)
+    if (isStatement)
+      this.checkLValSimple(node.id, BIND_LEXICAL, false)
   } else {
     if (isStatement === true)
       this.unexpected()
