@@ -877,6 +877,8 @@ pp.parseClassId = function(node, isStatement) {
     node.id = this.parseIdent()
     if (isStatement)
       this.checkLValSimple(node.id, BIND_LEXICAL, false)
+    else if (this.strict && this.reservedWordsStrictBind.test(node.id.name))
+      this.raiseRecoverable(node.id.start, `Binding ${node.id.name} in strict mode`)
   } else {
     if (isStatement === true)
       this.unexpected()
