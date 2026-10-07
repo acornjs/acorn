@@ -17026,3 +17026,6 @@ test("for ([{a = 0}] = [] ;;) ;", {}, {ecmaVersion: 6})
 test("({a = 0}) => 0;", {}, {ecmaVersion: 6})
 test("async ({a = 0}) => 0;", {}, {ecmaVersion: 2022})
 test("[{a: 0}.x] = [];", {}, {ecmaVersion: 6})
+
+testFail("(class arguments {})", "Binding arguments in strict mode (1:7)", {ecmaVersion: 6})
+testFail("(class eval {})", "Binding eval in strict mode (1:7)", {ecmaVersion: 6})
