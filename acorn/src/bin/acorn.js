@@ -52,6 +52,8 @@ function run(codeList) {
         } while (token.type !== acorn.tokTypes.eof)
       }
     })
+
+    
   } catch (e) {
     console.error(fileMode ? e.message.replace(/\(\d+:\d+\)$/, m => m.slice(0, 1) + inputFilePaths[fileIdx] + " " + m.slice(1)) : e.message)
     process.exit(1)
