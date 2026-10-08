@@ -63,7 +63,7 @@ export default [
       "bin/generate-unicode-script-values.js"
     ],
     languageOptions: {
-      ecmaVersion: 2022
+      ecmaVersion: 2022 
     },
     rules: {
       "no-console": "off"

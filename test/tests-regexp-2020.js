@@ -3,6 +3,7 @@ if (typeof exports !== "undefined") {
   var testFail = require("./driver.js").testFail
 }
 
+
 // https://github.com/tc39/ecma262/pull/1869
 testFail("/(?<\\ud835\\udc9c>.)/", "Invalid regular expression: /(?<\\ud835\\udc9c>.)/: Invalid capture group name (1:1)", { ecmaVersion: 2019 })
 test("/(?<\\ud835\\udc9c>.)/", {}, { ecmaVersion: 2020 })

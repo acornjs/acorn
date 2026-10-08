@@ -193,7 +193,7 @@ test("async function f() { for await (let x of xs); }", {
     }
   ],
   "sourceType": "script"
-}, { ecmaVersion: 9 })
+}, { ecmaVersion: 9})
 test("async function f() { for\nawait (x of xs); }", {
   "type": "Program",
   "start": 0,
