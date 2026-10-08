@@ -1,6 +1,6 @@
 import {types as tt} from "./tokentype.js"
 import {Parser} from "./state.js"
-import {lineBreak, skipWhiteSpace} from "./whitespace.js"
+import {lineBreak, whitespaceRE} from "./whitespace.js"
 import {isIdentifierChar} from "./identifier.js"
 
 const pp = Parser.prototype
@@ -10,15 +10,16 @@ const pp = Parser.prototype
 const literal = /^(?:'((?:\\[^]|[^'\\])*?)'|"((?:\\[^]|[^"\\])*?)")/
 pp.strictDirective = function(start) {
   if (this.options.ecmaVersion < 5) return false
+  let skip = whitespaceRE(this.inModule)
   for (;;) {
     // Try to find string literal.
-    skipWhiteSpace.lastIndex = start
-    start += skipWhiteSpace.exec(this.input)[0].length
+    skip.lastIndex = start
+    start += skip.exec(this.input)[0].length
     let match = literal.exec(this.input.slice(start))
     if (!match) return false
     if ((match[1] || match[2]) === "use strict") {
-      skipWhiteSpace.lastIndex = start + match[0].length
-      let spaceAfter = skipWhiteSpace.exec(this.input), end = spaceAfter.index + spaceAfter[0].length
+      skip.lastIndex = start + match[0].length
+      let spaceAfter = skip.exec(this.input), end = spaceAfter.index + spaceAfter[0].length
       let next = this.input.charAt(end)
       return next === ";" || next === "}" ||
         (lineBreak.test(spaceAfter[0]) &&
@@ -29,8 +30,8 @@ pp.strictDirective = function(start) {
     start += match[0].length
 
     // Skip semicolon, if any.
-    skipWhiteSpace.lastIndex = start
-    start += skipWhiteSpace.exec(this.input)[0].length
+    skip.lastIndex = start
+    start += skip.exec(this.input)[0].length
     if (this.input[start] === ";")
       start++
   }

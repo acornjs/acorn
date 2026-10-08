@@ -1,6 +1,6 @@
 import {types as tt} from "./tokentype.js"
 import {Parser} from "./state.js"
-import {lineBreak, skipWhiteSpace} from "./whitespace.js"
+import {lineBreak, whitespaceRE} from "./whitespace.js"
 import {isIdentifierStart, isIdentifierChar, keywordRelationalOperator} from "./identifier.js"
 import {hasOwn, loneSurrogate} from "./util.js"
 import {DestructuringErrors} from "./parseutil.js"
@@ -35,8 +35,9 @@ const loopLabel = {kind: "loop"}, switchLabel = {kind: "switch"}
 
 pp.isLet = function(context) {
   if (this.options.ecmaVersion < 6 || !this.isContextual("let")) return false
-  skipWhiteSpace.lastIndex = this.pos
-  let skip = skipWhiteSpace.exec(this.input)
+  let skipRE = whitespaceRE(this.inModule)
+  skipRE.lastIndex = this.pos
+  let skip = skipRE.exec(this.input)
   let next = this.pos + skip[0].length, nextCh = this.fullCharCodeAt(next)
   // For ambiguous cases, determine if a LexicalDeclaration (or only a
   // Statement) is allowed here. If context is not empty then only a Statement
@@ -64,8 +65,9 @@ pp.isAsyncFunction = function() {
   if (this.options.ecmaVersion < 8 || !this.isContextual("async"))
     return false
 
-  skipWhiteSpace.lastIndex = this.pos
-  let skip = skipWhiteSpace.exec(this.input)
+  let skipRE = whitespaceRE(this.inModule)
+  skipRE.lastIndex = this.pos
+  let skip = skipRE.exec(this.input)
   let next = this.pos + skip[0].length, after
   return !lineBreak.test(this.input.slice(this.pos, next)) &&
     this.input.slice(next, next + 8) === "function" &&
@@ -77,8 +79,9 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
   if (this.options.ecmaVersion < 17 || !this.isContextual(isAwaitUsing ? "await" : "using"))
     return false
 
-  skipWhiteSpace.lastIndex = this.pos
-  let skip = skipWhiteSpace.exec(this.input)
+  let skipRE = whitespaceRE(this.inModule)
+  skipRE.lastIndex = this.pos
+  let skip = skipRE.exec(this.input)
   let next = this.pos + skip[0].length
 
   if (lineBreak.test(this.input.slice(this.pos, next))) return false
@@ -91,8 +94,8 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
       after === 92 /* '\' */
     ) return false
 
-    skipWhiteSpace.lastIndex = usingEndPos
-    let skipAfterUsing = skipWhiteSpace.exec(this.input)
+    skipRE.lastIndex = usingEndPos
+    let skipAfterUsing = skipRE.exec(this.input)
     next = usingEndPos + skipAfterUsing[0].length
     if (skipAfterUsing && lineBreak.test(this.input.slice(usingEndPos, next))) return false
   }
@@ -107,8 +110,8 @@ pp.isUsingKeyword = function(isAwaitUsing, isFor) {
   if (keywordRelationalOperator.test(id)) return false
   if (isFor && !isAwaitUsing && id === "of") {
     // Look ahead for using declaration with initializer, i.e., `for (using of = ...)`
-    skipWhiteSpace.lastIndex = next
-    const skipAfterOf = skipWhiteSpace.exec(this.input)
+    skipRE.lastIndex = next
+    const skipAfterOf = skipRE.exec(this.input)
     next = next + skipAfterOf[0].length
     if (this.input.charCodeAt(next) !== 61 /* '=' */ ||
       // Check for ==, === and => operators
@@ -176,8 +179,9 @@ pp.parseStatement = function(context, topLevel, exports) {
   case tt._export:
   case tt._import:
     if (this.options.ecmaVersion > 10 && starttype === tt._import) {
-      skipWhiteSpace.lastIndex = this.pos
-      let skip = skipWhiteSpace.exec(this.input)
+      let skipRE = whitespaceRE(this.inModule)
+      skipRE.lastIndex = this.pos
+      let skip = skipRE.exec(this.input)
       let next = this.pos + skip[0].length, nextCh = this.input.charCodeAt(next)
       if (nextCh === 40 || nextCh === 46) // '(' or '.'
         return this.parseExpressionStatement(node, this.parseExpression())

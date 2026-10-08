@@ -17031,3 +17031,4 @@ testFail("(class arguments {})", "Binding arguments in strict mode (1:7)", {ecma
 testFail("(class eval {})", "Binding eval in strict mode (1:7)", {ecmaVersion: 6})
 
 test("let<!-- c\nx = 1", {"body": [{"type": "VariableDeclaration"}]}, {ecmaVersion: 6})
+test("let\n--> c\nx = 1", {"body": [{"type": "VariableDeclaration"}]}, {ecmaVersion: 6})
