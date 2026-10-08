@@ -37,7 +37,10 @@ function writeGeneratedFile(filename, content) {
  * Gets the all unicode script values from the latest PropertyValueAliases.
  */
 async function * getLatestUnicodeScriptValues() {
-  const response = await fetch("https://unicode.org/Public/UCD/latest/ucd/PropertyValueAliases.txt")
+  // Fetch from a specific, pinned Unicode version rather than the "latest"
+  // endpoint, which can change its contents without notice and would make
+  // the generated output non-reproducible and unverifiable.
+  const response = await fetch("https://unicode.org/Public/18.0.0/ucd/PropertyValueAliases.txt")
   const lines = (await response.text()).split("\n")
   for (const line of lines) {
     if (!line || line.startsWith("#")) {
