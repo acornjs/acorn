@@ -19,4 +19,4 @@ export function nextLineBreak(code, from, end = code.length) {
 
 export const nonASCIIwhitespace = /[\u1680\u2000-\u200a\u202f\u205f\u3000\ufeff]/
 
-export const skipWhiteSpace = /(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g
+export const skipWhiteSpace = /(?:\s|\/\/.*|<!--.*|\/\*[^]*?\*\/)*/g
