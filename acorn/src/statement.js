@@ -610,7 +610,7 @@ pp.parseVar = function(node, isFor, kind, allowMissingInitializer) {
     this.parseVarId(decl, kind)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
-    } else if (!allowMissingInitializer && kind === "const" && !(this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
+    } else if (!allowMissingInitializer && kind === "const" && !(isFor && (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))))) {
       this.unexpected()
     } else if (!allowMissingInitializer && (kind === "using" || kind === "await using") && this.options.ecmaVersion >= 17 && this.type !== tt._in && !this.isContextual("of")) {
       this.raise(this.lastTokEnd, `Missing initializer in ${kind} declaration`)
