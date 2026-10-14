@@ -17033,4 +17033,4 @@ testFail("(class eval {})", "Binding eval in strict mode (1:7)", {ecmaVersion: 6
 test("let<!-- c\nx = 1", {"body": [{"type": "VariableDeclaration"}]}, {ecmaVersion: 6})
 test("let\n--> c\nx = 1", {"body": [{"type": "VariableDeclaration"}]}, {ecmaVersion: 6})
 
-testFail("const x\nof", "Unexpected token (2:0)", {ecmaVersion: 6})
+testFail("const x\nof", "Missing initializer in const declaration (1:7)", {ecmaVersion: 6})

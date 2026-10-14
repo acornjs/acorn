@@ -610,12 +610,12 @@ pp.parseVar = function(node, isFor, kind, allowMissingInitializer) {
     this.parseVarId(decl, kind)
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor)
-    } else if (!allowMissingInitializer && kind === "const" && !(isFor && (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))))) {
-      this.unexpected()
-    } else if (!allowMissingInitializer && (kind === "using" || kind === "await using") && this.options.ecmaVersion >= 17 && this.type !== tt._in && !this.isContextual("of")) {
-      this.raise(this.lastTokEnd, `Missing initializer in ${kind} declaration`)
-    } else if (!allowMissingInitializer && decl.id.type !== "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
-      this.raise(this.lastTokEnd, "Complex binding patterns require an initialization value")
+    } else if (!allowMissingInitializer &&
+               (kind === "const" || kind === "using" || kind === "await using" || decl.id.type !== "Identifier") &&
+               !(isFor && (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))))) {
+      this.raise(this.lastTokEnd, decl.id.type !== "Identifier"
+                 ? "Complex binding patterns require an initialization value"
+                 : `Missing initializer in ${kind} declaration`)
     } else {
       decl.init = null
     }

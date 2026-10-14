@@ -3110,3 +3110,5 @@ test("for (await using of of []) {}", {
 testFail("for (;;) using x = resource", "Using declaration is not allowed in single-statement positions (1:9)", {ecmaVersion: 17, sourceType: "module"})
 
 testFail("if (true) await using x = resource", "Using declaration is not allowed in single-statement positions (1:10)", {ecmaVersion: 17, sourceType: "module"})
+
+testFail("() => { using x\nof }", "Missing initializer in using declaration (1:15)", {ecmaVersion: 17})

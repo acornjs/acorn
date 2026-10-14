@@ -28981,7 +28981,7 @@ test("const x = 14, y = 3, z = 1977", {
   }
 }, {ecmaVersion: 6, locations: true});
 
-testFail("const a;", "Unexpected token (1:7)", {ecmaVersion: 6});
+testFail("const a;", "Missing initializer in const declaration (1:7)", {ecmaVersion: 6});
 
 test("for(const x = 0;;);", {
   type: "Program",
