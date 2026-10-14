@@ -614,8 +614,8 @@ pp.parseVar = function(node, isFor, kind, allowMissingInitializer) {
                (kind === "const" || kind === "using" || kind === "await using" || decl.id.type !== "Identifier") &&
                !(isFor && (this.type === tt._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))))) {
       this.raise(this.lastTokEnd, decl.id.type !== "Identifier"
-                 ? "Complex binding patterns require an initialization value"
-                 : `Missing initializer in ${kind} declaration`)
+        ? "Complex binding patterns require an initialization value"
+        : `Missing initializer in ${kind} declaration`)
     } else {
       decl.init = null
     }
