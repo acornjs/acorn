@@ -1057,14 +1057,17 @@ pp.parseExprList = function(close, allowTrailingComma, allowEmpty, refDestructur
   return elts
 }
 
-pp.checkUnreserved = function({start, end, name}) {
+pp.checkUnreserved = function({start, end, name}, forLabel) {
   if (this.inGenerator && name === "yield")
     this.raiseRecoverable(start, "Cannot use 'yield' as identifier inside a generator")
   if (this.inAsync && name === "await")
     this.raiseRecoverable(start, "Cannot use 'await' as identifier inside an async function")
-  if (!(this.currentThisScope().flags & SCOPE_VAR) && name === "arguments")
+  // A LabelIdentifier is not an IdentifierReference, so `arguments` is a
+  // valid label (and break/continue target) even where ContainsArguments
+  // must be false (class field initializers and static blocks).
+  if (!forLabel && !(this.currentThisScope().flags & SCOPE_VAR) && name === "arguments")
     this.raiseRecoverable(start, "Cannot use 'arguments' in class field initializer")
-  if (this.inClassStaticBlock && (name === "arguments" || name === "await"))
+  if (this.inClassStaticBlock && (name === "await" || (!forLabel && name === "arguments")))
     this.raise(start, `Cannot use ${name} in class static initialization block`)
   if (this.keywords.test(name))
     this.raise(start, `Unexpected keyword '${name}'`)
@@ -1082,12 +1085,12 @@ pp.checkUnreserved = function({start, end, name}) {
 // when parsing properties), it will also convert keywords into
 // identifiers.
 
-pp.parseIdent = function(liberal) {
+pp.parseIdent = function(liberal, forLabel) {
   let node = this.parseIdentNode()
   this.next(!!liberal)
   this.finishNode(node, "Identifier")
   if (!liberal) {
-    this.checkUnreserved(node)
+    this.checkUnreserved(node, forLabel)
     if (node.name === "await" && !this.awaitIdentPos)
       this.awaitIdentPos = node.start
   }
