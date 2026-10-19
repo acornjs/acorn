@@ -1561,6 +1561,12 @@ test("class C { [arguments] = 0 }", {}, {ecmaVersion: 13})
 testFail("class C { aaa = arguments }", "Cannot use 'arguments' in class field initializer (1:16)", {ecmaVersion: 13})
 testFail("class C { aaa = { arguments } }", "Cannot use 'arguments' in class field initializer (1:18)", {ecmaVersion: 13})
 
+// arguments as a label is not an identifier reference (gh-1473)
+test("class C { aaa = () => { arguments: 1 } }", {}, {ecmaVersion: 13})
+test("class C { static { arguments: 1 } }", {}, {ecmaVersion: 13})
+test("class C { static { arguments: for (;;) { break arguments } } }", {}, {ecmaVersion: 13})
+testFail("class C { static { await: 1 } }", "Cannot use await in class static initialization block (1:19)", {ecmaVersion: 13})
+
 //------------------------------------------------------------------------------
 // Private Class Field
 //------------------------------------------------------------------------------
