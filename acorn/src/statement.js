@@ -228,7 +228,21 @@ pp.parseStatement = function(context, topLevel, exports) {
       return this.finishNode(node, "VariableDeclaration")
     }
 
-    let maybeName = this.value, expr = this.parseExpression()
+    let maybeName = this.value
+    if (starttype === tt.name && maybeName === "arguments") {
+      // Peek past whitespace/comments: when `arguments` is followed by a
+      // colon it starts a labeled statement, and the label check must not
+      // apply the class field/static block `arguments` restriction.
+      let skipRE = whitespaceRE(this.inModule)
+      skipRE.lastIndex = this.pos
+      let afterWhitespace = this.pos + skipRE.exec(this.input)[0].length
+      if (this.input.charCodeAt(afterWhitespace) === 58 /* ':' */) {
+        let label = this.parseIdent(false, true)
+        this.next() // eat the colon
+        return this.parseLabeledStatement(node, maybeName, label, context)
+      }
+    }
+    let expr = this.parseExpression()
     if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon))
       return this.parseLabeledStatement(node, maybeName, expr, context)
     else return this.parseExpressionStatement(node, expr)
@@ -241,7 +255,7 @@ pp.parseBreakContinueStatement = function(node, keyword) {
   if (this.eat(tt.semi) || this.insertSemicolon()) node.label = null
   else if (this.type !== tt.name) this.unexpected()
   else {
-    node.label = this.parseIdent()
+    node.label = this.parseIdent(false, true)
     this.semicolon()
   }
 
