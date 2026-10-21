@@ -149,3 +149,9 @@ export const types = {
   _void: kw("void", {beforeExpr: true, prefix: true, startsExpr: true}),
   _delete: kw("delete", {beforeExpr: true, prefix: true, startsExpr: true})
 }
+
+const keywordMap = typeof Map === "function" ? new Map(Object.entries(keywords)) : null
+
+export const getKeyword = keywordMap
+  ? name => keywordMap.get(name)
+  : name => keywords[name]

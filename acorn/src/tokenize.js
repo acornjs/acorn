@@ -1,5 +1,5 @@
 import {isIdentifierStart, isIdentifierChar} from "./identifier.js"
-import {types as tt, keywords as keywordTypes} from "./tokentype.js"
+import {types as tt, getKeyword} from "./tokentype.js"
 import {Parser} from "./state.js"
 import {SourceLocation} from "./locutil.js"
 import {RegExpValidationState} from "./regexp.js"
@@ -806,7 +806,7 @@ pp.readWord = function() {
   let word = this.readWord1()
   let type = tt.name
   if (this.keywords.test(word)) {
-    let kw = keywordTypes[word]
+    let kw = getKeyword(word)
     if (!this.containsEsc || (kw !== tt._in && kw !== tt._instanceof)) type = kw
   }
   return this.finishToken(type, word)
