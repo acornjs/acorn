@@ -806,7 +806,8 @@ pp.readWord = function() {
   let word = this.readWord1()
   let type = tt.name
   if (this.keywords.test(word)) {
-    type = keywordTypes[word]
+    let kw = keywordTypes[word]
+    if (!this.containsEsc || (kw !== tt._in && kw !== tt._instanceof)) type = kw
   }
   return this.finishToken(type, word)
 }

@@ -6396,3 +6396,5 @@ testFail(`class X { static { return; } }`, "'return' outside of function (1:19)"
 
 test("class C { x = () => { arguments: 1 } }", {}, {ecmaVersion: 13})
 test("class C { static { arguments: for (;;) { break arguments } } }", {}, {ecmaVersion: 13})
+
+test("class C { x = 1\n\\u{69}n }", {}, {ecmaVersion: 13})
