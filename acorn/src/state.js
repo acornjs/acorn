@@ -74,6 +74,9 @@ export class Parser {
     this.potentialArrowAt = -1
     this.potentialArrowInForAwait = false
 
+    // Used to distinguish potential statement labels
+    this.statementStart = -1
+
     // Positions to delayed-check that yield/await does not exist in default parameters.
     this.yieldPos = this.awaitPos = this.awaitIdentPos = 0
     // Labels in scope.

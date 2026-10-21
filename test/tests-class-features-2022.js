@@ -6393,3 +6393,6 @@ testFail(`class C {
 }`, 'Private identifier can only be left side of binary expression (5:21)', { ecmaVersion: 13 })
 
 testFail(`class X { static { return; } }`, "'return' outside of function (1:19)", {allowReturnOutsideFunction: true, ecmaVersion: 13});
+
+test("class C { x = () => { arguments: 1 } }", {}, {ecmaVersion: 13})
+test("class C { static { arguments: for (;;) { break arguments } } }", {}, {ecmaVersion: 13})

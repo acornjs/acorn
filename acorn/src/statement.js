@@ -139,6 +139,7 @@ pp.isUsing = function(isFor) {
 
 pp.parseStatement = function(context, topLevel, exports) {
   let starttype = this.type, node = this.startNode(), kind
+  this.statementStart = this.start
 
   if (this.isLet(context)) {
     starttype = tt._var
@@ -241,7 +242,7 @@ pp.parseBreakContinueStatement = function(node, keyword) {
   if (this.eat(tt.semi) || this.insertSemicolon()) node.label = null
   else if (this.type !== tt.name) this.unexpected()
   else {
-    node.label = this.parseIdent()
+    node.label = this.parseIdent(true)
     this.semicolon()
   }
 
