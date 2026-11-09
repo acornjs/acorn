@@ -160,7 +160,7 @@ pp.parseStatement = function(context, topLevel, exports) {
     // works, but not when it is part of a labeled statement that is the sole
     // body of an if statement.
     if ((context && (this.strict || context !== "if" && context !== "label")) && this.options.ecmaVersion >= 6) this.unexpected()
-    return this.parseFunctionStatement(node, false, !context)
+    return this.parseFunctionStatement(node, false, !context, context === "label")
   case tt._class:
     if (context) this.unexpected()
     return this.parseClass(node, true)
@@ -362,9 +362,9 @@ pp.parseForAfterInit = function(node, init, awaitAt) {
   return this.parseFor(node, init)
 }
 
-pp.parseFunctionStatement = function(node, isAsync, declarationPosition) {
+pp.parseFunctionStatement = function(node, isAsync, declarationPosition, inLabel = false) {
   this.next()
-  return this.parseFunction(node, FUNC_STATEMENT | (declarationPosition ? 0 : FUNC_HANGING_STATEMENT), false, isAsync)
+  return this.parseFunction(node, FUNC_STATEMENT | (declarationPosition ? 0 : FUNC_HANGING_STATEMENT) | (inLabel ? FUNC_LABELED_STATEMENT : 0), false, isAsync)
 }
 
 pp.parseIfStatement = function(node) {
@@ -634,7 +634,7 @@ pp.parseVarId = function(decl, kind) {
   this.checkLValPattern(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false)
 }
 
-const FUNC_STATEMENT = 1, FUNC_HANGING_STATEMENT = 2, FUNC_NULLABLE_ID = 4
+const FUNC_STATEMENT = 1, FUNC_HANGING_STATEMENT = 2, FUNC_NULLABLE_ID = 4, FUNC_LABELED_STATEMENT = 8
 
 // Parse a function declaration or literal (depending on the
 // `statement & FUNC_STATEMENT`).
@@ -652,7 +652,12 @@ pp.parseFunction = function(node, statement, allowExpressionBody, isAsync, forIn
 
   if (statement & FUNC_STATEMENT) {
     node.id = (statement & FUNC_NULLABLE_ID) && this.type !== tt.name ? null : this.parseIdent()
-    if (node.id && !(statement & FUNC_HANGING_STATEMENT))
+    // The id of a function declaration that is the sole body of a labeled
+    // statement is registered as well, since Annex B.3.1 gives it a
+    // binding in the current scope, unlike a declaration that is the sole
+    // body of an `if` statement (Annex B.3.4), which is only bound when
+    // the branch executes.
+    if (node.id && (!(statement & FUNC_HANGING_STATEMENT) || (statement & FUNC_LABELED_STATEMENT)))
       // If it is a regular function declaration in sloppy mode, then it is
       // subject to Annex B semantics (BIND_FUNCTION). Otherwise, the binding
       // mode depends on properties of the current scope (see
