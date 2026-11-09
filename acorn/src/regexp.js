@@ -5,6 +5,10 @@ import {hasOwn, codePointToString} from "./util.js"
 
 const pp = Parser.prototype
 
+// Which comparison last marked a disjunction, so that a walk's marks
+// are told apart from the previous walk's without clearing them.
+let branchWalk = 0
+
 // Track disjunction structure to determine whether a duplicate
 // capture group name is allowed because it is in a separate branch.
 class BranchID {
@@ -13,15 +17,24 @@ class BranchID {
     this.parent = parent
     // Identifies this set of sibling branches
     this.base = base || this
+    // Which walk last marked this disjunction, and with which of its branches
+    this.walk = 0
+    this.taken = null
   }
 
   separatedFrom(alt) {
     // A branch is separate from another branch if they or any of
-    // their parents are siblings in a given disjunction
+    // their parents are siblings in a given disjunction. A chain holds
+    // one branch per disjunction, so marking this chain's disjunctions
+    // answers the comparison in a single walk of the other chain
+    // instead of a nested one (#1445).
+    let walk = ++branchWalk
     for (let self = this; self; self = self.parent) {
-      for (let other = alt; other; other = other.parent) {
-        if (self.base === other.base && self !== other) return true
-      }
+      self.base.walk = walk
+      self.base.taken = self
+    }
+    for (let other = alt; other; other = other.parent) {
+      if (other.base.walk === walk && other.base.taken !== other) return true
     }
     return false
   }
@@ -1384,4 +1397,4 @@ pp.regexp_eatFixedHexDigits = function(state, length) {
     state.advance()
   }
   return true
-}
+          }
