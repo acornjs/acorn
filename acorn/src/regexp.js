@@ -1397,4 +1397,4 @@ pp.regexp_eatFixedHexDigits = function(state, length) {
     state.advance()
   }
   return true
-          }
+}
