@@ -1338,7 +1338,6 @@ test("(function({x, ...y}) {})", {
         "end": 23,
         "id": null,
         "generator": false,
-        "expression": false,
         "params": [
           {
             "type": "ObjectPattern",
