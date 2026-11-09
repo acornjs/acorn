@@ -11,23 +11,21 @@ class BranchID {
   constructor(parent, base) {
     // Parent disjunction branch
     this.parent = parent
-    // Identifies this set of sibling branches
-    this.base = base || this
+    // Used by separatedFrom to find the shared ancestor between two
+    // branches in linear time.
+    this.mark = null
   }
 
   separatedFrom(alt) {
     // A branch is separate from another branch if they or any of
     // their parents are siblings in a given disjunction
-    for (let self = this; self; self = self.parent) {
-      for (let other = alt; other; other = other.parent) {
-        if (self.base === other.base && self !== other) return true
-      }
+    for (let mark = this; mark; mark = mark.parent) mark.mark = this
+    for (let scan = alt; scan; scan = scan.parent) if (scan.mark === this) {
+      // `scan` is the nearest shared ancestor. Must both be
+      // descendants of it.
+      return scan !== alt && scan !== this
     }
-    return false
-  }
-
-  sibling() {
-    return new BranchID(this.parent, this.base)
+    return alt !== this
   }
 }
 
@@ -228,10 +226,10 @@ pp.regexp_pattern = function(state) {
 // https://www.ecma-international.org/ecma-262/8.0/#prod-Disjunction
 pp.regexp_disjunction = function(state) {
   let trackDisjunction = this.options.ecmaVersion >= 16
-  if (trackDisjunction) state.branchID = new BranchID(state.branchID, null)
+  if (trackDisjunction) state.branchID = new BranchID(state.branchID)
   this.regexp_alternative(state)
   while (state.eat(0x7C /* | */)) {
-    if (trackDisjunction) state.branchID = state.branchID.sibling()
+    if (trackDisjunction) state.branchID = new BranchID(state.branchID.parent)
     this.regexp_alternative(state)
   }
   if (trackDisjunction) state.branchID = state.branchID.parent
